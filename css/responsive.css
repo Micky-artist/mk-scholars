@@ -1,0 +1,182 @@
+/* Responsive CSS Document */
+
+/* 
+    Created on   : 29/08/2017.
+    Theme Name   : Scholars.
+    Description  : Scholars - Education, University & LMS HTML Template
+    Version      : 1.0.
+    Author       : @TheMazine.
+    Developed by : Jubayer al hasan. (jubayer.hasan1991@gmail.com)
+   
+*/
+
+@media (min-width: 992px) {
+    .container {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+}
+@media (max-width: 1199px) {
+   .shop-details .single-product-details .product-order-details {width: 100%;padding: 40px 0 0 0;}
+   .teachers-profile .teachers-bio {padding-right: 0;}
+   .teachers-profile .owl-theme .owl-nav {right: 15px;top:-52px;}
+   .teachers-profile .enroll-banner {margin-top: 0;}
+   #theme-main-banner.banner-two .camera_caption .container h1 br {display: none;}
+}
+/*(max-width: 1199px)*/
+
+@media (min-width: 992px) and (max-width: 1199px) {
+    .shop-details .review-tab .nav-tabs > li > a {padding: 0 25px;}
+    #mega-menu-wrapper .nav>li>a {padding-left: 15px;padding-right: 15px;}
+    .our-blog .single-post .text ul li:last-child {margin-right: 6px;}
+    .our-blog .single-post .text ul li:first-child {margin-right: 10px;}
+    .instructor-banner .main-content {padding-left: 90px;}
+    .course-details .details-sidebar .course-feedback .feedback-container>ul>li:nth-child(1) {width: 18%;}
+    .course-details .details-sidebar .course-feedback .feedback-container>ul>li:nth-child(2) ul li:nth-child(1) {width: 58%;}
+    .course-details .details-sidebar .course-feedback .feedback-container>ul>li:nth-child(2) {width: 82%;}
+    .course-details .details-sidebar .course-feedback .feedback-container>ul>li:nth-child(1) ul li {font-size: 18px;}
+    .theme-details-page .theme-large-sidebar .image-text p {margin-top: 45px;}
+    .faq-page .faq_panel .panel-group .panel-heading + .panel-collapse > .panel-body {padding-right: 60px;}
+    .contact-address div .opacity  h2 {margin-bottom: 45px;}
+    .contact-address div .opacity {padding-bottom: 32px;}
+    #video-banner {height: 700px;}
+}
+
+/*(min-width: 992px) and (max-width: 1199px)*/
+
+@media (max-width: 991px) {
+    .shop-product {margin-bottom: 80px;}
+    .course-sidebar {margin-top: 60px;}
+    .theme-sidebar {margin-bottom: 100px;}
+    #mega-menu-wrapper {width: 100%;}
+    .short-feature h5 br {display: none;}
+    .short-feature h5 {padding-left: 50px;}
+    .short-feature h5 i {font-size: 40px;top:0;}
+    footer [class*="col-"] {margin-bottom: 60px;}
+    footer {padding-bottom: 80px;}
+    .theme-details-page .theme-large-sidebar .mark-text {margin-right: 0;}
+    .theme-details-page .theme-large-sidebar .image-text p:after {right: 0;}
+    .teachers-profile .teachers-bio {margin-bottom: 60px;}
+    .about-us-text .about-top-text {padding-left: 15px; padding-top: 50px;}
+    .faq-page .faq_panel .panel-group .panel-heading + .panel-collapse > .panel-body {padding-right: 0;}
+    .faq-page .theme-title p {margin-bottom: 0;}
+    #theme-main-banner .camera_caption .container h1 br {display: none;}
+    #video-banner .banner-wrapper .container  h6 {margin-top: 100px;}
+    .theme-menu-wrapper.fixed .logo,
+    .theme-menu-wrapper.fixed .cart-button,
+    .theme-menu-wrapper.fixed .search-option {display: none;}
+    .theme-menu-wrapper.fixed {padding-top: 0;}
+} 
+/*(max-width: 991px)*/
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .shop-details .review-tab .nav-tabs > li > a {padding: 0 40px;}
+    .instructor-banner .main-content {padding-left: 30px;}
+    .instructor-banner .main-content .wrapper {padding-right: 0;}
+    footer [class*="col-"] {min-height: 240px;}
+    .course-details .details-sidebar .course-feedback .feedback-container>ul>li:nth-child(1) ul li {font-size: 16px;}
+    .course-details .details-sidebar .course-feedback .feedback-container>ul>li:nth-child(2) ul li:nth-child(1) {width: 58%;}
+    .theme-details-page .theme-large-sidebar .image-text p {margin-top: 40px;}
+    .faq-page .faq_panel .panel-group .panel-heading a {font-size: 15px;}
+    #theme-main-banner .camera_caption .container h1,#video-banner .banner-wrapper .container  h1 {font-size: 45px;line-height: 56px;}
+    #video-banner {height: 650px;}
+}
+
+/*(min-width: 768px) and (max-width: 991px)*/
+@media (max-width: 767px) {
+    .shop-details .review-tab .nav-tabs > li > a {padding: 0;margin: 0;font-size: 18px;}
+    .shop-details .review-tab .nav-tabs > li {width: 33.333333%;text-align: center;padding: 0 1px;}
+    .short-feature h5 i {top:-11px;}
+    .testomonial .slider-wrapper,.instructor-banner .main-content {width: 100%;}
+    .instructor-banner .main-content {padding: 80px 15px;}
+    .instructor-banner .main-content .wrapper {padding-right: 0;}
+    .theme-menu-wrapper .search-option form.dropdown-menu {right: -25px;top:125%;}
+    .feature-course-2-column .featured-course .single-course-grid .text {padding-left: 15px;padding-right: 15px;}
+    .course-details .details-sidebar .image-box .opacity a {font-size: 20px;width: 60px;height: 60px;line-height: 56px;}
+    .course-details .details-sidebar .curriculum-of-course .panel-group .panel .panel-body ul li {padding: 0 10px;}
+    .course-details .details-sidebar .course-feedback .feedback-container>ul>li:nth-child(1) {width: 100%;padding-bottom: 30px;}
+    .course-details .details-sidebar .course-feedback .feedback-container>ul>li:nth-child(2) {width: 100%;padding: 0;}
+    .course-details .details-sidebar .course-feedback .feedback-container>ul>li:nth-child(2) ul li:nth-child(1) {width: 100%;margin-bottom: 15px;}
+    .course-details .details-sidebar .course-feedback .feedback-container>ul>li:nth-child(2) ul li {width: 33.33333%;text-align: center;}
+    .theme-details-page .theme-large-sidebar .image-text p {margin-top: 50px;margin-bottom: 40px;}
+    #theme-main-banner .camera_caption .container h1,
+    #video-banner .banner-wrapper .container  h1 {font-size: 35px;line-height: 45px;margin: 10px 0 0 0;}
+    #theme-main-banner .camera_caption .container a,#video-banner .banner-wrapper  .container a {margin-top: 20px;}
+    #theme-main-banner .camera_caption .container h6 {margin-top: 20px;}
+    #theme-main-banner.banner-two .camera_caption .container h1 {margin-top: 20px;}
+    #video-banner {height: 600px;}
+}
+/*(max-width: 767px)*/
+
+@media (max-width: 650px) {
+    #success, #error {
+        width: 86%;
+        height: auto;
+        top: calc(50% - 50px);
+        left: 7%;
+        padding: 30px 10px;
+    }
+    .shop-product .single-product .info h6 a {font-size: 16px;}
+    .shop-details .review-tab .nav-tabs > li {width: 100%;padding: 2px 0;}
+}
+
+@media (max-width: 600px) {
+  .feature-course-2-column .featured-course .col-xs-6,.event-grid .col-xs-6,.our-portfolio .col-xs-6 {width: 100%;}
+  .theme-inner-banner .opacity {padding: 200px 0 120px 0;}
+  .course-details .details-sidebar .curriculum-of-course .panel-group .panel .panel-body ul li span {
+    display: block;
+    float: none;
+    margin:0 !important;
+  }
+  .theme-large-sidebar .single-grid-content p {padding-right: 0;}
+  .blog-details .theme-large-sidebar .comment-section .single-comment.reply-comment {margin-left: 50px;}
+}
+
+@media (max-width: 550px) {
+    .course-details .details-sidebar .curriculum-of-course .curriculum-panel .panel-heading a span {float: none;display: block;margin: 5px 0;}
+    .shop-page .shop-product .col-xs-6 {width: 100%;}
+}
+@media (max-width: 520px) {
+    
+}
+@media (max-width: 500px) {
+    .course-selection .col-xs-6,.theme-login-page .form-wrapper {width: 100%;}
+    .theme-login-page .form-wrapper {padding: 0 15px;}
+    .blog-details .share-option ul {float: none;}
+}
+
+@media (max-width: 480px) {
+    .shop-page .top-select-section {margin-bottom: 40px;}
+    .shop-page .top-select-section>li {float: none;margin-bottom: 30px;}
+   .pricing-plan .col-xs-6,.course-details .details-sidebar .course-short-info li,.our-teacher .col-xs-6 {width: 100%;}
+   .course-details .details-sidebar .curriculum-of-course>.clearfix li {display: block;margin: 10px 0;}
+   .course-details .details-sidebar .curriculum-of-course h5,.course-details .details-sidebar .curriculum-of-course ul {float: none;}
+   #review .single-review .text div,#review .single-review .text ul {float: none;}
+   #review .single-review .text ul li {margin: 0 2px 10px 2px;}
+   #review .single-review {padding-left: 10px;padding-right: 10px;}
+   .blog-details .theme-large-sidebar .comment-section .single-comment button {position: static;margin-top: 15px;}
+   .blog-details .theme-large-sidebar .comment-section .single-comment.reply-comment {margin-left: 0;}
+}
+
+@media (max-width: 450px) {
+   .find-course .col-xs-6,.shop-details .single-product-details img,.seo-theme .error-page form {width: 100%;}
+   .course-details .details-sidebar .curriculum-of-course .curriculum-panel .panel-heading a {padding-left: 40px;}
+   .course-details .details-sidebar .curriculum-of-course .curriculum-panel .panel-heading a:before {left: 10px;}
+   .faq-page .faq_panel .panel-group .panel-heading a {font-size: 18px;}
+}
+
+@media (max-width: 400px) {
+    .shop-details .single-product-details .product-order-details .clearfix ul {width: 100%;}
+  .shop-details .single-product-details .product-order-details .clearfix a {float: left;margin-top: 20px;}
+   .featured-course .single-course-grid .text {padding-left: 10px;padding-right: 10px;}
+   .our-blog .single-post .text ul li {margin: 5px 10px;}
+   .our-blog .single-post .text ul li.float-right {float: left;margin: 5px 10px;}
+   .error-page form {width: 100%;}
+   .theme-login-page form ul li {float: none;}
+   .theme-login-page form ul li label {margin-bottom: 40px;}
+   .blog-details .author-text img {float: none;margin: 0 auto;}
+   .blog-details .author-text .text {width: 100%;float: none;padding: 30px 0 0 0;text-align: center;}
+   .contact-address div .opacity {padding-left: 20px;}
+   .contact-address div .opacity ul li {padding-left: 55px;}
+   .contact-address div .opacity ul li br {display: none;}
+}
