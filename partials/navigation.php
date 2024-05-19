@@ -1,0 +1,43 @@
+<header class="theme-menu-wrapper">
+				<div class="header-wrapper">
+					<div class="container">
+						<!-- Logo -->
+						<div class="logo float-left"><a href="index.php">
+							<!-- <img src="images/logo/logo.png" alt="Logo"> -->
+							<h3>MK Scholars</h3>
+						</a></div>
+
+						<!-- ============================ Theme Menu ========================= -->
+						<nav class="theme-main-menu float-right navbar" id="mega-menu-wrapper">
+							<!-- Brand and toggle get grouped for better mobile display -->
+						   <div class="navbar-header">
+						     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
+						       <span class="sr-only">Toggle navigation</span>
+						       <span class="icon-bar"></span>
+						       <span class="icon-bar"></span>
+						       <span class="icon-bar"></span>
+						     </button>
+						   </div>
+						   <!-- Collect the nav links, forms, and other content for toggling -->
+						   <div class="collapse navbar-collapse" id="navbar-collapse-1">
+								<ul class="nav">
+									<li><a href="index.php" class="tran3s">Home</a>
+									</li>
+									<li><a href="scholarships.php" class="tran3s">Apply Now</a>
+									</li>
+									<li><a href="contact-us.php" class="tran3s">Contact</a></li>
+
+									<li class="dropdown-holder"><a href="#" class="tran3s">More</a>
+										<ul class="sub-menu">
+											<li><a href="about-us.php">About Us</a></li>
+											<li><a href="faq.php">FAQ</a></li>
+											<li><a href="login.php">Login</a></li>
+											<li><a href="sign-up.php">sign up</a></li>
+										</ul>
+									</li>
+								</ul>
+						   </div><!-- /.navbar-collapse -->
+						</nav> <!-- /.theme-main-menu -->
+					</div> <!-- /.container -->
+				</div>
+			</header> <!-- /.theme-menu-wrapper -->
