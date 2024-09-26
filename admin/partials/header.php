@@ -18,12 +18,13 @@
             </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <span class="d-none d-md-block">Create New <i class="fa fa-angle-down"></i></span>
+                <span class="d-none d-md-block">Upload New <i class="fa fa-angle-down"></i></span>
                 <span class="d-block d-md-none"><i class="fa fa-plus"></i></span>
               </a>
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="./upload-service">Post Sevice</a></li>
-                <li><a class="dropdown-item" href="./upload-post">Post Project</a></li>
+                <li><a class="dropdown-item" href="./upload-scholarship">Upload Scholarship</a></li>
+                <li><a class="dropdown-item" href="./upload-country">Upload Country</a></li>
+                <!-- <li><a class="dropdown-item" href="./upload-post">Post Project</a></li> -->
               </ul>
             </li>
           </ul>

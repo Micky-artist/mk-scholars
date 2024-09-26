@@ -2,7 +2,7 @@
 				<div class="header-wrapper">
 					<div class="container">
 						<!-- Logo -->
-						<div class="logo float-left"><a href="index.php">
+						<div class="logo float-left"><a href="index">
 							<!-- <img src="images/logo/logo.png" alt="Logo"> -->
 							<h3>MK Scholars</h3>
 						</a></div>
@@ -21,20 +21,20 @@
 						   <!-- Collect the nav links, forms, and other content for toggling -->
 						   <div class="collapse navbar-collapse" id="navbar-collapse-1">
 								<ul class="nav">
-									<li><a href="index.php" class="tran3s">Home</a>
+									<li><a href="index" class="tran3s">Home</a>
 									</li>
-									<li><a href="scholarships.php" class="tran3s">Apply Now</a>
+									<li><a href="scholarships" class="tran3s">Apply Now</a>
 									</li>
-									<li><a href="contact-us.php" class="tran3s">Contact</a></li>
+									<li><a href="contact-us" class="tran3s">Contact</a></li>
 
-									<li class="dropdown-holder"><a href="#" class="tran3s">More</a>
+									<!-- <li class="dropdown-holder"><a href="#" class="tran3s">More</a>
 										<ul class="sub-menu">
-											<li><a href="about-us.php">About Us</a></li>
-											<li><a href="faq.php">FAQ</a></li>
-											<li><a href="login.php">Login</a></li>
-											<li><a href="sign-up.php">sign up</a></li>
+											<li><a href="about-us">About Us</a></li>
+											<li><a href="faq">FAQ</a></li>
+											<li><a href="login">Login</a></li>
+											<li><a href="sign-up">sign up</a></li>
 										</ul>
-									</li>
+									</li> -->
 								</ul>
 						   </div><!-- /.navbar-collapse -->
 						</nav> <!-- /.theme-main-menu -->

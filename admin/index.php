@@ -67,14 +67,14 @@ include("./partials/navbar.php");
         <!-- ============================================================== -->
         <div class="row">
           <div class="col-md-6">
-            <div class="card">
+            <!-- <div class="card">
               <div class="card-body">
                 <h4 class="card-title mb-0">Pending Services</h4>
               </div>
               <div class="comment-widgets scrollable">
               <?php include("./php/selectPendingServices.php"); ?>
               </div>
-            </div>
+            </div> -->
             <!-- accoridan part -->
            
             <!-- toggle part -->
@@ -83,14 +83,14 @@ include("./partials/navbar.php");
            
           </div>
           <div class="col-md-6">
-            <div class="card">
+            <!-- <div class="card">
               <div class="card-body">
                 <h4 class="card-title mb-0">Pending Projects</h4>
               </div>
               <div class="comment-widgets scrollable">
               <?php include("./php/selectPendingPosts.php"); ?>
               </div>
-            </div>
+            </div> -->
             <!-- accoridan part -->
            
             <!-- toggle part -->

@@ -2,7 +2,7 @@
 session_start();
 include("./dbconnections/connection.php");
 include("./php/validateAdminSession.php");
-include("./php/uploadPost.php");
+include("./php/uploadCountry.php");
 
 ?>
 
@@ -19,7 +19,7 @@ include("./php/uploadPost.php");
     <meta name="description"
         content="Matrix Admin Lite Free Version is powerful and clean admin dashboard template, inpired from Bootstrap Framework" />
     <meta name="robots" content="noindex,nofollow" />
-    <title>Icyeza Admin Panel</title>
+    <title>Mk Scholars Admin Panel</title>
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="./assets/images/favicon.png" />
     <!-- Custom CSS -->
@@ -74,13 +74,13 @@ include("./php/uploadPost.php");
             <div class="page-breadcrumb">
                 <div class="row">
                     <div class="col-12 d-flex no-block align-items-center">
-                        <h4 class="page-title">Upload Project</h4>
+                        <h4 class="page-title">Upload Country</h4>
                         <div class="ms-auto text-end">
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="index">Home</a></li>
                                     <li class="breadcrumb-item active" aria-current="page">
-                                        Upload Post
+                                        Upload Country
                                     </li>
                                 </ol>
                             </nav>
@@ -105,68 +105,26 @@ include("./php/uploadPost.php");
                                 <!-- <div class="card"> -->
                                 <form class="form-horizontal" enctype="multipart/form-data" method="post">
                                     <div class="card-body">
-                                        <h4 class="card-title">Upload Project</h4>
+                                        <h4 class="card-title">Upload Country</h4>
                                         <div class="form-group row">
-                                            <label for="cono1" class="card-title">Post Title</label>
+                                            <label for="cono1" class="card-title">Country Name</label>
                                             <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="postTitle" id="title"
-                                                    placeholder="Post Title" />
+                                                <input type="text" class="form-control" name="countryName" placeholder="Country Name" />
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label for="cono1" class="card-title">Project Approval</label>
+                                            <label for="cono1" class="card-title">Country Status</label>
                                             <div class="col-sm-9">
-                                                <select type="text" name="projStatus" class="form-control" id="lname">
-                                                <option value="0" selected>Not Approved</option>
-                                                <option value="1">Approved</option>
+                                                <select type="text" name="countryStatus" class="form-control">
+                                                <option value="0" selected>Hidden</option>
+                                                <option value="1" >Visible</option>
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="form-group row">
-                                            <label for="cono1" class="card-title">Project Category</label>
-                                            <div class="col-sm-9">
-                                                <select type="text" name="projectCat" class="form-control" id="lname">
-                                                <option value="0" selected>Pending</option>
-                                                <option value="1">Completed</option>
-                                                <option value="2">Upcoming</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label for="cono1" class="card-title">Project Sevice</label>
-                                        <div class="col-sm-9">
-                                            <select type="text" name="projectService" class="form-control" id="lname">
-                                                <option value="0" selected disabled>Select Service</option>
-                                                <?php include("./php/selectFormService.php");?><?php  ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label for="cono1" class="card-title">File Upload</label>
-                                            <div class="col-md-9">
-                                                <div class="custom-file">
-                                                    <input type="file" name="projectImg"  accept="image/*" class="custom-file-input"
-                                                        id="validatedCustomFile" required />
-                                                    <label class="custom-file-label" for="validatedCustomFile">Choose
-                                                        Image 1...</label>
-                                                    <div class="invalid-feedback">
-                                                        Example invalid custom file feedback
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <label class="card-title">Display description</label>
-                                    <textarea type="text" id="post" name="shortDescription" class="form-control" rows="5" required></textarea>
-
-                                    <!-- </div> -->
-                                    <label class="card-title">Project description</label>
-                                    <textarea type="text" id="post" name="projectDescription" class="text-jqte" rows="20" required></textarea>
-
                             </div>
                             <div class="border-top">
                                 <div class="card-body">
-                                    <button name="uploadPost" class="btn btn-primary">
+                                    <button name="uploadCountry" class="btn btn-primary">
                                         Save
                                     </button>
                                 </div>

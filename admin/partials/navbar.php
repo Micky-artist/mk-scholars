@@ -8,11 +8,13 @@
               <a class="sidebar-link waves-effect waves-dark sidebar-link" href="index" aria-expanded="false"><i class="mdi mdi-view-dashboard"></i><span class="hide-menu">Dashboard</span></a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="projects" aria-expanded="false"><i class="mdi mdi-file-check"></i><span class="hide-menu">Projects</span></a>
+              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="countries" aria-expanded="false"><i class="mdi mdi-briefcase"></i><span class="hide-menu">Countries</span></a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="services" aria-expanded="false"><i class="mdi mdi-briefcase"></i><span class="hide-menu">Services</span></a>
+              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="scholarships" aria-expanded="false"><i class="mdi mdi-file-check"></i><span class="hide-menu">Scholarships</span></a>
             </li>
+             
+            <!--
             <li class="sidebar-item">
               <a class="sidebar-link waves-effect waves-dark sidebar-link" href="upload-post" aria-expanded="false"><i class="mdi mdi-file-export"></i><span class="hide-menu">Upload Project</span></a>
             </li>
@@ -21,7 +23,7 @@
             </li>
             <li class="sidebar-item">
                   <a href="register" class="sidebar-link"><i class="mdi mdi-account-plus"></i><span class="hide-menu"> Register a user </span></a>
-                </li>
+                </li> -->
           </ul>
         </nav>
         <!-- End Sidebar navigation -->
