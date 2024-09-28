@@ -158,8 +158,12 @@ include("./php/uploadScholarship.php");
                             <label class="card-title">Scholarship Link</label>
                             <textarea type="text" id="post" name="ScholarshipLink" class="form-control" rows="2" required></textarea>
                             <br>
-                            <label class="card-title">Project description</label>
-                            <textarea type="text" id="post" name="ScholarshipDescription" class="text-jqte" rows="20" required></textarea>
+                            <label class="card-title">Scholarship Youtube Link</label>
+                            <textarea type="text" id="post" name="scholarshipYoutubeLink" class="form-control" rows="2" required></textarea>
+                            <br>
+                            <label class="card-title">Scholarship description</label>
+                            <textarea type="text" id="post" name="ScholarshipDescription" class="form-control" rows="20" required></textarea>
+                            <!-- <textarea type="text" id="post" name="ScholarshipDescription" class="text-jqte" rows="20" required></textarea> -->
 
                         </div>
                         <div class="border-top">

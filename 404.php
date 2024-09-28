@@ -1,54 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 	
-<!-- Mirrored from themazine.com/html/scholars-lms/404.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 10 May 2024 11:38:10 GMT -->
-<head>
-		<meta charset="UTF-8">
-		<!-- For IE -->
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<?php include("./partials/head.php") ?>
 
-		<!-- For Resposive Device -->
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-		<title>Scholars - Education, University &amp; LMS HTML Template</title>
-
-		<!-- Favicon -->
-		<link rel="icon" type="image/png" sizes="56x56" href="images/fav-icon/icon.png">
-
-
-		<!-- Main style sheet -->
-		<link rel="stylesheet" type="text/css" href="css/style.css">
-		<!-- responsive style sheet -->
-		<link rel="stylesheet" type="text/css" href="css/responsive.css">
-
-
-		<!-- Fix Internet Explorer ______________________________________-->
-
-		<!--[if lt IE 9]>
-			<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-			<script src="vendor/html5shiv.js"></script>
-			<script src="vendor/respond.js"></script>
-		<![endif]-->
-			
-	</head>
 
 	<body>
 		<div class="main-page-wrapper">
 
-			<!-- ===================================================
-				Loading Transition
-			==================================================== -->
-			<div id="loader-wrapper">
-				<div id="loader"></div>
-			</div>
-
-
-
-			<!-- 
-			=============================================
-				Theme Header
-			============================================== 
-			-->
+			
 			<header class="theme-menu-wrapper">
 				<div class="header-wrapper">
 					<div class="container">
@@ -225,5 +184,4 @@
 		</div> <!-- /.main-page-wrapper -->
 	</body>
 
-<!-- Mirrored from themazine.com/html/scholars-lms/404.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 10 May 2024 11:38:12 GMT -->
 </html>

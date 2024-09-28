@@ -2,9 +2,11 @@
 				<div class="header-wrapper">
 					<div class="container">
 						<!-- Logo -->
-						<div class="logo float-left"><a href="index">
-							<!-- <img src="images/logo/logo.png" alt="Logo"> -->
-							<h3>MK Scholars</h3>
+						<div class="logo float-left">
+							
+						<a href="index">
+							<img src="images/logo/logoRound.png" width="100" height="100"  alt="Logo">
+							<!-- <h3>MK Scholars</h3> -->
 						</a></div>
 
 						<!-- ============================ Theme Menu ========================= -->
@@ -23,7 +25,7 @@
 								<ul class="nav">
 									<li><a href="index" class="tran3s">Home</a>
 									</li>
-									<li><a href="scholarships" class="tran3s">Apply Now</a>
+									<!-- <li><a href="scholarships" class="tran3s">Apply Now</a> -->
 									</li>
 									<li><a href="contact-us" class="tran3s">Contact</a></li>
 

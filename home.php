@@ -5,55 +5,11 @@ include("./dbconnection/connection.php");
 <!DOCTYPE html>
 <html lang="en">
 
-<!-- Mirrored from themazine.com/html/scholars-lms/index-2.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 10 May 2024 11:34:18 GMT -->
 
-<head>
-	<meta charset="UTF-8">
-	<!-- For IE -->
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-
-	<!-- For Resposive Device -->
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-	<title>MK Scholars</title>
-
-	<!-- Favicon -->
-	<link rel="icon" type="image/png" sizes="56x56" href="">
-
-
-	<!-- Main style sheet -->
-	<link rel="stylesheet" type="text/css" href="css/style.css">
-	<!-- responsive style sheet -->
-	<link rel="stylesheet" type="text/css" href="css/responsive.css">
-
-
-	<!-- Fix Internet Explorer ______________________________________-->
-
-	<!--[if lt IE 9]>
-			<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-			<script src="vendor/html5shiv.js"></script>
-			<script src="vendor/respond.js"></script>
-		<![endif]-->
-
-</head>
+<?php include("./partials/head.php") ?>
 
 <body>
 	<div class="main-page-wrapper">
-
-		<!-- ===================================================
-				Loading Transition
-			==================================================== -->
-		<div id="loader-wrapper">
-			<div id="loader"></div>
-		</div>
-
-
-
-		<!-- 
-			=============================================
-				Theme Header
-			============================================== 
-			-->
 		<?php
 		include("./partials/navigation.php");
 		?>
@@ -65,30 +21,30 @@ include("./dbconnection/connection.php");
 			-->
 
 		<div id="theme-main-banner" class="banner-two">
-			<div data-src="images/home/slide-2.jpg">
+			<div data-src="images/home/s7.jpg">
 				<div class="camera_caption">
 					<div class="container text-center">
-						<h1 class="wow fadeInUp animated">LEARN SOMETHING NEW FROM THE BEST <br>TEACHERS AROUND THE WORLD</h1>
-						<a href="course-3-column.html" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR COURSE</a>
-						<a href="course-3-column.html" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
+						<h1 class="wow fadeInUp animated">Welcome to our global scholarship platform, where opportunities for education are just a click away. </h1>
+						<a href="#" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR COURSE</a>
+						<a href="#" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
 					</div> <!-- /.container -->
 				</div> <!-- /.camera_caption -->
 			</div>
-			<div data-src="images/home/slide-5.jpg">
+			<div data-src="images/home/s5.avif">
 				<div class="camera_caption">
 					<div class="container text-center">
-						<h1 class="wow fadeInUp animated">LEARN SOMETHING NEW FROM THE BEST <br>TEACHERS AROUND THE WORLD</h1>
-						<a href="course-3-column.html" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR COURSE</a>
-						<a href="course-3-column.html" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
+						<h1 class="wow fadeInUp animated">We connect you with scholarships from around the world to help you achieve your academic dreams.</h1>
+						<a href="#" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR COURSE</a>
+						<a href="#" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
 					</div> <!-- /.container -->
 				</div> <!-- /.camera_caption -->
 			</div>
-			<div data-src="images/home/slide-6.jpg">
+			<div data-src="images/home/s4.jpg">
 				<div class="camera_caption">
 					<div class="container text-center">
-						<h1 class="wow fadeInUp animated">LEARN SOMETHING NEW FROM THE BEST <br>TEACHERS AROUND THE WORLD</h1>
-						<a href="course-3-column.html" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR COURSE</a>
-						<a href="course-3-column.html" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
+						<h1 class="wow fadeInUp animated">Start your journey today and unlock <br> a world of possibilities!</h1>
+						<a href="#" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR COURSE</a>
+						<a href="#" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
 					</div> <!-- /.container -->
 				</div> <!-- /.camera_caption -->
 			</div>
@@ -147,7 +103,7 @@ include("./dbconnection/connection.php");
 								</div> <!-- /.single-input -->
 							</div> <!-- /.col -->
 						</div> <!-- /.row -->
-						<button class="p-bg-color hvr-rectangle-out">Search Course</button>
+						<button style="background-color: #fff; color: #4183E6; font-weight: bold;" class="p-bg-color hvr-rectangle-out">Search Course</button>
 					</form>
 				</div> <!-- /.container -->
 			</div> <!-- /.opacity -->
@@ -172,7 +128,7 @@ include("./dbconnection/connection.php");
 							<img src="images/home/4.jpg" alt="">
 							<div class="opacity">
 								<div>
-									<h5><a href="#">Become a Front-End Web Developer</a></h5>
+									<h5><a href="#">Become a Software Engineer</a></h5>
 									<p>Course Duration 60 hours</p>
 								</div>
 							</div> <!-- /.opacity -->
@@ -183,8 +139,8 @@ include("./dbconnection/connection.php");
 							<img src="images/home/5.jpg" alt="">
 							<div class="opacity">
 								<div>
-									<h5><a href="#">Become a UI/UX Designer</a></h5>
-									<p>Course Duration 60 hours</p>
+									<h5><a href="#">Study Law</a></h5>
+									<p>Request Help Now</p>
 								</div>
 							</div> <!-- /.opacity -->
 						</div> <!-- /.image -->
@@ -194,8 +150,8 @@ include("./dbconnection/connection.php");
 							<img src="images/home/6.jpg" alt="">
 							<div class="opacity">
 								<div>
-									<h5><a href="#">Become a Python Developer</a></h5>
-									<p>Course Duration 60 hours</p>
+									<h5><a href="#">Study Mechanical Engineering / Mechatronics</a></h5>
+									<p>Request Help Now</p>
 								</div>
 							</div> <!-- /.opacity -->
 						</div> <!-- /.image -->
@@ -206,7 +162,7 @@ include("./dbconnection/connection.php");
 							<div class="opacity">
 								<div>
 									<h5><a href="#">Become a SEO Specialist</a></h5>
-									<p>Course Duration 60 hours</p>
+									<p>Request Help Now</p>
 								</div>
 							</div> <!-- /.opacity -->
 						</div> <!-- /.image -->
@@ -216,8 +172,8 @@ include("./dbconnection/connection.php");
 							<img src="images/home/8.jpg" alt="">
 							<div class="opacity">
 								<div>
-									<h5><a href="#">Become a Java Engineer</a></h5>
-									<p>Course Duration 60 hours</p>
+									<h5><a href="#">Become an Entrepreneur Leader</a></h5>
+									<p>Request Help Now</p>
 								</div>
 							</div> <!-- /.opacity -->
 						</div> <!-- /.image -->
@@ -227,7 +183,7 @@ include("./dbconnection/connection.php");
 							<img src="images/home/9.jpg" alt="">
 							<div class="opacity">
 								<div>
-									<h5><a href="#">Become an Affiliate Marketer</a></h5>
+									<h5><a href="#">Study Business Analytics & Intelligence.</a></h5>
 									<p>Course Duration 60 hours</p>
 								</div>
 							</div> <!-- /.opacity -->
@@ -245,7 +201,7 @@ include("./dbconnection/connection.php");
 				Featured Course
 			============================================== 
 			-->
-		<div class="featured-course">
+		<div class="featured-course" id="scholarships">
 			<div class="container">
 				<div class="theme-title">
 					<h2>Our Featured Scholarships</h2>
@@ -254,32 +210,31 @@ include("./dbconnection/connection.php");
 
 				<div class="row">
 					<?php
-					$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships ORDER BY scholarshipUpdateDate DESC");
+					$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 ORDER BY scholarshipUpdateDate DESC");
 					if ($selectScholarships->num_rows > 0) {
 						while ($getScholarships = mysqli_fetch_assoc($selectScholarships)) {
 					?>
 							<div class="col-md-4 col-sm-6 col-xs-12">
 								<div class="single-course-grid">
-									<div class="image"><img src="images/course/1.jpg" alt=""></div>
+									<div class="image"><img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipTitle'] ?>" alt=""></div>
 									<div class="text">
-										<h6><a href="scholarship-details" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a></h6>
-										<p><?php echo $getScholarships['scholarshipDetails'] ?></p>
+										<h6><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo $getScholarships['scholarshipTitle'] ?>" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a></h6>
+										<p class="postLineLimit"><?php echo $getScholarships['scholarshipDetails'] ?></p>
+										<style>
+											.postLineLimit {
+												overflow: hidden;
+												text-overflow: ellipsis;
+												display: -webkit-box;
+												-webkit-line-clamp: 4;
+												/* number of lines to show */
+												line-clamp: 4;
+												-webkit-box-orient: vertical;
+											}
+										</style>
 										<ul class="clearfix">
 											<li class="float-left"><i class="fa fa-calendar" aria-hidden="true"></i> <?php echo $getScholarships['scholarshipUpdateDate'] ?></li>
-											<?php
-											if ($getScholarships['scholarshipStatus'] == 1) {
-											?>
-												<li class="float-right"><a href="#" class="tran3s free hvr-float-shadow">Free</a></li>
 
-											<?php
-
-											} else {
-											?>
-												<li class="float-right"><a href="#" class="tran3s hvr-float-shadow"><?php echo $getScholarships['amount'] ?></a></li>
-
-											<?php
-											}
-											?>
+											<li class="float-right"><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo $getScholarships['scholarshipTitle'] ?>" class="tran3s free hvr-float-shadow">More</a></li>
 										</ul>
 									</div> <!-- /.text -->
 								</div> <!-- /.single-course-grid -->
@@ -290,7 +245,7 @@ include("./dbconnection/connection.php");
 
 					?>
 				</div> <!-- /.row -->
-				<a href="course-3-column.html" class="theme-button hvr-rectangle-out">ALL COURSES</a>
+				<a href="#" class="theme-button hvr-rectangle-out">ALL COURSES</a>
 			</div> <!-- /.container -->
 		</div> <!-- /.featured-course -->
 
@@ -309,7 +264,7 @@ include("./dbconnection/connection.php");
 				<div class="container">
 					<h2>Ready to take your Skills to the next Level?</h2>
 					<p>Start learning the skills that you need, start your free trial today</p>
-					<a href="sign-up.html" class="tran3s hvr-float-shadow">Sign Up</a>
+					<a href="#" class="tran3s hvr-float-shadow">Sign Up</a>
 				</div> <!-- /.container -->
 			</div> <!-- /.opacity -->
 		</div> <!-- /.signUp-banner -->
@@ -322,7 +277,7 @@ include("./dbconnection/connection.php");
 				Pricing Plan
 			============================================== 
 			-->
-		
+
 
 
 
@@ -336,31 +291,31 @@ include("./dbconnection/connection.php");
 				<div class="theme-title">
 					<h2>Testomonial</h2>
 					<p>What our valuable clients have to say about our courses, tutorials and online classes</p>
-				</div> <!-- /.theme-title -->
+				</div>
 				<div class="slider-wrapper">
 					<div class="row">
 						<div class="testimonial-slider">
 							<div class="item">
 								<div class="item-wrapper">
-									<img src="images/home/c1.jpg" alt="">
-									<h6>Riyad Lawrence</h6>
-									<span>CEO</span>
-									<p>MK Scholars website is a great way of learning new things, I love their courses.</p>
+									<!-- <img src="images/home/c1.jpg" alt=""> -->
+									<h6>Salomon Uwimana</h6>
+									<span>M&S Innovation Lab Ltd CTO</span>
+									<p>I'm thankfull for MK Scholars because it helped me secure a full paid Scholarship at African Leadership University.</p>
 								</div>
-							</div> <!-- /.item -->
+							</div>
 							<div class="item">
 								<div class="item-wrapper">
-									<img src="images/home/c2.jpg" alt="">
-									<h6>Milon Sayfur</h6>
-									<span>CEO</span>
-									<p>MK Scholars website is a great way of learning new things, I love their courses.</p>
+									<!-- <img src="images/home/c2.jpg" alt=""> -->
+									<h6>Umwari Grace</h6>
+									<span>Student At ALU</span>
+									<p>MK Scholars Helped me secure a grant at African Leadership University and I'm Thankful for it.</p>
 								</div>
-							</div> <!-- /.item -->
-						</div> <!-- /.testimonial-slider -->
-					</div> <!-- /.row -->
-				</div> <!-- /.slider-wrapper -->
-			</div> <!-- /.container -->
-		</div> <!-- /.testomonial -->
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
 
 
@@ -369,7 +324,7 @@ include("./dbconnection/connection.php");
 				Our Blog
 			============================================== 
 			-->
-            <!-- <div class="our-blog">
+		<!-- <div class="our-blog">
 			<div class="container">
 				<div class="theme-title">
 					<h2>Latest News</h2>
@@ -438,7 +393,7 @@ include("./dbconnection/connection.php");
 		<div class="instructor-banner clearfix">
 			<div class="main-content float-right">
 				<div class="wrapper">
-					<h4>Apply for a Scholarip Now</h4>
+					<h4>Apply for a Scholarship Now</h4>
 					<p>Be a part of the world class institution where leaders are made. Make a difference in the world by taking the responsibility. Be different.</p>
 					<a href="#" class="p-bg-color hvr-float-shadow">LEARN MORE</a>
 				</div> <!-- /.wrapper -->
@@ -451,7 +406,7 @@ include("./dbconnection/connection.php");
 				Partner Logo
 			============================================== 
 			-->
-		<div class="partent-logo-section">
+		<!-- <div class="partent-logo-section">
 			<div class="container">
 				<div id="partner-logo">
 					<div class="item"><img src="images/logo/p-1.png" alt="logo"></div>
@@ -462,7 +417,8 @@ include("./dbconnection/connection.php");
 					<div class="item"><img src="images/logo/p-6.png" alt="logo"></div>
 				</div>
 			</div>
-		</div> <!-- /.partent-logo-section -->
+		</div>  -->
+		<!-- /.partent-logo-section -->
 
 
 
@@ -519,6 +475,5 @@ include("./dbconnection/connection.php");
 	</div> <!-- /.main-page-wrapper -->
 </body>
 
-<!-- Mirrored from themazine.com/html/scholars-lms/index-2.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 10 May 2024 11:36:14 GMT -->
 
 </html>

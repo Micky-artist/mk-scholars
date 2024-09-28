@@ -19,38 +19,38 @@ if ($selectScholarships->num_rows > 0) {
                         <?php echo $getScholarships['scholarshipUpdateDate'] ?>
                     </span>
                     <a target="_blank"
-                        href="edit-service?edit=true&i=<?php echo $getScholarships['scholarshipId'] ?>&n=<?php echo $getScholarships['scholarshipTitle'] ?>">
+                        href="edit-scholarship?edit=true&i=<?php echo $getScholarships['scholarshipId'] ?>&n=<?php echo $getScholarships['scholarshipTitle'] ?>">
                         <button type="button" class="btn btn-cyan btn-sm text-white">
                             Edit
                         </button>
                     </a>
                     <a target="_blank"
-                        href="https://www.icyezainteriors.com/services-prev?d=<?php echo $getScholarships['scholarshipId']?>&n=<?php echo $getScholarships['scholarshipTitle']?>">
+                        href="https://www.mkscholars.com/scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId']?>&scholarship-title=<?php echo $getScholarships['scholarshipTitle']?>">
                         <button type="button" class="btn btn-warning btn-sm text-white">
                             View
                         </button>
                     </a>
                     <?php
-                    if ($getScholarships['servicestatus'] == 0) {
+                    if ($getScholarships['scholarshipStatus'] == 0) {
                         ?>
-                        <a href="./php/actions?a=publishService&i=<?php echo $getScholarships['scholarshipId']?>&n=<?php echo $getScholarships['scholarshipTitle']?>">
-                        <button name="publishService" class="btn btn-success btn-sm text-white">
+                        <a href="./php/actions?a=publishScholarship&i=<?php echo $getScholarships['scholarshipId']?>&n=<?php echo $getScholarships['scholarshipTitle']?>">
+                        <button name="publishScholarship" class="btn btn-success btn-sm text-white">
                             Publish
                         </button>
                         </a>
                         <?php
                     } else {
                         ?>
-                        <a href="./php/actions?a=unPublishService&i=<?php echo $getScholarships['scholarshipId']?>&n=<?php echo $getScholarships['scholarshipTitle']?>">
-                        <button name="unPublishService" class="btn btn-success btn-sm text-white">
+                        <a href="./php/actions?a=unPublishScholarship&i=<?php echo $getScholarships['scholarshipId']?>&n=<?php echo $getScholarships['scholarshipTitle']?>">
+                        <button name="unPublishScholarship" class="btn btn-success btn-sm text-white">
                             Un Publish
                         </button>
                         </a>
                         <?php
                     }
                     ?>
-                    <a href="./php/actions?a=deleteService&i=<?php echo $getScholarships['scholarshipId']?>&n=<?php echo $getScholarships['scholarshipTitle']?>">
-                    <button name="deleteService" class="btn btn-danger btn-sm text-white">
+                    <a href="./php/actions?a=deleteScholarship&i=<?php echo $getScholarships['scholarshipId']?>&n=<?php echo $getScholarships['scholarshipTitle']?>">
+                    <button name="deleteScholarship" class="btn btn-danger btn-sm text-white">
                         Delete
                     </button>
                     </a>

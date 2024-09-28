@@ -3,27 +3,28 @@
 					<div class="row">
 						<div class="col-md-3 col-sm-6">
 							<div class="footer-logo">
-								<a href="index.php"><img src="images/logo/logo.png" alt="Logo"></a>
-								<p>MK Scholars provides universal access to the world’s best education, partnering with top universities and organizations to offer courses online.</p>
-								<p>&copy; 2017 Scholrs Inc. All rights reserved.</p>
-								<ul>
+								<a href="index"><img src="images/logo/fullLogo.png" width="200" height="200" alt="Logo"></a>
+								<p>MK Scholars provides universal access to the world’s best education, Providing scholarship applacation facilitation with top universities and organizations.</p>
+								<p>&copy; <?php echo date('Y'); ?> MK Scholars. All rights reserved.</p><br>
+								<p>Developed by <a href="https://msilab.rw/">M&S Innovation Lab Ltd.</a></p>
+								<!-- <ul>
 									<li><a href="https://www.apple.com/itunes/"><img src="images/logo/android.png" alt=""></a></li>
 									<li><a href="https://play.google.com/store"><img src="images/logo/apple.png" alt=""></a></li>
-								</ul>
+								</ul> -->
 							</div>
 						</div>
 						<div class="col-md-2 col-sm-3 footer-list">
 							<h6>MK Scholars</h6>
 							<ul>
-								<li><a href="about-us.php" class="tran3s">About Us</a></li>
+								<li><a href="#" class="tran3s">About Us</a></li>
 								<li><a href="#" class="tran3s">Leadership</a></li>
 								<li><a href="#" class="tran3s">Careers</a></li>
-								<li><a href="faq.php" class="tran3s">FAQ</a></li>
-								<li><a href="contact-us.php" class="tran3s">Contact</a></li>
+								<li><a href="#" class="tran3s">FAQ</a></li>
+								<li><a href="contact-us" class="tran3s">Contact</a></li>
 							</ul>
 						</div>
 						<div class="col-md-2 col-sm-3 footer-list">
-							<h6>Product</h6>
+							<h6>Applications</h6>
 							<ul>
 								<li><a href="#" class="tran3s">Education Light</a></li>
 								<li><a href="#" class="tran3s">Eucation Starter</a></li>
@@ -36,9 +37,9 @@
 							<h6>Support</h6>
 							<ul>
 								<li><a href="#" class="tran3s">Support</a></li>
-								<li><a href="#" class="tran3s">Toll Free Number</a></li>
+								<!-- <li><a href="#" class="tran3s">Toll Free Number</a></li> -->
 								<li><a href="#" class="tran3s">Open Ticket</a></li>
-								<li><a href="#" class="tran3s">System Requirements</a></li>
+								<!-- <li><a href="#" class="tran3s">System Requirements</a></li> -->
 								<li><a href="#" class="tran3s">Feedback</a></li>
 							</ul>
 						</div>

@@ -6,18 +6,18 @@ include("./validateAdminSession.php");
 
 if ((isset($_GET['i']) && !empty(isset($_GET['i'])) && (isset($_GET['n']) && !empty(isset($_GET['n']))))) {
     $Id = $_GET['i'];
-    if (isset($_GET['a']) && $_GET['a'] == "publishService") {
-        $publishService = mysqli_query($conn, "UPDATE services SET servicestatus=1 WHERE serviceId=$Id");
-        if ($publishService) {
+    if (isset($_GET['a']) && $_GET['a'] == "publishScholarship") {
+        $publishScholarship = mysqli_query($conn, "UPDATE scholarships SET scholarshipStatus=1 WHERE scholarshipId=$Id");
+        if ($publishScholarship) {
             echo ('
 <script type="text/javascript">
 history.back()
 </script>
 ');
         }
-    } else if (isset($_GET['a']) && $_GET['a'] == "unPublishService") {
-        $unPublishService = mysqli_query($conn, "UPDATE services SET servicestatus=0 WHERE serviceId=$Id");
-        if ($unPublishService) {
+    } else if (isset($_GET['a']) && $_GET['a'] == "unPublishScholarship") {
+        $unPublishScholarship = mysqli_query($conn, "UPDATE scholarships SET scholarshipStatus=0 WHERE scholarshipId=$Id");
+        if ($unPublishScholarship) {
             echo ('
 <script type="text/javascript">
 history.back()
@@ -45,17 +45,17 @@ history.back()
 ');
         }
 
-    } else if (isset($_GET['a']) && $_GET['a'] == "deleteService") {
+    } else if (isset($_GET['a']) && $_GET['a'] == "deleteScholarship") {
 
-        $selectImageToDelete = mysqli_query($conn, "SELECT serviceId,image1 FROM services WHERE serviceId=$Id");
+        $selectImageToDelete = mysqli_query($conn, "SELECT scholarshipId,scholarshipImage FROM scholarships WHERE scholarshipId=$Id");
         if ($selectImageToDelete->num_rows > 0) {
             $imageNameData = mysqli_fetch_assoc($selectImageToDelete);
             $imageName = $imageNameData['image1'];
-            $filename = "../uploads/services/" . $imageName;
+            $filename = "../uploads/posts" . $imageName;
 
             if (file_exists($filename)) {
                 unlink($filename);
-                $deleteService = mysqli_query($conn, "DELETE FROM services WHERE serviceId=$Id");
+                $deleteScholarship = mysqli_query($conn, "DELETE FROM scholarships WHERE scholarshipId=$Id");
                 // echo 'File ' . $filename . ' has been deleted';
                 echo ('
                 <script type="text/javascript">
