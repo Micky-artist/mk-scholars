@@ -7,12 +7,12 @@ include("./php/selectScholarshipDetails.php")
 
 <!DOCTYPE html>
 <html lang="en">
+<title>Mk Scholars <?php echo $scholarshipData['scholarshipTitle'] ?></title>
 
 <?php include("./partials/head.php") ?>
 <head>
-<meta property="og:image:secure_url" content="https://admin.mkscholars.com/uploads/posts/<?php echo $$scholarshipData['scholarshipImage'] ?>">
-<meta name="description" content="<?php echo $scholarshipData['scholarshipDetails'] ?>">
-<title>Mk Scholars <?php echo $scholarshipData['scholarshipTitle'] ?></title>
+<!-- <meta property="og:image:secure_url" content="https://admin.mkscholars.com/uploads/posts/<?php echo $$scholarshipData['scholarshipImage'] ?>"> -->
+<meta name="description" content="<?php echo $scholarshipData['scholarshipTitle'] ?>">
 </head>
 
 
@@ -63,7 +63,7 @@ include("./php/selectScholarshipDetails.php")
 									<li>Business</li>
 								</ul> -->
 						</div> <!-- /.title -->
-						<img src="https://admin.mkscholars.com/uploads/posts/<?php echo $$scholarshipData['scholarshipImage'] ?>" alt=""> <br>
+						<img src="https://admin.mkscholars.com/uploads/posts/<?php echo $scholarshipData['scholarshipImage'] ?>" alt=""> <br>
 						<p><?php echo $scholarshipData['scholarshipDetails'] ?></p>
 						<br>
 						<div>
@@ -92,7 +92,7 @@ include("./php/selectScholarshipDetails.php")
 										<li class="clearfix">
 											<img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipImage'] ?>" alt="" class="float-left">
 											<div class="post float-left">
-												<a href="#" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a>
+												<a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo $getScholarships['scholarshipTitle'] ?>" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a>
 												<span><?php echo $getScholarships['scholarshipUpdateDate'] ?></span>
 											</div>
 										</li>

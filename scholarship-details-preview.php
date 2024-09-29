@@ -77,29 +77,24 @@ include("./php/selectScholarshipDetails-preview.php")
 							<div class="sidebar-recent-post">
 								<h5>Recently Uploaded</h5>
 								<!-- TO BE USED IN FUTURE -->
-								<!-- <ul>
-									<li class="clearfix">
-										<img src="images/blog/7.jpg" alt="" class="float-left">
-										<div class="post float-left">
-											<a href="#" class="tran3s">How to Increase Your Values</a>
-											<span>February 27, 2017</span>
-										</div>
-									</li>
-									<li class="clearfix">
-										<img src="images/blog/8.jpg" alt="" class="float-left">
-										<div class="post float-left">
-											<a href="#" class="tran3s">How to Increase Your Values</a>
-											<span>February 27, 2017</span>
-										</div> 
-									</li>
-									<li class="clearfix">
-										<img src="images/blog/9.jpg" alt="" class="float-left">
-										<div class="post float-left">
-											<a href="#" class="tran3s">How to Increase Your Values</a>
-											<span>February 27, 2017</span>
-										</div>
-									</li>
-								</ul> -->
+								<ul>
+								<?php
+								$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 ORDER BY scholarshipId DESC LIMIT 4");
+								if ($selectScholarships->num_rows > 0) {
+									while ($getScholarships = mysqli_fetch_assoc($selectScholarships)) {
+								?>
+										<li class="clearfix">
+											<img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipImage'] ?>" alt="" class="float-left">
+											<div class="post float-left">
+												<a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo $getScholarships['scholarshipTitle'] ?>" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a>
+												<span><?php echo $getScholarships['scholarshipUpdateDate'] ?></span>
+											</div>
+										</li>
+								<?php
+									}
+								}
+								?>
+							</ul>
 							</div> 
 							
 							

@@ -25,7 +25,7 @@ if ($selectScholarships->num_rows > 0) {
                         </button>
                     </a>
                     <a target="_blank"
-                        href="https://www.mkscholars.com/scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId']?>&scholarship-title=<?php echo $getScholarships['scholarshipTitle']?>">
+                        href="https://www.mkscholars.com/scholarship-details-preview?scholarship-id=<?php echo $getScholarships['scholarshipId']?>&scholarship-title=<?php echo $getScholarships['scholarshipTitle']?>">
                         <button type="button" class="btn btn-warning btn-sm text-white">
                             View
                         </button>
