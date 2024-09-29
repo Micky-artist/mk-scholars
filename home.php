@@ -216,19 +216,24 @@ include("./dbconnection/connection.php");
 					?>
 							<div class="col-md-4 col-sm-6 col-xs-12">
 								<div class="single-course-grid">
-									<div class="image"><img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipTitle'] ?>" alt=""></div>
+									<div class="image"><img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipImage'] ?>" alt=""></div>
 									<div class="text">
 										<h6><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo $getScholarships['scholarshipTitle'] ?>" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a></h6>
-										<p class="postLineLimit"><?php echo $getScholarships['scholarshipDetails'] ?></p>
+										<div class="DetailWrapper">
+											<p class="postLineLimit"><?php echo $getScholarships['scholarshipDetails'] ?></p>
+										</div>
 										<style>
 											.postLineLimit {
-												overflow: hidden;
 												text-overflow: ellipsis;
 												display: -webkit-box;
 												-webkit-line-clamp: 4;
-												/* number of lines to show */
 												line-clamp: 4;
 												-webkit-box-orient: vertical;
+												overflow: hidden;
+											}
+											.DetailWrapper {
+												height: 5cm;
+												overflow: hidden;
 											}
 										</style>
 										<ul class="clearfix">

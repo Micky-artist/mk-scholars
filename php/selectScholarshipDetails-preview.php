@@ -4,7 +4,7 @@ if((isset($_GET['scholarship-id']) && $_GET['scholarship-id'] != NULL ) && (isse
     $scholarshipId=$_GET['scholarship-id'];
     $scholarshipTitle=$_GET['scholarship-title'];
 
-    $selectScholarshipDetails=mysqli_query($conn,"SELECT * FROM scholarships WHERE scholarshipId=$scholarshipId AND scholarshipStatus != 0 ");
+    $selectScholarshipDetails=mysqli_query($conn,"SELECT * FROM scholarships WHERE scholarshipId=$scholarshipId");
     if($selectScholarshipDetails->num_rows>0){
         $scholarshipData = mysqli_fetch_assoc($selectScholarshipDetails);
     }

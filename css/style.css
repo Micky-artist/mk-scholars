@@ -112,7 +112,7 @@
   z-index: 99;
   text-align: center;
   color: #fff;
-  background: #4183E6;
+  background: #083352;
   font-size: 25px;
   display: none;
 }
@@ -305,7 +305,7 @@ footer .footer-subscribe button:hover,
 .shop-details .single-product-details .product-order-details .price li:first-child,
 #video-banner .banner-wrapper .container a:hover,
 .course-details .details-sidebar .curriculum-of-course .panel-group .panel .panel-body ul li span a:hover {
-  color: #4183E6;
+  color: #083352;
 }
 
 .p-bg-color,
@@ -330,14 +330,14 @@ body .theme-button,
 .course-sidebar .purchase-badge a:hover,
 .course-sidebar .sidebar-teachers-profile>a:hover,
 .course-details .details-sidebar .submit-review-form form button:hover {
-  background: #4183E6;
+  background: #083352;
 }
 
 .our-blog .single-post:hover .text>a,
 .blog-details .share-option ul.float-left li a:hover,
 .theme-login-page .form-wrapper form input:focus {
   border-style: solid;
-  border-color: #4183E6;
+  border-color: #083352;
 }
 
 .s-color,
@@ -404,7 +404,7 @@ body .theme-button {
   border-radius: 30px;
   color: #fff;
   text-transform: uppercase;
-  border: 1px solid #4183E6;
+  border: 1px solid #083352;
 }
 
 /*----------------------- Theme Menu -------------------*/
