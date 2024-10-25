@@ -17,12 +17,12 @@
 			============================================== 
 			-->
 
-			<div class="theme-inner-banner" style="background: url(images/home/banner-1.jpg) no-repeat center;background-size:cover;">
+			<div class="theme-inner-banner" style="background: url(images/home/s2.jpg) no-repeat center;background-size:cover;">
 				<div class="opacity">
 					<div class="container">
 						<h3>ABOUT US</h3>
 						<ul>
-							<li><a href="index.html">Home</a></li>
+							<li><a href="home">Home</a></li>
 							<li>/</li>
 							<li>About us</li>
 						</ul>
@@ -40,15 +40,12 @@
 			<div class="about-us-text">
 				<div class="container">
 					<div class="row">
-						<div class="col-md-6 col-xs-12"><img src="images/inner-page/1.jpg" alt=""></div>
+						<div class="col-md-6 col-xs-12"><img src="images/home/grad2.jpg" alt=""></div>
 						<div class="col-md-6 col-xs-12 about-top-text">
 							<h4>WHO WE ARE?</h4>
-							<span>At Scholars, we are doing our best to provide world class Education at your doorstep.</span>
-							<p>Scholars is an amazing global marketplace for learning and teaching online where students can learn new skills and achieve their goals by learning from an extensive library of over 45,000 courses taught by world renowned</p> <br>
-							<p>For 20 years, we have helped students, leaders, IT and design pros, project managers—anyone in any role—develop software, creative, and business skills. Now part of Linkedin, Lynda.com serves more than 10,000 organizations. With tutorials in five languages, Lynda.com is a global platform for success.</p>
-							<br>
-							<p>In addition to helping individual learners achieve personal and professional goals, we offer flexible, cost-effective group memberships for your business, school, or government organization. </p>
-						</div> <!-- /.about-top-text -->
+
+							<p>At MK Scholars, we are dedicated to helping students access scholarship opportunities and study programs worldwide. We provide the latest news on scholarships, study, and job opportunities while guiding students through the entire application process. From essay writing and proofreading to admission, financial aid applications, test preparation, and interview coaching, we are here to support every step. </p>
+							</div> <!-- /.about-top-text -->
 					</div> <!-- /.row -->
 
 					<div class="row about-us-bottom-text">
@@ -57,14 +54,10 @@
 							<span>Quotes by Albert Einstein</span>
 						</div>
 						<div class="col-md-4 col-xs-12">
-							<p>The Open University revolutionized the scope of the correspondence program and helped to create a respectable learning alternative to the traditional form of education. It has been at the forefront of developing new technologies to improve the distance learning service.</p>
-							<br>
-							<p>Although the expansion of the Internet blurs the boundaries, distance education technologies are divided into two modes of delivery: synchronous learning and asynchronous learning.</p>
 							<p class="mark-text">
-								In synchronous learning, all participants are "present" at the same time. In this regard, it resembles traditional classroom teaching methods despite the participants being located remotely.
-							</p>
+							Our mission is to make higher education accessible to talented students, especially from underserved communities, by connecting them with scholarship opportunities.							</p>
 						</div>
-						<div class="col-md-4 col-xs-12"><img src="images/inner-page/2.jpg" alt=""></div>
+						<div class="col-md-4 col-xs-12"><img src="images/home/grad.jpg" alt=""></div>
 					</div> <!-- /.row -->
 				</div> <!-- /.container -->
 			</div> <!-- /.about-us-text -->
@@ -83,9 +76,9 @@
 				<div id="particles-js"></div>
 				<div class="opacity">
 					<div class="container">
-						<h2>Ready to take your Skills to the next Level?</h2>
-						<p>Start learning the skills that you need, start your free trial today</p>
-						<a href="sign-up.html" class="tran3s hvr-float-shadow">Sign Up</a>
+						<h2>Ready to take your Education to the next Level?</h2>
+						<p>Get access on many scholarships that you need, start your free today</p>
+						<a href="scholarships" class="tran3s hvr-float-shadow">Start Now</a>
 					</div> <!-- /.container -->
 				</div> <!-- /.opacity -->
 			</div> <!-- /.signUp-banner -->
@@ -98,61 +91,44 @@
 				Testomonial
 			============================================== 
 			-->
-			<div class="testomonial m-top0 m-bottom0">
-				<div class="container">
-					<div class="theme-title">
-						<h2>Testomonial</h2>
-						<p>What our valuable clients have to say about our courses, tutorials and online classes</p>
-					</div> <!-- /.theme-title -->
-					<div class="slider-wrapper">
-						<div class="row">
-							<div class="testimonial-slider">
-								<div class="item">
-									<div class="item-wrapper">
-										<img src="images/home/c1.jpg" alt="">
-										<h6>Riyad Lawrence</h6>
-										<span>CEO</span>
-										<p>Scholars website is a great way of learning new things, I love their courses.</p>
-									</div>
-								</div> <!-- /.item -->
-								<div class="item">
-									<div class="item-wrapper">
-										<img src="images/home/c2.jpg" alt="">
-										<h6>Milon Sayfur</h6>
-										<span>CEO</span>
-										<p>Scholars website is a great way of learning new things, I love their courses.</p>
-									</div>
-								</div> <!-- /.item -->
-							</div> <!-- /.testimonial-slider -->
-						</div> <!-- /.row -->
-					</div> <!-- /.slider-wrapper -->
-				</div> <!-- /.container -->
-			</div> <!-- /.testomonial -->
+			<div class="testomonial">
+			<div class="container">
+				<div class="theme-title">
+					<h2>Testomonial</h2>
+					<p>What our valuable clients have to say about our courses, tutorials and online classes</p>
+				</div>
+				<div class="slider-wrapper">
+					<div class="row">
+						<div class="testimonial-slider">
+							<div class="item">
+								<div class="item-wrapper">
+									<!-- <img src="images/home/c1.jpg" alt=""> -->
+									<h6>Salomon Uwimana</h6>
+									<span>M&S Innovation Lab Ltd CTO</span>
+									<p>I'm thankfull for MK Scholars because it helped me secure a full paid Scholarship at African Leadership University.</p>
+								</div>
+							</div>
+							<div class="item">
+								<div class="item-wrapper">
+									<!-- <img src="images/home/c2.jpg" alt=""> -->
+									<h6>Umwari Grace</h6>
+									<span>Student At ALU</span>
+									<p>MK Scholars Helped me secure a grant at African Leadership University and I'm Thankful for it.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 			
-
-
-			<!-- 
-			=============================================
-				Instructor Banner
-			============================================== 
-			-->
-			<div class="instructor-banner clearfix">
-				<div class="main-content float-right">
-					<div class="wrapper">
-						<h4>Become an Instructor</h4>
-						<p>Be a part of the world class institution where we make leaders. Make a difference in the world by taking the responsibility. Be different.</p>
-						<a href="#" class="p-bg-color hvr-float-shadow">LEARN MORE</a>
-					</div> <!-- /.wrapper -->
-				</div> <!-- /.main-content -->
-			</div> <!-- /.instructor-banner -->
-
 
 			<!-- 
 			=============================================
 				Partner Logo
 			============================================== 
 			-->
-			<div class="partent-logo-section">
+			<!-- <div class="partent-logo-section">
 				<div class="container">
 					<div id="partner-logo">
 						<div class="item"><img src="images/logo/p-1.png" alt="logo"></div>
@@ -163,7 +139,9 @@
 						<div class="item"><img src="images/logo/p-6.png" alt="logo"></div>
 					</div>
 				</div>
-			</div> <!-- /.partent-logo-section -->
+			</div>  -->
+			
+			<!-- /.partent-logo-section -->
 
 
 

@@ -7,22 +7,14 @@
 	<body>
 		<div class="main-page-wrapper">
 
-			<!-- ===================================================
-				Loading Transition
-			==================================================== -->
-			<div id="loader-wrapper">
-				<div id="loader"></div>
-			</div>
-
 			
-			<!-- ===================================================
-				Login Page
-			==================================================== -->
 			<div class="theme-login-page">
-				<div class="logo"><a href="index.html"><img src="images/logo/logo2.png" alt=""></a></div>
+				<div class="logo"><a href="index"><img src="images/logo/logoRound.png" width="100" height="100" alt=""></a></div>
 				<div class="form-wrapper">
-					<a href="#" class="facebook-button">LOGIN WITH FACEBOOK</a>
-					<p><span>Or</span></p>
+				<br>
+				<br>
+					<!-- <a href="#" class="facebook-button">LOGIN WITH FACEBOOK</a> -->
+					<!-- <p><span>Or</span></p> -->
 					<form action="#">
 						<input type="text" placeholder="Username or email">
 						<input type="password" placeholder="Password">
@@ -34,7 +26,7 @@
 							<li class="float-right"><button class="theme-button tran3s">LOG IN</button></li>
 						</ul>
 						<p><a href="#" class="p-color">Forgot your username or pasword?</a></p>
-						<p>Don’t have an account? <a href="sign-up.html" class="p-color">Sign Up</a></p>
+						<p>Don’t have an account? <a href="sign-up" class="p-color">Sign Up</a></p>
 					</form>
 				</div> <!-- /.form-wrapper -->
 			</div>

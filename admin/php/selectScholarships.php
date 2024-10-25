@@ -5,7 +5,7 @@ if ($selectScholarships->num_rows > 0) {
         ?>
         <div class="d-flex flex-row comment-row mt-0">
             <div class="p-2">
-                <img width="100" src="./uploads/services/<?php echo $getScholarships['scholarshipImage'] ?>" />
+                <img width="100" src="./uploads/posts/<?php echo $getScholarships['scholarshipImage'] ?>" />
             </div>
             <div class="comment-text w-100">
                 <h6 class="font-medium">

@@ -163,6 +163,14 @@
    .course-details .details-sidebar .curriculum-of-course .curriculum-panel .panel-heading a {padding-left: 40px;}
    .course-details .details-sidebar .curriculum-of-course .curriculum-panel .panel-heading a:before {left: 10px;}
    .faq-page .faq_panel .panel-group .panel-heading a {font-size: 18px;}
+
+   /* .navPadding2{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  } */
 }
 
 @media (max-width: 400px) {

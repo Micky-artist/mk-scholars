@@ -25,8 +25,8 @@ include("./dbconnection/connection.php");
 				<div class="camera_caption">
 					<div class="container text-center">
 						<h1 class="wow fadeInUp animated">Welcome to our global scholarship platform, where opportunities for education are just a click away. </h1>
-						<a href="#" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR COURSE</a>
-						<a href="#" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
+						<a href="./scholarships" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR SCHOLARSHIPS</a>
+						<a href="./login" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
 					</div> <!-- /.container -->
 				</div> <!-- /.camera_caption -->
 			</div>
@@ -34,8 +34,8 @@ include("./dbconnection/connection.php");
 				<div class="camera_caption">
 					<div class="container text-center">
 						<h1 class="wow fadeInUp animated">We connect you with scholarships from around the world to help you achieve your academic dreams.</h1>
-						<a href="#" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR COURSE</a>
-						<a href="#" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
+						<a href="./scholarships" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR SCHOLARSHIPS</a>
+						<a href="./login" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
 					</div> <!-- /.container -->
 				</div> <!-- /.camera_caption -->
 			</div>
@@ -43,8 +43,8 @@ include("./dbconnection/connection.php");
 				<div class="camera_caption">
 					<div class="container text-center">
 						<h1 class="wow fadeInUp animated">Start your journey today and unlock <br> a world of possibilities!</h1>
-						<a href="#" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR COURSE</a>
-						<a href="#" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
+						<a href="./scholarships" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR SCHOLARSHIPS</a>
+						<a href="./login" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
 					</div> <!-- /.container -->
 				</div> <!-- /.camera_caption -->
 			</div>
@@ -65,50 +65,57 @@ include("./dbconnection/connection.php");
 						<p>Find your preferred course from our wide range of courses easily, with just a one search here</p>
 					</div> <!-- /.theme-title -->
 
-					<form action="#">
+					<form method="post">
 						<div class="row">
-							<div class="col-md-3 col-xs-6">
+							<!-- <div class="col-md-3 col-xs-6">
 								<div class="single-input">
 									<input type="text" placeholder="Course Name">
-								</div> <!-- /.single-input -->
-							</div> <!-- /.col- -->
+								</div> 
+							</div> -->
 							<div class="col-md-3 col-xs-6">
 								<div class="single-input">
 									<select class="selectpicker">
-										<option>Course Cateogries</option>
-										<option>Course Demo one</option>
-										<option>Course Demo two</option>
-										<option>Course Demo three</option>
+										<option>Sort By Country</option>
+										<?php include("./php/selectCountries.php") ?>
 									</select>
-								</div> <!-- /.single-input -->
-							</div> <!-- /.col -->
+								</div>
+							</div>
 							<div class="col-md-3 col-xs-6">
 								<div class="single-input">
 									<select class="selectpicker">
-										<option>Course Level</option>
-										<option>Course Level one</option>
-										<option>Course Level two</option>
-										<option>Course Level three</option>
+										<option>Sort By Degree</option>
+										<option>Short Course</option>
+										<option>Vacational Training</option>
+										<option>Undergraduate</option>
+										<option>Masters degree</option>
 									</select>
-								</div> <!-- /.single-input -->
-							</div> <!-- /.col -->
+								</div>
+							</div>
 							<div class="col-md-3 col-xs-6">
 								<div class="single-input">
 									<select class="selectpicker">
-										<option>Course Instructors</option>
-										<option>Course Instructors one</option>
-										<option>Course Instructors two</option>
-										<option>Course Instructors three</option>
+										<option>Course Program</option>
+										<option>Software Engineering</option>
+										<option>Mechanical Engineering</option>
+										<option>Bussiness</option>
+
 									</select>
 								</div> <!-- /.single-input -->
 							</div> <!-- /.col -->
 						</div> <!-- /.row -->
-						<button style="background-color: #fff; color: #4183E6; font-weight: bold;" class="p-bg-color hvr-rectangle-out">Search Course</button>
+						<button style="background-color: #fff; color: #4183E6; font-weight: bold;" name="searchCourse" class="p-bg-color hvr-rectangle-out">Search Course</button>
 					</form>
 				</div> <!-- /.container -->
 			</div> <!-- /.opacity -->
 		</div> <!-- /.find-course -->
+		<?php
+		if (isset($_POST['searchCourse'])) {
+			echo '<script type="text/javascript">
+                window.location.href="./scholarships"
 
+</script>';
+		}
+		?>
 
 		<!-- 
 			=============================================
@@ -128,7 +135,7 @@ include("./dbconnection/connection.php");
 							<img src="images/home/4.jpg" alt="">
 							<div class="opacity">
 								<div>
-									<h5><a href="#">Become a Software Engineer</a></h5>
+									<h5><a href="scholarships">Become a Software Engineer</a></h5>
 									<p>Course Duration 60 hours</p>
 								</div>
 							</div> <!-- /.opacity -->
@@ -139,7 +146,7 @@ include("./dbconnection/connection.php");
 							<img src="images/home/5.jpg" alt="">
 							<div class="opacity">
 								<div>
-									<h5><a href="#">Study Law</a></h5>
+									<h5><a href="scholarships">Study Law</a></h5>
 									<p>Request Help Now</p>
 								</div>
 							</div> <!-- /.opacity -->
@@ -150,7 +157,7 @@ include("./dbconnection/connection.php");
 							<img src="images/home/6.jpg" alt="">
 							<div class="opacity">
 								<div>
-									<h5><a href="#">Study Mechanical Engineering / Mechatronics</a></h5>
+									<h5><a href="scholarships">Study Mechanical Engineering / Mechatronics</a></h5>
 									<p>Request Help Now</p>
 								</div>
 							</div> <!-- /.opacity -->
@@ -161,7 +168,7 @@ include("./dbconnection/connection.php");
 							<img src="images/home/7.jpg" alt="">
 							<div class="opacity">
 								<div>
-									<h5><a href="#">Become a SEO Specialist</a></h5>
+									<h5><a href="scholarships">Become a SEO Specialist</a></h5>
 									<p>Request Help Now</p>
 								</div>
 							</div> <!-- /.opacity -->
@@ -172,7 +179,7 @@ include("./dbconnection/connection.php");
 							<img src="images/home/8.jpg" alt="">
 							<div class="opacity">
 								<div>
-									<h5><a href="#">Become an Entrepreneur Leader</a></h5>
+									<h5><a href="scholarships">Become an Entrepreneur Leader</a></h5>
 									<p>Request Help Now</p>
 								</div>
 							</div> <!-- /.opacity -->
@@ -183,7 +190,7 @@ include("./dbconnection/connection.php");
 							<img src="images/home/9.jpg" alt="">
 							<div class="opacity">
 								<div>
-									<h5><a href="#">Study Business Analytics & Intelligence.</a></h5>
+									<h5><a href="scholarships">Study Business Analytics & Intelligence.</a></h5>
 									<p>Course Duration 60 hours</p>
 								</div>
 							</div> <!-- /.opacity -->
@@ -210,32 +217,22 @@ include("./dbconnection/connection.php");
 
 				<div class="row">
 					<?php
-					$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 ORDER BY scholarshipUpdateDate DESC");
+					$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 ORDER BY scholarshipId DESC LIMIT 6");
 					if ($selectScholarships->num_rows > 0) {
 						while ($getScholarships = mysqli_fetch_assoc($selectScholarships)) {
 					?>
-							<div class="col-md-4 col-sm-6 col-xs-12">
+							<!-- <a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo $getScholarships['scholarshipTitle'] ?>" class="tran3s"> -->
+							<div class="col-md-4 col-sm-6 col-xs-12 allScholarshipContainer">
 								<div class="single-course-grid">
-									<div class="image"><img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipImage'] ?>" alt=""></div>
+									<div class="image">
+										<img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipImage'] ?>" alt="">
+									</div>
 									<div class="text">
 										<h6><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo $getScholarships['scholarshipTitle'] ?>" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a></h6>
 										<div class="DetailWrapper">
 											<p class="postLineLimit"><?php echo $getScholarships['scholarshipDetails'] ?></p>
 										</div>
-										<style>
-											.postLineLimit {
-												text-overflow: ellipsis;
-												display: -webkit-box;
-												-webkit-line-clamp: 4;
-												line-clamp: 4;
-												-webkit-box-orient: vertical;
-												overflow: hidden;
-											}
-											.DetailWrapper {
-												height: 5cm;
-												overflow: hidden;
-											}
-										</style>
+
 										<ul class="clearfix">
 											<li class="float-left"><i class="fa fa-calendar" aria-hidden="true"></i> <?php echo $getScholarships['scholarshipUpdateDate'] ?></li>
 
@@ -244,13 +241,44 @@ include("./dbconnection/connection.php");
 									</div> <!-- /.text -->
 								</div> <!-- /.single-course-grid -->
 							</div> <!-- /.col- -->
+							<!-- </a> -->
 					<?php
 						}
 					}
 
 					?>
+
+					<style>
+						.allScholarshipContainer {
+							height: 14cm;
+						}
+
+						.image {
+							height: 5cm;
+						}
+
+						.image img {
+							object-fit: cover;
+							width: 100%;
+							height: 100%;
+						}
+
+						.postLineLimit {
+							text-overflow: ellipsis;
+							display: -webkit-box;
+							-webkit-line-clamp: 4;
+							line-clamp: 4;
+							-webkit-box-orient: vertical;
+							overflow: hidden;
+						}
+
+						.DetailWrapper {
+							height: 5cm;
+							overflow: hidden;
+						}
+					</style>
 				</div> <!-- /.row -->
-				<a href="#" class="theme-button hvr-rectangle-out">ALL COURSES</a>
+				<a href="./scholarships" style="background-color: #fff; color: #4183E6; font-weight: bold;" class="theme-button hvr-rectangle-out">ALL APPLICATIONS</a>
 			</div> <!-- /.container -->
 		</div> <!-- /.featured-course -->
 
@@ -268,8 +296,8 @@ include("./dbconnection/connection.php");
 			<div class="opacity">
 				<div class="container">
 					<h2>Ready to take your Skills to the next Level?</h2>
-					<p>Start learning the skills that you need, start your free trial today</p>
-					<a href="#" class="tran3s hvr-float-shadow">Sign Up</a>
+					<p>Start learning the skills that you need, signup to start accessing exclussive scholarships now</p>
+					<a href="sign-up" class="tran3s hvr-float-shadow">Sign Up</a>
 				</div> <!-- /.container -->
 			</div> <!-- /.opacity -->
 		</div> <!-- /.signUp-banner -->

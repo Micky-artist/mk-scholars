@@ -16,5 +16,5 @@
 	<!-- responsive style sheet -->
 	<link rel="stylesheet" type="text/css" href="css/responsive.css">
 	<link rel="shortcut icon" href="./images/logo/logoRound.png" type="image/x-icon">
-
+	
 </head>

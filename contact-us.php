@@ -16,12 +16,12 @@
 			============================================== 
 			-->
 
-			<div class="theme-inner-banner" style="background: url(images/home/banner-7.jpg) no-repeat center;background-size:cover;">
+			<div class="theme-inner-banner" style="background: url(images/home/s3.jpg) no-repeat center;background-size:cover;">
 				<div class="opacity">
 					<div class="container">
 						<h3>Contact Us</h3>
 						<ul>
-							<li><a href="index.html">Home</a></li>
+							<li><a href="home">Home</a></li>
 							<li>/</li>
 							<li>Contact Us</li>
 						</ul>
@@ -38,7 +38,7 @@
 			<div class="contact-address">
 				<div class="container">
 					<div class="row">
-						<div class="col-lg-7 col-md-7 hidden-sm hidden-xs"><img src="images/inner-page/3.jpg" alt=""></div>
+						<div class="col-lg-7 col-md-7 hidden-sm hidden-xs"><img src="images/home/grad2.jpg" alt=""></div>
 						<div class="col-lg-5 col-md-5 col-xs-12">
 							<div class="address-banner">
 								<div class="opacity">

@@ -7,6 +7,10 @@ if((isset($_GET['scholarship-id']) && $_GET['scholarship-id'] != NULL ) && (isse
     $selectScholarshipDetails=mysqli_query($conn,"SELECT * FROM scholarships WHERE scholarshipId=$scholarshipId AND scholarshipStatus != 0 ");
     if($selectScholarshipDetails->num_rows>0){
         $scholarshipData = mysqli_fetch_assoc($selectScholarshipDetails);
+    }else{
+        echo '<script type="text/javascript">
+	window.location.href="home";
+</script>';
     }
 }else{
     echo '<script type="text/javascript">

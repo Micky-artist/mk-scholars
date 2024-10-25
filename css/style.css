@@ -514,18 +514,26 @@ header .cart-button {
   }
 }
 
+/* the navigation menu */
 .theme-menu-wrapper.fixed {
   position: fixed;
   width: 100%;
   top: 0;
   left: 0;
   z-index: 9999;
-  background: #000;
+  background: #083352;
   -webkit-animation: menu_sticky 0.7s ease-in-out;
   animation: menu_sticky 0.7s ease-in-out;
   padding: 10px 0 0 0;
 }
 
+.navPadding2{
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 /*** 
 
 ====================================================================
@@ -3462,9 +3470,9 @@ footer .footer-subscribe button {
 
 /*---------------------- Theme Login Page --------------------*/
 .theme-login-page {
-  background-image: -moz-linear-gradient(90deg, rgba(184, 2, 87, 0.6) 0%, rgba(226, 25, 67, 0) 100%);
+  /* background-image: -moz-linear-gradient(90deg, rgba(184, 2, 87, 0.6) 0%, rgba(226, 25, 67, 0) 100%);
   background-image: -webkit-linear-gradient(90deg, rgba(184, 2, 87, 0.6) 0%, rgba(226, 25, 67, 0) 100%);
-  background-image: -ms-linear-gradient(90deg, rgba(184, 2, 87, 0.6) 0%, rgba(226, 25, 67, 0) 100%);
+  background-image: -ms-linear-gradient(90deg, rgba(184, 2, 87, 0.6) 0%, rgba(226, 25, 67, 0) 100%); */
   padding-bottom: 750px;
 }
 

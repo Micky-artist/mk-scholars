@@ -7,29 +7,21 @@
 	<body>
 		<div class="main-page-wrapper">
 
-			<!-- ===================================================
-				Loading Transition
-			==================================================== -->
-			<div id="loader-wrapper">
-				<div id="loader"></div>
-			</div>
-
 			
-			<!-- ===================================================
-				Sign Up Page
-			==================================================== -->
 			<div class="theme-login-page sign-up-page">
-				<div class="logo"><a href="index.html"><img src="images/logo/logo2.png" alt=""></a></div>
+				<div class="logo"><a href="index"><img src="images/logo/logoRound.png" width="100" height="100"  alt=""></a></div>
 				<div class="form-wrapper">
-					<a href="#" class="facebook-button">SIGN UP WITH FACEBOOK</a>
-					<p><span>Or</span></p>
+					<br>
+					<br>
+					<!-- <a href="#" class="facebook-button">SIGN UP WITH FACEBOOK</a> -->
+					<!-- <p><span>Or</span></p> -->
 					<form action="#">
 						<input type="text" placeholder="Username">
 						<input type="email" placeholder="Email">
 						<input type="password" placeholder="Password">
 						<input type="password" placeholder="Repeat Password">
 						<button class="theme-button tran3s">SIGN UP</button>
-						<p>Already have an account? <a href="login.html" class="p-color">Sign In</a></p>
+						<p>Already have an account? <a href="login" class="p-color">Sign In</a></p>
 					</form>
 				</div> <!-- /.form-wrapper -->
 			</div>

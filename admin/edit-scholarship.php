@@ -2,8 +2,16 @@
 session_start();
 include("./dbconnections/connection.php");
 include("./php/validateAdminSession.php");
-include("./php/uploadScholarship.php");
+include("./php/updateScholarship.php");
 
+if ((isset($_GET['edit']) && !empty(isset($_GET['edit'])) && (isset($_GET['i']) && !empty(isset($_GET['i']))))) {
+    $scholarshipId = $_GET['i'];
+
+    $selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipId=$scholarshipId ORDER BY scholarshipUpdateDate DESC");
+    if ($selectScholarships->num_rows > 0) {
+        $getScholarships = mysqli_fetch_assoc($selectScholarships);
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -109,16 +117,16 @@ include("./php/uploadScholarship.php");
                                         <div class="form-group row">
                                             <label for="cono1" class="card-title">Scholarships Title</label>
                                             <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="ScholarshipTitle" id="title"
+                                                <input type="text" class="form-control" value="<?php echo $getScholarships['scholarshipTitle'] ?>" name="ScholarshipTitle" id="title"
                                                     placeholder="Scholarships Title" />
                                             </div>
                                         </div>
                                         <div class="form-group row">
                                             <label for="cono1" class="card-title">Scholarship Status</label>
                                             <div class="col-sm-9">
-                                                <select type="text" name="ScholarshipStatus" class="form-control" id="lname">
-                                                    <option value="-1" selected disabled>Select Status</option>
-                                                    <option value="0" selected>Hidden</option>
+                                                <select type="text" name="ScholarshipStatus" class="form-control" id="lname" required>
+                                                    <option selected disabled>Select Status</option>
+                                                    <option value="10">Hidden</option>
                                                     <option value="1">Free</option>
                                                     <option value="2">Payable</option>
                                                 </select>
@@ -127,7 +135,7 @@ include("./php/uploadScholarship.php");
                                         <div class="form-group row">
                                             <label for="cono1" class="card-title">Amount</label>
                                             <div class="col-sm-9">
-                                                <input type="number" class="form-control" name="ScholarshipPrice" id="title"
+                                                <input value="<?php echo $getScholarships['amount'] ?>" type="number" class="form-control" name="ScholarshipPrice" id="title"
                                                     placeholder="Amount (Optional)" />
                                             </div>
                                         </div>
@@ -135,8 +143,8 @@ include("./php/uploadScholarship.php");
                                     <div class="form-group row">
                                         <label for="cono1" class="card-title">Scholarship Country</label>
                                         <div class="col-sm-9">
-                                            <select type="text" name="ScholarshipCountry" class="form-control" id="lname">
-                                                <option value="0" selected disabled>Select Country</option>
+                                            <select type="text" name="ScholarshipCountry" class="form-control" id="lname" required>
+                                                <option selected disabled>Select Country</option>
                                                 <?php include("./php/selectCountries.php"); ?><?php  ?>
                                             </select>
                                         </div>
@@ -146,9 +154,8 @@ include("./php/uploadScholarship.php");
                                         <div class="col-md-9">
                                             <div class="custom-file">
                                                 <input type="file" name="ScholarshipImage" accept="image/*" class="custom-file-input"
-                                                    id="validatedCustomFile" required />
-                                                <label class="custom-file-label" for="validatedCustomFile">Choose
-                                                    Image 1...</label>
+                                                    id="validatedCustomFile" />
+                                                <label class="custom-file-label"  for="validatedCustomFile"><?php echo $getScholarships['scholarshipImage'] ?></label>
                                                 <div class="invalid-feedback">
                                                     Example invalid custom file feedback
                                                 </div>
@@ -156,20 +163,21 @@ include("./php/uploadScholarship.php");
                                         </div>
                                     </div>
                                     <label class="card-title">Scholarship Link</label>
-                            <textarea type="text" id="post" name="ScholarshipLink" class="form-control" rows="2" required></textarea>
+                            <textarea type="text" id="post" name="ScholarshipLink" class="form-control" rows="2" required><?php echo $getScholarships['scholarshipLink'] ?></textarea>
                             <br>
                             <label class="card-title">Scholarship Youtube Link</label>
-                            <textarea type="text" id="post" name="scholarshipYoutubeLink" class="form-control" rows="2" required></textarea>
+                            <textarea type="text" id="post" name="scholarshipYoutubeLink" class="form-control" rows="2" required><?php echo $getScholarships['scholarshipYoutubeLink'] ?></textarea>
                             <br>
                             <label class="card-title">Scholarship description</label>
-                            <textarea type="text" id="post" name="ScholarshipDescription" class="form-control" rows="20" required></textarea>
+                            <textarea type="text" id="post" name="ScholarshipDescription" class="form-control" rows="10" required><?php echo $getScholarships['scholarshipDetails'] ?></textarea>
+
                             </div>
-                            
+                           
                         </div>
                         <div class="border-top">
                             <div class="card-body">
-                                <button name="uploadScholarship" class="btn btn-primary">
-                                    Save
+                                <button name="updateScholarship" class="btn btn-primary">
+                                    Update
                                 </button>
                             </div>
                         </div>
