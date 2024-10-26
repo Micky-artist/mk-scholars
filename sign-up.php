@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 	
-<?php include("./partials/head.php") ?>
+<?php 
+include("./partials/head.php") ;
+include("./php/CreateUser.php");
+?>
 
 
 	<body>
@@ -13,14 +17,28 @@
 				<div class="form-wrapper">
 					<br>
 					<br>
+					<div>
+					<p class="<?php echo $class ?>">
+						<?php echo $msg ?>
+					 </p>
+					</div>
 					<!-- <a href="#" class="facebook-button">SIGN UP WITH FACEBOOK</a> -->
 					<!-- <p><span>Or</span></p> -->
-					<form action="#">
-						<input type="text" placeholder="Username">
-						<input type="email" placeholder="Email">
-						<input type="password" placeholder="Password">
-						<input type="password" placeholder="Repeat Password">
-						<button class="theme-button tran3s">SIGN UP</button>
+					 
+					<form method="post">
+						<input type="text" name="NoUsername" placeholder="Username" required>
+						<input type="email" name="NoEmail" placeholder="Email" required>
+						<input type="number" name="NoPhone" placeholder="Phone" required>
+						<input type="password" name="NoPassword" placeholder="Password" required>
+						<input type="password" name="NoCoPassword" placeholder="Comfirm Password" required>
+						<ul class="clearfix">
+							<li class="float-left">
+								<input type="checkbox" name="aggree" id="remember">
+								<label for="remember">By signing up you confirm that you agree with <a href="" target="_blank">Terms and Conditions</a> and <a href="" target="_blank">Privacy Policy</a></label>
+							</li>
+						</ul>
+						<button class="theme-button tran3s" name="signup">SIGN UP</button>
+						<p><a href="./home">Back Home</a></p>
 						<p>Already have an account? <a href="login" class="p-color">Sign In</a></p>
 					</form>
 				</div> <!-- /.form-wrapper -->

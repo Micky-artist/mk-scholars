@@ -13,6 +13,9 @@
             <li class="sidebar-item">
               <a class="sidebar-link waves-effect waves-dark sidebar-link" href="scholarships" aria-expanded="false"><i class="mdi mdi-file-check"></i><span class="hide-menu">Scholarships</span></a>
             </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="users" aria-expanded="false"><i class="mdi mdi-file-check"></i><span class="hide-menu">Users</span></a>
+            </li>
              
             <!--
             <li class="sidebar-item">

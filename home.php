@@ -50,64 +50,6 @@ include("./dbconnection/connection.php");
 			</div>
 		</div> <!-- /#theme-main-banner -->
 
-
-
-		<!-- 
-			=============================================
-				Find Course Form
-			============================================== 
-			-->
-		<div class="find-course">
-			<div class="opacity color-two">
-				<div class="container">
-					<div class="theme-title">
-						<h2>Find the Best Courses</h2>
-						<p>Find your preferred course from our wide range of courses easily, with just a one search here</p>
-					</div> <!-- /.theme-title -->
-
-					<form method="post">
-						<div class="row">
-							<!-- <div class="col-md-3 col-xs-6">
-								<div class="single-input">
-									<input type="text" placeholder="Course Name">
-								</div> 
-							</div> -->
-							<div class="col-md-3 col-xs-6">
-								<div class="single-input">
-									<select class="selectpicker">
-										<option>Sort By Country</option>
-										<?php include("./php/selectCountries.php") ?>
-									</select>
-								</div>
-							</div>
-							<div class="col-md-3 col-xs-6">
-								<div class="single-input">
-									<select class="selectpicker">
-										<option>Sort By Degree</option>
-										<option>Short Course</option>
-										<option>Vacational Training</option>
-										<option>Undergraduate</option>
-										<option>Masters degree</option>
-									</select>
-								</div>
-							</div>
-							<div class="col-md-3 col-xs-6">
-								<div class="single-input">
-									<select class="selectpicker">
-										<option>Course Program</option>
-										<option>Software Engineering</option>
-										<option>Mechanical Engineering</option>
-										<option>Bussiness</option>
-
-									</select>
-								</div> <!-- /.single-input -->
-							</div> <!-- /.col -->
-						</div> <!-- /.row -->
-						<button style="background-color: #fff; color: #4183E6; font-weight: bold;" name="searchCourse" class="p-bg-color hvr-rectangle-out">Search Course</button>
-					</form>
-				</div> <!-- /.container -->
-			</div> <!-- /.opacity -->
-		</div> <!-- /.find-course -->
 		<?php
 		if (isset($_POST['searchCourse'])) {
 			echo '<script type="text/javascript">
@@ -117,97 +59,7 @@ include("./dbconnection/connection.php");
 		}
 		?>
 
-		<!-- 
-			=============================================
-				Course selection
-			============================================== 
-			-->
-		<div class="course-selection">
-			<div class="container">
-				<div class="theme-title">
-					<h2>What you want to Become?</h2>
-					<p>Stay Focused, and learn new skills. Get skilled today and become what you have always wanted to be.</p>
-				</div> <!-- /.theme-title -->
-
-				<div class="row">
-					<div class="col-md-4 col-xs-6">
-						<div class="image">
-							<img src="images/home/4.jpg" alt="">
-							<div class="opacity">
-								<div>
-									<h5><a href="scholarships">Become a Software Engineer</a></h5>
-									<p>Course Duration 60 hours</p>
-								</div>
-							</div> <!-- /.opacity -->
-						</div> <!-- /.image -->
-					</div> <!-- /.col- -->
-					<div class="col-md-4 col-xs-6">
-						<div class="image">
-							<img src="images/home/5.jpg" alt="">
-							<div class="opacity">
-								<div>
-									<h5><a href="scholarships">Study Law</a></h5>
-									<p>Request Help Now</p>
-								</div>
-							</div> <!-- /.opacity -->
-						</div> <!-- /.image -->
-					</div> <!-- /.col- -->
-					<div class="col-md-4 col-xs-6">
-						<div class="image">
-							<img src="images/home/6.jpg" alt="">
-							<div class="opacity">
-								<div>
-									<h5><a href="scholarships">Study Mechanical Engineering / Mechatronics</a></h5>
-									<p>Request Help Now</p>
-								</div>
-							</div> <!-- /.opacity -->
-						</div> <!-- /.image -->
-					</div> <!-- /.col- -->
-					<div class="col-md-4 col-xs-6">
-						<div class="image">
-							<img src="images/home/7.jpg" alt="">
-							<div class="opacity">
-								<div>
-									<h5><a href="scholarships">Become a SEO Specialist</a></h5>
-									<p>Request Help Now</p>
-								</div>
-							</div> <!-- /.opacity -->
-						</div> <!-- /.image -->
-					</div> <!-- /.col- -->
-					<div class="col-md-4 col-xs-6">
-						<div class="image">
-							<img src="images/home/8.jpg" alt="">
-							<div class="opacity">
-								<div>
-									<h5><a href="scholarships">Become an Entrepreneur Leader</a></h5>
-									<p>Request Help Now</p>
-								</div>
-							</div> <!-- /.opacity -->
-						</div> <!-- /.image -->
-					</div> <!-- /.col- -->
-					<div class="col-md-4 col-xs-6">
-						<div class="image">
-							<img src="images/home/9.jpg" alt="">
-							<div class="opacity">
-								<div>
-									<h5><a href="scholarships">Study Business Analytics & Intelligence.</a></h5>
-									<p>Course Duration 60 hours</p>
-								</div>
-							</div> <!-- /.opacity -->
-						</div> <!-- /.image -->
-					</div> <!-- /.col- -->
-				</div> <!-- /.row -->
-			</div> <!-- /.container -->
-		</div> <!-- /.course-selection -->
-
-
-
-
-		<!-- 
-			=============================================
-				Featured Course
-			============================================== 
-			-->
+		
 		<div class="featured-course" id="scholarships">
 			<div class="container">
 				<div class="theme-title">
@@ -330,7 +182,6 @@ include("./dbconnection/connection.php");
 						<div class="testimonial-slider">
 							<div class="item">
 								<div class="item-wrapper">
-									<!-- <img src="images/home/c1.jpg" alt=""> -->
 									<h6>Salomon Uwimana</h6>
 									<span>M&S Innovation Lab Ltd CTO</span>
 									<p>I'm thankfull for MK Scholars because it helped me secure a full paid Scholarship at African Leadership University.</p>
@@ -338,12 +189,53 @@ include("./dbconnection/connection.php");
 							</div>
 							<div class="item">
 								<div class="item-wrapper">
-									<!-- <img src="images/home/c2.jpg" alt=""> -->
 									<h6>Umwari Grace</h6>
 									<span>Student At ALU</span>
 									<p>MK Scholars Helped me secure a grant at African Leadership University and I'm Thankful for it.</p>
 								</div>
 							</div>
+							<div class="item">
+								<div class="item-wrapper">
+									<h6>Josue NSHUTI</h6>
+									<span>Student at Ege University</span>
+									<p>I am incredibly grateful to MK Scholars for helping me secure a full scholarship to study Pharmacy in Turkey. Their support made my dreams come true. I highly recommend MK Scholars to other students looking for opportunities. They truly care and can help you achieve your goals, just like they did for me!</p>
+								</div>
+							</div>
+							<div class="item">
+								<div class="item-wrapper">
+									<h6>Uwera Peace</h6>
+									<span>Student at University of Rwanda </span>
+									<p>I am so grateful to Mk Scholars for helping me get a Mastercard full scholarship at the University of Rwanda. Their support and guidance made my dream come true. Thank you, Mk Scholars, for believing in me and giving me the chance to achieve a brighter future.</p>
+								</div>
+							</div>
+							<div class="item">
+								<div class="item-wrapper">
+									<h6>Rukundo Desire</h6>
+									<span>Student at University of cassino and southern lazio</span>
+									<p>I am very grateful to MK Scholars for helping me get admission and a visa to study in Italy. Their support made the whole process easy and stress-free. Without their help, I wouldn't have achieved this dream. Thank you, MK Scholars, for making it possible!</p>
+								</div>
+							</div>
+							<div class="item">
+								<div class="item-wrapper">
+									<h6>RUTIKANGA Jean Damour</h6>
+									<span>Student at Mohammed VI Polytechnic University</span>
+									<p>I am very grateful to MK Scholars for helping me secure a full scholarship to study Architecture in Morocco. Their support made my dream possible, and I feel encouraged to pursue my passion. I highly recommend MK Scholars to other students seeking opportunities for their education. Thank you, MK Scholars!</p>
+								</div>
+							</div>
+							<!-- <div class="item">
+								<div class="item-wrapper">
+									<h6>NSHUTI</h6>
+									<span>Student</span>
+									<p>incredibly</p>
+								</div>
+							</div>
+							<div class="item">
+								<div class="item-wrapper">
+									<h6>NSHUTI</h6>
+									<span>Student</span>
+									<p>incredibly</p>
+								</div>
+							</div> -->
 						</div>
 					</div>
 				</div>

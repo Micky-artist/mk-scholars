@@ -1,3 +1,7 @@
+<?php
+session_start();
+include("./dbconnection/connection.php");
+?>
 <head>
 	<meta charset="UTF-8">
 	<!-- For IE -->

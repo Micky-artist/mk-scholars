@@ -38,8 +38,19 @@
 								<!-- <li><a href="about-us" class="tran3s">About Us</a> -->
 								<li><a href="about-us">About Us</a></li>
 								<li><a href="faq">FAQ</a></li>
-								<li><a href="login">Login</a></li>
-								<li><a href="sign-up">sign up</a></li>
+								<?php
+								if (isset($_SESSION['username']) && isset($_SESSION['userId'])) {
+								?>
+									<li><a href="./php/logout.php">Log Out: <?php echo $_SESSION['username']; ?></a></li>
+								<?php
+								} else {
+								?>
+									<li><a href="login">Login</a></li>
+									<li><a href="sign-up">sign up</a></li>
+								<?php
+								}
+								?>
+
 							</ul>
 						</li>
 					</ul>

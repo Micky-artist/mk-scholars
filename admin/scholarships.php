@@ -78,6 +78,7 @@ include("./partials/head.php");
   <!-- ============================================================== -->
   <!-- All Jquery -->
   <!-- ============================================================== -->
+
   <script src="./assets/libs/jquery/dist/jquery.min.js"></script>
   <!-- Bootstrap tether Core JavaScript -->
   <script src="./assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

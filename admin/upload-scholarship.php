@@ -35,12 +35,6 @@ include("./php/uploadScholarship.php");
 </head>
 
 <body>
-    <div class="preloader">
-        <div class="lds-ripple">
-            <div class="lds-pos"></div>
-            <div class="lds-pos"></div>
-        </div>
-    </div>
     <!-- ============================================================== -->
     <!-- Main wrapper - style you can find in pages.scss -->
     <!-- ============================================================== -->
@@ -156,15 +150,15 @@ include("./php/uploadScholarship.php");
                                         </div>
                                     </div>
                                     <label class="card-title">Scholarship Link</label>
-                            <textarea type="text" id="post" name="ScholarshipLink" class="form-control" rows="2" required></textarea>
-                            <br>
-                            <label class="card-title">Scholarship Youtube Link</label>
-                            <textarea type="text" id="post" name="scholarshipYoutubeLink" class="form-control" rows="2" required></textarea>
-                            <br>
-                            <label class="card-title">Scholarship description</label>
-                            <textarea type="text" id="post" name="ScholarshipDescription" class="form-control" rows="20" required></textarea>
+                                    <textarea type="text" id="post" name="ScholarshipLink" class="form-control" rows="2" required></textarea>
+                                    <br>
+                                    <label class="card-title">Scholarship Youtube Link</label>
+                                    <textarea type="text" id="post" name="scholarshipYoutubeLink" class="form-control" rows="2" required></textarea>
+                                    <br>
+                                    <label class="card-title">Scholarship description</label>
+                                    <textarea type="text" id="textdescription" name="ScholarshipDescription" class="form-control" required></textarea>
                             </div>
-                            
+
                         </div>
                         <div class="border-top">
                             <div class="card-body">
@@ -184,116 +178,9 @@ include("./php/uploadScholarship.php");
         ?>
     </div>
     </div>
-    <script src="./assets/libs/jquery/dist/jquery.min.js"></script>
-    <!-- Bootstrap tether Core JavaScript -->
-    <script src="./assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- slimscrollbar scrollbar JavaScript -->
-    <script src="./assets/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js"></script>
-    <script src="./assets/extra-libs/sparkline/sparkline.js"></script>
-    <!--Wave Effects -->
-    <script src="./dist/js/waves.js"></script>
-    <!--Menu sidebar -->
-    <script src="./dist/js/sidebarmenu.js"></script>
-    <!--Custom JavaScript -->
-    <script src="./dist/js/custom.min.js"></script>
-    <!-- This Page JS -->
-    <script src="./assets/libs/inputmask/dist/min/jquery.inputmask.bundle.min.js"></script>
-    <script src="./dist/js/pages/mask/mask.init.js"></script>
-    <script src="./assets/libs/select2/dist/js/select2.full.min.js"></script>
-    <script src="./assets/libs/select2/dist/js/select2.min.js"></script>
-    <script src="./assets/libs/jquery-asColor/dist/jquery-asColor.min.js"></script>
-    <script src="./assets/libs/jquery-asGradient/dist/jquery-asGradient.js"></script>
-    <script src="./assets/libs/jquery-asColorPicker/dist/jquery-asColorPicker.min.js"></script>
-    <script src="./assets/libs/jquery-minicolors/jquery.minicolors.min.js"></script>
-    <script src="./assets/libs/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
-    <script src="./assets/libs/quill/dist/quill.min.js"></script>
 
-    <script type="text/javascript" src="./assets/js/jquery-te-1.4.0.min.js" charset="utf-8"></script>
-    <script type="text/javascript">
-        $('.text-jqte').jqte();
-
-
-        function displayImg(input, _this) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    _this.parent().parent().parent().find('.img-field').attr('src', e.target.result);
-                    _this.siblings('label').html(input.files[0]['name'])
-                    _this.siblings('input[name="fname"]').val('<?php echo strtotime(date('y-m-d H:i:s')) ?>_' + input.files[0]['name'])
-                    var p = $('<p></p>')
-
-                }
-
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        $('#manage-category').submit(function(e) {
-            e.preventDefault();
-            start_load();
-
-            $.ajax({
-                url: 'ajax.php?action=save_post',
-                data: new FormData($(this)[0]),
-                cache: false,
-                contentType: false,
-                processData: false,
-                method: 'POST',
-                type: 'POST',
-                success: function(resp) {
-                    resp = JSON.parse(resp)
-                    if (resp.status == 1) {
-                        alert_toast("Data successfully updated.", 'success');
-                        setTimeout(function() {
-                            location.replace('index.php?page=preview_post&id=' + resp.id)
-
-                        }, 1500)
-                    }
-                }
-            })
-        })
-    </script>
-    <script>
-        //***********************************//
-        // For select 2
-        //***********************************//
-        $(".select2").select2();
-
-        /*colorpicker*/
-        $(".demo").each(function() {
-            //
-            // Dear reader, it's actually very easy to initialize MiniColors. For example:
-            //
-            //  $(selector).minicolors();
-            //
-            // The way I've done it below is just for the demo, so don't get confused
-            // by it. Also, data- attributes aren't supported at this time...they're
-            // only used for this demo.
-            //
-            $(this).minicolors({
-                control: $(this).attr("data-control") || "hue",
-                position: $(this).attr("data-position") || "bottom left",
-
-                change: function(value, opacity) {
-                    if (!value) return;
-                    if (opacity) value += ", " + opacity;
-                    if (typeof console === "object") {
-                        console.log(value);
-                    }
-                },
-                theme: "bootstrap",
-            });
-        });
-        /*datwpicker*/
-        jQuery(".mydatepicker").datepicker();
-        jQuery("#datepicker-autoclose").datepicker({
-            autoclose: true,
-            todayHighlight: true,
-        });
-        var quill = new Quill("#editor", {
-            theme: "snow",
-        });
-    </script>
+    <script type="text/javascript" src="./tinymce/tinymce.min.js"></script>
+    <script type="text/javascript" src="./tinymce/tinyscript.js"></script>
 </body>
 
 </html>
