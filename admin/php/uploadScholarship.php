@@ -7,7 +7,7 @@ $ScholarshipPrice=mysqli_real_escape_string($conn, $_POST['ScholarshipPrice']);
 $ScholarshipCountry=mysqli_real_escape_string($conn, $_POST['ScholarshipCountry']);
 $ScholarshipLink=mysqli_real_escape_string($conn, $_POST['ScholarshipLink']);
 $scholarshipYoutubeLink=mysqli_real_escape_string($conn, $_POST['scholarshipYoutubeLink']);
-$ScholarshipDescription=$_POST['ScholarshipDescription'];
+$ScholarshipDescription=mysqli_real_escape_string($conn,$_POST['ScholarshipDescription']);
 
 $uploadDate=date("Y-m-d");
 $uploadTime=date("h:i a");

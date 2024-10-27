@@ -156,7 +156,7 @@ include("./php/uploadScholarship.php");
                                     <textarea type="text" id="post" name="scholarshipYoutubeLink" class="form-control" rows="2" required></textarea>
                                     <br>
                                     <label class="card-title">Scholarship description</label>
-                                    <textarea type="text" id="textdescription" name="ScholarshipDescription" class="form-control" required></textarea>
+                                    <textarea type="text" id="textdescription" name="ScholarshipDescription" class="form-control" rows="30" cols="20" required></textarea>
                             </div>
 
                         </div>
