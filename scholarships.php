@@ -53,24 +53,20 @@ include("./dbconnection/connection.php");
 
 						<div class="row">
 							<?php
-							if((isset($_GET['i']) && !empty($_GET['i'])) && (isset($_GET['Country_name']) && !empty($_GET['Country_name']))){
+							if ((isset($_GET['i']) && !empty($_GET['i'])) && (isset($_GET['Country_name']) && !empty($_GET['Country_name']))) {
 								$countryId = $_GET['i'];
 								$Country_name = $_GET['Country_name'];
 								$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 AND country=$countryId ORDER BY scholarshipId DESC");
-								echo "<h5>Showing results of ".$Country_name.".</h5><br>";
-							}elseif(isset($_GET['search'])){
-								$search=$_GET['searchText'];
+								echo "<h5>Showing results of " . $Country_name . ".</h5><br>";
+							} elseif (isset($_GET['search'])) {
+								$search = $_GET['searchText'];
 								$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 AND scholarshipDetails LIKE '%$search%' ORDER BY scholarshipId DESC");
-								echo "<h5>Showing results of ".$search.".</h5><br>";
-							}elseif(isset($_GET['key']) && !empty($_GET['key'])){
-								$key=$_GET['key'];
+								echo "<h5>Showing results of " . $search . ".</h5><br>";
+							} elseif (isset($_GET['key']) && !empty($_GET['key'])) {
+								$key = $_GET['key'];
 								$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 AND scholarshipDetails LIKE '%$key%' ORDER BY scholarshipId DESC");
-								echo "<h5>Showing results of ".$key.".</h5><br>";
-							}elseif(isset($_GET['course']) && !empty($_GET['course'])){
-								$course=$_GET['course'];
-								$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 AND scholarshipDetails LIKE '%$course%' ORDER BY scholarshipId DESC");
-								echo "<h5>Showing results of ".$course.".</h5><br>";
-							}else{
+								echo "<h5>Showing results of " . $key . ".</h5><br>";
+							}else {
 								$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 ORDER BY scholarshipId DESC");
 							}
 							if ($selectScholarships->num_rows > 0) {
@@ -97,12 +93,14 @@ include("./dbconnection/connection.php");
 										</div> <!-- /.single-course-grid -->
 									</div> <!-- /.col- -->
 									<!-- </a> -->
-							<?php
-								}
-							}else{
-								?>
-								<div><p>No results found</p></div>
 								<?php
+								}
+							} else {
+								?>
+								<div>
+									<p>No results found</p>
+								</div>
+							<?php
 							}
 
 							?>
@@ -147,31 +145,44 @@ include("./dbconnection/connection.php");
 
 					<div class="col-md-3 col-sm-6 col-xs-12 course-sidebar">
 						<form method="get" class="course-sidebar-search">
-							<input type="text" name="searchText" placeholder="Search Scholarship..." value="<?php if(isset($_GET['search'])){echo $search;} ?>">
+							<input type="text" name="searchText" placeholder="Search Scholarship..." value="<?php if (isset($_GET['search'])) {
+																												echo $search;
+																											} ?>">
 							<button name="search"><i class="fa fa-search" aria-hidden="true"></i></button>
 						</form>
 
 						<div class="course-sidebar-list">
 							<h6>Countries</h6>
 							<ul>
-							<li><a href="scholarships" class="tran3s">Show All (Reset)</a></li>
+								<li><a href="scholarships" class="tran3s">Show All (Reset)</a></li>
 								<?php include("./php/selectCountriesLI.php") ?>
 							</ul>
 						</div>
-						<div class="course-sidebar-list">
+						<!-- <div class="course-sidebar-list">
 							<h6>Courses</h6>
 							<ul>
 								<li><a href="?course=software" class="tran3s">Software Engineering</a></li>
 							</ul>
-						</div>
+						</div> -->
 						<div class="course-sidebar-list">
-							<h6>Degree</h6>
+							<h6>Tags</h6>
 							<ul>
-								<li><a href="?key=Internship" class="tran3s">Internship</a></li>
-								<li><a href="?key=Trainings" class="tran3s">Vacational Trainings</a></li>
-								<li><a href="?key=Short Course" class="tran3s">Short Course</a></li>
-								<li><a href="?key=Masters" class="tran3s">Masters</a></li>
-								<li><a href="?key=undergraduate" class="tran3s">Undergraduate</a></li>
+								<?php
+								$selectTags = mysqli_query($conn, "SELECT * FROM PostTags WHERE TagStatus = 1");
+								if ($selectTags->num_rows > 0) {
+									while ($tagData = mysqli_fetch_assoc($selectTags)) {
+								?>
+										<li><a href="?key=<?php echo $tagData['TagValue'] ?>" class="tran3s"><?php echo $tagData['TagName'] ?></a></li>
+
+									<?php
+									}
+								} else {
+									?>
+									<li>No tags available</li>
+								<?php
+								}
+
+								?>
 							</ul>
 						</div>
 					</div> <!-- /.course-sidebar -->

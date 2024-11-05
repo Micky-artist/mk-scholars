@@ -16,6 +16,15 @@
             <li class="sidebar-item">
               <a class="sidebar-link waves-effect waves-dark sidebar-link" href="users" aria-expanded="false"><i class="mdi mdi-file-check"></i><span class="hide-menu">Users</span></a>
             </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="tags" aria-expanded="false"><i class="mdi mdi-file-check"></i><span class="hide-menu">Tags</span></a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="upload-youtube-video" aria-expanded="false"><i class="mdi mdi-file-check"></i><span class="hide-menu">Upload Youtube Video</span></a>
+            </li>
+            <!-- <li class="sidebar-item">
+              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="students-application" aria-expanded="false"><i class="mdi mdi-file-check"></i><span class="hide-menu">Students Application</span></a>
+            </li> -->
              
             <!--
             <li class="sidebar-item">

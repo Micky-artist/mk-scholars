@@ -1,49 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 
-	
-<?php 
-include("./partials/head.php") ;
+
+<?php
+include("./partials/head.php");
 include("./php/CreateUser.php");
 ?>
 
 
-	<body>
-		<div class="main-page-wrapper">
+<body>
+	<div class="main-page-wrapper">
 
-			
-			<div class="theme-login-page sign-up-page">
-				<div class="logo"><a href="index"><img src="images/logo/logoRound.png" width="100" height="100"  alt=""></a></div>
-				<div class="form-wrapper">
-					<br>
-					<br>
-					<div>
+
+		<div class="theme-login-page sign-up-page">
+			<div class="logo"><a href="index"><img src="images/logo/logoRound.png" width="100" height="100" alt=""></a></div>
+			<div class="form-wrapper">
+				<br>
+				<br>
+				<div>
 					<p class="<?php echo $class ?>">
 						<?php echo $msg ?>
-					 </p>
-					</div>
-					<!-- <a href="#" class="facebook-button">SIGN UP WITH FACEBOOK</a> -->
-					<!-- <p><span>Or</span></p> -->
-					 
-					<form method="post">
-						<input type="text" name="NoUsername" placeholder="Username" required>
-						<input type="email" name="NoEmail" placeholder="Email" required>
-						<input type="number" name="NoPhone" placeholder="Phone" required>
-						<input type="password" name="NoPassword" placeholder="Password" required>
-						<input type="password" name="NoCoPassword" placeholder="Comfirm Password" required>
-						<ul class="clearfix">
-							<li class="float-left">
-								<input type="checkbox" name="aggree" id="remember">
-								<label for="remember">By signing up you confirm that you agree with <a href="" target="_blank">Terms and Conditions</a> and <a href="" target="_blank">Privacy Policy</a></label>
-							</li>
-						</ul>
-						<button class="theme-button tran3s" name="signup">SIGN UP</button>
-						<p><a href="./home">Back Home</a></p>
-						<p>Already have an account? <a href="login" class="p-color">Sign In</a></p>
-					</form>
-				</div> <!-- /.form-wrapper -->
-			</div>
-	        
+					</p>
+				</div>
+				<!-- <a href="#" class="facebook-button">SIGN UP WITH FACEBOOK</a> -->
+				<!-- <p><span>Or</span></p> -->
+
+				<form method="post">
+					<input type="text" name="NoUsername" placeholder="Username" required>
+					<input type="email" name="NoEmail" placeholder="Email" required>
+					<input type="number" name="NoPhone" placeholder="Phone" required>
+					<input type="password" name="NoPassword" placeholder="Password" required>
+					<input type="password" name="NoCoPassword" placeholder="Comfirm Password" required>
+					<ul class="clearfix">
+						<li class="float-left">
+							<input type="checkbox" name="aggree" id="remember">
+							<label for="remember">By signing up you confirm that you agree with <a href="./terms-and-conditions" target="_blank">Terms and Conditions</a> and <a href="./privacy-policy" target="_blank">Privacy Policy</a></label>
+						</li>
+					</ul>
+					<button class="theme-button tran3s" name="signup">SIGN UP</button>
+					<p><a href="./home">Back Home</a></p>
+					<p>Already have an account? <a href="login" class="p-color">Sign In</a></p>
+				</form>
+			</div> <!-- /.form-wrapper -->
+		</div>
+
 
 
 		<!-- Js File_________________________________ -->
@@ -58,7 +58,7 @@ include("./php/CreateUser.php");
 		<!-- Theme js -->
 		<script type="text/javascript" src="js/theme.js"></script>
 
-		</div> <!-- /.main-page-wrapper -->
-	</body>
+	</div> <!-- /.main-page-wrapper -->
+</body>
 
 </html>

@@ -88,9 +88,19 @@ include("./php/selectScholarshipDetails.php")
 
 
 					<div class="col-md-3 col-sm-6 col-xs-12 theme-sidebar">
-						<form action="#" class="sidebar-search">
-							<input type="text" placeholder="Search...">
-							<button class="s-color-bg tran3s"><i class="fa fa-search" aria-hidden="true"></i></button>
+						<div>
+							<?php
+							$selectVideos=mysqli_query($conn,"SELECT * FROM youtubeVideos WHERE VideoStatus=1");
+							if($selectVideos->num_rows>0){
+								while($videoData=mysqli_fetch_assoc($selectVideos)){
+									echo $videoData['videoLink'];
+								}
+							}
+							?>
+						</div>
+						<form method="post" class="sidebar-search">
+							<input type="text" name="searchValue" placeholder="Search...">
+							<button name="search" class="s-color-bg tran3s"><i class="fa fa-search" aria-hidden="true"></i></button>
 						</form>
 						<div class="sidebar-recent-post">
 							<h5>Recently Uploaded</h5>
@@ -99,7 +109,12 @@ include("./php/selectScholarshipDetails.php")
 							<ul>
 								<?php
 								$PresentScholarship=$_GET['scholarship-id'];
-								$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 AND scholarshipId != $PresentScholarship ORDER BY scholarshipId DESC LIMIT 4");
+								if(isset($_POST['search'])){
+									$searchValue = $_POST['searchValue'];
+									$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 AND scholarshipDetails LIKE '%$searchValue%' ORDER BY scholarshipId DESC LIMIT 7");
+								}else{
+									$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 AND scholarshipId != $PresentScholarship ORDER BY scholarshipId DESC LIMIT 7");
+								}
 								if ($selectScholarships->num_rows > 0) {
 									while ($getScholarships = mysqli_fetch_assoc($selectScholarships)) {
 								?>
@@ -112,6 +127,12 @@ include("./php/selectScholarshipDetails.php")
 										</li>
 								<?php
 									}
+								}else{
+									?>
+									<li class="clearfix">
+										No Results found
+									</li>
+									<?php
 								}
 								?>
 							</ul>
