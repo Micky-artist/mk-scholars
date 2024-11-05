@@ -5,6 +5,7 @@
 				<div class="footer-logo">
 					<a href="index"><img src="images/logo/fullLogo.png" width="200" height="200" alt="Logo"></a>
 					<div class="SocialMediaIcons">
+						<h6>Follow Us Via</h6>
 						<a target="_blank" href="#"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#87CEEB" class="bi bi-facebook" viewBox="0 0 16 16">
 								<path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951" />
 							</svg></a>
@@ -24,7 +25,7 @@
 					</style>
 
 					<p>&copy; <?php echo date('Y'); ?> MK Scholars. All rights reserved.</p>
-					<p>Developed by <a href="https://msilab.rw/">M&S Innovation Lab Ltd.</a></p>
+					<p>Developed by <a target="_blank" href="https://msilab.rw/">M&S Innovation Lab Ltd.</a></p>
 					<!-- <ul>
 									<li><a href="https://www.apple.com/itunes/"><img src="images/logo/android.png" alt=""></a></li>
 									<li><a href="https://play.google.com/store"><img src="images/logo/apple.png" alt=""></a></li>
@@ -45,6 +46,9 @@
 					<!-- <li><a href="#" class="tran3s">Careers</a></li> -->
 					<!-- <li><a href="#" class="tran3s">FAQ</a></li> -->
 					<li><a href="contact-us" class="tran3s">Contact</a></li>
+					<li><a href="terms-and-conditions" class="tran3s">Terms and Conditions</a></li>
+					<li><a href="privacy-policy" class="tran3s">Privacy Policy</a></li>
+
 				</ul>
 			</div>
 			<!-- <div class="col-md-2 col-sm-3 footer-list">

@@ -79,7 +79,7 @@ include("./dbconnection/connection.php");
 												<img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipImage'] ?>" alt="">
 											</div>
 											<div class="text">
-												<h6><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo $getScholarships['scholarshipTitle'] ?>" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a></h6>
+												<h6><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-",$getScholarships['scholarshipTitle']) ?>" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a></h6>
 												<div class="DetailWrapper">
 													<p class="postLineLimit"><?php echo $getScholarships['scholarshipDetails'] ?></p>
 												</div>
@@ -87,7 +87,7 @@ include("./dbconnection/connection.php");
 												<ul class="clearfix">
 													<li class="float-left"><i class="fa fa-calendar" aria-hidden="true"></i> <?php echo $getScholarships['scholarshipUpdateDate'] ?></li>
 
-													<li class="float-right"><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo $getScholarships['scholarshipTitle'] ?>" class="tran3s free hvr-float-shadow">More</a></li>
+													<li class="float-right"><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-",$getScholarships['scholarshipTitle']) ?>" class="tran3s free hvr-float-shadow">More</a></li>
 												</ul>
 											</div> <!-- /.text -->
 										</div> <!-- /.single-course-grid -->

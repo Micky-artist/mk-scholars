@@ -9,6 +9,7 @@ include("./dbconnection/connection.php");
 <?php include("./partials/head.php") ?>
 
 <body>
+	
 	<div class="main-page-wrapper">
 		<?php
 		include("./partials/navigation.php");
@@ -80,7 +81,7 @@ include("./dbconnection/connection.php");
 										<img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipImage'] ?>" alt="">
 									</div>
 									<div class="text">
-										<h6><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo $getScholarships['scholarshipTitle'] ?>" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a></h6>
+										<h6><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-",$getScholarships['scholarshipTitle']) ?>" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a></h6>
 										<div class="DetailWrapper">
 											<p class="postLineLimit"><?php echo $getScholarships['scholarshipDetails'] ?></p>
 										</div>
@@ -88,7 +89,7 @@ include("./dbconnection/connection.php");
 										<ul class="clearfix">
 											<li class="float-left"><i class="fa fa-calendar" aria-hidden="true"></i> <?php echo $getScholarships['scholarshipUpdateDate'] ?></li>
 
-											<li class="float-right"><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo $getScholarships['scholarshipTitle'] ?>" class="tran3s free hvr-float-shadow">More</a></li>
+											<li class="float-right"><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-",$getScholarships['scholarshipTitle']) ?>" class="tran3s free hvr-float-shadow">More</a></li>
 										</ul>
 									</div> <!-- /.text -->
 								</div> <!-- /.single-course-grid -->
@@ -180,20 +181,7 @@ include("./dbconnection/connection.php");
 				<div class="slider-wrapper">
 					<div class="row">
 						<div class="testimonial-slider">
-							<div class="item">
-								<div class="item-wrapper">
-									<h6>Salomon Uwimana</h6>
-									<span>M&S Innovation Lab Ltd CTO</span>
-									<p>I'm thankfull for MK Scholars because it helped me secure a full paid Scholarship at African Leadership University.</p>
-								</div>
-							</div>
-							<div class="item">
-								<div class="item-wrapper">
-									<h6>Umwari Grace</h6>
-									<span>Student At ALU</span>
-									<p>MK Scholars Helped me secure a grant at African Leadership University and I'm Thankful for it.</p>
-								</div>
-							</div>
+							
 							<div class="item">
 								<div class="item-wrapper">
 									<h6>Josue NSHUTI</h6>
@@ -222,13 +210,28 @@ include("./dbconnection/connection.php");
 									<p>I am very grateful to MK Scholars for helping me secure a full scholarship to study Architecture in Morocco. Their support made my dream possible, and I feel encouraged to pursue my passion. I highly recommend MK Scholars to other students seeking opportunities for their education. Thank you, MK Scholars!</p>
 								</div>
 							</div>
-							<!-- <div class="item">
+							<div class="item">
 								<div class="item-wrapper">
-									<h6>NSHUTI</h6>
-									<span>Student</span>
-									<p>incredibly</p>
+									<h6>Christella Ineza</h6>
+									<span>A student at the University of Global Health Equity (UGHE)</span>
+									<p>MK Scholars have been tremendously helpful in obtaining a full scholarship at UGHE, and their help was not in vain. I am filled with gratitude for their assistance!</p>
 								</div>
 							</div>
+							<div class="item">
+								<div class="item-wrapper">
+									<h6>Salomon Uwimana</h6>
+									<span>M&S Innovation Lab Ltd CTO</span>
+									<p>I'm thankfull for MK Scholars because it helped me secure a full paid Scholarship at African Leadership University.</p>
+								</div>
+							</div>
+							<div class="item">
+								<div class="item-wrapper">
+									<h6>Umwari Grace</h6>
+									<span>Student At ALU</span>
+									<p>MK Scholars Helped me secure a grant at African Leadership University and I'm Thankful for it.</p>
+								</div>
+							</div>
+							<!-- 
 							<div class="item">
 								<div class="item-wrapper">
 									<h6>NSHUTI</h6>

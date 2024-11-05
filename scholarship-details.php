@@ -89,15 +89,25 @@ include("./php/selectScholarshipDetails.php")
 
 					<div class="col-md-3 col-sm-6 col-xs-12 theme-sidebar">
 						<div>
+						<h5>Application process guiding videos</h5>
 							<?php
 							$selectVideos=mysqli_query($conn,"SELECT * FROM youtubeVideos WHERE VideoStatus=1");
 							if($selectVideos->num_rows>0){
 								while($videoData=mysqli_fetch_assoc($selectVideos)){
 									echo $videoData['videoLink'];
+									?>
+									<b><p><?php echo $videoData['VideoTitle']; ?></p></b><br>
+									<?php
 								}
 							}
 							?>
 						</div>
+						<br>
+						<div>
+							<a href="https://www.youtube.com/@mkscholars" target="_blank" style="background-color: #b90e0e; color:white; font-size: 16px;" class="btn btn-danger">Visit our Youtube Channel @mkscholars</a>
+						</div>
+						<br>
+
 						<form method="post" class="sidebar-search">
 							<input type="text" name="searchValue" placeholder="Search...">
 							<button name="search" class="s-color-bg tran3s"><i class="fa fa-search" aria-hidden="true"></i></button>
@@ -121,7 +131,7 @@ include("./php/selectScholarshipDetails.php")
 										<li class="clearfix">
 											<img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipImage'] ?>" alt="" class="float-left">
 											<div class="post float-left">
-												<a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo $getScholarships['scholarshipTitle'] ?>" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a>
+												<a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-",$getScholarships['scholarshipTitle']) ?>" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a>
 												<span><?php echo $getScholarships['scholarshipUpdateDate'] ?></span>
 											</div>
 										</li>

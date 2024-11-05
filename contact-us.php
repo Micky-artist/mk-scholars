@@ -46,7 +46,7 @@
 									<ul>
 										<li><i class="fa fa-map-marker" aria-hidden="true"></i> Kigali - Rwanda <br> Kicukiro - Nyanza Near Canal Olympia</li>
 										<li><i class="fa fa-phone" aria-hidden="true"></i> +250 798 611 161</li>
-										<li><i class="fa fa-envelope-o" aria-hidden="true"></i> paulscholar250@gmail.com</li>
+										<li><i class="fa fa-envelope-o" aria-hidden="true"></i> mkscholars250@gmail.com</li>
 									</ul>
 								</div> <!-- /.opacity -->
 							</div>
