@@ -58,3 +58,7 @@ if (isset($_GET['DeActivate'])) {
     $vidId = $_GET['DeActivate'];
     $deleteTag = mysqli_query($conn, "UPDATE youtubeVideos SET VideoStatus=0 WHERE videoId=$vidId");
 }
+if (isset($_GET['Delete'])) {
+    $vidId = $_GET['Delete'];
+    $deleteTag = mysqli_query($conn, "DELETE FROM youtubeVideos WHERE videoId=$vidId");
+}

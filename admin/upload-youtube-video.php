@@ -181,6 +181,7 @@ include("./php/videoOperations.php");
                                                             <a class="btn btn-primary" href="?DeActivate=<?php echo $videosData['videoId'] ?>">De-Activate</a>
                                                         <?php } ?>
                                                         <a class="btn btn-secondary" href="?Edit=<?php echo $videosData['videoId'] ?>">Edit</a>
+                                                        <a class="btn btn-warning" href="?Delete=<?php echo $videosData['videoId'] ?>">Delete</a>
                                                     </td>
 
                                                 </tr>
