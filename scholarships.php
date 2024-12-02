@@ -87,7 +87,7 @@ include("./dbconnection/connection.php");
 												<ul class="clearfix">
 													<li class="float-left"><i class="fa fa-calendar" aria-hidden="true"></i> <?php echo $getScholarships['scholarshipUpdateDate'] ?></li>
 
-													<li class="float-right"><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-",$getScholarships['scholarshipTitle']) ?>" class="tran3s free hvr-float-shadow">More</a></li>
+													<li class="float-right"><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-",$getScholarships['scholarshipTitle']) ?>" class="tran3s textfont free hvr-float-shadow">READ MORE</a></li>
 												</ul>
 											</div> <!-- /.text -->
 										</div> <!-- /.single-course-grid -->
