@@ -143,7 +143,29 @@
     url('../fonts/font-awesome/fonts/fontawesome-webfont.svg') format('svg');
   /* Legacy iOS */
 }
-
+.scholarshipTable{
+  margin: 5px;
+}
+.scholarshipTable .tdiv{
+  background-color: #083352;
+  color: white;
+  padding: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.scholarshipTable .ta{
+  background-color: #eae9e9;
+  padding: 5px;
+  font-size: 18px;
+  font-weight: bold;
+  width: 100%;
+  border-bottom: 1px solid #083352;
+  transition: .2s ease-in-out;
+}
+.scholarshipTable .ta:hover{
+  background-color: #d1d1d1;
+}
 body {
   font-family: 'Source Sans Pro', sans-serif;
   font-weight: normal;

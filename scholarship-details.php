@@ -7,12 +7,21 @@ include("./php/selectScholarshipDetails.php")
 
 <!DOCTYPE html>
 <html lang="en">
-<title>Mk Scholars <?php echo $scholarshipData['scholarshipTitle'] ?></title>
-
 <?php include("./partials/head.php") ?>
 
 <head>
-	<!-- <meta property="og:image:secure_url" content="https://admin.mkscholars.com/uploads/posts/<?php echo $$scholarshipData['scholarshipImage'] ?>"> -->
+	<title>Mk Scholars <?php echo $scholarshipData['scholarshipTitle'] ?></title>
+
+	<!-- Open Graph metadata for social sharing -->
+	<meta property="og:title" content="Mk Scholars <?php echo $scholarshipData['scholarshipTitle'] ?>" />
+	<meta property="og:description" content="<?php echo $scholarshipData['scholarshipTitle'] ?>" />
+	<meta property="og:image" content="https://admin.mkscholars.com/uploads/posts/<?php echo $scholarshipData['scholarshipImage'] ?>" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://mkscholars.com/scholarship-details?scholarship-id=<?php echo $scholarshipData['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-", $scholarshipData['scholarshipTitle']) ?>" />
+
+	<!-- Existing meta tags -->
 	<meta name="description" content="<?php echo $scholarshipData['scholarshipTitle'] ?>">
 </head>
 
@@ -54,6 +63,12 @@ include("./php/selectScholarshipDetails.php")
 				<div class="row">
 					<div class="col-md-9 col-xs-12 theme-large-sidebar">
 						<a style="font-size: 16px; background-color: green; padding: 10px; color: white;" class="btn btn-primary" target="_blank" href="https://chat.whatsapp.com/Jm0hfcLeRVm3pbnNPx82GD">Join What'sApp group</a>
+						<a href="https://api.whatsapp.com/send?text=<?php echo urlencode('Check out this scholarship: https://mkscholars.com/scholarship-details?scholarship-id=' . $scholarshipData['scholarshipId'] . '&scholarship-title=' . preg_replace('/\s+/', '-', $scholarshipData['scholarshipTitle'])); ?>" target="_blank">
+							<button style="background-color: #25D366; color: white; padding: 10px; border: none; border-radius: 5px;">
+								Share on WhatsApp
+							</button>
+						</a>
+
 
 						<div class="SocialMediaIcons">
 							<a href="#"><svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="#87CEEB" class="bi bi-facebook" viewBox="0 0 16 16">
@@ -84,20 +99,27 @@ include("./php/selectScholarshipDetails.php")
 							<a style="font-size: 16px; background-color: red; padding: 10px; color: white;" class="btn btn-primary" target="_blank" href="<?php echo $scholarshipData['scholarshipYoutubeLink'] ?>">Youtube Guide Video</a>
 							<a style="font-size: 16px; background-color: green; padding: 10px; color: white;" class="btn btn-primary" target="_blank" href="https://chat.whatsapp.com/Jm0hfcLeRVm3pbnNPx82GD">Join What'sApp group</a>
 						</div>
+
+						<div class="scholarshipTable">
+							<div>This is the title</div>
+							<a href="">This is the link</a>
+						</div>
 					</div> <!-- /.theme-large-sidebar -->
 
 
 					<div class="col-md-3 col-sm-6 col-xs-12 theme-sidebar">
 						<div>
-						<h5>Application process guiding videos</h5>
+							<h5>Application process guiding videos</h5>
 							<?php
-							$selectVideos=mysqli_query($conn,"SELECT * FROM youtubeVideos WHERE VideoStatus=1");
-							if($selectVideos->num_rows>0){
-								while($videoData=mysqli_fetch_assoc($selectVideos)){
+							$selectVideos = mysqli_query($conn, "SELECT * FROM youtubeVideos WHERE VideoStatus=1");
+							if ($selectVideos->num_rows > 0) {
+								while ($videoData = mysqli_fetch_assoc($selectVideos)) {
 									echo $videoData['videoLink'];
-									?>
-									<b><p><?php echo $videoData['VideoTitle']; ?></p></b><br>
-									<?php
+							?>
+									<b>
+										<p><?php echo $videoData['VideoTitle']; ?></p>
+									</b><br>
+							<?php
 								}
 							}
 							?>
@@ -118,11 +140,11 @@ include("./php/selectScholarshipDetails.php")
 							<!-- TO BE USED IN FUTURE -->
 							<ul>
 								<?php
-								$PresentScholarship=$_GET['scholarship-id'];
-								if(isset($_POST['search'])){
+								$PresentScholarship = $_GET['scholarship-id'];
+								if (isset($_POST['search'])) {
 									$searchValue = $_POST['searchValue'];
 									$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 AND scholarshipDetails LIKE '%$searchValue%' ORDER BY scholarshipId DESC LIMIT 7");
-								}else{
+								} else {
 									$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 AND scholarshipId != $PresentScholarship ORDER BY scholarshipId DESC LIMIT 7");
 								}
 								if ($selectScholarships->num_rows > 0) {
@@ -131,18 +153,18 @@ include("./php/selectScholarshipDetails.php")
 										<li class="clearfix">
 											<img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipImage'] ?>" alt="" class="float-left">
 											<div class="post float-left">
-												<a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-",$getScholarships['scholarshipTitle']) ?>" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a>
+												<a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-", $getScholarships['scholarshipTitle']) ?>" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a>
 												<span><?php echo $getScholarships['scholarshipUpdateDate'] ?></span>
 											</div>
 										</li>
-								<?php
+									<?php
 									}
-								}else{
+								} else {
 									?>
 									<li class="clearfix">
 										No Results found
 									</li>
-									<?php
+								<?php
 								}
 								?>
 							</ul>

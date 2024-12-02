@@ -30,7 +30,6 @@ if (isset($_POST['updateScholarship'])) {
                 $sql1 = "UPDATE scholarships 
                          SET scholarshipTitle='$ScholarshipTitle', 
                              scholarshipDetails='$ScholarshipDescription', 
-                             scholarshipUpdateDate='$uploadDate', 
                              scholarshipLink='$ScholarshipLink', 
                              scholarshipYoutubeLink='$scholarshipYoutubeLink', 
                              scholarshipStatus='$ScholarshipStatus', 
