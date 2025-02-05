@@ -76,7 +76,7 @@
 						</li>
 						<!-- <li><a href="scholarships" class="tran3s">Apply Now</a> -->
 						</li>
-						<li><a href="contact-us" class="tran3s">Contact</a></li>
+						<li><a href="about-us#contact" class="tran3s">Contact</a></li>
 
 						<li class="dropdown-holder"><a href="#" class="tran3s">More</a>
 							<ul class="sub-menu">

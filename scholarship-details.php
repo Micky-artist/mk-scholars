@@ -100,10 +100,10 @@ include("./php/selectScholarshipDetails.php")
 							<a style="font-size: 16px; background-color: green; padding: 10px; color: white;" class="btn btn-primary" target="_blank" href="https://chat.whatsapp.com/L6w35n4buOW2YF0r74r3LI">Join What'sApp group</a>
 						</div>
 
-						<div class="scholarshipTable">
+						<!-- <div class="scholarshipTable">
 							<div>This is the title</div>
 							<a href="">This is the link</a>
-						</div>
+						</div> -->
 					</div> <!-- /.theme-large-sidebar -->
 
 

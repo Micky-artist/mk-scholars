@@ -75,7 +75,7 @@
 				</div>
 				<div id="particles-js"></div>
 				<div class="opacity">
-					<div class="container">
+					<div class="container"  id="contact">
 						<h2>Ready to take your Education to the next Level?</h2>
 						<p>Get access on many scholarships that you need, start your free today</p>
 						<a href="scholarships" class="tran3s hvr-float-shadow">Start Now</a>
@@ -83,9 +83,72 @@
 				</div> <!-- /.opacity -->
 			</div> <!-- /.signUp-banner -->
 
+			<div class="contact-address">
+				<div class="container">
+					<div class="row">
+						<div class="col-lg-7 col-md-7 hidden-sm hidden-xs"><img src="images/home/grad2.jpg" alt=""></div>
+						<div class="col-lg-5 col-md-5 col-xs-12">
+							<div class="address-banner">
+								<div class="opacity">
+									<h2>OUR CONTACT</h2>
+									<ul>
+										<li><i class="fa fa-map-marker" aria-hidden="true"></i> Kigali - Rwanda <br> Kicukiro - Nyanza Near Canal Olympia</li>
+										<li><i class="fa fa-phone" aria-hidden="true"></i> <a style="color: #fff;" href="tel:+250798611161">+250 798 611 161</a></li>
+										<li><i class="fa fa-envelope-o" aria-hidden="true"></i> <a style="color: #fff;" href="mailto:mkscholars250@gmail.com">mkscholars250@gmail.com</a></li>
+									</ul>
+								</div> <!-- /.opacity -->
+							</div>
+						</div> <!-- /.col- -->
+					</div> <!-- /.row -->
+				</div> <!-- /.container -->
+			</div> <!-- /.contact-address -->
 
-
-
+			<div class="contact-form-holder container">
+				<div class="row">
+					<form action="" method="post" class="form-validation" autocomplete="off">
+						<div class="col-sm-6 col-xs-12">
+							<div class="single-input-group">
+								<input type="text" placeholder="First Name" name="Fname">
+							</div> 
+						</div> 
+						<div class="col-sm-6 col-xs-12">
+							<div class="single-input-group">
+								<input type="text" placeholder="Last Name" name="Lname">
+							</div> 
+						</div> 
+						<div class="col-sm-6 col-xs-12">
+							<div class="single-input-group">
+								<input type="email" placeholder="Email" name="email">
+							</div>
+						</div> 
+						<div class="col-sm-6 col-xs-12">
+							<div class="single-input-group">
+								<input type="text" placeholder="Phone" name="phone">
+							</div> 
+						</div>
+						<div class="col-xs-12">
+							<textarea placeholder="Write Message" name="message"></textarea>
+							<button class="tran3s">send</button>
+						</div> 
+					</form>
+				</div> 
+				<div class="alert-wrapper" id="alert-success">
+					<div id="success">
+						<button class="closeAlert"><i class="fa fa-times" aria-hidden="true"></i></button>
+						<div class="wrapper">
+			               	<p>Your message was sent successfully.</p>
+			             </div>
+			        </div>
+			    </div> <!-- End of .alert_wrapper -->
+			    <div class="alert-wrapper" id="alert-error">
+			        <div id="error">
+			           	<button class="closeAlert"><i class="fa fa-times" aria-hidden="true"></i></button>
+			           	<div class="wrapper">
+			               	<p>Sorry!Something Went Wrong.</p>
+			            </div>
+			        </div>
+			    </div> 
+			    </div> 
 			<!-- 
 			=============================================
 				Testomonial

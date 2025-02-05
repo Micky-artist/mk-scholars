@@ -58,8 +58,8 @@
 
 			<!-- Contact Form -->
 			<div class="contact-form-holder container">
-				<!-- <div class="row">
-					<form action="https://themazine.com/html/scholars-lms/inc/sendemail.php" class="form-validation" autocomplete="off">
+				<div class="row">
+					<form action="" class="form-validation" autocomplete="off">
 						<div class="col-sm-6 col-xs-12">
 							<div class="single-input-group">
 								<input type="text" placeholder="First Name" name="Fname">
@@ -85,7 +85,7 @@
 							<button class="tran3s">send</button>
 						</div> 
 					</form>
-				</div>  -->
+				</div> 
 				<!-- /.row -->
 				<!--Contact Form Validation Markup -->
 				<!-- Contact alert -->
@@ -104,7 +104,8 @@
 			               	<p>Sorry!Something Went Wrong.</p>
 			            </div>
 			        </div>
-			    </div> <!-- End of .alert_wrapper -->
+			    </div> 
+				<!-- End of .alert_wrapper -->
 			</div> <!-- /.contact-form-holder -->
 
 			<!-- Google Map _______________________ -->
