@@ -23,7 +23,7 @@
               <a class="sidebar-link waves-effect waves-dark sidebar-link" href="upload-youtube-video" aria-expanded="false"><i class="mdi mdi-link"></i><span class="hide-menu">Upload Youtube Video</span></a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="user-logs" aria-expanded="false"><i class="mdi mdi-account-switch"></i><span class="hide-menu">Upload Youtube Video</span></a>
+              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="user-logs" aria-expanded="false"><i class="mdi mdi-account-switch"></i><span class="hide-menu">User Logs</span></a>
             </li>
             <!-- <li class="sidebar-item">
               <a class="sidebar-link waves-effect waves-dark sidebar-link" href="students-application" aria-expanded="false"><i class="mdi mdi-file-check"></i><span class="hide-menu">Students Application</span></a>

@@ -16,7 +16,6 @@ include("./php/CreateUser.php");
 			<div class="logo"><a href="index"><img src="images/logo/logoRound.png" width="100" height="100" alt=""></a></div>
 			<div class="form-wrapper">
 				<br>
-				<br>
 				<div>
 					<p class="<?php echo $class ?>">
 						<?php echo $msg ?>
@@ -26,11 +25,11 @@ include("./php/CreateUser.php");
 				<!-- <p><span>Or</span></p> -->
 
 				<form method="post">
-					<input type="text" name="NoUsername" placeholder="Username" required>
-					<input type="email" name="NoEmail" placeholder="Email" required>
-					<input type="number" name="NoPhone" placeholder="Phone" required>
-					<input type="password" name="NoPassword" placeholder="Password" required>
-					<input type="password" name="NoCoPassword" placeholder="Comfirm Password" required>
+					<input type="text" name="NoUsername" placeholder="Username" value="<?php echo $NoUsername ?>" required>
+					<input type="email" name="NoEmail" placeholder="Email" value="<?php echo $NoEmail ?>" required>
+					<input type="number" name="NoPhone" placeholder="Phone" value="<?php echo $NoPhone ?>" required>
+					<input type="password" name="NoPassword" placeholder="Password" value="<?php echo $NoPassword ?>" required>
+					<input type="password" name="NoCoPassword" placeholder="Comfirm Password" value="<?php echo $NoCoPassword ?>" required>
 					<ul class="clearfix">
 						<li class="float-left">
 							<input type="checkbox" name="aggree" id="remember">

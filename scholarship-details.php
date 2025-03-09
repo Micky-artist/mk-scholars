@@ -95,7 +95,7 @@ include("./php/selectScholarshipDetails.php")
 						<p><?php echo $scholarshipData['scholarshipDetails'] ?></p>
 						<br>
 						<div>
-							<a style="font-size: 16px; background-color: #4183E6; padding: 10px; color: white;" class="btn btn-primary" target="_blank" href="<?php echo $scholarshipData['scholarshipLink'] ?>">Open Scholarship Link</a>
+							<a style="font-size: 16px; background-color: #4183E6; padding: 10px; color: white;" class="btn btn-primary" target="_blank" href="<?php echo $scholarshipData['scholarshipLink'] ?>">Open Application Link</a>
 							<a style="font-size: 16px; background-color: red; padding: 10px; color: white;" class="btn btn-primary" target="_blank" href="<?php echo $scholarshipData['scholarshipYoutubeLink'] ?>">Youtube Guide Video</a>
 							<a style="font-size: 16px; background-color: green; padding: 10px; color: white;" class="btn btn-primary" target="_blank" href="https://chat.whatsapp.com/BnJwwyblsSm9DcFZLT3tFk">Join What'sApp group</a>
 						</div>
@@ -140,13 +140,35 @@ include("./php/selectScholarshipDetails.php")
 							<!-- TO BE USED IN FUTURE -->
 							<ul>
 								<?php
-								$PresentScholarship = $_GET['scholarship-id'];
-								if (isset($_POST['search'])) {
-									$searchValue = $_POST['searchValue'];
-									$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 AND scholarshipDetails LIKE '%$searchValue%' ORDER BY scholarshipId DESC LIMIT 7");
+								// Validate and sanitize the scholarship ID
+								if (isset($_GET['scholarship-id']) && is_numeric($_GET['scholarship-id'])) {
+									$presentScholarshipId = (int)$_GET['scholarship-id']; // Cast to integer for safety
 								} else {
-									$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 AND scholarshipId != $PresentScholarship ORDER BY scholarshipId DESC LIMIT 7");
+									// Set a default or handle the error
+									$presentScholarshipId = 0;
+									// Optionally redirect or show an error
+									// header("Location: error.php?message=Invalid scholarship ID");
+									// exit;
 								}
+								
+								// Prepare the base query
+								if (isset($_POST['search']) && !empty($_POST['searchValue'])) {
+									// Search query using prepared statement
+									$stmt = $conn->prepare("SELECT * FROM scholarships WHERE scholarshipStatus != 0 AND scholarshipDetails LIKE ? ORDER BY scholarshipId DESC LIMIT 7");
+									$searchParam = "%" . $_POST['searchValue'] . "%";
+									$stmt->bind_param("s", $searchParam);
+								} else {
+									// Default query using prepared statement
+									$stmt = $conn->prepare("SELECT * FROM scholarships WHERE scholarshipStatus != 0 AND scholarshipId != ? ORDER BY scholarshipId DESC LIMIT 7");
+									$stmt->bind_param("i", $presentScholarshipId);
+								}
+								
+								// Execute the query
+								$stmt->execute();
+								$selectScholarships = $stmt->get_result();
+								
+								// Don't forget to close the statement when done
+								$stmt->close(); 
 								if ($selectScholarships->num_rows > 0) {
 									while ($getScholarships = mysqli_fetch_assoc($selectScholarships)) {
 								?>

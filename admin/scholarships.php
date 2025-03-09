@@ -42,11 +42,8 @@ include("./partials/head.php");
         
         <div class="row">
           <!-- column -->
-          <div class="col-lg-6">
+          <div class="col-lg-14">
             <div class="card">
-              <div class="card-body">
-                <h4 class="card-title">Applications</h4>
-              </div>
               <div class="comment-widgets scrollable">
                 <?php include("./php/selectScholarships.php"); ?>
               </div>

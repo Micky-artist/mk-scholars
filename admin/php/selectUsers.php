@@ -1,77 +1,152 @@
 <?php
-$selectUsers = mysqli_query($conn, "SELECT * FROM normUsers");
-$counter=1;
-if ($selectUsers->num_rows > 0) {
-    while ($getUsers = mysqli_fetch_assoc($selectUsers)) {
+session_start();
+include("./dbconnections/connection.php");
 
-        ?>
-        <div class="d-flex flex-row comment-row mt-0">
-            <div class="p-2">
-                <?php echo $counter++ ?>
+// Pagination
+$per_page = 20;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$start = ($page - 1) * $per_page;
+
+// Search functionality
+$search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
+$search_condition = $search ? " WHERE (NoUsername LIKE '%$search%' OR NoEmail LIKE '%$search%')" : '';
+
+// Get total users
+$total_query = mysqli_query($conn, "SELECT COUNT(*) as total FROM normUsers $search_condition");
+$total_row = mysqli_fetch_assoc($total_query);
+$total_pages = ceil($total_row['total'] / $per_page);
+
+// Fetch users
+$selectUsers = mysqli_query($conn, "SELECT * FROM normUsers $search_condition ORDER BY NoCreationDate DESC LIMIT $start, $per_page");
+?>
+
+<div class="container-fluid mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="card-title mb-0">User Management</h4>
+        </div>
+        <div class="card-body">
+            <!-- Search Bar -->
+            <div class="mb-4">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-8">
+                        <input type="text" name="search" class="form-control" placeholder="Search by username or email" value="<?= htmlspecialchars($search) ?>">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">Search</button>
+                    </div>
+                    <div class="col-md-2">
+                        <a href="?" class="btn btn-secondary w-100">Reset</a>
+                    </div>
+                </form>
             </div>
-            <div class="comment-text w-100">
-            <h6 class="font-medium">
-                    User Name: <?php echo $getUsers['NoUsername'] ?>
-                </h6>
-                <h6 class="font-medium">
-                    Email Address: <?php echo $getUsers['NoEmail'] ?>
-                </h6>
-                <h6 class="font-medium">
-                    Phone Number: <?php echo $getUsers['NoPhone'] ?>
-                </h6>
-                <h6 class="font-medium">
-                    Creation Date: <?php echo $getUsers['NoCreationDate'] ?>
-                </h6>
-                <!-- <span class="mb-3 d-block">Lorem Ipsum is simply dummy text of the printing and
-                      type setting industry.
-                    </span> -->
-                <!-- <div class="comment-footer">
-                    <span class="text-muted float-end">
-                        <?php echo $getUsers['scholarshipUpdateDate'] ?>
-                    </span>
-                    <a target="_blank"
-                        href="edit-scholarship?edit=true&i=<?php echo $getUsers['scholarshipId'] ?>&n=<?php echo $getScholarships['scholarshipTitle'] ?>">
-                        <button type="button" class="btn btn-cyan btn-sm text-white">
-                            Edit
-                        </button>
-                    </a>
-                    <a target="_blank"
-                        href="https://www.mkscholars.com/scholarship-details-preview?scholarship-id=<?php echo $getScholarships['scholarshipId']?>&scholarship-title=<?php echo $getScholarships['scholarshipTitle']?>">
-                        <button type="button" class="btn btn-warning btn-sm text-white">
-                            View
-                        </button>
-                    </a>
-                    <?php
-                    if ($getUsers['scholarshipStatus'] == 0) {
-                        ?>
-                        <a href="./php/actions?a=publishScholarship&i=<?php echo $getUsers['scholarshipId']?>&n=<?php echo $getScholarships['scholarshipTitle']?>">
-                        <button name="publishScholarship" class="btn btn-success btn-sm text-white">
-                            Publish
-                        </button>
-                        </a>
-                        <?php
-                    } else {
-                        ?>
-                        <a href="./php/actions?a=unPublishScholarship&i=<?php echo $getUsers['scholarshipId']?>&n=<?php echo $getScholarships['scholarshipTitle']?>">
-                        <button name="unPublishScholarship" class="btn btn-success btn-sm text-white">
-                            Un Publish
-                        </button>
-                        </a>
-                        <?php
+
+            <!-- Users List -->
+            <div class="row">
+                <?php
+                $counter = $start + 1;
+                if ($selectUsers->num_rows > 0) {
+                    while ($user = mysqli_fetch_assoc($selectUsers)) {
+                ?>
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0"><?= $counter++ ?>. <?= htmlspecialchars($user['NoUsername']) ?></h5>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-outline-primary view-scholarships" 
+                                            data-userid="<?= $user['userId'] ?>" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#scholarshipsModal">
+                                        <i class="fas fa-list"></i> Scholarships
+                                    </button>
+                                    <a href="sms:<?= $user['NoPhone'] ?>" class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-comment"></i> Text
+                                    </a>
+                                </div>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <i class="fas fa-envelope me-2"></i><?= htmlspecialchars($user['NoEmail']) ?>
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-phone me-2"></i><?= htmlspecialchars($user['NoPhone']) ?>
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="fas fa-calendar me-2"></i>Joined: <?= $user['NoCreationDate'] ?>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <?php
                     }
-                    ?>
-                    <a href="./php/actions?a=deleteScholarship&i=<?php echo $getUsers['scholarshipId']?>&n=<?php echo $getScholarships['scholarshipTitle']?>">
-                    <button name="deleteScholarship" class="btn btn-danger btn-sm text-white">
-                        Delete
-                    </button>
-                    </a>
-                </div> -->
+                } else {
+                    echo '<div class="col-12 text-center py-5"><div class="alert alert-info">No users found</div></div>';
+                }
+                ?>
+            </div>
+
+            <!-- Pagination -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <?php if($page > 1): ?>
+                        <li class="page-item">
+                            <a class="page-link" href="?page=<?= $page-1 ?>&search=<?= urlencode($search) ?>">Previous</a>
+                        </li>
+                    <?php endif; ?>
+
+                    <?php for($i = 1; $i <= $total_pages; $i++): ?>
+                        <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                            <a class="page-link" href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
+                        </li>
+                    <?php endfor; ?>
+
+                    <?php if($page < $total_pages): ?>
+                        <li class="page-item">
+                            <a class="page-link" href="?page=<?= $page+1 ?>&search=<?= urlencode($search) ?>">Next</a>
+                        </li>
+                    <?php endif; ?>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Scholarships Modal -->
+<div class="modal fade" id="scholarshipsModal" tabindex="-1" aria-labelledby="scholarshipsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scholarshipsModalLabel">Applied Scholarships</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="scholarshipsContent">
+                Loading...
             </div>
         </div>
-        <!-- <li>
-            <a href="services?d=<?php echo $getService['serviceId'] ?>&n=<?php echo $getService['servicename'] ?>"><?php echo $getService['servicename'] ?></a>
-        </li> -->
-        <?php
-    }
-}
-?>
+    </div>
+</div>
+
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+<script>
+$(document).ready(function() {
+    $('.view-scholarships').click(function() {
+        const userId = $(this).data('userid');
+        $('#scholarshipsContent').html('<div class="text-center py-4"><div class="spinner-border" role="status"></div></div>');
+        
+        $.ajax({
+            url: `get_scholarships.php?user_id=${userId}`,
+            success: function(data) {
+                $('#scholarshipsContent').html(data);
+            },
+            error: function() {
+                $('#scholarshipsContent').html('<div class="alert alert-danger">Error loading scholarships</div>');
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>

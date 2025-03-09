@@ -53,8 +53,10 @@ include("./dbconnection/connection.php");
 								'scholarships' => 'Scholarships'
 							];
 
+							$currentKey = isset($_GET['key']) ? $_GET['key'] : '';
+
 							foreach ($menuItems as $key => $label) {
-								$activeClass = ($_GET['key'] == $key) ? 'active' : '';
+								$activeClass = ($currentKey == $key) ? 'active' : '';
 								$href = ($key == '') ? './applications' : "?key=$key";
 								echo "<li><a href='$href' class='tran3s $activeClass'>$label</a></li>";
 							}
@@ -63,30 +65,100 @@ include("./dbconnection/connection.php");
 
 						<div class="row">
 							<?php
-							if ((isset($_GET['i']) && !empty($_GET['i'])) && (isset($_GET['Country_name']) && !empty($_GET['Country_name']))) {
-								$countryId = $_GET['i'];
-								$Country_name = $_GET['Country_name'];
-								$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 AND country=$countryId ORDER BY scholarshipId DESC");
-								echo "<h5>Showing results of " . $Country_name . ".</h5><br>";
-							} elseif (isset($_GET['search'])) {
+							// Pagination settings
+							$records_per_page = 25; // Number of records to display per page
+							$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+							$offset = ($page - 1) * $records_per_page;
+
+							// Initialize the base query
+							$query = "SELECT * FROM scholarships WHERE scholarshipStatus != 0";
+							$params = [];
+							$types = "";
+							$resultHeading = "";
+							
+							// Handle country filter
+							if (isset($_GET['i']) && !empty($_GET['i']) && is_numeric($_GET['i']) && 
+								isset($_GET['Country_name']) && !empty($_GET['Country_name'])) {
+								
+								$countryId = (int)$_GET['i']; // Cast to integer for additional safety
+								$Country_name = htmlspecialchars($_GET['Country_name'], ENT_QUOTES, 'UTF-8');
+								
+								$query .= " AND country = ?";
+								$params[] = $countryId;
+								$types .= "i"; // Integer parameter
+								
+								$resultHeading = "<h5>Showing results of " . $Country_name . ".</h5><br>";
+							} 
+							// Handle search text
+							elseif (isset($_GET['search']) && isset($_GET['searchText']) && !empty($_GET['searchText'])) {
 								$search = $_GET['searchText'];
-								$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 AND scholarshipDetails LIKE '%$search%' ORDER BY scholarshipId DESC");
-								echo "<h5>Showing results of " . $search . ".</h5><br>";
-							} elseif (isset($_GET['key']) && !empty($_GET['key'])) {
+								
+								$query .= " AND scholarshipDetails LIKE ?";
+								$params[] = "%$search%";
+								$types .= "s"; // String parameter
+								
+								$resultHeading = "<h5>Showing results of \"" . htmlspecialchars($search, ENT_QUOTES, 'UTF-8') . "\"</h5><br>";
+							} 
+							// Handle key search
+							elseif (isset($_GET['key']) && !empty($_GET['key'])) {
 								$key = $_GET['key'];
-								$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 AND scholarshipDetails LIKE '%$key%' ORDER BY scholarshipId DESC");
-								echo "<h5>Showing results of " . $key . ".</h5><br>";
-							} else {
-								$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 ORDER BY scholarshipId DESC");
+								
+								$query .= " AND scholarshipDetails LIKE ?";
+								$params[] = "%$key%";
+								$types .= "s"; // String parameter
+								
+								$resultHeading = "<h5>Showing results of \"" . htmlspecialchars($key, ENT_QUOTES, 'UTF-8') . "\"</h5><br>";
 							}
+							
+							// Add the ordering to all queries
+							$query .= " ORDER BY scholarshipId DESC";
+							
+							// Query for counting total records (for pagination)
+							$count_query = str_replace("SELECT *", "SELECT COUNT(*) as total", $query);
+							$count_stmt = $conn->prepare($count_query);
+							
+							// Bind parameters if there are any
+							if (!empty($params)) {
+								$count_stmt->bind_param($types, ...$params);
+							}
+							
+							$count_stmt->execute();
+							$count_result = $count_stmt->get_result();
+							$total_records = $count_result->fetch_assoc()['total'];
+							$total_pages = ceil($total_records / $records_per_page);
+							$count_stmt->close();
+							
+							// Add LIMIT clause for pagination
+							$query .= " LIMIT ?, ?";
+							$params[] = $offset;
+							$params[] = $records_per_page;
+							$types .= "ii"; // Two integer parameters for LIMIT
+							
+							// Prepare and execute the statement
+							$stmt = $conn->prepare($query);
+							
+							// Bind parameters if there are any
+							if (!empty($params)) {
+								$stmt->bind_param($types, ...$params);
+							}
+							
+							$stmt->execute();
+							$selectScholarships = $stmt->get_result();
+							
+							// Output the result heading if it exists
+							if (!empty($resultHeading)) {
+								echo $resultHeading;
+							}
+							
+							$stmt->close();
+							
 							if ($selectScholarships->num_rows > 0) {
 								while ($getScholarships = mysqli_fetch_assoc($selectScholarships)) {
 							?>
-									<!-- <a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo $getScholarships['scholarshipTitle'] ?>" class="tran3s"> -->
 									<div class="col-md-4 col-sm-6 col-xs-12 allScholarshipContainer">
 										<div class="single-course-grid">
 											<div class="image">
-												<img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipImage'] ?>" alt="">
+												<img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipImage'] ?>" alt="<?php echo htmlspecialchars($getScholarships['scholarshipTitle']) ?>">
 											</div>
 											<div class="text">
 												<h6><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-", $getScholarships['scholarshipTitle']) ?>" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a></h6>
@@ -102,12 +174,11 @@ include("./dbconnection/connection.php");
 											</div> <!-- /.text -->
 										</div> <!-- /.single-course-grid -->
 									</div> <!-- /.col- -->
-									<!-- </a> -->
 								<?php
 								}
 							} else {
 								?>
-								<div>
+								<div class="col-xs-12">
 									<p>No results found</p>
 								</div>
 							<?php
@@ -116,11 +187,12 @@ include("./dbconnection/connection.php");
 							?>
 							<style>
 								.allScholarshipContainer {
-									height: 14cm;
+									height: 450px;
+									margin-bottom: 20px;
 								}
 
 								.image {
-									height: 5cm;
+									height: 200px;
 								}
 
 								.image img {
@@ -139,26 +211,76 @@ include("./dbconnection/connection.php");
 								}
 
 								.DetailWrapper {
-									height: 5cm;
+									height: 120px;
 									overflow: hidden;
+								}
+
+								.course-pagination {
+									text-align: center;
+									margin: 30px 0;
+								}
+
+								.course-pagination li {
+									display: inline-block;
+									margin: 0 3px;
+								}
+
+								.course-pagination li a {
+									display: block;
+									width: 40px;
+									height: 40px;
+									line-height: 40px;
+									border-radius: 50%;
+									background: #f7f7f7;
+									font-weight: 600;
+									color: #666;
+								}
+
+								.course-pagination li a.active,
+								.course-pagination li a:hover {
+									background: #cd2122;
+									color: #fff;
 								}
 							</style>
 						</div> <!-- /.row -->
 
-						<!-- <ul class="course-pagination">
-							<li><a href="#" class="tran3s active">1</a></li>
-							<li><a href="#" class="tran3s">2</a></li>
-							<li><a href="#" class="tran3s">3</a></li>
-							<li><a href="#" class="tran3s">Next</a></li>
-						</ul> -->
+						<!-- Pagination -->
+						<?php if ($total_pages > 1): ?>
+						<ul class="course-pagination">
+							<?php if ($page > 1): ?>
+								<li><a href="<?php echo generatePaginationLink($page - 1); ?>" class="tran3s">Prev</a></li>
+							<?php endif; ?>
+							
+							<?php
+							// Calculate range of page numbers to display
+							$start_page = max(1, $page - 2);
+							$end_page = min($total_pages, $page + 2);
+							
+							for ($i = $start_page; $i <= $end_page; $i++): 
+							?>
+								<li><a href="<?php echo generatePaginationLink($i); ?>" class="tran3s <?php echo ($i == $page) ? 'active' : ''; ?>"><?php echo $i; ?></a></li>
+							<?php endfor; ?>
+							
+							<?php if ($page < $total_pages): ?>
+								<li><a href="<?php echo generatePaginationLink($page + 1); ?>" class="tran3s">Next</a></li>
+							<?php endif; ?>
+						</ul>
+						<?php endif; ?>
+
+						<?php
+						// Helper function to generate pagination links preserving existing GET parameters
+						function generatePaginationLink($page_num) {
+							$params = $_GET;
+							$params['page'] = $page_num;
+							return '?' . http_build_query($params);
+						}
+						?>
 					</div> <!-- /.featured-course -->
 
 					<div class="col-md-3 col-sm-6 col-xs-12 course-sidebar">
 						<form method="get" class="course-sidebar-search">
-							<input type="text" name="searchText" placeholder="Search Scholarship..." value="<?php if (isset($_GET['search'])) {
-																												echo $search;
-																											} ?>">
-							<button name="search"><i class="fa fa-search" aria-hidden="true"></i></button>
+							<input type="text" name="searchText" placeholder="Search Scholarship..." value="<?php echo isset($_GET['searchText']) ? htmlspecialchars($_GET['searchText']) : ''; ?>">
+							<button type="submit" name="search"><i class="fa fa-search" aria-hidden="true"></i></button>
 						</form>
 
 						<div class="course-sidebar-list">
@@ -168,12 +290,7 @@ include("./dbconnection/connection.php");
 								<?php include("./php/selectCountriesLI.php") ?>
 							</ul>
 						</div>
-						<!-- <div class="course-sidebar-list">
-							<h6>Courses</h6>
-							<ul>
-								<li><a href="?course=software" class="tran3s">Software Engineering</a></li>
-							</ul>
-						</div> -->
+						
 						<div class="course-sidebar-list">
 							<h6>Tags</h6>
 							<ul>
@@ -182,7 +299,7 @@ include("./dbconnection/connection.php");
 								if ($selectTags->num_rows > 0) {
 									while ($tagData = mysqli_fetch_assoc($selectTags)) {
 								?>
-										<li><a href="?key=<?php echo $tagData['TagValue'] ?>" class="tran3s"><?php echo $tagData['TagName'] ?></a></li>
+										<li><a href="?key=<?php echo htmlspecialchars($tagData['TagValue'], ENT_QUOTES, 'UTF-8'); ?>" class="tran3s"><?php echo htmlspecialchars($tagData['TagName'], ENT_QUOTES, 'UTF-8'); ?></a></li>
 
 									<?php
 									}
@@ -191,7 +308,6 @@ include("./dbconnection/connection.php");
 									<li>No tags available</li>
 								<?php
 								}
-
 								?>
 							</ul>
 						</div>
@@ -245,7 +361,5 @@ include("./dbconnection/connection.php");
 
 	</div> <!-- /.main-page-wrapper -->
 </body>
-
-<!-- Mirrored from themazine.com/html/scholars-lms/course-3-column.html by HTTrack Website Copier/3.x [XR&CO'2014], Fri, 10 May 2024 11:37:07 GMT -->
 
 </html>
