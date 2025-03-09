@@ -11,6 +11,45 @@ include("./php/validateAdminSession.php");
 include("./partials/head.php");
 ?>
 
+<style>
+        .dashboard-card {
+            transition: all 0.3s ease;
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            min-height: 250px;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .gradient-1 {
+            background: linear-gradient(45deg, #4e73df, #224abe);
+        }
+        
+        .gradient-2 {
+            background: linear-gradient(45deg, #1cc88a, #13855c);
+        }
+        
+        .gradient-3 {
+            background: linear-gradient(45deg, #f6c23e, #dda20a);
+        }
+        
+        .gradient-4 {
+            background: linear-gradient(45deg, #e74a3b, #c03526);
+        }
+        
+        .gradient-5 {
+            background: linear-gradient(45deg, #36b9cc, #258391);
+        }
+    </style>
 <body>
   <div id="main-wrapper" data-layout="vertical" data-navbarbg="skin5" data-sidebartype="full" data-sidebar-position="absolute" data-header-position="absolute" data-boxed-layout="full">
     <!-- ============================================================== -->
@@ -38,23 +77,82 @@ include("./partials/navbar.php");
       <!-- ============================================================== -->
       <!-- Bread crumb and right sidebar toggle -->
       <!-- ============================================================== -->
-      <div class="page-breadcrumb">
-        <div class="row">
-          <div class="col-12 d-flex no-block align-items-center">
-            <h4 class="page-title">Pending Approvals</h4>
-            <div class="ms-auto text-end">
-              <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                  <li class="breadcrumb-item"><a href="./home">Home</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">
-                    Dashboard
-                  </li>
-                </ol>
-              </nav>
+    
+      <div class="container py-5">
+        <h1 class="text-center mb-5">Admin Dashboard</h1>
+        
+        <div class="row g-4">
+            <!-- Message Students Card -->
+            <div class="col-md-3">
+                <a href="#" class="text-decoration-none">
+                    <div class="card dashboard-card gradient-1 text-white">
+                        <div class="card-body text-center d-flex flex-column justify-content-center">
+                            <i class="fas fa-comments card-icon"></i>
+                            <h3 class="card-title mb-3">Message Students</h3>
+                            <p class="card-text">Send announcements and individual messages to students</p>
+                            <span class="badge bg-light text-dark mt-2">New Messages: 5</span>
+                        </div>
+                    </div>
+                </a>
             </div>
-          </div>
+
+            <!-- Student Applications Card -->
+            <div class="col-md-3">
+                <a href="#" class="text-decoration-none">
+                    <div class="card dashboard-card gradient-2 text-white">
+                        <div class="card-body text-center d-flex flex-column justify-content-center">
+                            <i class="fas fa-file-alt card-icon"></i>
+                            <h3 class="card-title mb-3">Applications</h3>
+                            <p class="card-text">Review and manage student scholarship applications</p>
+                            <span class="badge bg-light text-dark mt-2">Pending: 12</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- User Logs Card -->
+            <div class="col-md-3">
+                <a href="user-logs" class="text-decoration-none">
+                    <div class="card dashboard-card gradient-3 text-white">
+                        <div class="card-body text-center d-flex flex-column justify-content-center">
+                            <i class="fas fa-clipboard-list card-icon"></i>
+                            <h3 class="card-title mb-3">User Logs</h3>
+                            <p class="card-text">Monitor system activities and user interactions</p>
+                            <span class="badge bg-light text-dark mt-2">Today's Logs: 42</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Manage Users Card -->
+            <div class="col-md-3">
+                <a href="users" class="text-decoration-none">
+                    <div class="card dashboard-card gradient-4 text-white">
+                        <div class="card-body text-center d-flex flex-column justify-content-center">
+                            <i class="fas fa-users card-icon"></i>
+                            <h3 class="card-title mb-3">Manage Users</h3>
+                            <p class="card-text">View and manage all system users and permissions</p>
+                            <span class="badge bg-light text-dark mt-2">Total Users: 154</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Scholarships Card -->
+            <div class="col-md-3">
+                <a href="scholarships" class="text-decoration-none">
+                    <div class="card dashboard-card gradient-5 text-white">
+                        <div class="card-body text-center d-flex flex-column justify-content-center">
+                            <i class="fas fa-graduation-cap card-icon"></i>
+                            <h3 class="card-title mb-3">Scholarships</h3>
+                            <p class="card-text">Upload scholarship programs and opportunities</p>
+                            <span class="badge bg-light text-dark mt-2">Active: 23</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
         </div>
-      </div>
+    </div>
       <!-- ============================================================== -->
       <!-- End Bread crumb and right sidebar toggle -->
       <!-- ============================================================== -->

@@ -60,7 +60,7 @@ $selectUsers = mysqli_query($conn, "SELECT * FROM normUsers $search_condition OR
                                             data-bs-target="#scholarshipsModal">
                                         <i class="fas fa-list"></i> Scholarships
                                     </button>
-                                    <a href="sms:<?= $user['NoPhone'] ?>" class="btn btn-sm btn-outline-success">
+                                    <a href="#" class="btn btn-sm btn-outline-success">
                                         <i class="fas fa-comment"></i> Text
                                     </a>
                                 </div>
