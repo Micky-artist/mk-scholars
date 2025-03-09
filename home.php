@@ -26,7 +26,7 @@ include("./dbconnection/connection.php");
 				<div class="camera_caption">
 					<div class="container text-center">
 						<h1 class="wow fadeInUp animated">Welcome to our global scholarship platform, where opportunities for education are just a click away. </h1>
-						<a href="./scholarships" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR SCHOLARSHIPS</a>
+						<a href="./applications" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR APPLICATIONS</a>
 						<a href="./login" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
 					</div> <!-- /.container -->
 				</div> <!-- /.camera_caption -->
@@ -35,7 +35,7 @@ include("./dbconnection/connection.php");
 				<div class="camera_caption">
 					<div class="container text-center">
 						<h1 class="wow fadeInUp animated">We connect you with scholarships from around the world to help you achieve your academic dreams.</h1>
-						<a href="./scholarships" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR SCHOLARSHIPS</a>
+						<a href="./applications" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR APPLICATIONS</a>
 						<a href="./login" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
 					</div> <!-- /.container -->
 				</div> <!-- /.camera_caption -->
@@ -44,7 +44,7 @@ include("./dbconnection/connection.php");
 				<div class="camera_caption">
 					<div class="container text-center">
 						<h1 class="wow fadeInUp animated">Start your journey today and unlock <br> a world of possibilities!</h1>
-						<a href="./scholarships" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR SCHOLARSHIPS</a>
+						<a href="./applications" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR APPLICATIONS</a>
 						<a href="./login" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
 					</div> <!-- /.container -->
 				</div> <!-- /.camera_caption -->
@@ -54,7 +54,7 @@ include("./dbconnection/connection.php");
 		<?php
 		if (isset($_POST['searchCourse'])) {
 			echo '<script type="text/javascript">
-                window.location.href="./scholarships"
+                window.location.href="./applications"
 
 </script>';
 		}
@@ -236,7 +236,7 @@ include("./dbconnection/connection.php");
 						}
 					</style>
 				</div> <!-- /.row -->
-				<a href="./scholarships" style="background-color: #fff; color: #4183E6; font-weight: bold;" class="theme-button hvr-rectangle-out">ALL APPLICATIONS</a>
+				<a href="./applications" style="background-color: #fff; color: #4183E6; font-weight: bold;" class="theme-button hvr-rectangle-out">ALL APPLICATIONS</a>
 			</div> <!-- /.container -->
 		</div> <!-- /.featured-course -->
 
@@ -428,7 +428,7 @@ include("./dbconnection/connection.php");
 				<div class="wrapper">
 					<h4>Apply for a Scholarship Now</h4>
 					<p>Be a part of the world class institution where leaders are made. Make a difference in the world by taking the responsibility. Be different.</p>
-					<a href="./scholarships" class="p-bg-color hvr-float-shadow">LEARN MORE</a>
+					<a href="./applications" class="p-bg-color hvr-float-shadow">LEARN MORE</a>
 				</div> <!-- /.wrapper -->
 			</div> <!-- /.main-content -->
 		</div> <!-- /.instructor-banner -->

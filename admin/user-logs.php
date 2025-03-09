@@ -24,13 +24,13 @@ include("./partials/head.php");
       <div class="page-breadcrumb">
         <div class="row">
           <div class="col-12 d-flex no-block align-items-center">
-            <h4 class="page-title">Applications</h4>
+            <h4 class="page-title">User Logs</h4>
             <div class="ms-auto text-end">
               <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                   <li class="breadcrumb-item"><a href="./index">Home</a></li>
                   <li class="breadcrumb-item active" aria-current="page">
-                  Applications
+                  User Logs
                   </li>
                 </ol>
               </nav>
@@ -44,11 +44,11 @@ include("./partials/head.php");
           <!-- column -->
           <div class="col-lg-6">
             <div class="card">
-              <div class="card-body">
-                <h4 class="card-title">Applications</h4>
-              </div>
+              <!-- <div class="card-body">
+                <h4 class="card-title">User Logs</h4>
+              </div> -->
               <div class="comment-widgets scrollable">
-                <?php include("./php/selectScholarships.php"); ?>
+                <?php include("./php/selectUserLogs.php"); ?>
               </div>
             </div>
           </div>

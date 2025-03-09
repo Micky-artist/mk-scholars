@@ -42,7 +42,7 @@
 				<h6>MK Scholars</h6>
 				<ul>
 					<li><a href="about-us" class="tran3s">About Us</a></li>
-					<li><a href="scholarships" class="tran3s">Scholarships</a></li>
+					<li><a href="applications" class="tran3s">Scholarships</a></li>
 					<!-- <li><a href="#" class="tran3s">Careers</a></li> -->
 					<!-- <li><a href="#" class="tran3s">FAQ</a></li> -->
 					<li><a href="contact-us" class="tran3s">Contact</a></li>

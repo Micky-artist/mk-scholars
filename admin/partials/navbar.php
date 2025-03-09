@@ -8,19 +8,22 @@
               <a class="sidebar-link waves-effect waves-dark sidebar-link" href="index" aria-expanded="false"><i class="mdi mdi-view-dashboard"></i><span class="hide-menu">Dashboard</span></a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="countries" aria-expanded="false"><i class="mdi mdi-briefcase"></i><span class="hide-menu">Countries</span></a>
+              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="countries" aria-expanded="false"><i class="mdi mdi-earth"></i><span class="hide-menu">Countries</span></a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="scholarships" aria-expanded="false"><i class="mdi mdi-file-check"></i><span class="hide-menu">Scholarships</span></a>
+              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="scholarships" aria-expanded="false"><i class="mdi mdi-view-list"></i><span class="hide-menu">Scholarships</span></a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="users" aria-expanded="false"><i class="mdi mdi-file-check"></i><span class="hide-menu">Users</span></a>
+              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="users" aria-expanded="false"><i class="mdi mdi-account"></i><span class="hide-menu">Users</span></a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="tags" aria-expanded="false"><i class="mdi mdi-file-check"></i><span class="hide-menu">Tags</span></a>
+              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="tags" aria-expanded="false"><i class="mdi mdi-tag"></i><span class="hide-menu">Tags</span></a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="upload-youtube-video" aria-expanded="false"><i class="mdi mdi-file-check"></i><span class="hide-menu">Upload Youtube Video</span></a>
+              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="upload-youtube-video" aria-expanded="false"><i class="mdi mdi-link"></i><span class="hide-menu">Upload Youtube Video</span></a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="user-logs" aria-expanded="false"><i class="mdi mdi-account-switch"></i><span class="hide-menu">Upload Youtube Video</span></a>
             </li>
             <!-- <li class="sidebar-item">
               <a class="sidebar-link waves-effect waves-dark sidebar-link" href="students-application" aria-expanded="false"><i class="mdi mdi-file-check"></i><span class="hide-menu">Students Application</span></a>

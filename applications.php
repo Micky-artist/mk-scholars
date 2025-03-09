@@ -23,11 +23,11 @@ include("./dbconnection/connection.php");
 		<div class="theme-inner-banner" style="background: url(images/home/banner-2.jpg) no-repeat center;background-size:cover;">
 			<div class="opacity">
 				<div class="container">
-					<h3>SCHOLARSHIPS</h3>
+					<h3>APPLICATIONS</h3>
 					<ul>
 						<li><a href="home">Home</a></li>
 						<li>/</li>
-						<li>Scholarships</li>
+						<li>Applications</li>
 					</ul>
 				</div> <!-- /.container -->
 			</div> <!-- /.opacity -->
@@ -39,17 +39,27 @@ include("./dbconnection/connection.php");
 			=============================================
 				Featured Course 3 Column
 			============================================== 
-			-->
+		-->
+
 		<div class="feature-course-3-column">
 			<div class="container">
 				<div class="row">
 					<div class="col-md-9 col-xs-12 float-right featured-course">
-						<!-- <ul class="course-menu">
-							<li><a href="#" class="tran3s active">New</a></li>
-							<li><a href="#" class="tran3s">Trending</a></li>
-							<li><a href="#" class="tran3s">Popular</a></li>
-							<li><a href="#" class="tran3s">Most Rated</a></li>
-						</ul> -->
+						<ul class="course-menu">
+							<?php
+							$menuItems = [
+								'' => 'All',
+								'jobapplications' => 'Job Applications',
+								'scholarships' => 'Scholarships'
+							];
+
+							foreach ($menuItems as $key => $label) {
+								$activeClass = ($_GET['key'] == $key) ? 'active' : '';
+								$href = ($key == '') ? './applications' : "?key=$key";
+								echo "<li><a href='$href' class='tran3s $activeClass'>$label</a></li>";
+							}
+							?>
+						</ul>
 
 						<div class="row">
 							<?php
@@ -66,7 +76,7 @@ include("./dbconnection/connection.php");
 								$key = $_GET['key'];
 								$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 AND scholarshipDetails LIKE '%$key%' ORDER BY scholarshipId DESC");
 								echo "<h5>Showing results of " . $key . ".</h5><br>";
-							}else {
+							} else {
 								$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 ORDER BY scholarshipId DESC");
 							}
 							if ($selectScholarships->num_rows > 0) {
@@ -79,7 +89,7 @@ include("./dbconnection/connection.php");
 												<img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipImage'] ?>" alt="">
 											</div>
 											<div class="text">
-												<h6><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-",$getScholarships['scholarshipTitle']) ?>" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a></h6>
+												<h6><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-", $getScholarships['scholarshipTitle']) ?>" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a></h6>
 												<div class="DetailWrapper">
 													<p class="postLineLimit"><?php echo $getScholarships['scholarshipDetails'] ?></p>
 												</div>
@@ -87,7 +97,7 @@ include("./dbconnection/connection.php");
 												<ul class="clearfix">
 													<li class="float-left"><i class="fa fa-calendar" aria-hidden="true"></i> <?php echo $getScholarships['scholarshipUpdateDate'] ?></li>
 
-													<li class="float-right"><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-",$getScholarships['scholarshipTitle']) ?>" class="tran3s textfont free hvr-float-shadow">READ MORE</a></li>
+													<li class="float-right"><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-", $getScholarships['scholarshipTitle']) ?>" class="tran3s textfont free hvr-float-shadow">READ MORE</a></li>
 												</ul>
 											</div> <!-- /.text -->
 										</div> <!-- /.single-course-grid -->
@@ -154,7 +164,7 @@ include("./dbconnection/connection.php");
 						<div class="course-sidebar-list">
 							<h6>Countries</h6>
 							<ul>
-								<li><a href="scholarships" class="tran3s">Show All (Reset)</a></li>
+								<li><a href="applications" class="tran3s">Show All (Reset)</a></li>
 								<?php include("./php/selectCountriesLI.php") ?>
 							</ul>
 						</div>

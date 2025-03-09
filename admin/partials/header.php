@@ -42,7 +42,7 @@
               <ul class="dropdown-menu dropdown-menu-end user-dd animated" aria-labelledby="navbarDropdown">
                 <a class="dropdown-item" href="javascript:void(0)"><i class="mdi mdi-account me-1 ms-1"></i><?php echo $_SESSION['AdminName']; ?> </a>
                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="posts"><i class="mdi mdi-settings me-1 ms-1"></i> Pending Approvals</a>
+                <!-- <a class="dropdown-item" href="posts"><i class="mdi mdi-settings me-1 ms-1"></i> Pending Approvals</a> -->
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="./php/logout.php"><i class="fa fa-power-off me-1 ms-1"></i> Logout</a>
                 <div class="dropdown-divider"></div>

@@ -72,9 +72,9 @@
 					<ul class="navPadding nav">
 						<li><a href="index" class="tran3s">Home</a>
 						</li>
-						<li><a href="scholarships" class="tran3s">All Applications</a></li>
+						<li><a href="applications" class="tran3s">All Applications</a></li>
 						</li>
-						<!-- <li><a href="scholarships" class="tran3s">Apply Now</a> -->
+						<!-- <li><a href="applications" class="tran3s">Apply Now</a> -->
 						</li>
 						<li><a href="about-us#contact" class="tran3s">Contact</a></li>
 

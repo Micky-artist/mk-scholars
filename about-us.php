@@ -78,7 +78,7 @@
 					<div class="container"  id="contact">
 						<h2>Ready to take your Education to the next Level?</h2>
 						<p>Get access on many scholarships that you need, start your free today</p>
-						<a href="scholarships" class="tran3s hvr-float-shadow">Start Now</a>
+						<a href="applications" class="tran3s hvr-float-shadow">Start Now</a>
 					</div> <!-- /.container -->
 				</div> <!-- /.opacity -->
 			</div> <!-- /.signUp-banner -->
