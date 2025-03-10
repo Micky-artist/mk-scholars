@@ -50,10 +50,10 @@ include("./dbconnection/connection.php");
 							$menuItems = [
 								'' => 'All',
 								'jobapplications' => 'Job Applications',
-								'scholarships' => 'Scholarships',
-								'internship' => 'Internship',
-								'trainings' => 'Trainings',
-								'fellowships' => 'Fellowships',
+								'scholarshipapplications' => 'Scholarships',
+								'internshipapplications' => 'Internship',
+								'trainingapplications' => 'Trainings',
+								'fellowshipapplications' => 'Fellowships',
 							];
 
 							$currentKey = isset($_GET['key']) ? $_GET['key'] : '';
@@ -78,83 +78,85 @@ include("./dbconnection/connection.php");
 							$params = [];
 							$types = "";
 							$resultHeading = "";
-							
+
 							// Handle country filter
-							if (isset($_GET['i']) && !empty($_GET['i']) && is_numeric($_GET['i']) && 
-								isset($_GET['Country_name']) && !empty($_GET['Country_name'])) {
-								
+							if (
+								isset($_GET['i']) && !empty($_GET['i']) && is_numeric($_GET['i']) &&
+								isset($_GET['Country_name']) && !empty($_GET['Country_name'])
+							) {
+
 								$countryId = (int)$_GET['i']; // Cast to integer for additional safety
 								$Country_name = htmlspecialchars($_GET['Country_name'], ENT_QUOTES, 'UTF-8');
-								
+
 								$query .= " AND country = ?";
 								$params[] = $countryId;
 								$types .= "i"; // Integer parameter
-								
+
 								$resultHeading = "<h5>Showing results of " . $Country_name . ".</h5><br>";
-							} 
+							}
 							// Handle search text
 							elseif (isset($_GET['search']) && isset($_GET['searchText']) && !empty($_GET['searchText'])) {
 								$search = $_GET['searchText'];
-								
+
 								$query .= " AND scholarshipDetails LIKE ?";
 								$params[] = "%$search%";
 								$types .= "s"; // String parameter
-								
+
 								$resultHeading = "<h5>Showing results of \"" . htmlspecialchars($search, ENT_QUOTES, 'UTF-8') . "\"</h5><br>";
-							} 
+							}
 							// Handle key search
 							elseif (isset($_GET['key']) && !empty($_GET['key'])) {
 								$key = $_GET['key'];
-								
+
 								$query .= " AND scholarshipDetails LIKE ?";
 								$params[] = "%$key%";
 								$types .= "s"; // String parameter
-								
+
 								$resultHeading = "<h5>Showing results of \"" . htmlspecialchars($key, ENT_QUOTES, 'UTF-8') . "\"</h5><br>";
 							}
-							
+
 							// Add the ordering to all queries
 							$query .= " ORDER BY scholarshipId DESC";
-							
+
 							// Query for counting total records (for pagination)
 							$count_query = str_replace("SELECT *", "SELECT COUNT(*) as total", $query);
 							$count_stmt = $conn->prepare($count_query);
-							
+
 							// Bind parameters if there are any
 							if (!empty($params)) {
 								$count_stmt->bind_param($types, ...$params);
 							}
-							
+
 							$count_stmt->execute();
 							$count_result = $count_stmt->get_result();
 							$total_records = $count_result->fetch_assoc()['total'];
 							$total_pages = ceil($total_records / $records_per_page);
 							$count_stmt->close();
-							
+
 							// Add LIMIT clause for pagination
 							$query .= " LIMIT ?, ?";
 							$params[] = $offset;
 							$params[] = $records_per_page;
 							$types .= "ii"; // Two integer parameters for LIMIT
-							
+
 							// Prepare and execute the statement
 							$stmt = $conn->prepare($query);
-							
+
 							// Bind parameters if there are any
 							if (!empty($params)) {
 								$stmt->bind_param($types, ...$params);
 							}
-							
+
 							$stmt->execute();
 							$selectScholarships = $stmt->get_result();
-							
+
 							// Output the result heading if it exists
 							if (!empty($resultHeading)) {
 								echo $resultHeading;
 							}
-							
+
 							$stmt->close();
-							
+
 							if ($selectScholarships->num_rows > 0) {
 								while ($getScholarships = mysqli_fetch_assoc($selectScholarships)) {
 							?>
@@ -244,35 +246,62 @@ include("./dbconnection/connection.php");
 									background: #cd2122;
 									color: #fff;
 								}
+
+								.searchBtn {
+									background-color: purple !important;
+									display: flex !important;
+									justify-content: center !important;
+									align-items: center !important;
+									color: #fff !important;
+								}
+								.course-menu{
+									background-color: #ebebff;
+									display: flex;
+									justify-content: space-evenly !important;
+									align-items: center !important;
+									flex-wrap: wrap;
+									padding: 10px 0px 0px 0px;
+								}
+								.course-menu .active{
+									background-color: purple !important;
+								}
+								.course-menu .tran3s{
+									text-transform: uppercase;
+									border: 1px solid purple;
+								}
+								.course-menu .tran3s:hover{
+									background-color: purple !important;
+								}
 							</style>
 						</div> <!-- /.row -->
 
 						<!-- Pagination -->
 						<?php if ($total_pages > 1): ?>
-						<ul class="course-pagination">
-							<?php if ($page > 1): ?>
-								<li><a href="<?php echo generatePaginationLink($page - 1); ?>" class="tran3s">Prev</a></li>
-							<?php endif; ?>
-							
-							<?php
-							// Calculate range of page numbers to display
-							$start_page = max(1, $page - 2);
-							$end_page = min($total_pages, $page + 2);
-							
-							for ($i = $start_page; $i <= $end_page; $i++): 
-							?>
-								<li><a href="<?php echo generatePaginationLink($i); ?>" class="tran3s <?php echo ($i == $page) ? 'active' : ''; ?>"><?php echo $i; ?></a></li>
-							<?php endfor; ?>
-							
-							<?php if ($page < $total_pages): ?>
-								<li><a href="<?php echo generatePaginationLink($page + 1); ?>" class="tran3s">Next</a></li>
-							<?php endif; ?>
-						</ul>
+							<ul class="course-pagination">
+								<?php if ($page > 1): ?>
+									<li><a href="<?php echo generatePaginationLink($page - 1); ?>" class="tran3s">Prev</a></li>
+								<?php endif; ?>
+
+								<?php
+								// Calculate range of page numbers to display
+								$start_page = max(1, $page - 2);
+								$end_page = min($total_pages, $page + 2);
+
+								for ($i = $start_page; $i <= $end_page; $i++):
+								?>
+									<li><a href="<?php echo generatePaginationLink($i); ?>" class="tran3s <?php echo ($i == $page) ? 'active' : ''; ?>"><?php echo $i; ?></a></li>
+								<?php endfor; ?>
+
+								<?php if ($page < $total_pages): ?>
+									<li><a href="<?php echo generatePaginationLink($page + 1); ?>" class="tran3s">Next</a></li>
+								<?php endif; ?>
+							</ul>
 						<?php endif; ?>
 
 						<?php
 						// Helper function to generate pagination links preserving existing GET parameters
-						function generatePaginationLink($page_num) {
+						function generatePaginationLink($page_num)
+						{
 							$params = $_GET;
 							$params['page'] = $page_num;
 							return '?' . http_build_query($params);
@@ -285,15 +314,7 @@ include("./dbconnection/connection.php");
 							<input type="text" name="searchText" placeholder="Search Scholarship..." value="<?php echo isset($_GET['searchText']) ? htmlspecialchars($_GET['searchText']) : ''; ?>">
 							<button class="searchBtn" type="submit" name="search"><i class="fa fa-search" aria-hidden="true"></i></button>
 						</form>
-<style>
-	.searchBtn{
-		background-color: purple !important;
-		display: flex !important;
-		justify-content: center !important;
-		align-items: center !important;
-		color: #fff !important;
-	}
-</style>
+
 						<div class="course-sidebar-list">
 							<h6>Countries</h6>
 							<ul>
@@ -301,7 +322,7 @@ include("./dbconnection/connection.php");
 								<?php include("./php/selectCountriesLI.php") ?>
 							</ul>
 						</div>
-						
+
 						<div class="course-sidebar-list">
 							<h6>Tags</h6>
 							<ul>

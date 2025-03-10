@@ -27,6 +27,10 @@ $totalQuery = mysqli_query($conn, "SELECT COUNT(*) AS total FROM scholarships $f
 $totalRows = mysqli_fetch_assoc($totalQuery)['total'];
 $totalPages = ceil($totalRows / $limit); // Total number of pages
 
+$sql = "SELECT COUNT(*) as scholarship_count FROM scholarships";
+$result = $conn->query($sql);
+$row = $result->fetch_assoc();
+$scholarship_count = $row['scholarship_count'];
 // Fetch scholarships with pagination, search, and filter
 $selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships $filter_condition $search_condition ORDER BY scholarshipUpdateDate DESC LIMIT $limit OFFSET $offset");
 ?>
@@ -34,7 +38,7 @@ $selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships $filter_co
 <div class="container mt-4">
     <div class="card">
         <div class="card-header bg-primary text-white">
-            <h4 class="card-title mb-0">Applications</h4>
+            <h4 class="card-title mb-0">Applications(<?php echo $scholarship_count ?>)</h4>
         </div>
         <div class="card-body">
             <!-- Search Bar and Filter -->
