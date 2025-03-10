@@ -11,7 +11,7 @@
               <a class="sidebar-link waves-effect waves-dark sidebar-link" href="countries" aria-expanded="false"><i class="mdi mdi-earth"></i><span class="hide-menu">Countries</span></a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="scholarships" aria-expanded="false"><i class="mdi mdi-view-list"></i><span class="hide-menu">Scholarships</span></a>
+              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="scholarships" aria-expanded="false"><i class="mdi mdi-view-list"></i><span class="hide-menu">Applications</span></a>
             </li>
             <li class="sidebar-item">
               <a class="sidebar-link waves-effect waves-dark sidebar-link" href="users" aria-expanded="false"><i class="mdi mdi-account"></i><span class="hide-menu">Users</span></a>
