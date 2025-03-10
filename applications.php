@@ -50,7 +50,10 @@ include("./dbconnection/connection.php");
 							$menuItems = [
 								'' => 'All',
 								'jobapplications' => 'Job Applications',
-								'scholarships' => 'Scholarships'
+								'scholarships' => 'Scholarships',
+								'internship' => 'Internship',
+								'trainings' => 'Trainings',
+								'fellowships' => 'Fellowships',
 							];
 
 							$currentKey = isset($_GET['key']) ? $_GET['key'] : '';
@@ -280,9 +283,17 @@ include("./dbconnection/connection.php");
 					<div class="col-md-3 col-sm-6 col-xs-12 course-sidebar">
 						<form method="get" class="course-sidebar-search">
 							<input type="text" name="searchText" placeholder="Search Scholarship..." value="<?php echo isset($_GET['searchText']) ? htmlspecialchars($_GET['searchText']) : ''; ?>">
-							<button type="submit" name="search"><i class="fa fa-search" aria-hidden="true"></i></button>
+							<button class="searchBtn" type="submit" name="search"><i class="fa fa-search" aria-hidden="true"></i></button>
 						</form>
-
+<style>
+	.searchBtn{
+		background-color: purple !important;
+		display: flex !important;
+		justify-content: center !important;
+		align-items: center !important;
+		color: #fff !important;
+	}
+</style>
 						<div class="course-sidebar-list">
 							<h6>Countries</h6>
 							<ul>
