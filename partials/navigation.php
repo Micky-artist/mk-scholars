@@ -1,3 +1,9 @@
+
+
+<?php
+include("./popup.php");
+?>
+
 <div class="TopDate">
 	<div>
 		<h6 class="TopTime"><?php echo date("l, Y F jS") ?></h6>
@@ -27,7 +33,7 @@
 	}
 
 	.TopDate {
-		position: fixed !important;
+		/* position: fixed !important; */
 		background-color: white;
 		width: 100%;
 		top: -20;

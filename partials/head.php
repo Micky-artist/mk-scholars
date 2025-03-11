@@ -15,9 +15,8 @@ include("./dbconnection/connection.php");
 	<!-- Favicon -->
 	<link rel="icon" type="image/png" sizes="56x56" href="">
 	
-	<!-- Main style sheet -->
 	<link rel="stylesheet" type="text/css" href="css/style.css">
-	<!-- responsive style sheet -->
+	
 	<link rel="stylesheet" type="text/css" href="css/responsive.css">
 	<link rel="shortcut icon" href="./images/logo/logoRound.png" type="image/x-icon">
 	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2301802228767379"
