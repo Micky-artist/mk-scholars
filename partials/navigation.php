@@ -80,9 +80,12 @@ include("./popup.php");
 						</li>
 						<li><a href="applications" class="tran3s">All Applications</a></li>
 						</li>
+						<li><a href="form" class="tran3s">Apply</a></li>
+						</li>
 						<!-- <li><a href="applications" class="tran3s">Apply Now</a> -->
 						</li>
 						<li><a href="about-us#contact" class="tran3s">Contact</a></li>
+						<!-- <li><a href="about-us#contact" class="tran3s">Dashboard</a></li> -->
 
 						<li class="dropdown-holder"><a href="#" class="tran3s">More</a>
 							<ul class="sub-menu">

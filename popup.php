@@ -170,19 +170,19 @@
                 <div class="emoji">
                     <img src="http://localhost/mkscholars/images/logo/logoRound.png" alt="MK Scholars Logo" width="200" height="200">
                 </div>
-                <h2>Welcome to MK Scholars!</h2>
-                <p>Let's find your perfect course match!</p>
+                <h2>We are excited to announce our new program!</h2><br>
+                <h5>Register now for our May intake</h5>
             </div>
 
             <!-- Popup Body -->
             <div class="popup-body">
-                <p>We'd love to help you find the perfect course! <br> Just 1 quick question - promise it'll be fun! 🚀</p>
+                <p>We now offer language classes in English, French, and German, plus coding classes to help you build new skills 🚀</p>
             </div>
 
             <!-- Popup Buttons -->
             <div class="popup-buttons">
                 <button class="popup-button secondary" onclick="dismissPopup()">No Thanks</button>
-                <button class="popup-button primary" onclick="continueAction()">Let's Go!</button>
+                <button class="popup-button primary" onclick="continueAction()">Start Now!</button>
             </div>
         </div>
     </div>

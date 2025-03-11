@@ -45,11 +45,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $time = date("H:i:s");
         
         // Use prepared statements to prevent SQL injection
-        $stmt = mysqli_prepare($conn, "INSERT INTO applicationsSurvey(Email, Phone, ApplicationContent, Comment, SubmitDate, SubmitTime, applicationStatus) VALUES (?, ?, ?, ?, ?, ?, 0)");
+        $stmt = mysqli_prepare($conn, "INSERT INTO applicationsSurvey(FullNames,Email, Phone, ApplicationContent, Comment, SubmitDate, SubmitTime, applicationStatus) VALUES (?, ?, ?, ?, ?, ?, ?, 0)");
         
         if ($stmt) {
             // Bind parameters with appropriate types
-            mysqli_stmt_bind_param($stmt, "ssssss", 
+            mysqli_stmt_bind_param($stmt, "sssssss", 
+                $name,
                 $email,     // s = string
                 $phone,     // s = string
                 $coursesString, // s = string
@@ -91,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Learn with Us! 🌍</title>
+    <title>Learn with Us!</title>
     <link rel="shortcut icon" href="./images/logo/logoRound.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -313,7 +314,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center">
                                 <img src="./images/home/en.png" alt="" width="30" height="30">
-                                <h4 class="mb-0 ms-3">English Mastery</h4>
+                                <h4 class="mb-0 ms-3">English Course</h4>
                             </div>
                             <button type="button" class="btn btn-dark btn-sm choose-course">Choose</button>
                         </div>
@@ -321,10 +322,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <hr>
                             <p class="text-muted">You'll learn:</p>
                             <ul class="list-unstyled">
-                                <li>✓ Grammar fundamentals</li>
-                                <li>✓ Business communication</li>
-                                <li>✓ Pronunciation mastery</li>
-                                <li>✓ Cultural immersion</li>
+                                <li>✓ Improve your speaking and writing skills</li>
+                                <li>✓ Build your vocabulary</li>
+                                <li>✓ Practice grammar and pronunciation</li>
+                                <li>✓ Enhance your reading comprehension</li>
+                                <li>✓ Learn how to write essays, emails, and reports</li>
                             </ul>
                             <span class="badge badge-certificate rounded-pill">Certificate Included</span>
                         </div>
@@ -336,7 +338,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center">
                                 <img src="./images/home/fr.png" alt="" width="30" height="30">
-                                <h4 class="mb-0 ms-3">French Mastery</h4>
+                                <h4 class="mb-0 ms-3">French Course</h4>
                             </div>
                             <button type="button" class="btn btn-dark btn-sm choose-course">Choose</button>
                         </div>
@@ -344,10 +346,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <hr>
                             <p class="text-muted">You'll learn:</p>
                             <ul class="list-unstyled">
-                                <li>✓ Grammar fundamentals</li>
-                                <li>✓ Business communication</li>
-                                <li>✓ Pronunciation mastery</li>
-                                <li>✓ Cultural immersion</li>
+                                <li>✓ Learn basic to advanced French</li>
+                                <li>✓ Practice speaking, listening, reading, and writing</li>
+                                <li>✓ Improve your pronunciation</li>
+                                <li>✓ Expand your vocabulary</li>
+                                <li>✓ Understand French culture and customs</li>
                             </ul>
                             <span class="badge badge-certificate rounded-pill">Certificate Included</span>
                         </div>
@@ -358,7 +361,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center">
                                 <img src="./images/home/ge.png" alt="" width="30" height="30">
-                                <h4 class="mb-0 ms-3">German Mastery</h4>
+                                <h4 class="mb-0 ms-3">German Course</h4>
                             </div>
                             <button type="button" class="btn btn-dark btn-sm choose-course">Choose</button>
                         </div>
@@ -366,10 +369,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <hr>
                             <p class="text-muted">You'll learn:</p>
                             <ul class="list-unstyled">
-                                <li>✓ Grammar fundamentals</li>
-                                <li>✓ Business communication</li>
-                                <li>✓ Pronunciation mastery</li>
-                                <li>✓ Cultural immersion</li>
+                                <li>✓ Learn basic to advanced German</li>
+                                <li>✓ Focus on speaking, listening, reading, and writing</li>
+                                <li>✓ Build a strong foundation in German grammar</li>
+                                <li>✓ Practice conversational skills</li>
+                                <li>✓ Explore German culture and traditions</li>
                             </ul>
                             <span class="badge badge-certificate rounded-pill">Certificate Included</span>
                         </div>
@@ -380,7 +384,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center">
                                 <i class="course-icon fas fa-code text-danger me-3"></i>
-                                <h4 class="mb-0">Coding Bootcamp</h4>
+                                <h4 class="mb-0">Coding Course</h4>
                             </div>
                             <button type="button" class="btn btn-dark btn-sm choose-course">Choose</button>
                         </div>
@@ -388,13 +392,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <hr>
                             <p class="text-muted">You'll learn:</p>
                             <ul class="list-unstyled">
-                                <li>✓ Web development fundamentals</li>
-                                <li>✓ JavaScript & Python</li>
-                                <li>✓ Database management</li>
-                                <li>✓ Project development</li>
+                                <li>✓ Learn the basics of programming</li>
+                                <li>✓ Understand HTML, CSS, JavaScript, and Python</li>
+                                <li>✓ Work on real-world projects</li>
+                                <li>✓ Develop problem-solving skills</li>
                             </ul>
                             <span class="badge badge-certificate rounded-pill">Certificate Included</span>
                         </div>
+                    </div>
+                    <h3 class="mb-4">Mode Of Study</h3>
+
+                    <div style="display: flex; flex-direction: row;">
+                    <div class="course-card" data-course="Online">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <h4 class="mb-0">Online</h4>
+                            </div>
+                            <button type="button" class="btn btn-dark btn-sm choose-course">Choose</button>
+                        </div>
+                    </div>
+                    <div class="course-card" data-course="Inperson">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <h4 class="mb-0">In-person</h4>
+                            </div>
+                            <button type="button" class="btn btn-dark btn-sm choose-course">Choose</button>
+                        </div>
+                    </div>
                     </div>
                 </div>
 
@@ -419,7 +443,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Phone</label>
+                        <label class="form-label">Phone (WhatsApp Number)</label>
                         <input type="tel" name="phone" class="form-control rounded-pill" value="<?= htmlspecialchars($formData['phone']) ?>" required>
                         <?php if (isset($errors['phone'])): ?>
                             <div class="text-danger"><?= $errors['phone'] ?></div>
@@ -438,7 +462,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <!-- Selected Courses -->
                     <div class="selected-courses">
-                        <h4>Selected Courses</h4>
+                        <h4>Choices</h4>
                         <ul id="selected-courses-list">
                             <?php foreach ($formData['courses'] as $course): ?>
                                 <li><?= htmlspecialchars($course) ?></li>
@@ -456,9 +480,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php endif; ?>
                     </div>
 
-                    <button type="submit"  class="btn btn-info w-100 rounded-pill py-2">
+                    <button style="margin:0 0 10px 0" type="submit"  class="btn btn-info w-100 rounded-pill py-2">
                         Enroll Now! <i class="fas fa-paper-plane ms-2"></i>
                     </button>
+                    <a class="btn btn-secondary w-100 rounded-pill py-2" href="./index">Back to home</a>
                 </div>
             </div>
         </form>
