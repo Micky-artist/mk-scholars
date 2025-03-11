@@ -473,7 +473,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="form-check mb-4">
                         <input class="form-check-input" type="checkbox" name="terms" id="terms" <?= $formData['terms'] ? 'checked' : '' ?>>
                         <label class="form-check-label" for="terms">
-                            I agree to the <a href="#" class="text-decoration-none">terms & conditions</a>
+                            I agree to the <a href="./terms-and-conditions" target="_blank" class="text-decoration-none">terms & conditions</a> and  <a href="./privacy-policy" target="_blank" class="text-decoration-none">Privacy Policy</a>
                         </label>
                         <?php if (isset($errors['terms'])): ?>
                             <div class="text-danger"><?= $errors['terms'] ?></div>
