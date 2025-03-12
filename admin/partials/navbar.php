@@ -17,7 +17,7 @@
               <a class="sidebar-link waves-effect waves-dark sidebar-link" href="application-requests" aria-expanded="false"><i class="mdi mdi-view-list"></i><span class="hide-menu">Application Support Requests</span></a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="course-applicatins" aria-expanded="false"><i class="mdi mdi-view-list"></i><span class="hide-menu">Course Applications</span></a>
+              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="course-applications" aria-expanded="false"><i class="mdi mdi-view-list"></i><span class="hide-menu">Course Applications</span></a>
             </li>
             <li class="sidebar-item">
               <a class="sidebar-link waves-effect waves-dark sidebar-link" href="chat-ground" aria-expanded="false"><i class="mdi mdi-view-list"></i><span class="hide-menu">Chat Ground</span></a>

@@ -42,7 +42,7 @@ include("./dbconnection/connection.php");
 		-->
 
 		<div class="feature-course-3-column">
-			<div class="container">
+			<div class="container-fluid" style="padding: 0 5%;">
 				<div class="row">
 					<div class="col-md-9 col-xs-12 float-right featured-course">
 						<ul class="course-menu">
@@ -66,7 +66,7 @@ include("./dbconnection/connection.php");
 							?>
 						</ul>
 
-						<div class="row">
+						<div class="scholarshipsContainerDiv">
 							<?php
 							// Pagination settings
 							$records_per_page = 25; // Number of records to display per page
@@ -160,25 +160,47 @@ include("./dbconnection/connection.php");
 							if ($selectScholarships->num_rows > 0) {
 								while ($getScholarships = mysqli_fetch_assoc($selectScholarships)) {
 							?>
-									<div class="col-md-4 col-sm-6 col-xs-12 allScholarshipContainer">
-										<div class="single-course-grid">
-											<div class="image">
-												<img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipImage'] ?>" alt="<?php echo htmlspecialchars($getScholarships['scholarshipTitle']) ?>">
+									<div class="scholarship-card">
+										<div class="card-image">
+											<img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipImage'] ?>"
+												alt="<?php echo $getScholarships['scholarshipTitle'] ?>">
+											<div class="image-overlay"></div>
+										</div>
+
+										<div class="card-content">
+											<h3 class="card-title">
+												<a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-", $getScholarships['scholarshipTitle']) ?>">
+													<?php echo $getScholarships['scholarshipTitle'] ?>
+												</a>
+											</h3>
+
+											<div class="card-description">
+												<p><?php echo $getScholarships['scholarshipDetails'] ?></p>
 											</div>
-											<div class="text">
-												<h6><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-", $getScholarships['scholarshipTitle']) ?>" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a></h6>
-												<div class="DetailWrapper">
-													<p class="postLineLimit"><?php echo $getScholarships['scholarshipDetails'] ?></p>
+
+											<div class="card-footer">
+												<div class="date-info">
+													<svg class="calendar-icon" viewBox="0 0 24 24">
+														<path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z" />
+													</svg>
+													<span><?php echo $getScholarships['scholarshipUpdateDate'] ?></span>
 												</div>
 
-												<ul class="clearfix">
-													<li class="float-left"><i class="fa fa-calendar" aria-hidden="true"></i> <?php echo $getScholarships['scholarshipUpdateDate'] ?></li>
+												<div class="card-actions">
+													<a href="#" class="apply-button">
+														<span>Apply Now</span>
+														<div class="button-hover-effect"></div>
+													</a>
 
-													<li class="float-right"><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-", $getScholarships['scholarshipTitle']) ?>" class="tran3s textfont free hvr-float-shadow">READ MORE</a></li>
-												</ul>
-											</div> <!-- /.text -->
-										</div> <!-- /.single-course-grid -->
-									</div> <!-- /.col- -->
+													<a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-", $getScholarships['scholarshipTitle']) ?>"
+														class="read-more-button">
+														<span>Read More</span>
+														<div class="button-arrow">→</div>
+													</a>
+												</div>
+											</div>
+										</div>
+									</div>
 								<?php
 								}
 							} else {
@@ -190,6 +212,190 @@ include("./dbconnection/connection.php");
 							}
 
 							?>
+							<style>
+								.scholarshipsContainerDiv {
+									display: flex;
+									flex-direction: row;
+									flex-wrap: wrap;
+									justify-content: center;
+									width: 100%;
+									/* background-color: #2d3436; */
+								}
+
+								.scholarship-card {
+									position: relative;
+									width: 100%;
+									max-width: 320px;
+									/* Reduced width */
+									background: #ffffff;
+									border-radius: 16px;
+									box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+									overflow: hidden;
+									transition: transform 0.3s ease, box-shadow 0.3s ease;
+									margin: 1rem;
+								}
+
+								.scholarship-card:hover {
+									transform: translateY(-5px);
+									box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+								}
+
+								.card-image {
+									position: relative;
+									height: 200px;
+									overflow: hidden;
+								}
+
+								.card-image img {
+									width: 100%;
+									height: 100%;
+									object-fit: cover;
+									transition: transform 0.4s ease;
+								}
+
+								.scholarship-card:hover .card-image img {
+									transform: scale(1.05);
+								}
+
+								.image-overlay {
+									position: absolute;
+									top: 0;
+									left: 0;
+									width: 100%;
+									height: 100%;
+									background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.7) 100%);
+								}
+
+								.card-content {
+									padding: 1.25rem;
+									position: relative;
+								}
+
+								.card-title {
+									font-size: 18px;
+									margin: 0 0 0.75rem 0;
+									line-height: 1.3;
+								}
+
+								.card-title a {
+									color: #2d3436;
+									text-decoration: none;
+									background-image: linear-gradient(to right, #2d3436 50%, transparent 50%);
+									background-size: 200% 2px;
+									background-position: 100% 100%;
+									background-repeat: no-repeat;
+									transition: background-position 0.3s ease;
+									padding: 5px 5px;
+								}
+
+								.card-title a:hover {
+									background-position: 0% 100%;
+								}
+
+								.card-description {
+									height: 4.5em;
+									/* 3 lines * 1.5em line-height */
+									overflow: hidden;
+									margin-bottom: 1.25rem;
+									/* Adjusted margin */
+								}
+
+								.card-description p {
+									margin: 0;
+									color: #636e72;
+									line-height: 1.5em;
+									display: -webkit-box;
+									-webkit-line-clamp: 3;
+									-webkit-box-orient: vertical;
+									overflow: hidden;
+								}
+
+								.card-footer {
+									display: flex;
+									justify-content: space-between;
+									align-items: center;
+
+								}
+
+								.date-info {
+									display: flex;
+									align-items: center;
+									gap: 0.5rem;
+									color: #636e72;
+									font-size: 14px;
+									/* Adjusted font size */
+								}
+
+								.calendar-icon {
+									width: 16px;
+									/* Adjusted size */
+									height: 16px;
+									/* Adjusted size */
+									fill: #636e72;
+								}
+
+								.card-actions {
+									display: flex;
+									gap: 0.5rem;
+									/* Adjusted gap */
+								}
+
+								.apply-button {
+									position: relative;
+									display: inline-flex;
+									align-items: center;
+									padding: 0.5rem 1rem;
+									/* Adjusted padding */
+									background: linear-gradient(135deg, #ff6b6b, #a855f7);
+									color: white;
+									border-radius: 8px;
+									text-decoration: none;
+									overflow: hidden;
+									transition: transform 0.3s ease;
+								}
+
+								.button-hover-effect {
+									position: absolute;
+									width: 100%;
+									height: 100%;
+									background: rgba(255, 255, 255, 0.1);
+									left: -100%;
+									transition: left 0.3s ease;
+								}
+
+								.apply-button:hover .button-hover-effect {
+									left: 0;
+								}
+
+								.read-more-button {
+									position: relative;
+									display: inline-flex;
+									align-items: center;
+									padding: 0.5rem 1rem;
+									/* Adjusted padding */
+									background: transparent;
+									border: 2px solid #e0e0e0;
+									border-radius: 8px;
+									color: #2d3436;
+									text-decoration: none;
+									transition: all 0.3s ease;
+								}
+
+								.read-more-button:hover {
+									border-color: #a855f7;
+									background: rgba(168, 85, 247, 0.05);
+								}
+
+								.button-arrow {
+									margin-left: 0.5rem;
+									transform: translateX(0);
+									transition: transform 0.3s ease;
+								}
+
+								.read-more-button:hover .button-arrow {
+									transform: translateX(3px);
+								}
+							</style>
 							<style>
 								.allScholarshipContainer {
 									height: 450px;
@@ -221,6 +427,7 @@ include("./dbconnection/connection.php");
 								}
 
 								.course-pagination {
+
 									text-align: center;
 									margin: 30px 0;
 								}
@@ -232,10 +439,12 @@ include("./dbconnection/connection.php");
 
 								.course-pagination li a {
 									display: block;
-									width: 40px;
-									height: 40px;
-									line-height: 40px;
-									border-radius: 50%;
+									width: 1cm;
+									height:1cm;
+									display: flex;
+									justify-content: center;
+									align-items: center;
+									/* border-radius: 50%; */
 									background: #f7f7f7;
 									font-weight: 600;
 									color: #666;
@@ -243,7 +452,7 @@ include("./dbconnection/connection.php");
 
 								.course-pagination li a.active,
 								.course-pagination li a:hover {
-									background: #cd2122;
+									background: purple;
 									color: #fff;
 								}
 
@@ -254,7 +463,8 @@ include("./dbconnection/connection.php");
 									align-items: center !important;
 									color: #fff !important;
 								}
-								.course-menu{
+
+								.course-menu {
 									background-color: #ebebff;
 									display: flex;
 									justify-content: space-evenly !important;
@@ -262,14 +472,17 @@ include("./dbconnection/connection.php");
 									flex-wrap: wrap;
 									padding: 10px 0px 0px 0px;
 								}
-								.course-menu .active{
+
+								.course-menu .active {
 									background-color: purple !important;
 								}
-								.course-menu .tran3s{
+
+								.course-menu .tran3s {
 									text-transform: uppercase;
 									border: 1px solid purple;
 								}
-								.course-menu .tran3s:hover{
+
+								.course-menu .tran3s:hover {
 									background-color: purple !important;
 								}
 							</style>
@@ -279,7 +492,7 @@ include("./dbconnection/connection.php");
 						<?php if ($total_pages > 1): ?>
 							<ul class="course-pagination">
 								<?php if ($page > 1): ?>
-									<li><a href="<?php echo generatePaginationLink($page - 1); ?>" class="tran3s">Prev</a></li>
+									<li><a href="<?php echo generatePaginationLink($page - 1); ?>" class="tran3s"><</a></li>
 								<?php endif; ?>
 
 								<?php
@@ -293,7 +506,7 @@ include("./dbconnection/connection.php");
 								<?php endfor; ?>
 
 								<?php if ($page < $total_pages): ?>
-									<li><a href="<?php echo generatePaginationLink($page + 1); ?>" class="tran3s">Next</a></li>
+									<li><a href="<?php echo generatePaginationLink($page + 1); ?>" class="tran3s">></a></li>
 								<?php endif; ?>
 							</ul>
 						<?php endif; ?>
@@ -345,7 +558,7 @@ include("./dbconnection/connection.php");
 						</div>
 					</div> <!-- /.course-sidebar -->
 				</div> <!-- /.row -->
-			</div> <!-- /.container -->
+			</div> 
 		</div> <!-- /.feature-course-3-column -->
 
 

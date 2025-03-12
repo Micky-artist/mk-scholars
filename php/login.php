@@ -98,16 +98,16 @@ if (isset($_POST['login']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                         
                         // Log successful login
-                        $ipAddress = $_SERVER['REMOTE_ADDR'];
-                        $userAgent = $_SERVER['HTTP_USER_AGENT'];
-                        $logStmt = $conn->prepare("INSERT INTO login_logs (user_id, ip_address, user_agent, status) VALUES (?, ?, ?, 'success')");
-                        $logStmt->bind_param("iss", $account['NoUserId'], $ipAddress, $userAgent);
-                        $logStmt->execute();
-                        $logStmt->close();
+                        // $ipAddress = $_SERVER['REMOTE_ADDR'];
+                        // $userAgent = $_SERVER['HTTP_USER_AGENT'];
+                        // $logStmt = $conn->prepare("INSERT INTO login_logs (user_id, ip_address, user_agent, status) VALUES (?, ?, ?, 'success')");
+                        // $logStmt->bind_param("iss", $account['NoUserId'], $ipAddress, $userAgent);
+                        // $logStmt->execute();
+                        // $logStmt->close();
                         
                         // Redirect user
-                        header("Location: ./index");
-                        exit();
+                        header("location: ./home");
+                        exit;
                     } else {
                         // Log failed attempt
                         $ipAddress = $_SERVER['REMOTE_ADDR'];

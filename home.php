@@ -70,54 +70,8 @@
 					<p>Choose a best scholarship you need from our wide range of scholarships available, start learning today from the best teachers around the world</p>
 				</div> <!-- /.theme-title -->
 
-				<div class="row">
-					<div class="col-md-4 col-sm-6 col-xs-12 allScholarshipContainer">
-						<div class="single-course-grid">
-							<div class="image">
-								<img src="./images/home/followUs.jpeg" alt="">
-							</div>
-							<div class="text">
-								<div>
-									<a class="noHover">
-										<h4>Follow Us</h4>
-									</a>
-								</div>
-								<div>
-									<a target="_blank" href="https://www.youtube.com/@mkscholars"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="red" class="bi bi-youtube" viewBox="0 0 16 16">
-											<path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.009.104c-.05.572-.124 1.14-.235 1.558a2.01 2.01 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.01 2.01 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31 31 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.01 2.01 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A100 100 0 0 1 7.858 2zM6.4 5.209v4.818l4.157-2.408z" />
-										</svg>
-										<h5>Youtube</h5>
-									</a>
+				<div class="scholarshipsContainerDiv">
 
-								</div>
-								<div>
-									<a target="_blank" href="https://chat.whatsapp.com/Ij6O5iYUVOt8pUXXJ1cCpD">
-										<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="green" class="bi bi-whatsapp" viewBox="0 0 16 16">
-											<path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232" />
-										</svg>
-										<h5>Join WhatsApp Group</h5>
-									</a>
-
-								</div>
-								<div>
-									<a target="_blank" href="https://x.com/MkScholars"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="black" class="bi bi-twitter-x" viewBox="0 0 16 16">
-											<path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z" />
-										</svg>
-										<h5>X</h5>
-									</a>
-
-								</div>
-								<div>
-									<a target="_blank" href="https://www.facebook.com/profile.php?id=100069262368212&sk=following"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="blue" class="bi bi-facebook" viewBox="0 0 16 16">
-											<path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951" />
-										</svg>
-										<h5>Facebook</h5>
-									</a>
-
-								</div>
-							</div>
-						</div>
-					</div>
 					<!-- <div class="col-md-4 col-sm-6 col-xs-12 allScholarshipContainer">
 						<div class="single-course-grid">
 							<div class="image">
@@ -168,10 +122,12 @@
 						.text div a:hover {
 							background-color: silver;
 						}
-						.noHover{
+
+						.noHover {
 							justify-content: center !important;
 						}
-						.noHover:hover{
+
+						.noHover:hover {
 							background-color: #fff !important;
 							cursor: default !important;
 						}
@@ -181,62 +137,239 @@
 					if ($selectScholarships->num_rows > 0) {
 						while ($getScholarships = mysqli_fetch_assoc($selectScholarships)) {
 					?>
-							<!-- <a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo $getScholarships['scholarshipTitle'] ?>" class="tran3s"> -->
-							<div class="col-md-4 col-sm-6 col-xs-12 allScholarshipContainer">
-								<div class="single-course-grid">
-									<div class="image">
-										<img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipImage'] ?>" alt="">
+							<div class="scholarship-card">
+								<div class="card-image">
+									<img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipImage'] ?>"
+										alt="<?php echo $getScholarships['scholarshipTitle'] ?>">
+									<div class="image-overlay"></div>
+								</div>
+
+								<div class="card-content">
+									<h3 class="card-title">
+										<a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-", $getScholarships['scholarshipTitle']) ?>">
+											<?php echo $getScholarships['scholarshipTitle'] ?>
+										</a>
+									</h3>
+
+									<div class="card-description">
+										<p><?php echo $getScholarships['scholarshipDetails'] ?></p>
 									</div>
-									<div class="text">
-										<h6><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-", $getScholarships['scholarshipTitle']) ?>" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a></h6>
-										<div class="DetailWrapper">
-											<p class="postLineLimit"><?php echo $getScholarships['scholarshipDetails'] ?></p>
+
+									<div class="card-footer">
+										<div class="date-info">
+											<svg class="calendar-icon" viewBox="0 0 24 24">
+												<path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z" />
+											</svg>
+											<span><?php echo $getScholarships['scholarshipUpdateDate'] ?></span>
 										</div>
 
-										<ul class="clearfix">
-											<li class="float-left"><i class="fa fa-calendar" aria-hidden="true"></i> <?php echo $getScholarships['scholarshipUpdateDate'] ?></li>
+										<div class="card-actions">
+											<a href="#" class="apply-button">
+												<span>Apply Now</span>
+												<div class="button-hover-effect"></div>
+											</a>
 
-											<li class="float-right"><a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-", $getScholarships['scholarshipTitle']) ?>" class="tran3s textfont free hvr-float-shadow">READ MORE</a></li>
-										</ul>
-									</div> <!-- /.text -->
-								</div> <!-- /.single-course-grid -->
-							</div> <!-- /.col- -->
-							<!-- </a> -->
+											<a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-", $getScholarships['scholarshipTitle']) ?>"
+												class="read-more-button">
+												<span>Read More</span>
+												<div class="button-arrow">→</div>
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+
 					<?php
 						}
 					}
 
 					?>
-
 					<style>
-						.allScholarshipContainer {
-							height: 14cm;
+						.scholarshipsContainerDiv {
+							display: flex;
+							flex-direction: row;
+							flex-wrap: wrap;
+							justify-content: center;
+							width: 100%;
+							/* background-color: #2d3436; */
 						}
 
-						.image {
-							height: 5cm;
+						.scholarship-card {
+							position: relative;
+							width: 100%;
+							max-width: 320px;
+							/* Reduced width */
+							background: #ffffff;
+							border-radius: 16px;
+							box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+							overflow: hidden;
+							transition: transform 0.3s ease, box-shadow 0.3s ease;
+							margin: 1rem;
 						}
 
-						.image img {
-							object-fit: cover;
+						.scholarship-card:hover {
+							transform: translateY(-5px);
+							box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+						}
+
+						.card-image {
+							position: relative;
+							height: 200px;
+							/* Adjusted height */
+							overflow: hidden;
+						}
+
+						.card-image img {
 							width: 100%;
 							height: 100%;
+							object-fit: cover;
+							transition: transform 0.4s ease;
 						}
 
-						.postLineLimit {
-							text-overflow: ellipsis;
+						.scholarship-card:hover .card-image img {
+							transform: scale(1.05);
+						}
+
+						.image-overlay {
+							position: absolute;
+							top: 0;
+							left: 0;
+							width: 100%;
+							height: 100%;
+							background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.7) 100%);
+						}
+
+						.card-content {
+							padding: 1.25rem;
+							position: relative;
+						}
+
+						.card-title {
+							font-size: 18px;
+							margin: 0 0 0.75rem 0;
+							line-height: 1.3;
+						}
+
+						.card-title a {
+							color: #2d3436;
+							text-decoration: none;
+							background-image: linear-gradient(to right, #2d3436 50%, transparent 50%);
+							background-size: 200% 2px;
+							background-position: 100% 100%;
+							background-repeat: no-repeat;
+							transition: background-position 0.3s ease;
+							padding: 5px 5px;
+						}
+
+						.card-title a:hover {
+							background-position: 0% 100%;
+						}
+
+						.card-description {
+							height: 4.5em;
+							/* 3 lines * 1.5em line-height */
+							overflow: hidden;
+							margin-bottom: 1.25rem;
+							/* Adjusted margin */
+						}
+
+						.card-description p {
+							margin: 0;
+							color: #636e72;
+							line-height: 1.5em;
 							display: -webkit-box;
-							-webkit-line-clamp: 4;
-							line-clamp: 4;
+							-webkit-line-clamp: 3;
 							-webkit-box-orient: vertical;
 							overflow: hidden;
 						}
 
-						.DetailWrapper {
-							height: 5cm;
+						.card-footer {
+							display: flex;
+							justify-content: space-between;
+							align-items: center;
+
+						}
+
+						.date-info {
+							display: flex;
+							align-items: center;
+							gap: 0.5rem;
+							color: #636e72;
+							font-size: 14px;
+							/* Adjusted font size */
+						}
+
+						.calendar-icon {
+							width: 16px;
+							/* Adjusted size */
+							height: 16px;
+							/* Adjusted size */
+							fill: #636e72;
+						}
+
+						.card-actions {
+							display: flex;
+							gap: 0.5rem;
+							/* Adjusted gap */
+						}
+
+						.apply-button {
+							position: relative;
+							display: inline-flex;
+							align-items: center;
+							padding: 0.5rem 1rem;
+							/* Adjusted padding */
+							background: linear-gradient(135deg, #ff6b6b, #a855f7);
+							color: white;
+							border-radius: 8px;
+							text-decoration: none;
 							overflow: hidden;
+							transition: transform 0.3s ease;
+						}
+
+						.button-hover-effect {
+							position: absolute;
+							width: 100%;
+							height: 100%;
+							background: rgba(255, 255, 255, 0.1);
+							left: -100%;
+							transition: left 0.3s ease;
+						}
+
+						.apply-button:hover .button-hover-effect {
+							left: 0;
+						}
+
+						.read-more-button {
+							position: relative;
+							display: inline-flex;
+							align-items: center;
+							padding: 0.5rem 1rem;
+							/* Adjusted padding */
+							background: transparent;
+							border: 2px solid #e0e0e0;
+							border-radius: 8px;
+							color: #2d3436;
+							text-decoration: none;
+							transition: all 0.3s ease;
+						}
+
+						.read-more-button:hover {
+							border-color: #a855f7;
+							background: rgba(168, 85, 247, 0.05);
+						}
+
+						.button-arrow {
+							margin-left: 0.5rem;
+							transform: translateX(0);
+							transition: transform 0.3s ease;
+						}
+
+						.read-more-button:hover .button-arrow {
+							transform: translateX(3px);
 						}
 					</style>
+
 				</div> <!-- /.row -->
 				<a href="./applications" style="background-color: #fff; color: #4183E6; font-weight: bold;" class="theme-button hvr-rectangle-out">ALL APPLICATIONS</a>
 			</div> <!-- /.container -->
