@@ -170,19 +170,24 @@
                 <div class="emoji">
                     <img src="http://localhost/mkscholars/images/logo/logoRound.png" alt="MK Scholars Logo" width="200" height="200">
                 </div>
-                <h2>We are excited to announce our new program!</h2><br>
-                <h5>Register now for our May intake</h5>
+                <h2>📢 <br> Exciting News from <br> MK SCHOLARS!</h2>
             </div>
 
             <!-- Popup Body -->
             <div class="popup-body">
-                <p>We now offer language classes in English, French, and German, plus coding classes to help you build new skills 🚀</p>
-            </div>
+                <p>We are now offering coaching for the following: <br>
+                    <div style="text-align: left; padding: 10px 20px">1. University Clinical Aptitude Test (UCAT)<br>2.  Language classes in English, French, and German, along with <br>3. coding classes!
 
+                    </div></p>
+            </div>
+            <div class="popup-header">
+                
+                <h5>Register now and take the first step toward success!</h5>
+            </div>
             <!-- Popup Buttons -->
             <div class="popup-buttons">
                 <button class="popup-button secondary" onclick="dismissPopup()">No Thanks</button>
-                <button class="popup-button primary" onclick="continueAction()">Start Now!</button>
+                <button class="popup-button primary" onclick="continueAction()">Register Now!</button>
             </div>
         </div>
     </div>
@@ -246,7 +251,7 @@
             closePopup();
             
             // You can replace the alert with an actual redirect:
-            window.open('form', '_blank');
+            window.open('courses', '_blank');
         }
 
         // Check if popup should be shown on page load

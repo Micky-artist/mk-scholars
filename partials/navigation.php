@@ -78,7 +78,7 @@ include("./popup.php");
 						</li>
 						<li><a href="applications" class="tran3s">All Applications</a></li>
 						</li>
-						<li><a href="form" class="tran3s">Apply</a></li>
+						<li><a href="courses" class="tran3s">Courses</a></li>
 						</li>
 						<!-- <li><a href="applications" class="tran3s">Apply Now</a> -->
 						</li>
@@ -106,17 +106,17 @@ include("./popup.php");
 
 							</ul>
 						</li>
-						<?php
+						<!-- <?php
 						if (isset($_SESSION['username']) && isset($_SESSION['userId'])) {
 						?>
 							<li><a href="./dashboard" target="_blank" class="tran3s UniqueButton">Dashboard</a></li>
 						<?php
 						} else {
 						?>
-							<li><a href="./login" target="_blank" class="tran3s UniqueButton">Login</a></li>
+							<li><a href="./login" class="tran3s UniqueButton">Login</a></li>
 						<?php
 						}
-						?>
+						?> -->
 
 						<style>
 							.UniqueButton{

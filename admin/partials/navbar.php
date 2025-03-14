@@ -20,7 +20,7 @@
               <a class="sidebar-link waves-effect waves-dark sidebar-link" href="course-applications" aria-expanded="false"><i class="mdi mdi-view-list"></i><span class="hide-menu">Course Applications</span></a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="chat-ground" aria-expanded="false"><i class="mdi mdi-view-list"></i><span class="hide-menu">Chat Ground</span></a>
+              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="chat-ground" target="_blank" aria-expanded="false"><i class="mdi mdi-view-list"></i><span class="hide-menu">Chat Ground</span></a>
             </li>
             <li class="sidebar-item">
               <a class="sidebar-link waves-effect waves-dark sidebar-link" href="users" aria-expanded="false"><i class="mdi mdi-account"></i><span class="hide-menu">Users</span></a>

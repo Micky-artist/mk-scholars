@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $time = date("H:i:s");
         
         // Use prepared statements to prevent SQL injection
-        $stmt = mysqli_prepare($conn, "INSERT INTO applicationsSurvey(FullNames,Email, Phone, ApplicationContent, Comment, SubmitDate, SubmitTime, applicationStatus) VALUES (?, ?, ?, ?, ?, ?, ?, 0)");
+        $stmt = mysqli_prepare($conn, "INSERT INTO applicationsSurvey(FullNames,Email, Phone, CourseId, ApplicationContent, Comment, SubmitDate, SubmitTime, applicationStatus) VALUES (?, ?, ?, 1, ?, ?, ?, ?, 0)");
         
         if ($stmt) {
             // Bind parameters with appropriate types
@@ -297,13 +297,113 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #666;
             margin-top: 5px;
         }
+        .navbar {
+            margin-bottom: 1cm;
+            /* width: 80%; */
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+            padding: .2rem 2rem;
+            /* position: sticky; */
+            top: 0 !important;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .brand-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .navbar-nav {
+            display: flex !important;
+            flex-direction: row;
+            gap: 2rem;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link {
+            color: #4a4a4a;
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.8rem;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
     </style>
 </head>
 
-<body class="py-5">
+<body class="">
+    <?php include("./partials/coursesNav.php") ?>
     <div class="container">
-        <h1 class="hero-title text-center mb-5">Start Your Learning Journey! with <br> MK Scholars 🚀</h1>
-
         <form method="POST" class="form-section p-4 mb-4">
             <div class="row">
                 <!-- Course Selection -->
@@ -328,6 +428,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <li>✓ Enhance your reading comprehension</li>
                                 <li>✓ Learn how to write essays, emails, and reports</li>
                             </ul>
+                            <h5>Fees: 15,000 FRW</h5>
                             <span class="badge badge-certificate rounded-pill">Certificate Included</span>
                         </div>
                     </div>
@@ -352,6 +453,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <li>✓ Expand your vocabulary</li>
                                 <li>✓ Understand French culture and customs</li>
                             </ul>
+                            <h5>Fees: 20,000 FRW</h5>
                             <span class="badge badge-certificate rounded-pill">Certificate Included</span>
                         </div>
                     </div>
@@ -375,6 +477,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <li>✓ Practice conversational skills</li>
                                 <li>✓ Explore German culture and traditions</li>
                             </ul>
+                            <h5>Fees: 20,000 FRW</h5>
+
                             <span class="badge badge-certificate rounded-pill">Certificate Included</span>
                         </div>
                     </div>
@@ -397,12 +501,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <li>✓ Work on real-world projects</li>
                                 <li>✓ Develop problem-solving skills</li>
                             </ul>
+                            <h5>Fees: 25,000 FRW</h5>
+
                             <span class="badge badge-certificate rounded-pill">Certificate Included</span>
                         </div>
                     </div>
                     <h3 class="mb-4">Mode Of Study</h3>
 
-                    <div style="display: flex; flex-direction: row;">
+                    <div style="display: flex; flex-direction: row; flex-wrap: wrap">
                     <div class="course-card" data-course="Online">
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center">

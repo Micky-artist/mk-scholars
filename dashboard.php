@@ -2,6 +2,8 @@
 session_start();
 include('./dbconnection/connection.php');
 include('./php/validateSession.php');
+// include('./php/sendMessage.php');
+
 
 ?>
 
@@ -199,46 +201,37 @@ include('./php/validateSession.php');
                         <div class="neumorphic-icon mx-auto mb-3">
                             <i class="fas fa-user text-primary"></i>
                         </div>
-                        <h5 class="mb-1">Alice Smith</h5>
-                        <small class="text-muted">Pro Member</small>
+                        <h5 class="mb-1"><?php echo $_SESSION['username']; ?></h5>
+                        <small class="text-muted"><?php echo $_SESSION['NoEmail']; ?></small>
                     </div>
 
-                    <div class="glass-panel p-3 mb-4">
-                        <ul class="nav flex-column">
-                            <li class="nav-item mb-2">
-                                <a class="nav-link d-flex align-items-center" href="#">
-                                    <i class="fas fa-comment-alt me-3 text-primary"></i>
-                                    <span>Chat</span>
-                                </a>
-                            </li>
-                            <li class="nav-item mb-2">
-                                <a class="nav-link d-flex align-items-center" href="#">
-                                    <i class="fas fa-cube me-3 text-success"></i>
-                                    <span>Applications</span>
-                                </a>
-                            </li>
-                            <li class="nav-item mb-2">
-                                <a class="nav-link d-flex align-items-center" href="#">
-                                    <i class="fas fa-chart-pie me-3 text-warning"></i>
-                                    <span>Analytics</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link d-flex align-items-center" href="#">
-                                    <i class="fas fa-cog me-3 text-secondary"></i>
-                                    <span>Settings</span>
-                                </a>
-                            </li>
-                        </ul>
+                    <div class="glass-panel p-2 mb-1">
+                        <a class="nav-link d-flex align-items-center" href="./dashboard">
+                            <i class="fas fa-comment-alt me-3 text-primary"></i>
+                            <span>Dashboard</span>
+                        </a>
                     </div>
+<!--                     
+                    <div class="glass-panel p-2 mb-1">
+                        <a class="nav-link d-flex align-items-center" href="#">
+                            <i class="fas fa-comment-alt me-3 text-primary"></i>
+                            <span>Chat</span>
+                        </a>
+                    </div>
+                    <div class="glass-panel p-2 mb-1">
+                        <a class="nav-link d-flex align-items-center" href="#">
+                            <i class="fas fa-comment-alt me-3 text-primary"></i>
+                            <span>Chat</span>
+                        </a>
+                    </div> -->
+                    
+                    
 
-                    <div class="glass-panel p-3 mt-auto">
-                        <h6 class="mb-3">Storage</h6>
-                        <div class="progress-glass">
-                            <div class="progress-bar bg-primary" style="width: 65%"></div>
-                        </div>
-                        <small class="text-muted">65% of 100GB used</small>
-                    </div>
+
+                    <a class="p-3 mt-auto" href="">
+                    <button class=" glass-panel p-3 mt-auto" style="color: red; font-weight: bold;">Logout</button>
+                    </a>
+
                 </div>
             </nav>
 
@@ -261,36 +254,188 @@ include('./php/validateSession.php');
                     <div class="col-lg-8">
                         <div class="glass-panel p-4">
                             <div class="d-flex justify-content-between align-items-center mb-4">
-                                <h5 class="mb-0">Chat With Us</h5>
-                                <span class="badge bg-primary rounded-pill">3 New</span>
+                                <h5 class="mb-0">Chat With Us (Refresh to check new messages)</h5>
+                                <!-- <span class="badge bg-primary rounded-pill">3 New</span> -->
                             </div>
                             <?php
-                            $UserId = $_SESSION[''];
-                            $CheckConvo = mysqli_query($conn,"SELECT * FROM Conversation WHERE UserId = '$'");
-                            ?>
-                            <div>
-                                <form action="" method="post">
-                                    <input type="hidden" name="" value="">
-                                    <button class="glass-panel p-3">Start New Conversation</button>
-                                </form>
-                            </div>
+                            $UserId = $_SESSION['userId'];
+                            $CheckConvo = mysqli_query($conn, "SELECT * FROM Conversation WHERE UserId = '$UserId' LIMIT 1");
+                            if ($CheckConvo->num_rows == 1) {
+                                $convoData = mysqli_fetch_assoc($CheckConvo);
+                                $convoId = $convoData['ConvId'];
+                                $UserId = $convoData['UserId'];
+                                $ConvStatus = $convoData['ConvStatus'];
 
-                            <div class="chat-container" style="height: 400px; overflow-y: auto;">
-                                <div class="chat-bubble received mb-3">Hey team! Let's discuss the new project updates.</div>
-                                <div class="chat-bubble sent mb-3">I've finished the UI components for review</div>
-                            </div>
-                            <div class="input-group mt-4">
-                                <input type="text" class="form-control bg-transparent" placeholder="Type message...">
-                                <button class="btn btn-primary">
-                                    <i class="fas fa-paper-plane"></i>
-                                </button>
-                            </div>
+                                // if ($convoData['ConvStatus'] == 1) {
+                                //     $DeleteConvo = mysqli_query($conn, "DELETE FROM Conversation WHERE ConvId = $convoId");
+                                //     if ($DeleteConvo) {
+                                //         echo ('
+                                //         <script>window.location.href = "./dashboard"</script>
+                                //         ');
+                                //     }
+                                // }
+
+                            ?>
+                                <div class="chat-container" style="height: 400px; overflow-y: auto;" id="chat-container">
+                                    <?php
+                                    // Fetch messages for the current conversation
+                                    $selectMessages = mysqli_query($conn, "SELECT * FROM Message WHERE ConvId = $convoId ORDER BY SentDate, SentTime");
+
+                                    if ($selectMessages->num_rows > 0) {
+                                        $currentDate = null; // Variable to track the current date for separating messages by day
+
+                                        while ($messages = mysqli_fetch_assoc($selectMessages)) {
+                                            $messageDate = date("Y-m-d", strtotime($messages['SentDate']));
+                                            $messageTime = date("h:i A", strtotime($messages['SentTime']));
+
+                                            // Display the date separator if the date changes
+                                            if ($currentDate !== $messageDate) {
+                                                $currentDate = $messageDate;
+                                                echo '<div class="date-separator text-center my-3">' . date("F j, Y", strtotime($currentDate)) . '</div>';
+                                            }
+
+                                            // Check if the sender is the user or admin
+                                            if ($messages['UserId'] == $UserId) {
+                                                // User's message (sent)
+                                                echo '<div class="chat-bubble sent mb-3">';
+                                                echo '<p class="message-content">' . htmlspecialchars($messages['MessageContent']) . '</p>';
+                                                echo '<span class="time">' . $messageTime . '</span>';
+                                                echo '</div>';
+                                            } else {
+                                                // Admin's message (received)
+                                                echo '<div class="chat-bubble received mb-3">';
+                                                echo '<p class="message-content">' . htmlspecialchars($messages['MessageContent']) . '</p>';
+                                                echo '<span class="time">' . $messageTime . '</span>';
+                                                echo '</div>';
+                                            }
+                                        }
+                                    } else {
+                                        echo '<div class="text-center">No messages found.</div>';
+                                    }
+
+                                    $conn->close();
+                                    ?>
+                                </div>
+                                <style>
+                                    .chat-container {
+                                        scroll-behavior: smooth;
+                                        /* Smooth scrolling */
+                                    }
+
+                                    .chat-bubble {
+                                        max-width: 70%;
+                                        padding: 10px;
+                                        border-radius: 10px;
+                                        position: relative;
+                                        word-wrap: break-word;
+                                        /* Ensure long messages wrap */
+                                    }
+
+                                    .chat-bubble.sent {
+                                        background-color: #007bff;
+                                        color: white;
+                                        margin-left: auto;
+                                    }
+
+                                    .chat-bubble.received {
+                                        background-color: #f1f1f1;
+                                        color: black;
+                                        margin-right: auto;
+                                    }
+
+                                    .chat-bubble .time {
+                                        display: block;
+                                        font-size: 0.8em;
+                                        text-align: right;
+                                        margin-top: 5px;
+                                    }
+
+                                    .date-separator {
+                                        font-size: 0.9em;
+                                        color: #777;
+                                        background-color: #f9f9f9;
+                                        padding: 5px;
+                                        border-radius: 5px;
+                                        display: inline-block;
+                                    }
+
+                                    .message-content {
+                                        margin: 0;
+                                    }
+
+                                    .file-input {
+                                        display: none;
+                                    }
+
+                                    .file-label {
+                                        display: inline-block;
+                                        cursor: pointer;
+                                        background-color: #f1f1f1;
+                                        padding: 10px;
+                                        border-radius: 5px;
+                                        transition: background-color 0.3s ease;
+                                    }
+
+                                    .file-label:hover {
+                                        background-color: #ddd;
+                                    }
+
+                                    .attachment-icon {
+                                        font-size: 20px;
+                                        color: #555;
+                                    }
+                                </style>
+
+                                <!-- <div > -->
+                                <div id="statusMessage"></div>
+                                <form id="messageForm" class="input-group mt-4">
+                                    <div class="file-input-container">
+                                        <input type="file" name="file" id="file-input" class="file-input">
+                                        <label for="file-input" class="file-label">
+                                            <i class="fas fa-paperclip attachment-icon"></i>
+                                        </label>
+                                    </div>
+                                    <input type="hidden" name="UserId" value="<?php echo htmlspecialchars($UserId); ?>">
+                                    <input type="hidden" name="AdminId" value="0">
+                                    <input type="hidden" name="ConvId" value="<?php echo htmlspecialchars($convoId); ?>">
+                                    <input type="text" class="form-control bg-transparent" name="message" placeholder="Type message..." required>
+                                    <button type="submit" name="send" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane"></i> Send
+                                    </button>
+                                </form>
+                                <!-- </div> -->
+                            <?php
+                            } else {
+                            ?>
+                                <div>
+                                    <form action="" method="post">
+                                        <input type="hidden" name="" value="">
+                                        <button name="startConvo" class="glass-panel p-3">Start New Conversation</button>
+                                    </form>
+                                </div>
+                            <?php
+                                if (isset($_POST['startConvo'])) {
+                                    $startTime = date("H:i");
+                                    $startDate = date("Y-m-d");
+                                    $adminId = 0;
+                                    $StartConvo = mysqli_query($conn, "INSERT INTO Conversation(UserId, AdminId, StartDate, StartTime, ConvStatus) VALUES($UserId, $adminId, '$startDate', '$startTime', 0)");
+                                    if ($StartConvo) {
+                                        echo ('
+                                        <script>window.location.href = "./dashboard"</script>
+                                        ');
+                                    }
+                                }
+                            }
+                            ?>
+
+
+
                         </div>
                     </div>
 
                     <div class="col-lg-4">
                         <div class="glass-panel p-4 h-100">
-                            <h5 class="mb-4">Recent Apps</h5>
+                            <h5 class="mb-4">Application Requests</h5>
                             <div class="app-card p-3 mb-3 rounded-3">
                                 <div class="d-flex align-items-center">
                                     <div class="neumorphic-icon me-3">
@@ -323,7 +468,7 @@ include('./php/validateSession.php');
                     </div>
                 </div>
 
-                <div class="row mt-4 g-4">
+                <!-- <div class="row mt-4 g-4">
                     <div class="col-md-6">
                         <div class="glass-panel p-4">
                             <h5><i class="fas fa-chart-line me-2"></i>Performance</h5>
@@ -339,7 +484,7 @@ include('./php/validateSession.php');
                             <small class="text-muted">Project Alpha - 30% complete</small>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </main>
         </div>
     </div>
@@ -400,6 +545,45 @@ include('./php/validateSession.php');
                 sidebar.classList.remove('active');
             }
         });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#messageForm').on('submit', function(event) {
+                event.preventDefault();
+
+                var formData = {
+                    UserId: $('input[name="UserId"]').val(),
+                    AdminId: $('input[name="AdminId"]').val(),
+                    ConvId: $('input[name="ConvId"]').val(),
+                    message: $('input[name="message"]').val()
+                };
+
+                if (formData.message.trim() === '') {
+                    alert('Please enter a message');
+                    return;
+                }
+
+                $.ajax({
+                    url: './php/submit_message.php',
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        $('#statusMessage').html('<div class="alert alert-success">Message sent successfully!</div>');
+                        $('input[name="message"]').val('');
+                    },
+                    error: function(xhr, status, error) {
+                        $('#statusMessage').html('<div class="alert alert-danger">Failed to send message</div>');
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+        // Scroll to the bottom of the chat container
+        const chatContainer = document.getElementById('chat-container');
+        chatContainer.scrollTop = chatContainer.scrollHeight;
     </script>
 </body>
 
