@@ -154,6 +154,20 @@ include("./php/login.php");
             display: flex;
             flex-direction: column;
         }
+		.alert{
+		padding: 10px;
+		margin: 5px 0;
+		border-radius: 10px;
+		font-size: 12px;
+	}
+	.alert-danger{
+		border: .5px solid #c41f10;
+		background-color: #fcd5d2;
+	}
+	.alert-success{
+		border: .5px solid #325737;
+		background-color: #cffad4;
+	}
 </style>
 
 
@@ -167,7 +181,9 @@ include("./php/login.php");
 				<h1>Login Account</h1>
 				<p>Get started to premium sections</p>
 			</div>
-
+			<div class="<?php echo $class ?>">
+				<?php echo $msg ?>
+			</div>
 			<form class="auth-form" method="post" id="login-form">
 				<div class="input-group">
 					<input type="email" name="username" id="login-email" placeholder=" ">
@@ -182,8 +198,8 @@ include("./php/login.php");
 			</form>
 
 			<div class="switch-form">
-				Remember your password? <a href="#" onclick="showLogin()">Login</a><br>
-				Need an account? <a href="./sign-up">Sign Up</a>
+				Need an account? <a href="./sign-up">Sign Up</a><br>
+				<a href="#">Forgot Password?</a>
 			</div>
 		</div>
 	</div>

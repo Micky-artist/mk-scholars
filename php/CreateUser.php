@@ -125,12 +125,12 @@ if (isset($_POST['signup']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
                                 $ipAddress = $_SERVER['REMOTE_ADDR'];
                                 $userAgent = $_SERVER['HTTP_USER_AGENT'];
                                 
-                                $logStmt = $conn->prepare("INSERT INTO registration_logs (user_id, ip_address, user_agent) VALUES (?, ?, ?)");
-                                if ($logStmt) {
-                                    $logStmt->bind_param("iss", $userId, $ipAddress, $userAgent);
-                                    $logStmt->execute();
-                                    $logStmt->close();
-                                }
+                                // $logStmt = $conn->prepare("INSERT INTO registration_logs (user_id, ip_address, user_agent) VALUES (?, ?, ?)");
+                                // if ($logStmt) {
+                                //     $logStmt->bind_param("iss", $userId, $ipAddress, $userAgent);
+                                //     $logStmt->execute();
+                                //     $logStmt->close();
+                                // }
                                 
                                 // If you want to automatically log them in:
                                 // $_SESSION['username'] = $NoUsername;
