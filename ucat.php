@@ -410,26 +410,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body class="">
-    <nav class="navbar">
-        <a href="./home" class="navbar-brand">
-            <img src="images/logo/logoRound.png" width="90" height="90" alt="Logo">
-            <span class="brand-text">MK Scholars</span>
-        </a>
+<?php include("./partials/coursesNav.php") ?>
 
-        <button class="menu-toggle">
-            <i class="fas fa-bars"></i>
-        </button>
-
-        <div class="navbar-nav">
-            <a href="./home" class="nav-link">Home</a>
-            <a href="./applications" class="nav-link">Applications</a>
-            <a href="./courses" class="nav-link">Courses</a>
-            <a href="./login" style="text-decoration: none;" class="nav-button">
-                <i class="fas fa-sign-in-alt"></i>
-                Login
-            </a>
-        </div>
-    </nav>
     <div class="container">
         <form method="POST" class="form-section p-4 mb-4">
             <div class="row">
@@ -455,10 +437,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <li>✓ Abstract Reasoning – Identifying patterns and solving puzzles</li>
                                 <li>✓ Situational Judgement – Understanding ethical and professional scenarios</li>
                             </ul>
+                            <div>
+                        <h5><b>Note: Before you pay WhatsApp or Call us on: +250 798 611 161</b></h5>
+                    </div>
                             <!-- <span class="badge badge-certificate rounded-pill">Certificate Included</span> -->
                         </div>
                     </div>
-
+                   
                     <!-- 15 Days Course (8000 RWF) -->
                     <div class="course-card" data-course-id="2">
                         <div class="d-flex align-items-center justify-content-between">
@@ -468,7 +453,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <button type="button" class="btn btn-dark btn-sm choose-course">Select</button>
                         </div>
                     </div>
-
+                    
                     <!-- 30 Days Course (15.000 RWF) -->
                     <div class="course-card" data-course-id="3">
                         <div class="d-flex align-items-center justify-content-between">

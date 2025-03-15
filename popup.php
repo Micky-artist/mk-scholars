@@ -168,7 +168,7 @@
             <!-- Popup Header -->
             <div class="popup-header">
                 <div class="emoji">
-                    <img src="http://localhost/mkscholars/images/logo/logoRound.png" alt="MK Scholars Logo" width="200" height="200">
+                    <img src="https://mkscholars.com/images/logo/logoRound.png" alt="MK Scholars" width="200" height="200">
                 </div>
                 <h2>📢 <br> Exciting News from <br> MK SCHOLARS!</h2>
             </div>

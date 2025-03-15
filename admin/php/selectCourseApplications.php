@@ -14,7 +14,7 @@ $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $search_param = "%$search%";
 
 // Filter logic with validation
-$valid_filters = ['all', 'English Course', 'French Course', 'German Course', 'Coding Course', 'In-person', 'Online'];
+$valid_filters = ['all', 'English Course', 'French Course', 'German Course', 'Coding Course', 'In-person', 'Online', 'UCAT Online'];
 $filter = isset($_GET['filter']) && in_array($_GET['filter'], $valid_filters) ? $_GET['filter'] : 'all';
 
 // Prepare base query with parameterized statements
@@ -159,6 +159,7 @@ $selectApplications = $stmt->get_result();
                                 <option value="Coding Course" <?= $filter === 'Coding Course' ? 'selected' : '' ?>>Coding Course</option>
                                 <option value="In-person" <?= $filter === 'In-person' ? 'selected' : '' ?>>In-person</option>
                                 <option value="Online" <?= $filter === 'Online' ? 'selected' : '' ?>>Online</option>
+                                <option value="UCAT Online" <?= $filter === 'UCAT Online' ? 'selected' : '' ?>>UCAT Online</option>
                             </select>
                         </div>
                         <div class="col-md-2">

@@ -347,7 +347,7 @@
 							padding: 0.5rem 1rem;
 							/* Adjusted padding */
 							background: transparent;
-							border: 2px solid #e0e0e0;
+							border: 2px solid #a855f7;
 							border-radius: 8px;
 							color: #2d3436;
 							text-decoration: none;

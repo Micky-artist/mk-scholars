@@ -106,7 +106,7 @@ include("./popup.php");
 
 							</ul>
 						</li>
-						<!-- <?php
+						<?php
 						if (isset($_SESSION['username']) && isset($_SESSION['userId'])) {
 						?>
 							<li><a href="./dashboard" target="_blank" class="tran3s UniqueButton">Dashboard</a></li>
@@ -116,7 +116,7 @@ include("./popup.php");
 							<li><a href="./login" class="tran3s UniqueButton">Login</a></li>
 						<?php
 						}
-						?> -->
+						?>
 
 						<style>
 							.UniqueButton{
