@@ -1,8 +1,3 @@
-<?php
-// session_start();
-// include("./dbconnection/connection.php");
-
-?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -164,7 +159,7 @@
 										</div>
 
 										<div class="card-actions">
-											<a href="#" class="apply-button">
+											<a href="./apply" class="apply-button">
 												<span>Apply Now</span>
 												<div class="button-hover-effect"></div>
 											</a>

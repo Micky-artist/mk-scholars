@@ -3,14 +3,15 @@
 <?php
 session_start();
 include("./dbconnection/connection.php");
-$pageName="SignIn";
+$pageName = "SignIn";
 ?>
+
 <head>
-<meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MK Scholars - Login</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="shortcut icon" href="./images/logo/logoRound.png" type="image/x-icon">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>MK Scholars - Login</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<link rel="shortcut icon" href="./images/logo/logoRound.png" type="image/x-icon">
 
 </head>
 <?php
@@ -148,23 +149,27 @@ include("./php/login.php");
 		justify-content: center;
 		align-items: center;
 	}
+
 	.container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            display: flex;
-            flex-direction: column;
-        }
-		.alert{
+		max-width: 1200px;
+		margin: 2rem auto;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.alert {
 		padding: 10px;
 		margin: 5px 0;
 		border-radius: 10px;
 		font-size: 12px;
 	}
-	.alert-danger{
+
+	.alert-danger {
 		border: .5px solid #c41f10;
 		background-color: #fcd5d2;
 	}
-	.alert-success{
+
+	.alert-success {
 		border: .5px solid #325737;
 		background-color: #cffad4;
 	}
@@ -186,8 +191,8 @@ include("./php/login.php");
 			</div>
 			<form class="auth-form" method="post" id="login-form">
 				<div class="input-group">
-					<input type="email" name="username" id="login-email" placeholder=" ">
-					<label for="login-email">Email Address</label>
+					<input type="text" name="username" value="<?php echo $NoUserName; ?>" id="login-email" placeholder=" ">
+					<label for="login-email">Email or Phone</label>
 				</div>
 				<div class="input-group">
 					<input type="password" name="password" id="login-email" placeholder=" ">
@@ -199,7 +204,7 @@ include("./php/login.php");
 
 			<div class="switch-form">
 				Need an account? <a href="./sign-up">Sign Up</a><br>
-				<a href="#">Forgot Password?</a>
+				<a href="./forgot-password">Forgot Password?</a>
 			</div>
 		</div>
 	</div>

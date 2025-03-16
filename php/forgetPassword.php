@@ -1,12 +1,15 @@
 <?php
+session_start();
+include("./dbconnection/connection.php");
+
 // Initialize message variables
 $msg = '';
 $class = '';
 
-if (isset($_POST['signup']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Validate CSRF token if implemented
+if (isset($_POST['reset_password']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+
         // Validate required fields exist
-        $required_fields = ['NoUsername', 'NoEmail', 'NoPhone', 'NoPassword', 'NoCoPassword'];
+        $required_fields = ['email', 'phone', 'newPassword', 'coNewPassword'];
         $missing_fields = false;
         
         foreach ($required_fields as $field) {
@@ -21,56 +24,44 @@ if (isset($_POST['signup']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $class = "alert alert-danger";
         } else {
             // Sanitize inputs
-            $NoUsername = trim($_POST['NoUsername']);
-            $NoEmail = trim($_POST['NoEmail']);
-            $NoPhone = trim($_POST['NoPhone']);
-            $NoPassword = $_POST['NoPassword']; // Don't escape password before hashing
-            $NoCoPassword = $_POST['NoCoPassword'];
-            $aggree = isset($_POST['aggree']) ? 1 : 0;
+            $email = trim($_POST['email']);
+            $phone = trim($_POST['phone']);
+            $newPassword = $_POST['newPassword']; // Don't escape password before hashing
+            $coNewPassword = $_POST['coNewPassword'];
             
             // Validate inputs
             $validationErrors = [];
             
-            // Username validation
-            if (strlen($NoUsername) < 3 || strlen($NoUsername) > 50) {
-                $validationErrors[] = "Username must be between 3 and 50 characters.";
-            }
-            
             // Email validation
-            if (!filter_var($NoEmail, FILTER_VALIDATE_EMAIL)) {
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $validationErrors[] = "Please enter a valid email address.";
             }
             
             // Phone validation (basic pattern)
-            if (!preg_match('/^[0-9+\-\s]{6,20}$/', $NoPhone)) {
+            if (!preg_match('/^[0-9+\-\s]{6,20}$/', $phone)) {
                 $validationErrors[] = "Please enter a valid phone number.";
             }
             
             // Password validation
-            if (strlen($NoPassword) < 8) {
+            if (strlen($newPassword) < 8) {
                 $validationErrors[] = "Password must be at least 8 characters.";
             }
             
-            if (!preg_match('/[A-Z]/', $NoPassword)) {
+            if (!preg_match('/[A-Z]/', $newPassword)) {
                 $validationErrors[] = "Password must contain at least one uppercase letter.";
             }
             
-            if (!preg_match('/[a-z]/', $NoPassword)) {
+            if (!preg_match('/[a-z]/', $newPassword)) {
                 $validationErrors[] = "Password must contain at least one lowercase letter.";
             }
             
-            if (!preg_match('/[0-9]/', $NoPassword)) {
+            if (!preg_match('/[0-9]/', $newPassword)) {
                 $validationErrors[] = "Password must contain at least one number.";
             }
             
             // Password confirmation
-            if ($NoPassword !== $NoCoPassword) {
+            if ($newPassword !== $coNewPassword) {
                 $validationErrors[] = "Passwords do not match.";
-            }
-            
-            // Terms agreement
-            if (!$aggree) {
-                $validationErrors[] = "You must agree to the terms and conditions and privacy policy.";
             }
             
             // If validation errors exist, display them
@@ -78,56 +69,46 @@ if (isset($_POST['signup']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
                 $msg = implode("<br>", $validationErrors);
                 $class = "alert alert-danger";
             } else {
-                // Check if email or phone already exists using prepared statements
-                $stmt = $conn->prepare("SELECT NoEmail, NoPhone FROM normUsers WHERE NoEmail = ? OR NoPhone = ?");
+                // Check if email and phone match an existing user
+                $stmt = $conn->prepare("SELECT NoEmail, NoPhone FROM normUsers WHERE NoEmail = ? AND NoPhone = ?");
                 if (!$stmt) {
                     $msg = "System error. Please try again later.";
                     $class = "alert alert-danger";
                     error_log("Database error: " . $conn->error);
                 } else {
-                    $stmt->bind_param("ss", $NoEmail, $NoPhone);
+                    $stmt->bind_param("ss", $email, $phone);
                     $stmt->execute();
                     $result = $stmt->get_result();
                     
-                    if ($result->num_rows > 0) {
-                        $existingUser = $result->fetch_assoc();
-                        if ($existingUser['NoEmail'] === $NoEmail) {
-                            $msg = "This email address is already registered.";
-                        } else {
-                            $msg = "This phone number is already registered.";
-                        }
+                    if ($result->num_rows === 0) {
+                        $msg = "No account found with the provided email and phone number.";
                         $class = "alert alert-danger";
                     } else {
                         // Create secure password hash
-                        $encPassword = password_hash($NoPassword, PASSWORD_DEFAULT, ['cost' => 12]);
-                        $creation_date = date('Y-m-d');
-                        $status = 1;
+                        $encPassword = password_hash($newPassword, PASSWORD_DEFAULT, ['cost' => 12]);
                         
-                        // Generate verification code if needed
-                        $verificationCode = bin2hex(random_bytes(16));
+                        // Update user password with prepared statement
+                        $updateStmt = $conn->prepare("UPDATE normUsers SET NoPassword = ? WHERE NoEmail = ? AND NoPhone = ?");
                         
-                        // Insert user with prepared statement
-                        $insertStmt = $conn->prepare("INSERT INTO normUsers(NoUsername, NoEmail, NoPhone, NoPassword, NoStatus, NoCreationDate, VerificationCode) VALUES(?, ?, ?, ?, ?, ?, ?)");
-                        
-                        if (!$insertStmt) {
+                        if (!$updateStmt) {
                             $msg = "System error. Please try again later.";
                             $class = "alert alert-danger";
                             error_log("Database error: " . $conn->error);
                         } else {
-                            $insertStmt->bind_param("sssssss", $NoUsername, $NoEmail, $NoPhone, $encPassword, $status, $creation_date, $verificationCode);
+                            $updateStmt->bind_param("sss", $encPassword, $email, $phone);
                             
-                            if ($insertStmt->execute()) {
-                                // Generate a new CSRF token after successful registration
+                            if ($updateStmt->execute()) {
+                                // Generate a new CSRF token after successful password reset
                                 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-                                $msg = "Your account has been created successfully!";
+                                $msg = "Your password has been reset successfully!";
                                 $class = "alert alert-success";
                             } else {
-                                $msg = "Account creation failed. Please try again.";
+                                $msg = "Password reset failed. Please try again.";
                                 $class = "alert alert-danger";
-                                error_log("Insert error: " . $insertStmt->error);
+                                error_log("Update error: " . $updateStmt->error);
                             }
                             
-                            $insertStmt->close();
+                            $updateStmt->close();
                         }
                     }
                     

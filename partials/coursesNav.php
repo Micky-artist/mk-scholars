@@ -12,23 +12,34 @@
         <a href="./home" class="nav-link">Home</a>
         <a href="./applications" class="nav-link">Applications</a>
         <a href="./courses" class="nav-link">Courses</a>
+        
         <?php
-        if ($pageName == "SignIn") {
-        ?>
-            <a href="./sign-up" style="text-decoration: none;" class="nav-button">
-                <i class="fas fa-sign-in-alt"></i>
-                Sign Up
+        if(isset($_SESSION['username'])){
+            ?>
+            <a style="text-decoration: none;" class="nav-button">
+                <!-- <i class="fas fa-sign-in-alt"></i> -->
+                <?php echo $_SESSION['username']; ?>
             </a>
         <?php
-        } else {
-        ?>
-            <a href="./login" style="text-decoration: none;" class="nav-button">
-                <i class="fas fa-sign-in-alt"></i>
-                Login
-            </a>
-
-        <?php
+        }else{
+            if ($pageName == "SignIn") {
+                ?>
+                    <a href="./sign-up" style="text-decoration: none;" class="nav-button">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Sign Up
+                    </a>
+                <?php
+                } else {
+                ?>
+                    <a href="./login" style="text-decoration: none;" class="nav-button">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Login
+                    </a>
+        
+                <?php
+                }
         }
+        
         ?>
 
     </div>

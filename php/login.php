@@ -48,7 +48,7 @@ if (isset($_POST['login']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($_SESSION['login_attempts'] >= 5 && time() - $_SESSION['last_attempt'] < 900) {
         // Block for 15 minutes after 5 failed attempts
         $msg = 'Too many failed login attempts. Please try again later.';
-        $class = 'alert alert-warning';
+        $class = 'alert alert-danger';
     } else {
         // Update attempt counter
         $_SESSION['login_attempts']++;
@@ -110,12 +110,12 @@ if (isset($_POST['login']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
                         exit;
                     } else {
                         // Log failed attempt
-                        $ipAddress = $_SERVER['REMOTE_ADDR'];
-                        $userAgent = $_SERVER['HTTP_USER_AGENT'];
-                        $logStmt = $conn->prepare("INSERT INTO login_logs (user_id, ip_address, user_agent, status) VALUES (?, ?, ?, 'failed')");
-                        $logStmt->bind_param("iss", $account['NoUserId'], $ipAddress, $userAgent);
-                        $logStmt->execute();
-                        $logStmt->close();
+                        // $ipAddress = $_SERVER['REMOTE_ADDR'];
+                        // $userAgent = $_SERVER['HTTP_USER_AGENT'];
+                        // $logStmt = $conn->prepare("INSERT INTO login_logs (user_id, ip_address, user_agent, status) VALUES (?, ?, ?, 'failed')");
+                        // $logStmt->bind_param("iss", $account['NoUserId'], $ipAddress, $userAgent);
+                        // $logStmt->execute();
+                        // $logStmt->close();
                         
                         // Use generic error message for security
                         $msg = 'Invalid username or password';
