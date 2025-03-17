@@ -1,7 +1,10 @@
 <?php
+session_start();
+include('../dbconnection/connection.php');
 
-
-
+/**
+ * Fetches all scholarship applications
+ */
 function getScholarshipApplications($conn) {
     $query = "
         SELECT 
@@ -104,30 +107,6 @@ function filterApplications($conn, $searchTerm = "", $status = "", $date = "") {
 }
 
 /**
- * Gets user by ID
- */
-function getUserById($conn, $userId) {
-    $query = "
-        SELECT NoUserId, NoUsername, NoEmail, NoPhone, NoCreationDate 
-        FROM normUsers 
-        WHERE NoUserId = ?
-    ";
-    
-    $stmt = $conn->prepare($query);
-    if (!$stmt) {
-        die("Error preparing statement: " . $conn->error);
-    }
-    
-    $stmt->bind_param("i", $userId);
-    if (!$stmt->execute()) {
-        die("Error fetching user: " . $stmt->error);
-    }
-    
-    $result = $stmt->get_result();
-    return $result->fetch_assoc();
-}
-
-/**
  * Counts total number of applications
  */
 function countTotalApplications($conn) {
@@ -214,9 +193,8 @@ if (isset($_GET['search']) || isset($_GET['status']) || isset($_GET['date'])) {
 }
 
 // Close the connection when done (at the end of the file)
-// $conn->close(); // Uncomment in production
+$conn->close();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -355,8 +333,8 @@ if (isset($_GET['search']) || isset($_GET['status']) || isset($_GET['date'])) {
                             <div class="modal-header">
                                 <h5 class="modal-title">Scholarship Application Details</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
+                            </div>
+                            <div class="modal-body">
                                 <div class="row">
                                     <div class="col-md-6">
                                         <h6>User Information</h6>
@@ -648,8 +626,5 @@ if (isset($_GET['search']) || isset($_GET['status']) || isset($_GET['date'])) {
             }
         });
     </script>
-
-    <!-- Create update_status.php file to handle AJAX requests -->
-    
 </body>
 </html>

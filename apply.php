@@ -244,10 +244,6 @@ if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST'
                                     </button>
                                 </div>
 
-                                <div class="progress mb-3" style="height: 8px;">
-                                    <div class="progress-bar bg-success" style="width: 69%"></div>
-                                </div>
-
                                 <div class="bg-light p-3 rounded mb-4">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
