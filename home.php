@@ -159,7 +159,7 @@
 										</div>
 
 										<div class="card-actions">
-											<a href="./apply" class="apply-button">
+											<a target="_blank" href="./apply?scholarshipId=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-", $getScholarships['scholarshipTitle']) ?>" class="apply-button">
 												<span>Apply Now</span>
 												<div class="button-hover-effect"></div>
 											</a>

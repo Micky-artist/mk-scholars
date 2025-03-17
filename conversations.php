@@ -13,7 +13,7 @@ include('./php/validateSession.php');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MK Dashboard</title>
+    <title>Conversation</title>
     <link rel="shortcut icon" href="./images/logo/logoRound.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -63,7 +63,7 @@ include('./php/validateSession.php');
                     <button class="btn btn-light d-md-none glass-panel sidebar-toggle" type="button">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <h3 class="mb-0">Dashboard</h3>
+                    <h3 class="mb-0">Conversation</h3>
                     <div class="glass-panel px-3 py-2 notification-btn" style="cursor: pointer;">
                         <i class="fas fa-bell text-muted"></i>
                     </div>

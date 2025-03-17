@@ -17,7 +17,7 @@ include('./php/validateSession.php');
     <link rel="shortcut icon" href="./images/logo/logoRound.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
 </head>
 
 <body data-theme="light">
@@ -68,27 +68,61 @@ include('./php/validateSession.php');
                     </div>
                 </div>
 
-                
+
 
                 <div class="row mt-4 g-4">
-                <div class="col-lg-4">
+                    <div class="col-lg-4">
                         <div class="glass-panel p-4 h-100">
                             <h5 class="mb-4">Application Requests</h5>
-                            <div class="app-card p-3 mb-3 rounded-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="neumorphic-icon me-3">
-                                        <i class="fas fa-photo-video text-info"></i>
-                                    </div>
-                                    <div class="w-100">
-                                        <h6 class="mb-0">Media Manager</h6>
-                                        <small class="text-muted">Updated 2h ago</small>
-                                        <div class="progress-glass mt-2">
-                                            <div class="progress-bar bg-success" style="width: 75%"></div>
+                            <?php
+                            $UserId = $_SESSION['userId'];
+                            $SelectApplicationRequest = mysqli_query($conn, "SELECT a.*, s.* FROM ApplicationRequests a JOIN scholarships s ON s.scholarshipId = a.ApplicationId WHERE UserId=$UserId ORDER BY RequestId DESC");
+                            if ($SelectApplicationRequest->num_rows > 0) {
+                                while ($ApplicationRequests = mysqli_fetch_assoc($SelectApplicationRequest)) {
+                            ?>
+
+                                    <div class="app-card p-3 mb-3 rounded-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="neumorphic-icon me-3">
+                                                <i class="fas fa-list text-info"></i>
+                                            </div>
+                                            <div class="w-100">
+                                                <h6 class="mb-0"><?php echo $ApplicationRequests['scholarshipTitle'];?></h6>
+                                                <small class="text-muted">Application Date: <?php echo $ApplicationRequests['RequestDate']; ?></small>
+                                                <!-- <div class="progress-glass mt-2">
+                                                    <div class="progress-bar bg-success" style="width: 75%; background:green !important;"></div>
+                                                </div> -->
+                                                <div style="font-size: 14px !important;">
+                                                    Status: <?php
+                                                    switch($ApplicationRequests['Status']){
+                                                        case 0:
+                                                            echo 'Submited';
+                                                            break;
+                                                        case 1:
+                                                            echo 'seen';
+                                                            break;
+                                                        case 2:
+                                                        case 3:
+                                                            echo 'In-Progress';
+                                                            break;
+                                                        case 4:
+                                                            echo 'Completed';
+                                                            break;
+                                                        default:
+                                                            echo "There was some Issue";
+                                                            break;
+                                                        }
+                                                    ?>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="app-card p-3 mb-3 rounded-3">
+                            <?php
+                                }
+                            }
+                            ?>
+
+                            <!-- <div class="app-card p-3 mb-3 rounded-3">
                                 <div class="d-flex align-items-center">
                                     <div class="neumorphic-icon me-3">
                                         <i class="fas fa-cloud-upload-alt text-danger"></i>
@@ -101,10 +135,10 @@ include('./php/validateSession.php');
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <!-- <div class="col-md-6">
                         <div class="glass-panel p-4">
                             <h5><i class="fas fa-chart-line me-2"></i>Performance</h5>
                             <canvas id="performanceChart" style="height: 200px;"></canvas>
@@ -118,7 +152,7 @@ include('./php/validateSession.php');
                             </div>
                             <small class="text-muted">Project Alpha - 30% complete</small>
                         </div>
-                    </div>
+                    </div> -->
 
                 </div>
             </main>

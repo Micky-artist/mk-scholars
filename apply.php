@@ -38,36 +38,36 @@ if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST'
     //     $msg = "Invalid CSRF token.";
     //     $class = "alert alert-danger";
     // } else {
-        if (!$scholarshipData) {
-            $msg = "No scholarship selected.";
-            $class = "alert alert-danger";
-        } else {
-            $userId = $_SESSION['userId']; // Assuming userId is stored in the session
-            $applicationId = $scholarshipData['scholarshipId'];
-            $requestDate = date('Y-m-d');
-            $requestTime = date('H:i:s');
-            $status = 0; // Default status is 0 (unseen)
-            $comments = isset($_POST['comments']) ? trim($_POST['comments']) : ''; // Capture comments
+    if (!$scholarshipData) {
+        $msg = "No scholarship selected.";
+        $class = "alert alert-danger";
+    } else {
+        $userId = $_SESSION['userId']; // Assuming userId is stored in the session
+        $applicationId = $scholarshipData['scholarshipId'];
+        $requestDate = date('Y-m-d');
+        $requestTime = date('H:i:s');
+        $status = 0; // Default status is 0 (unseen)
+        $comments = isset($_POST['comments']) ? trim($_POST['comments']) : ''; // Capture comments
 
-            // Insert into ApplicationRequests table
-            $insertStmt = $conn->prepare("INSERT INTO ApplicationRequests (UserId, ApplicationId, RequestDate, RequestTime, Status, Comments) VALUES (?, ?, ?, ?, ?, ?)");
-            if (!$insertStmt) {
-                $msg = "System error. Please try again later.";
-                $class = "alert alert-danger";
-                error_log("Database error: " . $conn->error);
+        // Insert into ApplicationRequests table
+        $insertStmt = $conn->prepare("INSERT INTO ApplicationRequests (UserId, ApplicationId, RequestDate, RequestTime, Status, Comments) VALUES (?, ?, ?, ?, ?, ?)");
+        if (!$insertStmt) {
+            $msg = "System error. Please try again later.";
+            $class = "alert alert-danger";
+            error_log("Database error: " . $conn->error);
+        } else {
+            $insertStmt->bind_param("iissss", $userId, $applicationId, $requestDate, $requestTime, $status, $comments);
+            if ($insertStmt->execute()) {
+                $msg = "Application submitted successfully!";
+                $class = "alert alert-success";
             } else {
-                $insertStmt->bind_param("iissss", $userId, $applicationId, $requestDate, $requestTime, $status, $comments);
-                if ($insertStmt->execute()) {
-                    $msg = "Application submitted successfully!";
-                    $class = "alert alert-success";
-                } else {
-                    $msg = "Submission failed. Please try again.";
-                    $class = "alert alert-danger";
-                    error_log("Insert error: " . $insertStmt->error);
-                }
-                $insertStmt->close();
+                $msg = "Submission failed. Please try again.";
+                $class = "alert alert-danger";
+                error_log("Insert error: " . $insertStmt->error);
             }
+            $insertStmt->close();
         }
+    }
     // }
 }
 
@@ -177,6 +177,15 @@ if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST'
     <?php include("./partials/dashboardNavigation.php"); ?>
 
     <main class="col-md-9 col-lg-10 main-content p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <button class="btn btn-light d-md-none glass-panel sidebar-toggle" type="button">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h3 class="mb-0">Application Request</h3>
+            <div class="glass-panel px-3 py-2 notification-btn" style="cursor: pointer;">
+                <i class="fas fa-bell text-muted"></i>
+            </div>
+        </div>
         <div class="container">
             <div class="search-container">
                 <input type="text" class="form-control form-control-lg" placeholder="Type to search for scholarships..." id="searchInput">
@@ -191,10 +200,17 @@ if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST'
                 <div class="application-card">
                     <div class="row g-0">
                         <div class="col-md-4">
-                            <div class="app-image-container" style="background-image: url('<?= $scholarshipData['scholarshipImage'] ?>')">
-                                <div class="status-badge text-success">Active</div>
+                            <div class="app-image-container">
+                                <img src="https://admin.mkscholars.com/uploads/posts/<?php echo $scholarshipData['scholarshipImage']; ?>" alt="Scholarship Image" class="img-fluid">
                             </div>
                         </div>
+                        <style>
+                            img {
+                                object-fit: cover;
+                                width: 100%;
+                                height: 100%;
+                            }
+                        </style>
 
                         <div class="col-md-8">
                             <div class="p-4">
@@ -255,7 +271,7 @@ if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST'
         const searchResults = document.getElementById('searchResults');
         let debounceTimer;
 
-        searchInput.addEventListener('input', function (e) {
+        searchInput.addEventListener('input', function(e) {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => {
                 if (this.value.length > 2) {
@@ -294,13 +310,33 @@ if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST'
                 searchResults.style.display = 'none';
             }
         }
+        // Close notifications when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!notificationBtn.contains(e.target)) {
+                notificationBox.style.display = 'none';
+            }
+        });
 
+        // Mobile Sidebar Toggle
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarToggle = document.querySelector('.sidebar-toggle');
+        const mainContent = document.querySelector('.main-content');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+         // Close sidebar when clicking outside on mobile
+         document.addEventListener('click', (e) => {
+            if (window.innerWidth < 768 && !sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
         // Form Validation
-        document.getElementById('termsCheck').addEventListener('change', function () {
+        document.getElementById('termsCheck').addEventListener('change', function() {
             document.getElementById('submitBtn').disabled = !this.checked;
         });
 
-        document.getElementById('comments').addEventListener('input', function () {
+        document.getElementById('comments').addEventListener('input', function() {
             const words = this.value.trim().split(/\s+/);
             if (words.length > 200) {
                 this.value = words.slice(0, 200).join(' ');
@@ -308,4 +344,5 @@ if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST'
         });
     </script>
 </body>
+
 </html>

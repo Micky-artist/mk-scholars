@@ -10,33 +10,29 @@
 
                     <div class="glass-panel p-2 mb-1">
                         <a class="nav-link d-flex align-items-center" href="./dashboard">
-                            <i class="fas fa-comment-alt me-3 text-primary"></i>
                             <span>Dashboard</span>
                         </a>
                     </div>
                     
                     <div class="glass-panel p-2 mb-1">
                         <a class="nav-link d-flex align-items-center" href="./conversations">
-                            <i class="fas fa-comment-alt me-3 text-primary"></i>
                             <span>conversations</span>
                         </a>
                     </div>
                     
                     <div class="glass-panel p-2 mb-1">
                         <a class="nav-link d-flex align-items-center" href="./apply">
-                            <i class="fas fa-comment-alt me-3 text-primary"></i>
                             <span>Apply</span>
                         </a>
                     </div>
-                    <div class="glass-panel p-2 mb-1">
+                    <!-- <div class="glass-panel p-2 mb-1">
                         <a class="nav-link d-flex align-items-center" href="./applications">
                             <i class="fas fa-comment-alt me-3 text-primary"></i>
                             <span>Applications</span>
                         </a>
-                    </div>
+                    </div> -->
                     <div class="glass-panel p-2 mb-1">
                         <a class="nav-link d-flex align-items-center" target="_blank" href="./home">
-                            <i class="fas fa-comment-alt me-3 text-primary"></i>
                             <span>Back home</span>
                         </a>
                     </div>
