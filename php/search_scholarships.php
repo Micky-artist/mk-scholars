@@ -5,7 +5,11 @@ include('../dbconnection/connection.php');
 $searchTerm = isset($_GET['q']) ? trim($_GET['q']) : '';
 
 if (!empty($searchTerm)) {
-    $query = "SELECT scholarshipId, scholarshipTitle, scholarshipDetails, scholarshipUpdateDate, scholarshipLink, scholarshipYoutubeLink, embededVideo, scholarshipImage, scholarshipStatus, amount, country FROM scholarships WHERE scholarshipTitle LIKE ? OR country LIKE ?";
+    // Join scholarships with countries table to fetch CountryName
+    $query = "SELECT s.*, c.CountryName 
+              FROM scholarships s 
+              JOIN countries c ON s.country = c.countryId 
+              WHERE s.scholarshipTitle LIKE ? OR c.CountryName LIKE ?";
     $stmt = $conn->prepare($query);
     if ($stmt) {
         $searchTerm = "%$searchTerm%";

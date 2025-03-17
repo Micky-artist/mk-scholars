@@ -76,9 +76,36 @@ include('./php/validateSession.php');
                             <h5 class="mb-4">Application Requests</h5>
                             <?php
                             $UserId = $_SESSION['userId'];
+                            $Status =  0;
+                            $Percentage = '';
                             $SelectApplicationRequest = mysqli_query($conn, "SELECT a.*, s.* FROM ApplicationRequests a JOIN scholarships s ON s.scholarshipId = a.ApplicationId WHERE UserId=$UserId ORDER BY RequestId DESC");
                             if ($SelectApplicationRequest->num_rows > 0) {
                                 while ($ApplicationRequests = mysqli_fetch_assoc($SelectApplicationRequest)) {
+
+                                    switch ($ApplicationRequests['Status']) {
+                                        case 0:
+                                            $Status =  'Submited';
+                                            $Percentage = 10;
+                                            break;
+                                        case 1:
+                                            $Status = 'seen';
+                                            $Percentage = 40;
+                                            break;
+                                        case 2:
+                                        case 3:
+                                            $Status = 'In-Progress';
+                                            $Percentage = 70;
+                                            break;
+                                        case 4:
+                                            $Status = 'Completed';
+                                            $Percentage = 100;
+                                            break;
+                                        default:
+                                            $Status = "There was some Issue";
+                                            $Percentage = 10;
+                                            break;
+                                    }
+
                             ?>
 
                                     <div class="app-card p-3 mb-3 rounded-3">
@@ -87,32 +114,14 @@ include('./php/validateSession.php');
                                                 <i class="fas fa-list text-info"></i>
                                             </div>
                                             <div class="w-100">
-                                                <h6 class="mb-0"><?php echo $ApplicationRequests['scholarshipTitle'];?></h6>
+                                                <h6 class="mb-0"><?php echo $ApplicationRequests['scholarshipTitle']; ?></h6>
                                                 <small class="text-muted">Application Date: <?php echo $ApplicationRequests['RequestDate']; ?></small>
-                                                <!-- <div class="progress-glass mt-2">
-                                                    <div class="progress-bar bg-success" style="width: 75%; background:green !important;"></div>
-                                                </div> -->
+                                                <div class="progress mt-1 mb-1">
+                                                    <div class="progress-bar bg-success" style="width: <?php echo $Percentage; ?>%; background:green !important;"></div>
+                                                </div>
+
                                                 <div style="font-size: 14px !important;">
-                                                    Status: <?php
-                                                    switch($ApplicationRequests['Status']){
-                                                        case 0:
-                                                            echo 'Submited';
-                                                            break;
-                                                        case 1:
-                                                            echo 'seen';
-                                                            break;
-                                                        case 2:
-                                                        case 3:
-                                                            echo 'In-Progress';
-                                                            break;
-                                                        case 4:
-                                                            echo 'Completed';
-                                                            break;
-                                                        default:
-                                                            echo "There was some Issue";
-                                                            break;
-                                                        }
-                                                    ?>
+                                                    Status: <?php echo $Status; ?>
                                                 </div>
                                             </div>
                                         </div>

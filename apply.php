@@ -12,7 +12,10 @@ $class = '';
 
 // Fetch scholarship data if scholarshipId is provided or searched
 if ($scholarshipId || $searchQuery) {
-    $query = "SELECT * FROM scholarships WHERE scholarshipId = ?";
+    $query = "SELECT s.*, c.* 
+              FROM scholarships s 
+              JOIN countries c ON s.country = c.countryId 
+              WHERE s.scholarshipId = ?";
     $stmt = $conn->prepare($query);
     if ($stmt) {
         $stmt->bind_param("i", $scholarshipId);
@@ -34,10 +37,6 @@ if ($scholarshipId || $searchQuery) {
 
 // Handle form submission
 if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    // if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-    //     $msg = "Invalid CSRF token.";
-    //     $class = "alert alert-danger";
-    // } else {
     if (!$scholarshipData) {
         $msg = "No scholarship selected.";
         $class = "alert alert-danger";
@@ -68,13 +67,7 @@ if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST'
             $insertStmt->close();
         }
     }
-    // }
 }
-
-// Generate CSRF token for the form if not exists
-// if (!isset($_SESSION['csrf_token'])) {
-//     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-// }
 ?>
 
 <!DOCTYPE html>
@@ -93,17 +86,36 @@ if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST'
             --fresh-green: #81C784;
             --leaf-green: #689F38;
             --progress-bar: #FFD54F;
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #4b5563;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --neumorphic-shadow: 5px 5px 10px #d1d5db, -5px -5px 10px #ffffff;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #111827;
+            --bg-secondary: #1f2937;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --glass-bg: rgba(31, 41, 55, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --neumorphic-shadow: 5px 5px 10px #0a0c10, -5px -5px 10px #283447;
         }
 
         body {
-            background: linear-gradient(135deg, #f8f9fa, #e8f5e9);
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
         }
 
         .application-card {
-            background: white;
+            background: var(--bg-secondary);
             border-radius: 15px;
-            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.1);
+            box-shadow: var(--neumorphic-shadow);
             transition: transform 0.3s, box-shadow 0.3s;
             overflow: hidden;
         }
@@ -126,21 +138,21 @@ if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST'
             max-height: 400px;
             overflow-y: auto;
             z-index: 1000;
-            background: white;
+            background: var(--bg-secondary);
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--neumorphic-shadow);
             display: none;
         }
 
         .search-item {
             padding: 1rem;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--glass-border);
             cursor: pointer;
             transition: background 0.2s;
         }
 
         .search-item:hover {
-            background: #f8f9fa;
+            background: var(--bg-primary);
         }
 
         .alert {
@@ -172,7 +184,12 @@ if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST'
     </style>
 </head>
 
-<body>
+<body data-theme="light">
+    <!-- Theme Toggle Button -->
+    <button style="color: orange;" class="btn btn-secondary theme-toggle glass-panel">
+        <i class="fas fa-moon"></i>
+    </button>
+
     <!-- Include your existing sidebar code here -->
     <?php include("./partials/dashboardNavigation.php"); ?>
 
@@ -219,7 +236,7 @@ if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST'
                                         <h3 class="fw-bold mb-1"><?= $scholarshipData['scholarshipTitle'] ?></h3>
                                         <div class="d-flex gap-2 text-muted">
                                             <span><i class="fas fa-calendar me-1"></i><?= $scholarshipData['scholarshipUpdateDate'] ?></span>
-                                            <span><i class="fas fa-globe me-1"></i><?= $scholarshipData['country'] ?></span>
+                                            <span><i class="fas fa-globe me-1"></i><?= $scholarshipData['CountryName'] ?></span>
                                         </div>
                                     </div>
                                     <button class="btn btn-outline-danger btn-sm">
@@ -228,7 +245,7 @@ if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST'
                                 </div>
 
                                 <div class="progress mb-3" style="height: 8px;">
-                                    <div class="progress-bar bg-success" style="width: 65%"></div>
+                                    <div class="progress-bar bg-success" style="width: 69%"></div>
                                 </div>
 
                                 <div class="bg-light p-3 rounded mb-4">
@@ -266,6 +283,28 @@ if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST'
     </main>
 
     <script>
+        // Theme Toggle
+        const themeToggle = document.querySelector('.theme-toggle');
+        const body = document.body;
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        body.setAttribute('data-theme', savedTheme);
+        updateToggleIcon();
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateToggleIcon();
+        });
+
+        function updateToggleIcon() {
+            const currentTheme = body.getAttribute('data-theme');
+            themeToggle.innerHTML = currentTheme === 'light' ?
+                '<i class="fas fa-moon"></i>' :
+                '<i class="fas fa-sun"></i>';
+        }
+
         // Real-time Search Implementation
         const searchInput = document.getElementById('searchInput');
         const searchResults = document.getElementById('searchResults');
@@ -298,7 +337,7 @@ if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST'
                     item.className = 'search-item';
                     item.innerHTML = `
                         <h6>${scholarship.scholarshipTitle}</h6>
-                        <small class="text-muted">${scholarship.country} • $${scholarship.amount}</small>
+                        <small class="text-muted">${scholarship.CountryName} • $${scholarship.amount}</small>
                     `;
                     item.addEventListener('click', () => {
                         window.location.href = `?scholarshipId=${scholarship.scholarshipId}`;
@@ -310,27 +349,7 @@ if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST'
                 searchResults.style.display = 'none';
             }
         }
-        // Close notifications when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!notificationBtn.contains(e.target)) {
-                notificationBox.style.display = 'none';
-            }
-        });
 
-        // Mobile Sidebar Toggle
-        const sidebar = document.querySelector('.sidebar');
-        const sidebarToggle = document.querySelector('.sidebar-toggle');
-        const mainContent = document.querySelector('.main-content');
-
-        sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
-        });
-         // Close sidebar when clicking outside on mobile
-         document.addEventListener('click', (e) => {
-            if (window.innerWidth < 768 && !sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
-                sidebar.classList.remove('active');
-            }
-        });
         // Form Validation
         document.getElementById('termsCheck').addEventListener('change', function() {
             document.getElementById('submitBtn').disabled = !this.checked;
