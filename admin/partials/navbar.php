@@ -40,20 +40,7 @@
             <li class="sidebar-item">
               <a class="sidebar-link waves-effect waves-dark sidebar-link" href="manage-access" aria-expanded="false"><i class="mdi mdi-account-details"></i><span class="hide-menu">Manage Access</span></a>
             </li>
-            <!-- <li class="sidebar-item">
-              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="students-application" aria-expanded="false"><i class="mdi mdi-file-check"></i><span class="hide-menu">Students Application</span></a>
-            </li> -->
-             
-            <!--
-            <li class="sidebar-item">
-              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="upload-post" aria-expanded="false"><i class="mdi mdi-file-export"></i><span class="hide-menu">Upload Project</span></a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="upload-service" aria-expanded="false"><i class="mdi mdi-briefcase-upload"></i><span class="hide-menu">Upload Service</span></a>
-            </li>
-            <li class="sidebar-item">
-                  <a href="register" class="sidebar-link"><i class="mdi mdi-account-plus"></i><span class="hide-menu"> Register a user </span></a>
-                </li> -->
+
           </ul>
         </nav>
         <!-- End Sidebar navigation -->

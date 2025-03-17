@@ -192,8 +192,5 @@
           <option value="guest">Guest</option>
         </select>
       </div>
-
-      <!-- Submit Button -->
-      <button type="submit" class="submit-btn">Sign Up</button>
     </form>
   </div>
