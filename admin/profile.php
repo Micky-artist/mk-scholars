@@ -45,7 +45,7 @@ include("./partials/head.php");
           <div class="col-lg-14">
             <div class="card">
               <div class="comment-widgets scrollable">
-                <?php include("./registerAdmin.php"); ?>
+                <?php include("./userProfile.php"); ?>
               </div>
             </div>
           </div>

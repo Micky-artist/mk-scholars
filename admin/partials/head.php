@@ -19,6 +19,8 @@
     <link rel="shortcut icon" href="./assets/images/logoRound.png" type="image/x-icon">
     <link href="./assets/libs/flot/css/float-chart.css" rel="stylesheet" />
     <!-- Custom CSS -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined" rel="stylesheet">
     <link href="./dist/css/style.min.css" rel="stylesheet" />
     <title>MK Scholars</title>
   </head>

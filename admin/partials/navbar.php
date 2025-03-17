@@ -37,6 +37,9 @@
             <li class="sidebar-item">
               <a class="sidebar-link waves-effect waves-dark sidebar-link" href="register" aria-expanded="false"><i class="mdi mdi-account-switch"></i><span class="hide-menu">Register User</span></a>
             </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link waves-effect waves-dark sidebar-link" href="manage-access" aria-expanded="false"><i class="mdi mdi-account-details"></i><span class="hide-menu">Manage Access</span></a>
+            </li>
             <!-- <li class="sidebar-item">
               <a class="sidebar-link waves-effect waves-dark sidebar-link" href="students-application" aria-expanded="false"><i class="mdi mdi-file-check"></i><span class="hide-menu">Students Application</span></a>
             </li> -->
