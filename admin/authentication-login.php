@@ -6,132 +6,155 @@ include("./dbconnections/connection.php");
 include("./php/validateSignInSignUp.php");
 include("./partials/head.php");
 include("./php/login.php");
-
 ?>
 
-<body style="background-color:#343A40; height:100vh; align-items:center; justify-content:center;">
-  <div class="main-wrapper">
-    <div class="preloader">
-      <div class="lds-ripple">
-        <div class="lds-pos"></div>
-        <div class="lds-pos"></div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - MK Scholars</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #343A40, #1E1E2F);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Poppins', sans-serif;
+      color: #fff;
+      /* width: 100%; */
+    }
+
+    .auth-box {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      width: 150%;
+      max-width: 400px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .input-group i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #777;
+      font-size: 1.2rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px 12px 12px 40px;
+      border: none;
+      border-radius: 10px;
+      background: #fff;
+      color: #333;
+      font-size: 1rem;
+      outline: none;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .input-group input:focus {
+      box-shadow: 0 0 0 3px rgba(0, 176, 155, 0.3);
+    }
+
+    .input-group input::placeholder {
+      color: #999;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #00b09b, #96c93d);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .footer-text {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .footer-text a {
+      color: #00b09b;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer-text a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-box">
+      <div class="mb-3">
+        <img src="./assets/images/favicon.png" width="150" height="150" alt="">
       </div>
-    </div>
-    <div class="
-          auth-wrapper
-          d-flex
-          no-block
-          justify-content-center
-          align-items-center
-          bg-dark
-        ">
-      <div class="auth-box bg-dark border-top border-secondary">
-        <div>
-          <div class="text-center pt-3 pb-3">
-            <!-- <span class="db"><img src="./assets/images/logo.png" style="max-width: 150px;" alt="logo" /></span> -->
-              <h1>MK Scholars</h1>
-          </div>
-          <!-- Form -->
-          <form class="form-horizontal mt-3"  method="POST">
-            <div class="row pb-4">
-              <div class="col-12">
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text bg-success text-white h-100"><i
-                        class="mdi mdi-account fs-4"></i></span>
-                  </div>
-                  <input type="text" class="form-control form-control-lg" placeholder="Email" aria-label="Username"
-                    aria-describedby="basic-addon1" name="adminName" required/>
-                </div>
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text bg-warning text-white h-100"><i
-                        class="mdi mdi-lock fs-4"></i></span>
-                  </div>
-                  <input type="password" class="form-control form-control-lg" placeholder="Password" aria-label="Password"
-                    aria-describedby="basic-addon1" name="password" required/>
-                </div>
-              </div>
-            </div>
-            <div class="row border-top border-secondary">
-              <div class="col-12">
-                <div class="form-group">
-                  <div class="pt-3">
-                    <button class="btn btn-success w-100 text-white" name="submit">
-                      Login
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </form>
+      <div class="text-center">
+        <h3>MK Scholars</h3>
+      </div>
+      <form class="form-horizontal mt-3" method="POST">
+        <div class="input-group">
+          <i class="fas fa-envelope"></i>
+          <input type="text" class="form-control" placeholder="Email" name="adminName" required>
         </div>
-        <!-- <div id="recoverform">
-          <div class="text-center">
-            <span class="text-white">Enter your e-mail address below and we will send you
-              instructions how to recover a password.</span>
-          </div>
-          <div class="row mt-3">
-            <form class="col-12" action="index.html">
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <span class="input-group-text bg-danger text-white h-100" id="basic-addon1"><i
-                      class="mdi mdi-email fs-4"></i></span>
-                </div>
-                <input type="text" class="form-control form-control-lg" placeholder="Email Address"
-                  aria-label="Username" aria-describedby="basic-addon1" />
-              </div>
-              <div class="row mt-3 pt-3 border-top border-secondary">
-                <div class="col-12">
-                  <a class="btn btn-success text-white" href="#" id="to-login" name="action">Back To Login</a>
-                  <button class="btn btn-info float-end" type="button" name="action">
-                    Recover
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div> -->
-      </div>
+        <div class="input-group">
+          <i class="fas fa-lock"></i>
+          <input type="password" class="form-control" placeholder="Password" name="password" required>
+        </div>
+        <button class="btn-login" name="submit">Login</button>
+      </form>
     </div>
-    <!-- ============================================================== -->
-    <!-- Login box.scss -->
-    <!-- ============================================================== -->
-    <!-- ============================================================== -->
-    <!-- Page wrapper scss in scafholding.scss -->
-    <!-- ============================================================== -->
-    <!-- ============================================================== -->
-    <!-- Page wrapper scss in scafholding.scss -->
-    <!-- ============================================================== -->
-    <!-- ============================================================== -->
-    <!-- Right Sidebar -->
-    <!-- ============================================================== -->
-    <!-- ============================================================== -->
-    <!-- Right Sidebar -->
-    <!-- ============================================================== -->
   </div>
-  <!-- ============================================================== -->
-  <!-- All Required js -->
-  <!-- ============================================================== -->
+
   <script src="./assets/libs/jquery/dist/jquery.min.js"></script>
-  <!-- Bootstrap tether Core JavaScript -->
   <script src="./assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- ============================================================== -->
-  <!-- This page plugin js -->
-  <!-- ============================================================== -->
   <script>
     $(".preloader").fadeOut();
-    // ==============================================================
-    // Login and Recover Password
-    // ==============================================================
-    $("#to-recover").on("click", function () {
-      $("#loginform").slideUp();
-      $("#recoverform").fadeIn();
-    });
-    $("#to-login").click(function () {
-      $("#recoverform").hide();
-      $("#loginform").fadeIn();
-    });
   </script>
 </body>
 
