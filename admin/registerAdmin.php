@@ -147,7 +147,7 @@
   <div class="form-container">
     <!-- Logo -->
     <!-- Form Title -->
-    <h1 class="form-title">Create Your Account</h1>
+    <h1 class="form-title">Add an Administrator</h1>
 
     <!-- Alert Message (Example) -->
     <div class="alert alert-success">
