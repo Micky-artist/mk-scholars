@@ -1,16 +1,36 @@
 <?php
-session_start();
+// session_start();
 
-// Database connection
-$host = 'localhost';
-$db = 'mkscholars';
-$user = 'root';
-$pass = '';
-$conn = new mysqli($host, $user, $pass, $db);
+// // Database connection
+// $host = 'localhost';
+// $db = 'mkscholars';
+// $user = 'root';
+// $pass = '';
+// $conn = new mysqli($host, $user, $pass, $db);
 
-if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
+// if ($conn->connect_error) {
+//   die("Connection failed: " . $conn->connect_error);
+// }
+
+if(isset($_GET['Deactivate'])){
+  $Deactivate = $_GET['Deactivate'];
+  $updateUserStatus = mysqli_query($conn,"UPDATE users SET status = 0 WHERE userId = $Deactivate");
+  if($updateUserStatus){
+    echo '<script>
+          window.location.href="manage-access";
+          </script>';
+  }
 }
+if(isset($_GET['Activate'])){
+  $Activate = $_GET['Activate'];
+  $updateUserStatus = mysqli_query($conn,"UPDATE users SET status = 1 WHERE userId = $Activate");
+  if($updateUserStatus){
+    echo '<script>
+          window.location.href="manage-access";
+          </script>';
+  }
+}
+
 
 // Check super admin status (implement proper authentication)
 $_SESSION['is_super_admin'] = true;
@@ -21,9 +41,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_SESSION['is_super_admin']) {
   $adminId = $_POST['adminId'];
   $rights = [];
   foreach ($_POST as $key => $value) {
-      if ($key !== 'adminId') {
-          $rights[$key] = isset($_POST[$key]) ? 1 : 0;
-      }
+    if ($key !== 'adminId') {
+      $rights[$key] = isset($_POST[$key]) ? 1 : 0;
+    }
   }
 
   // Check if the admin already has rights
@@ -31,25 +51,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_SESSION['is_super_admin']) {
   $checkResult = $conn->query($checkSql);
 
   if ($checkResult->num_rows > 0) {
-      // Update existing rights
-      $updateSql = "UPDATE AdminRights SET " . 
-          implode(', ', array_map(fn($k) => "$k = {$rights[$k]}", array_keys($rights))) . 
-          "WHERE AdminId = $adminId";
-      if ($conn->query($updateSql)) {
-          $_SESSION['flash'] = 'Rights updated successfully!';
-      } else {
-          $_SESSION['flash'] = "Error: " . $conn->error;
-      }
+
+    $updateSql = "UPDATE AdminRights SET " .
+      implode(', ', array_map(function ($k) use ($rights) {
+        return "$k = {$rights[$k]}";
+      }, array_keys($rights))) .
+      " WHERE AdminId = $adminId"; // Added space before WHERE
+
+    if ($conn->query($updateSql)) {
+      $_SESSION['flash'] = 'Rights updated successfully!';
+      echo '<script>
+          window.location.href="manage-access";
+          </script>';
+    } else {
+      $_SESSION['flash'] = "Error: " . $conn->error;
+      echo '<script>
+          window.location.href="manage-access";
+          </script>';
+    }
   } else {
-      // Insert new rights
-      $columns = implode(', ', array_keys($rights));
-      $values = implode(', ', array_values($rights));
-      $insertSql = "INSERT INTO AdminRights (AdminId, $columns) VALUES ($adminId, $values)";
-      if ($conn->query($insertSql)) {
-          $_SESSION['flash'] = 'Rights created successfully!';
-      } else {
-          $_SESSION['flash'] = "Error: " . $conn->error;
-      }
+    // Insert new rights
+    $columns = implode(', ', array_keys($rights));
+    $values = implode(', ', array_values($rights));
+    $insertSql = "INSERT INTO AdminRights (AdminId, $columns) VALUES ($adminId, $values)";
+    if ($conn->query($insertSql)) {
+      // $_SESSION['flash'] = 'Rights created successfully!';
+      echo '<script>
+        alert("done some changes");
+        </script>';
+    } else {
+      echo '<script>
+        alert("done some changes");
+        </script>';
+      // $_SESSION['flash'] = "Error: " . $conn->error;
+    }
   }
 
   header("Location: " . $_SERVER['REQUEST_URI']);
@@ -68,19 +103,16 @@ if ($result->num_rows > 0) {
 }
 ?>
 
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Access Control Panel</title>
-  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- SweetAlert2 CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> -->
   <style>
     :root {
       --primary: #6c5dd3;
@@ -172,9 +204,9 @@ if ($result->num_rows > 0) {
       margin: 2rem 0 1rem;
     }
   </style>
-</head>
+<!-- </head>
 
-<body>
+<body> -->
   <div class="container py-5">
     <div class="text-center mb-5">
       <h1 class="display-5 fw-bold mb-3" style="color: var(--primary)">Access Control Panel</h1>
@@ -204,6 +236,7 @@ if ($result->num_rows > 0) {
               <div class="ms-3">
                 <h5 class="mb-0"><?= $admin['username'] ?></h5>
                 <small class="text-muted">Last modified: Today</small>
+                <?= $admin['status']== 1 ? '<a href="?Deactivate='.$admin['userId'].'" class="btn btn-danger">Deactivate</a>' : '<a href="?Activate='.$admin['userId'].'"class="btn btn-success">Activate</a>' ?>
               </div>
             </div>
             <div class="d-flex flex-wrap gap-2">
@@ -294,25 +327,25 @@ if ($result->num_rows > 0) {
           }
         }
       });
-      
+
       // Add custom confirmation dialog
       document.getElementById('rightsForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                Swal.fire({
-                    title: 'Confirm Changes',
-                    text: 'Are you sure you want to update these permissions?',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, save changes',
-                    cancelButtonText: 'Cancel'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        e.target.submit();
-                    }
-                });
-            });
+        e.preventDefault();
+        Swal.fire({
+          title: 'Confirm Changes',
+          text: 'Are you sure you want to update these permissions?',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, save changes',
+          cancelButtonText: 'Cancel'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            e.target.submit();
+          }
+        });
+      });
     });
   </script>
-</body>
+<!-- </body>
 
-</html>
+</html> -->

@@ -1,16 +1,17 @@
 <?php
-session_start();
+// session_start();
 
-// Database connection
-$host = 'localhost';
-$db = 'mkscholars';
-$user = 'root';
-$pass = '';
-$conn = new mysqli($host, $user, $pass, $db);
+// // Database connection
+// $host = 'localhost';
+// $db = 'mkscholars';
+// $user = 'root';
+// $pass = '';
+// $conn = new mysqli($host, $user, $pass, $db);
 
-if ($conn->connect_error) {
-    die(json_encode(['success' => false, 'message' => 'Database connection failed']));
-}
+// if ($conn->connect_error) {
+//     die(json_encode(['success' => false, 'message' => 'Database connection failed']));
+// }
+include("../dbconnections/connection.php");
 
 // Get admin ID and right from the query string
 $adminId = isset($_GET['adminId']) ? (int)$_GET['adminId'] : 0;
