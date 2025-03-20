@@ -156,7 +156,7 @@
     </div>
 
     <!-- Form -->
-    <form>
+    <form action="POST">
       <!-- Username -->
       <div class="input-group">
         <i class="input-icon fas fa-user"></i>
