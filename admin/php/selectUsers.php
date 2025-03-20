@@ -55,14 +55,15 @@ $selectUsers = mysqli_query($conn, "SELECT * FROM normUsers $search_condition OR
                                 <h5 class="card-title mb-0"><?= $counter++ ?>. <?= htmlspecialchars($user['NoUsername']) ?></h5>
                                 <div class="btn-group">
                                     <button class="btn btn-sm btn-outline-primary view-scholarships" 
-                                            data-userid="<?= $user['userId'] ?>" 
+                                            data-userid="<?= $user['NoUserId'] ?>" 
                                             data-bs-toggle="modal" 
                                             data-bs-target="#scholarshipsModal">
                                         <i class="fas fa-list"></i> Scholarships
                                     </button>
-                                    <a href="#" class="btn btn-sm btn-outline-success">
+                                    <button class="btn btn-sm btn-outline-success start-conversation" 
+                                            data-userid="<?= $user['NoUserId'] ?>">
                                         <i class="fas fa-comment"></i> Text
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                             <ul class="list-group list-group-flush">
@@ -128,16 +129,20 @@ $selectUsers = mysqli_query($conn, "SELECT * FROM normUsers $search_condition OR
     </div>
 </div>
 
-<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
 $(document).ready(function() {
+    // Scholarships Modal
     $('.view-scholarships').click(function() {
         const userId = $(this).data('userid');
         $('#scholarshipsContent').html('<div class="text-center py-4"><div class="spinner-border" role="status"></div></div>');
         
         $.ajax({
-            url: `get_scholarships.php?user_id=${userId}`,
+            url: `./php/get_scholarships.php?user_id=${userId}`,
             success: function(data) {
                 $('#scholarshipsContent').html(data);
             },
@@ -146,7 +151,34 @@ $(document).ready(function() {
             }
         });
     });
+
+    // Start Conversation
+    $('.start-conversation').click(function() {
+        const userId = $(this).data('userid');
+        Swal.fire({
+            title: 'Start Conversation',
+            text: 'Do you want to start a conversation with this user?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `./php/start_conversation.php?user_id=${userId}`,
+                    success: function(response) {
+                        if (response.success) {
+                            window.location.href = `chat.php?conv_id=${response.convId}`;
+                        } else {
+                            Swal.fire('Error', response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire('Error', 'Failed to start conversation', 'error');
+                    }
+                });
+            }
+        });
+    });
 });
 </script>
-</body>
-</html>

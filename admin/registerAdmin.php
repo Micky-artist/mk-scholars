@@ -142,8 +142,6 @@
       height: 24px;
     }
   </style>
-</head>
-<body>
   <div class="form-container">
     <!-- Logo -->
     <!-- Form Title -->
