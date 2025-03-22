@@ -3,6 +3,11 @@ session_start();
 include("./dbconnections/connection.php");
 include("./php/validateAdminSession.php");
 
+if (!hasPermission('ManageCountries')) {
+  header("Location: ./index");
+  exit;
+}
+
 // Handle Edit Country
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editCountry'])) {
     // Validate session exists to prevent unauthorized access

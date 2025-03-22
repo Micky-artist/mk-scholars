@@ -75,14 +75,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_SESSION['is_super_admin']) {
     $values = implode(', ', array_values($rights));
     $insertSql = "INSERT INTO AdminRights (AdminId, $columns) VALUES ($adminId, $values)";
     if ($conn->query($insertSql)) {
-      // $_SESSION['flash'] = 'Rights created successfully!';
+      $_SESSION['flash'] = 'Rights created successfully!';
+
       echo '<script>
-        alert("done some changes");
-        </script>';
+          window.location.href="manage-access";
+          </script>';
+          // unset($_SESSION['flash']);
     } else {
       echo '<script>
-        alert("done some changes");
-        </script>';
+          window.location.href="manage-access";
+          </script>';
       // $_SESSION['flash'] = "Error: " . $conn->error;
     }
   }

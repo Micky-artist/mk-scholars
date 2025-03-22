@@ -1,10 +1,10 @@
 <?php
-// session_start();
-// include('../dbconnection/connection.php');
 
 function getScholarshipApplications($conn) {
     $query = "SELECT s.*, ar.*, u.NoUserId, u.NoUsername, u.NoEmail, u.NoPhone, u.NoCreationDate
-        FROM ApplicationRequests ar JOIN normUsers u ON ar.UserId = u.NoUserId JOIN scholarships s ON ar.ApplicationId = S.scholarshipId
+        FROM ApplicationRequests ar 
+        JOIN normUsers u ON ar.UserId = u.NoUserId 
+        JOIN scholarships s ON ar.ScholarshipId = s.scholarshipId
         ORDER BY ar.ApplicationId DESC";
     
     $result = $conn->query($query);
@@ -15,10 +15,10 @@ function getScholarshipApplications($conn) {
     return $result->fetch_all(MYSQLI_ASSOC);
 }
 
-
 function updateApplicationStatus($conn, $applicationId, $newStatus) {
     $query = "UPDATE scholarships 
-        SET scholarshipStatus = ?
+        SET scholarshipStatus = ?,
+            scholarshipUpdateDate = NOW()
         WHERE scholarshipId = ?
     ";
     
@@ -41,8 +41,10 @@ function updateApplicationStatus($conn, $applicationId, $newStatus) {
  */
 function filterApplications($conn, $searchTerm = "", $status = "", $date = "") {
     $query = "SELECT s.*, ar.*, u.NoUserId, u.NoUsername, u.NoEmail, u.NoPhone, u.NoCreationDate
-        FROM ApplicationRequests ar JOIN normUsers u ON ar.UserId = u.NoUserId JOIN scholarships s ON ar.ApplicationId = S.scholarshipId
-        ORDER BY ar.ApplicationId DESC";
+        FROM ApplicationRequests ar 
+        JOIN normUsers u ON ar.UserId = u.NoUserId 
+        JOIN scholarships s ON ar.ScholarshipId = s.scholarshipId
+        WHERE 1"; // Added WHERE clause
     
     // Add filters dynamically
     $params = [];
@@ -108,9 +110,11 @@ function countTotalApplications($conn) {
 function getPaginatedApplications($conn, $page = 1, $perPage = 10) {
     $offset = ($page - 1) * $perPage;
     
-    $query = "SELECT s.*, ar.*, c.*, u.NoUserId, u.NoUsername, u.NoEmail, u.NoPhone, u.NoCreationDate
-        FROM ApplicationRequests ar JOIN normUsers u ON ar.UserId = u.NoUserId JOIN scholarships s ON ar.ApplicationId = S.scholarshipId
-        JOIN countries c ON s.country=c.countryId ORDER BY ar.ApplicationId DESC LIMIT ?, ? ";
+    $query = "SELECT s.*, ar.*, u.NoUserId, u.NoUsername, u.NoEmail, u.NoPhone, u.NoCreationDate
+        FROM ApplicationRequests ar 
+        JOIN normUsers u ON ar.UserId = u.NoUserId 
+        JOIN scholarships s ON ar.ScholarshipId = s.scholarshipId
+        ORDER BY ar.ApplicationId DESC LIMIT ?, ?";
     
     $stmt = $conn->prepare($query);
     if (!$stmt) {
@@ -130,7 +134,7 @@ function getPaginatedApplications($conn, $page = 1, $perPage = 10) {
  * Gets status text based on status code
  */
 function getStatusText($status) {
-    $texts = ['Unseen', 'Seen', 'In Progress', 'Reviewing', 'Completed'];
+    $texts = [0 => 'Unseen', 1 => 'Seen', 2 => 'In Progress', 3 => 'Reviewing', 4 => 'Completed'];
     return isset($texts[$status]) ? $texts[$status] : 'Unknown';
 }
 
@@ -138,9 +142,11 @@ function getStatusText($status) {
  * Gets status color based on status code
  */
 function getStatusColor($status) {
-    $colors = ['secondary', 'primary', 'warning', 'info', 'success'];
+    $colors = [0 => 'secondary', 1 => 'primary', 2 => 'warning', 3 => 'info', 4 => 'success'];
     return isset($colors[$status]) ? $colors[$status] : 'secondary';
 }
+
+
 
 // Set current page for pagination
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -161,6 +167,9 @@ if (isset($_GET['search']) || isset($_GET['status']) || isset($_GET['date'])) {
     // Default: get paginated applications
     $applications = getPaginatedApplications($conn, $page, $perPage);
 }
+
+
+// Continue with code that uses the $applications variable
 
 // Close the connection when done (at the end of the file)
 $conn->close();
@@ -321,11 +330,11 @@ $conn->close();
                                         <ul class="list-group mb-3">
                                             <li class="list-group-item d-flex justify-content-between">
                                                 <span>Amount:</span>
-                                                <strong>RWF <?= $app['amount'] ?></strong>
+                                                <strong>$<?= number_format($app['amount'], 2) ?></strong>
                                             </li>
                                             <li class="list-group-item d-flex justify-content-between">
                                                 <span>Country:</span>
-                                                <strong><?= htmlspecialchars($app['CountryName']) ?></strong>
+                                                <strong><?= htmlspecialchars($app['country']) ?></strong>
                                             </li>
                                             <li class="list-group-item d-flex justify-content-between">
                                                 <span>Status:</span>
@@ -343,9 +352,45 @@ $conn->close();
                                     </div>
                                 </div>
                                 
+                                <div class="mt-3">
+                                    <h6>Scholarship Details</h6>
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <?= nl2br(htmlspecialchars($app['scholarshipDetails'])) ?>
+                                        </div>
+                                    </div>
+                                </div>
                                 
+                                <?php if (!empty($app['scholarshipLink'])): ?>
+                                <div class="mt-3">
+                                    <h6>External Link</h6>
+                                    <a href="<?= htmlspecialchars($app['scholarshipLink']) ?>" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-link-45deg"></i> Open Link
+                                    </a>
+                                </div>
+                                <?php endif; ?>
                                 
+                                <?php if (!empty($app['scholarshipYoutubeLink']) || !empty($app['embededVideo'])): ?>
+                                <div class="mt-3">
+                                    <h6>Video</h6>
+                                    <?php if (!empty($app['embededVideo'])): ?>
+                                        <div class="ratio ratio-16x9">
+                                            <?= $app['embededVideo'] ?>
+                                        </div>
+                                    <?php elseif (!empty($app['scholarshipYoutubeLink'])): ?>
+                                        <a href="<?= htmlspecialchars($app['scholarshipYoutubeLink']) ?>" target="_blank" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-youtube"></i> Open YouTube Video
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                                <?php endif; ?>
                                 
+                                <?php if (!empty($app['scholarshipImage'])): ?>
+                                <div class="mt-3">
+                                    <h6>Application Image</h6>
+                                    <img src="<?= htmlspecialchars($app['scholarshipImage']) ?>" class="img-fluid rounded" alt="Scholarship Image">
+                                </div>
+                                <?php endif; ?>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

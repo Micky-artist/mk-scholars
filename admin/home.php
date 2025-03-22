@@ -2,6 +2,7 @@
 session_start();
 include("./dbconnections/connection.php");
 include("./php/validateAdminSession.php");
+
 ?>
 
 <!DOCTYPE html>
