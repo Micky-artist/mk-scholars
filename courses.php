@@ -31,7 +31,7 @@ session_start();
             width: 100%;
         }
 
-        
+
 
         /* ==== Scholarship Cards (Separate Section) ==== */
         .container {
@@ -248,13 +248,14 @@ session_start();
                 </div>
 
                 <p class="card-description">
-                    Comprehensive online coaching for students preparing for the University Clinical Aptitude Test (UCAT). Includes expert guidance, practice tests, and strategies to improve scores. Morning and evening classes are available.
+                    Comprehensive online coaching for students preparing for the University Clinical Aptitude Test (UCAT). Includes expert guidance, practice tests, and strategies to improve scores. Morning and evening classes are available. <br>
+                    <li>March Intake (Virtual Classes) – Course starts on March 24, 2025</li> <br>
                 </p>
 
                 <div class="card-details">
                     <div class="detail-item">
                         <i class="fas fa-graduation-cap"></i>
-                        <span>Undergraduate</span>
+                        <span>Online Courses</span>
                     </div>
                     <div class="detail-item">
                         <i class="fas fa-clock"></i>
@@ -262,7 +263,7 @@ session_start();
                     </div>
                     <div class="detail-item">
                         <i class="fas fa-users"></i>
-                        <span>25 Seats Available</span>
+                        <span>7 Seats Available</span>
                     </div>
                 </div>
 
@@ -331,7 +332,7 @@ session_start();
     </div>
 
     <!-- ==== Navigation JavaScript ==== -->
-    
+
 </body>
 
 </html>

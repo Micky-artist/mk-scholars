@@ -61,8 +61,8 @@ $selectUsers = mysqli_query($conn, "SELECT * FROM normUsers $search_condition OR
                                         <i class="fas fa-list"></i> Scholarships
                                     </button>
                                     <button class="btn btn-sm btn-outline-success start-conversation" 
-                                            data-userid="<?= $user['NoUserId'] ?>">
-                                        <i class="fas fa-comment"></i> Text
+                                            data-userid="<?= $user['NoUserId'] ?>" data-usename="<?= $user['NoUsername'] ?>">
+                                        <i class="fas fa-comment"></i> Text<?= $user['NoUserId'] ?>
                                     </button>
                                 </div>
                             </div>
@@ -154,31 +154,34 @@ $(document).ready(function() {
 
     // Start Conversation
     $('.start-conversation').click(function() {
-        const userId = $(this).data('userid');
-        Swal.fire({
-            title: 'Start Conversation',
-            text: 'Do you want to start a conversation with this user?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Yes',
-            cancelButtonText: 'No'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: `./php/start_conversation.php?user_id=${userId}`,
-                    success: function(response) {
-                        if (response.success) {
-                            window.location.href = `chat.php?conv_id=${response.convId}`;
-                        } else {
-                            Swal.fire('Error', response.message, 'error');
-                        }
-                    },
-                    error: function() {
-                        Swal.fire('Error', 'Failed to start conversation', 'error');
+    const userId = $(this).data('userid');
+    const usename = $(this).data('usename');
+    Swal.fire({
+        title: 'Start Conversation',
+        text: 'Do you want to start a conversation with this user?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'No'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: `./php/start_conversation.php?username=${usename}&user_id=${userId}`,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        window.location.href = `./chat-ground.php?username=${usename}&userId=${response.UserId}`;
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
                     }
-                });
-            }
-        });
+                },
+                error: function() {
+                    Swal.fire('Error', 'Failed to start conversation', 'error');
+                }
+            });
+        }
     });
+});
 });
 </script>

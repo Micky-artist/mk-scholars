@@ -152,6 +152,9 @@ if (!hasPermission('ManageYoutubeVideo')) {
                                                     <td><?php echo $videosData['VideoTitle'] ?></td>
                                                     <td><?php echo $videosData['VideoStatus'] == 1 ? "Active" : "Not Active"; ?></td>
                                                     <td>
+                                                    <?php
+                                if (hasPermission('DeleteYoutubeVideo')) {
+                                ?>
                                                         <!-- <a href="?">Edit</a> -->
                                                         <?php if ($videosData['VideoStatus'] == 0) { ?>
                                                             <a class="btn btn-primary" href="?Activate=<?php echo $videosData['videoId'] ?>">Activate</a>
@@ -161,6 +164,11 @@ if (!hasPermission('ManageYoutubeVideo')) {
                                                         <?php } ?>
                                                         <a class="btn btn-secondary" href="?Edit=<?php echo $videosData['videoId'] ?>">Edit</a>
                                                         <a class="btn btn-warning" href="?Delete=<?php echo $videosData['videoId'] ?>">Delete</a>
+                                                    <?php }else{
+                                                        ?>
+No Actions
+                                                        <?php
+                                                    } ?>
                                                     </td>
 
                                                 </tr>

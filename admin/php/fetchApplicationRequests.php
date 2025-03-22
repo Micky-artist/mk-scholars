@@ -3,9 +3,9 @@
 // include('../dbconnection/connection.php');
 
 function getScholarshipApplications($conn) {
-    $query = "SELECT s.*, ar.*, u.NoUserId, u.NoUsername, u.NoEmail, u.NoPhone, u.NoCreationDate
+    $query = "SELECT s.*, ar.*, c.*, u.NoUserId, u.NoUsername, u.NoEmail, u.NoPhone, u.NoCreationDate
         FROM ApplicationRequests ar JOIN normUsers u ON ar.UserId = u.NoUserId JOIN scholarships s ON ar.ApplicationId = S.scholarshipId
-        ORDER BY ar.ApplicationId DESC";
+        JOIN countries c ON s.country=c.countryId ORDER BY ar.ApplicationId DESC";
     
     $result = $conn->query($query);
     if (!$result) {
@@ -17,9 +17,9 @@ function getScholarshipApplications($conn) {
 
 
 function updateApplicationStatus($conn, $applicationId, $newStatus) {
-    $query = "UPDATE scholarships 
-        SET scholarshipStatus = ?
-        WHERE scholarshipId = ?
+    $query = "UPDATE ApplicationRequests 
+        SET Status = ?
+        WHERE RequestId = ?
     ";
     
     $stmt = $conn->prepare($query);
@@ -29,7 +29,7 @@ function updateApplicationStatus($conn, $applicationId, $newStatus) {
     
     $stmt->bind_param("ii", $newStatus, $applicationId);
     if (!$stmt->execute()) {
-        die("Error updating status: " . $stmt->error);
+        die("Error updating status 1: " . $stmt->error);
     }
     
     $stmt->close();
@@ -40,9 +40,9 @@ function updateApplicationStatus($conn, $applicationId, $newStatus) {
  * Filters applications based on search term, status, and date
  */
 function filterApplications($conn, $searchTerm = "", $status = "", $date = "") {
-    $query = "SELECT s.*, ar.*, u.NoUserId, u.NoUsername, u.NoEmail, u.NoPhone, u.NoCreationDate
+    $query = "SELECT s.*, ar.*, c.*, u.NoUserId, u.NoUsername, u.NoEmail, u.NoPhone, u.NoCreationDate
         FROM ApplicationRequests ar JOIN normUsers u ON ar.UserId = u.NoUserId JOIN scholarships s ON ar.ApplicationId = S.scholarshipId
-        ORDER BY ar.ApplicationId DESC";
+        JOIN countries c ON s.country=c.countryId WHERE 1";
     
     // Add filters dynamically
     $params = [];
@@ -56,7 +56,7 @@ function filterApplications($conn, $searchTerm = "", $status = "", $date = "") {
     }
     
     if (!empty($status)) {
-        $query .= " AND s.scholarshipStatus = ?";
+        $query .= " AND ar.Status = ?";
         $params[] = $status;
         $types .= "i";
     }
@@ -223,12 +223,15 @@ $conn->close();
                                 <option value="4" <?= (isset($_GET['status']) && $_GET['status'] === '4') ? 'selected' : '' ?>>Completed</option>
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <input type="date" class="form-control" id="dateFilter" name="date" 
                                 value="<?= isset($_GET['date']) ? htmlspecialchars($_GET['date']) : '' ?>">
                         </div>
                         <div class="col-md-2">
                             <button type="submit" class="btn btn-primary w-100">Search</button>
+                        </div>
+                        <div class="col-md-1">
+                            <a href="./application-requests" class="btn btn-secondary w-100">Reset</a>
                         </div>
                     </div>
                 </form>
@@ -249,8 +252,8 @@ $conn->close();
                 <div class="col">
                     <div class="card h-100 shadow-sm">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <span class="badge bg-<?= getStatusColor($app['scholarshipStatus']) ?>">
-                                <?= getStatusText($app['scholarshipStatus']) ?>
+                            <span class="badge bg-<?= getStatusColor($app['Status']) ?>">
+                                <?= getStatusText($app['Status']) ?>
                             </span>
                             <small class="text-muted"><?= date('M d, Y', strtotime($app['scholarshipUpdateDate'])) ?></small>
                         </div>
@@ -266,12 +269,12 @@ $conn->close();
                             
                             <div class="row g-2">
                                 <div class="col-md-6">
-                                    <select class="form-select status-dropdown" data-app-id="<?= $app['scholarshipId'] ?>">
-                                        <option value="0" <?= $app['scholarshipStatus'] == 0 ? 'selected' : '' ?>>Unseen</option>
-                                        <option value="1" <?= $app['scholarshipStatus'] == 1 ? 'selected' : '' ?>>Seen</option>
-                                        <option value="2" <?= $app['scholarshipStatus'] == 2 ? 'selected' : '' ?>>In Progress</option>
-                                        <option value="3" <?= $app['scholarshipStatus'] == 3 ? 'selected' : '' ?>>Reviewing</option>
-                                        <option value="4" <?= $app['scholarshipStatus'] == 4 ? 'selected' : '' ?>>Completed</option>
+                                    <select class="form-select status-dropdown" data-app-id="<?= $app['RequestId'] ?>">
+                                        <option value="0" <?= $app['Status'] == 0 ? 'selected' : '' ?>>Unseen</option>
+                                        <option value="1" <?= $app['Status'] == 1 ? 'selected' : '' ?>>Seen</option>
+                                        <option value="2" <?= $app['Status'] == 2 ? 'selected' : '' ?>>In Progress</option>
+                                        <option value="3" <?= $app['Status'] == 3 ? 'selected' : '' ?>>Reviewing</option>
+                                        <option value="4" <?= $app['Status'] == 4 ? 'selected' : '' ?>>Completed</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6">
@@ -292,6 +295,9 @@ $conn->close();
                             <div class="modal-header">
                                 <h5 class="modal-title">Scholarship Application Details</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-header">
+                                <h5 class="modal-title"><?= htmlspecialchars($app['scholarshipTitle']) ?></h5>
                             </div>
                             <div class="modal-body">
                                 <div class="row">
@@ -330,8 +336,8 @@ $conn->close();
                                             <li class="list-group-item d-flex justify-content-between">
                                                 <span>Status:</span>
                                                 <strong>
-                                                    <span class="badge bg-<?= getStatusColor($app['scholarshipStatus']) ?>">
-                                                        <?= getStatusText($app['scholarshipStatus']) ?>
+                                                    <span class="badge bg-<?= getStatusColor($app['Status']) ?>">
+                                                        <?= getStatusText($app['Status']) ?>
                                                     </span>
                                                 </strong>
                                             </li>
@@ -342,25 +348,9 @@ $conn->close();
                                         </ul>
                                     </div>
                                 </div>
-                                
-                                
-                                
-                                
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <div class="dropdown">
-                                    <button class="btn btn-primary dropdown-toggle" type="button" id="statusDropdown-<?= $app['scholarshipId'] ?>" data-bs-toggle="dropdown">
-                                        Update Status
-                                    </button>
-                                    <ul class="dropdown-menu" aria-labelledby="statusDropdown-<?= $app['scholarshipId'] ?>">
-                                        <li><a class="dropdown-item status-update" href="#" data-app-id="<?= $app['scholarshipId'] ?>" data-status="0">Unseen</a></li>
-                                        <li><a class="dropdown-item status-update" href="#" data-app-id="<?= $app['scholarshipId'] ?>" data-status="1">Seen</a></li>
-                                        <li><a class="dropdown-item status-update" href="#" data-app-id="<?= $app['scholarshipId'] ?>" data-status="2">In Progress</a></li>
-                                        <li><a class="dropdown-item status-update" href="#" data-app-id="<?= $app['scholarshipId'] ?>" data-status="3">Reviewing</a></li>
-                                        <li><a class="dropdown-item status-update" href="#" data-app-id="<?= $app['scholarshipId'] ?>" data-status="4">Completed</a></li>
-                                    </ul>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -429,7 +419,7 @@ $conn->close();
                 formData.append('newStatus', newStatus);
                 
                 // Send AJAX request
-                fetch('update_status.php', {
+                fetch('./php/update_status.php', {
                     method: 'POST',
                     body: formData
                 })
@@ -440,11 +430,11 @@ $conn->close();
                         updateStatusUI(applicationId, newStatus);
                         showToast('Status updated successfully!', 'success');
                     } else {
-                        showToast('Error updating status: ' + data.message, 'danger');
+                        showToast('Error updating status 2: ' + data.message, 'danger');
                     }
                 })
                 .catch(error => {
-                    showToast('Error updating status: ' + error, 'danger');
+                    showToast('Error updating status: 3' + error, 'danger');
                 });
             }
             
@@ -531,21 +521,21 @@ $conn->close();
             }
             
             // Clear filter button
-            const clearFilterBtn = document.createElement('button');
-            clearFilterBtn.className = 'btn btn-outline-secondary ms-2';
-            clearFilterBtn.textContent = 'Clear Filters';
-            clearFilterBtn.addEventListener('click', function() {
-                window.location.href = window.location.pathname;
-            });
+            // const clearFilterBtn = document.createElement('button');
+            // clearFilterBtn.className = 'btn btn-outline-secondary ms-2';
+            // clearFilterBtn.textContent = 'Clear Filters';
+            // clearFilterBtn.addEventListener('click', function() {
+            //     window.location.href = window.location.pathname;
+            // });
             
             // Add clear button if filters are active
-            const filterForm = document.getElementById('filterForm');
-            const filterActive = window.location.search.includes('search=') || 
-                               window.location.search.includes('status=') || 
-                               window.location.search.includes('date=');
+            // const filterForm = document.getElementById('filterForm');
+            // const filterActive = window.location.search.includes('search=') || 
+            //                    window.location.search.includes('status=') || 
+            //                    window.location.search.includes('date=');
             
-            if (filterActive) {
-                filterForm.querySelector('button[type="submit"]').parentNode.appendChild(clearFilterBtn);
-            }
+            // if (filterActive) {
+            //     filterForm.querySelector('button[type="submit"]').parentNode.appendChild(clearFilterBtn);
+            // }
         });
     </script>

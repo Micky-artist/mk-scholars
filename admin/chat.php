@@ -248,6 +248,7 @@
                 $convoId = $convoData['ConvId'];
                 $ConvStatus = $convoData['ConvStatus'];
                 $adminId = $_SESSION['adminId'];
+                
         ?>
                 <div class="glass-panel p-3 flex-grow-1">
                     <div class="d-flex flex-column h-100">
@@ -267,9 +268,9 @@
                             <li class="nav-item">
                                 <a class="nav-link active" data-bs-toggle="pill" href="#chat">Chat</a>
                             </li>
-                            <li class="nav-item">
+                            <!-- <li class="nav-item">
                                 <a class="nav-link" data-bs-toggle="pill" href="#applications">Applications</a>
-                            </li>
+                            </li> -->
                         </ul>
 
                         <!-- Content -->
