@@ -1,21 +1,9 @@
 <?php
-session_start();
-include('../dbconnection/connection.php');
 
-/**
- * Fetches all scholarship applications
- */
 function getScholarshipApplications($conn) {
-    $query = "
-        SELECT 
-            s.scholarshipId, s.scholarshipTitle, s.scholarshipDetails, s.scholarshipUpdateDate, 
-            s.scholarshipLink, s.scholarshipYoutubeLink, s.embededVideo, s.scholarshipImage, 
-            s.scholarshipStatus, s.amount, s.country, s.userId,
-            u.NoUserId, u.NoUsername, u.NoEmail, u.NoPhone, u.NoCreationDate
-        FROM scholarships s
-        INNER JOIN normUsers u ON s.userId = u.NoUserId
-        ORDER BY s.scholarshipUpdateDate DESC
-    ";
+    $query = "SELECT s.*, ar.*, u.NoUserId, u.NoUsername, u.NoEmail, u.NoPhone, u.NoCreationDate
+        FROM ApplicationRequests ar JOIN normUsers u ON ar.UserId = u.NoUserId JOIN scholarships s ON ar.RequestId = S.scholarshipId
+        ORDER BY ar.ApplicationId DESC";
     
     $result = $conn->query($query);
     if (!$result) {
@@ -25,12 +13,9 @@ function getScholarshipApplications($conn) {
     return $result->fetch_all(MYSQLI_ASSOC);
 }
 
-/**
- * Updates application status
- */
+
 function updateApplicationStatus($conn, $applicationId, $newStatus) {
-    $query = "
-        UPDATE scholarships 
+    $query = "UPDATE scholarships 
         SET scholarshipStatus = ?
         WHERE scholarshipId = ?
     ";
@@ -53,16 +38,9 @@ function updateApplicationStatus($conn, $applicationId, $newStatus) {
  * Filters applications based on search term, status, and date
  */
 function filterApplications($conn, $searchTerm = "", $status = "", $date = "") {
-    $query = "
-        SELECT 
-            s.scholarshipId, s.scholarshipTitle, s.scholarshipDetails, s.scholarshipUpdateDate, 
-            s.scholarshipLink, s.scholarshipYoutubeLink, s.embededVideo, s.scholarshipImage, 
-            s.scholarshipStatus, s.amount, s.country, s.userId,
-            u.NoUserId, u.NoUsername, u.NoEmail, u.NoPhone, u.NoCreationDate
-        FROM scholarships s
-        INNER JOIN normUsers u ON s.userId = u.NoUserId
-        WHERE 1
-    ";
+    $query = "SELECT s.*, ar.*, u.NoUserId, u.NoUsername, u.NoEmail, u.NoPhone, u.NoCreationDate
+        FROM ApplicationRequests ar JOIN normUsers u ON ar.UserId = u.NoUserId JOIN scholarships s ON ar.RequestId = S.scholarshipId
+        ORDER BY ar.ApplicationId DESC";
     
     // Add filters dynamically
     $params = [];
@@ -110,10 +88,8 @@ function filterApplications($conn, $searchTerm = "", $status = "", $date = "") {
  * Counts total number of applications
  */
 function countTotalApplications($conn) {
-    $query = "
-        SELECT COUNT(*) AS total 
-        FROM scholarships
-    ";
+    $query = "SELECT COUNT(*) AS total 
+        FROM ApplicationRequests";
     
     $result = $conn->query($query);
     if (!$result) {
@@ -130,17 +106,9 @@ function countTotalApplications($conn) {
 function getPaginatedApplications($conn, $page = 1, $perPage = 10) {
     $offset = ($page - 1) * $perPage;
     
-    $query = "
-        SELECT 
-            s.scholarshipId, s.scholarshipTitle, s.scholarshipDetails, s.scholarshipUpdateDate, 
-            s.scholarshipLink, s.scholarshipYoutubeLink, s.embededVideo, s.scholarshipImage, 
-            s.scholarshipStatus, s.amount, s.country, s.userId,
-            u.NoUserId, u.NoUsername, u.NoEmail, u.NoPhone, u.NoCreationDate
-        FROM scholarships s
-        INNER JOIN normUsers u ON s.userId = u.NoUserId
-        ORDER BY s.scholarshipUpdateDate DESC
-        LIMIT ?, ?
-    ";
+    $query = "SELECT s.*, ar.*, u.NoUserId, u.NoUsername, u.NoEmail, u.NoPhone, u.NoCreationDate
+        FROM ApplicationRequests ar JOIN normUsers u ON ar.UserId = u.NoUserId JOIN scholarships s ON ar.RequestId = S.scholarshipId
+        ORDER BY ar.ApplicationId DESC LIMIT ?, ? ";
     
     $stmt = $conn->prepare($query);
     if (!$stmt) {
@@ -195,22 +163,12 @@ if (isset($_GET['search']) || isset($_GET['status']) || isset($_GET['date'])) {
 // Close the connection when done (at the end of the file)
 $conn->close();
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scholarship Applications Admin</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
-    
+
     <style>
-        .card:hover {
+        /* .card:hover {
             transform: translateY(-2px);
             transition: transform 0.2s ease;
-        }
+        } */
         .status-dropdown {
             cursor: pointer;
         }
@@ -228,8 +186,7 @@ $conn->close();
             margin-top: 30px;
         }
     </style>
-</head>
-<body>
+
     <!-- Admin Header -->
     <header class="admin-header">
         <div class="container-fluid">
@@ -626,5 +583,3 @@ $conn->close();
             }
         });
     </script>
-</body>
-</html>
