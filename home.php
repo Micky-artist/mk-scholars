@@ -101,6 +101,7 @@
 							</div>
 						</div>
 					</div> -->
+					<?php include('./playground/stayInTouch.php'); ?>
 					<style>
 						.text div a {
 							display: flex;
@@ -410,7 +411,7 @@
 		<div class="testomonial">
 			<div class="container">
 				<div class="theme-title">
-					<h2>Testomonial</h2>
+					<h2>Testimonial</h2>
 					<p>What our valuable clients have to say about our courses, tutorials and online classes</p>
 				</div>
 				<div class="slider-wrapper">
