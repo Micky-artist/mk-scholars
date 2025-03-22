@@ -7,7 +7,7 @@ include("./php/tagOperations.php");
 if (!hasPermission('ViewTags')) {
     header("Location: ./index");
     exit;
-  }
+}
 ?>
 
 <!DOCTYPE html>
@@ -107,21 +107,24 @@ if (!hasPermission('ViewTags')) {
                         <div class="card">
                             <div class="card-body">
                                 <!-- <div class="card"> -->
-                                <form class="form-horizontal" method="post">
-                                    <div class="card-body">
-                                        <h4 class="card-title">Add Tag</h4>
-                                        <div class="form-group row">
-                                            <label for="cono1" class="card-title">Tag Name</label>
-                                            <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="tagName" placeholder="Tag Name" required/>
+                                <?php
+                                if (hasPermission('AddTag')) {
+                                ?>
+                                    <form class="form-horizontal" method="post">
+                                        <div class="card-body">
+                                            <h4 class="card-title">Add Tag</h4>
+                                            <div class="form-group row">
+                                                <label for="cono1" class="card-title">Tag Name</label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" class="form-control" name="tagName" placeholder="Tag Name" required />
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="form-group row">
-                                            <label for="cono1" class="card-title">Tag Value</label>
-                                            <div class="col-sm-9">
-                                                <input type="text" class="form-control" name="tagValue" placeholder="Tag Value" required/>
+                                            <div class="form-group row">
+                                                <label for="cono1" class="card-title">Tag Value</label>
+                                                <div class="col-sm-9">
+                                                    <input type="text" class="form-control" name="tagValue" placeholder="Tag Value" required />
+                                                </div>
                                             </div>
-                                        </div>
                                             <div class="form-group row">
                                                 <label for="cono1" class="card-title">Tag Status</label>
                                                 <div class="col-sm-9">
@@ -131,14 +134,17 @@ if (!hasPermission('ViewTags')) {
                                                     </select>
                                                 </div>
                                             </div>
-                                    </div>
-                                    <div class="card-body">
-                                        <button name="addTag" class="btn btn-primary">
-                                            Add Tag
-                                        </button>
-                                    </div>
-                                </form>
+                                        </div>
+                                        <div class="card-body">
+                                            <button name="addTag" class="btn btn-primary">
+                                                Add Tag
+                                            </button>
+                                        </div>
+                                    </form>
+                                <?php
 
+                                }
+                                ?>
                                 <div class="border-top">
                                     <table class="table">
                                         <thead>
@@ -160,7 +166,11 @@ if (!hasPermission('ViewTags')) {
                                                     <td><?php echo $tagsData['TagStatus'] == 1 ? "Active" : "Not Active"; ?></td>
                                                     <td>
                                                         <!-- <a href="?">Edit</a> -->
-                                                        <a href="?deleteTag=<?php echo $tagsData['Tagid'] ?>">Delete</a>
+                                                        <?php
+                                                        if (hasPermission('DeleteTag')) {
+                                                        ?>
+                                                            <a href="?deleteTag=<?php echo $tagsData['Tagid'] ?>">Delete</a>
+                                                        <?php } ?>
                                                     </td>
 
                                                 </tr>

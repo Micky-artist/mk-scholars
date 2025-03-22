@@ -1,24 +1,3 @@
-<?php
-session_start();
-include("./dbconnections/connection.php");
-include("./php/validateAdminSession.php");
-
-if (!hasPermission('ChatGround')) {
-    header("Location: ./index");
-    exit;
-  }
-?>
-<!DOCTYPE html>
-<html lang="en">
-
-<!-- <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Ground</title>
-    <link rel="shortcut icon" href="./assets/images/logoRound.png" type="image/x-icon">
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> -->
 
     <style>
         :root {
@@ -488,6 +467,3 @@ if (!hasPermission('ChatGround')) {
             });
         });
     </script>
-<!-- </body>
-
-</html> -->

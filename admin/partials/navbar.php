@@ -27,7 +27,7 @@
         if (hasPermission('ViewApplications')) {
         ?>
           <li class="sidebar-item">
-            <a class="sidebar-link waves-effect waves-dark sidebar-link" href="scholarships" aria-expanded="false"><i class="mdi mdi-view-list"></i><span class="hide-menu">Applications</span></a>
+            <a class="sidebar-link waves-effect waves-dark sidebar-link" href="applications" aria-expanded="false"><i class="mdi mdi-view-list"></i><span class="hide-menu">Applications</span></a>
           </li>
         <?php } ?>
         <?php

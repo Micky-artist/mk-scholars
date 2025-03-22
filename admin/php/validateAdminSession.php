@@ -47,13 +47,13 @@ if(isset($_SESSION['adminId']) && isset($_SESSION['AdminName']) && isset($_SESSI
         // Log deactivated account access attempt
         error_log("Deactivated account (Admin ID: {$_SESSION['adminId']}) attempted access");
         session_destroy();
-        header("Location: login.php?status=account_deactivated");
+        header("Location: authentication-login?status=account_deactivated");
         exit();
     }
 } else {
     // Log unauthorized access attempt
     error_log("Unauthorized access attempt from IP: " . $_SERVER['REMOTE_ADDR']);
-    header("Location: login.php?status=not_logged_in");
+    header("Location: authentication-login?status=not_logged_in");
     exit();
 }
 
