@@ -4,7 +4,10 @@ include("./dbconnections/connection.php");
 include("./php/validateAdminSession.php");
 
 
-
+if (!hasPermission('ViewUsers')) {
+  header("Location: ./index");
+  exit;
+}
 ?>
 
 <!DOCTYPE html>

@@ -1,5 +1,8 @@
 <?php
-
+if (!hasPermission('AddAdmin')) {
+    header("Location: ./index");
+    exit;
+  }
 
 // Initialize variables for form data and messages
 $username = $email = $password = $confirmPassword = '';

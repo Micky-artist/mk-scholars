@@ -3,6 +3,7 @@ session_start();
 include("./dbconnections/connection.php");
 include("./php/validateAdminSession.php");
 
+
 ?>
 
 <!DOCTYPE html>
@@ -29,7 +30,7 @@ include("./partials/head.php");
           <div class="col-lg-14">
             <div class="card">
               <div class="comment-widgets scrollable">
-                <?php include("./manage-access1.php"); ?>
+                <?php include("./manageAdminAccess.php"); ?>
               </div>
             </div>
           </div>

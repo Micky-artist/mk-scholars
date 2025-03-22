@@ -2,6 +2,11 @@
 session_start();
 include("./dbconnections/connection.php");
 include("./php/validateAdminSession.php");
+
+if (!hasPermission('ChatGround')) {
+    header("Location: ./index");
+    exit;
+  }
 ?>
 <!DOCTYPE html>
 <html lang="en">

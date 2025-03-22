@@ -3,6 +3,11 @@ session_start();
 include("./dbconnections/connection.php");
 include("./php/validateAdminSession.php");
 include("./php/tagOperations.php");
+
+if (!hasPermission('ViewTags')) {
+    header("Location: ./index");
+    exit;
+  }
 ?>
 
 <!DOCTYPE html>

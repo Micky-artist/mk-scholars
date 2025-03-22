@@ -1,16 +1,10 @@
 <?php
-// session_start();
 
-// // Database connection
-// $host = 'localhost';
-// $db = 'mkscholars';
-// $user = 'root';
-// $pass = '';
-// $conn = new mysqli($host, $user, $pass, $db);
+if (!hasPermission('ManageRights')) {
+  header("Location: ./index");
+  exit;
+}
 
-// if ($conn->connect_error) {
-//   die("Connection failed: " . $conn->connect_error);
-// }
 
 if(isset($_GET['Deactivate'])){
   $Deactivate = $_GET['Deactivate'];

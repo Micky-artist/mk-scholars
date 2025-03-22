@@ -4,6 +4,11 @@ include("./dbconnections/connection.php");
 include("./php/validateAdminSession.php");
 include("./php/uploadScholarship.php");
 
+if (!hasPermission('PublishApplication')) {
+    header("Location: ./index");
+    exit;
+}
+
 ?>
 
 <!DOCTYPE html>

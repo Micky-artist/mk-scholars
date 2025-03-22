@@ -3,6 +3,10 @@ session_start();
 include("./dbconnections/connection.php");
 include("./php/validateAdminSession.php");
 
+if (!hasPermission('ViewApplications')) {
+  header("Location: ./index");
+  exit;
+}
 ?>
 
 <!DOCTYPE html>
