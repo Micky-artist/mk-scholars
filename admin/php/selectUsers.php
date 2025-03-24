@@ -1,6 +1,6 @@
 <?php
-session_start();
-include("./dbconnections/connection.php");
+// session_start();
+// include("./dbconnections/connection.php");
 
 // Pagination
 $per_page = 20;
@@ -62,7 +62,7 @@ $selectUsers = mysqli_query($conn, "SELECT * FROM normUsers $search_condition OR
                                     </button>
                                     <button class="btn btn-sm btn-outline-success start-conversation" 
                                             data-userid="<?= $user['NoUserId'] ?>" data-usename="<?= $user['NoUsername'] ?>">
-                                        <i class="fas fa-comment"></i> Text<?= $user['NoUserId'] ?>
+                                        <i class="fas fa-comment"></i> Text
                                     </button>
                                 </div>
                             </div>

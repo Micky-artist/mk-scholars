@@ -213,7 +213,7 @@ include("./php/CreateUser.php");
 			</form>
 
 			<div class="switch-form">
-				Already have an account? <a href="./login">Sign Up</a><br>
+				Already have an account? <a href="./login">Sign In</a><br>
 			</div>
 		</div>
 	</div>

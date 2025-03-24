@@ -1,0 +1,142 @@
+CREATE TABLE `AdminRights` (
+  `RightId` int(11) NOT NULL,
+  `AdminId` int(11) NOT NULL DEFAULT 0,
+  `RightStatus` int(11) NOT NULL DEFAULT 0,
+  `ManageRights` int(11) NOT NULL DEFAULT 0,
+  `ManageCountries` int(11) NOT NULL DEFAULT 0,
+  `ViewApplications` int(11) NOT NULL DEFAULT 0,
+  `DeleteApplication` int(11) NOT NULL DEFAULT 0,
+  `EditApplication` int(11) NOT NULL DEFAULT 0,
+  `PublishApplication` int(11) NOT NULL DEFAULT 0,
+  `ApplicationSupportRequest` int(11) NOT NULL DEFAULT 0,
+  `CourseApplication` int(11) NOT NULL DEFAULT 0,
+  `ChatGround` int(11) NOT NULL DEFAULT 0,
+  `ViewUsers` int(11) NOT NULL DEFAULT 0,
+  `ManageUsers` int(11) NOT NULL DEFAULT 0,
+  `ViewTags` int(11) NOT NULL DEFAULT 0,
+  `AddTag` int(11) NOT NULL DEFAULT 0,
+  `DeleteTag` int(11) NOT NULL DEFAULT 0,
+  `ManageYoutubeVideo` int(11) NOT NULL DEFAULT 0,
+  `DeleteYoutubeVideo` int(11) NOT NULL DEFAULT 0,
+  `ManageUserLogs` int(11) NOT NULL DEFAULT 0,
+  `AddAdmin` int(11) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+CREATE TABLE `ApplicationRequests` (
+  `RequestId` int(11) NOT NULL,
+  `UserId` int(11) NOT NULL,
+  `ApplicationId` int(11) NOT NULL,
+  `RequestDate` varchar(50) NOT NULL,
+  `RequestTime` varchar(20) NOT NULL,
+  `Comments` varchar(255) NOT NULL,
+  `Status` int(11) NOT NULL COMMENT '0=unseen,1=seen,2=inprogress,3=reviwing,4=completed'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `applicationsSurvey` (
+  `applicationId` int(11) NOT NULL,
+  `FullNames` varchar(255) NOT NULL,
+  `Email` varchar(50) NOT NULL,
+  `Phone` varchar(50) NOT NULL,
+  `ApplicationContent` varchar(255) NOT NULL,
+  `Comment` varchar(255) NOT NULL,
+  `CourseId` int(11) NOT NULL,
+  `SubmitDate` varchar(50) NOT NULL,
+  `SubmitTime` varchar(20) NOT NULL,
+  `applicationStatus` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+CREATE TABLE `Conversation` (
+  `ConvId` int(11) NOT NULL,
+  `UserId` int(11) NOT NULL,
+  `AdminId` int(11) NOT NULL,
+  `StartDate` varchar(50) NOT NULL,
+  `StartTime` varchar(20) NOT NULL,
+  `ConvStatus` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+CREATE TABLE `countries` (
+  `countryId` int(11) NOT NULL,
+  `CountryName` varchar(100) NOT NULL,
+  `CountryStatus` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+CREATE TABLE `Logs` (
+  `logId` int(11) NOT NULL,
+  `userId` int(11) NOT NULL,
+  `logMessage` text NOT NULL,
+  `logDate` varchar(20) NOT NULL,
+  `logTime` varchar(10) NOT NULL,
+  `logStatus` int(11) NOT NULL DEFAULT 0 COMMENT '1=seen, 0=notseen'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+CREATE TABLE `Message` (
+  `MessageId` int(11) NOT NULL,
+  `UserId` int(11) NOT NULL,
+  `senderId` int(11) NOT NULL,
+  `AdminId` int(11) NOT NULL,
+  `ConvId` int(11) NOT NULL,
+  `MessageContent` text NOT NULL,
+  `SentDate` varchar(50) NOT NULL,
+  `SentTime` varchar(20) NOT NULL,
+  `MessageStatus` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+
+CREATE TABLE `normUsers` (
+  `NoUserId` int(11) NOT NULL,
+  `NoUsername` varchar(200) NOT NULL,
+  `NoEmail` varchar(100) NOT NULL,
+  `NoPhone` varchar(100) NOT NULL,
+  `NoPassword` varchar(255) NOT NULL,
+  `NoStatus` int(11) NOT NULL,
+  `NoCreationDate` varchar(255) NOT NULL,
+  `VerificationCode` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+CREATE TABLE `PostTags` (
+  `Tagid` int(11) NOT NULL,
+  `TagName` varchar(100) NOT NULL,
+  `TagValue` varchar(100) NOT NULL,
+  `TagStatus` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+CREATE TABLE `scholarships` (
+  `scholarshipId` int(11) NOT NULL,
+  `scholarshipTitle` varchar(255) NOT NULL,
+  `scholarshipDetails` longtext NOT NULL,
+  `scholarshipUpdateDate` varchar(50) NOT NULL,
+  `scholarshipLink` text NOT NULL,
+  `scholarshipYoutubeLink` text NOT NULL,
+  `embededVideo` text NOT NULL,
+  `scholarshipImage` varchar(255) NOT NULL,
+  `scholarshipStatus` int(11) NOT NULL,
+  `amount` varchar(200) NOT NULL,
+  `country` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+CREATE TABLE `users` (
+  `userId` int(11) NOT NULL,
+  `username` varchar(200) NOT NULL,
+  `email` varchar(200) NOT NULL,
+  `password` varchar(250) NOT NULL,
+  `status` int(11) NOT NULL COMMENT '1=approved, 0=not-approved'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+CREATE TABLE `youtubeVideos` (
+  `videoId` int(11) NOT NULL,
+  `videoLink` text NOT NULL,
+  `VideoTitle` varchar(200) NOT NULL,
+  `VideoStatus` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+

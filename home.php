@@ -101,7 +101,7 @@
 							</div>
 						</div>
 					</div> -->
-					<?php include('./playground/stayInTouch.php'); ?>
+					<?php include('./partials/stayInTouch.php'); ?>
 					<style>
 						.text div a {
 							display: flex;

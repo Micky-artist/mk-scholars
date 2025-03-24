@@ -38,7 +38,8 @@ if(isset($_SESSION['adminId']) && isset($_SESSION['AdminName']) && isset($_SESSI
         } else {
             // Log access attempt with no permissions
             error_log("Admin ID $AdminId attempted access with no permissions");
-            header("Location: access_denied.php?reason=no_permissions");
+            session_destroy();
+            header("Location: authentication-login.php?reason=no_permissions");
             exit();
         }
         
@@ -53,6 +54,7 @@ if(isset($_SESSION['adminId']) && isset($_SESSION['AdminName']) && isset($_SESSI
 } else {
     // Log unauthorized access attempt
     error_log("Unauthorized access attempt from IP: " . $_SERVER['REMOTE_ADDR']);
+    session_destroy();
     header("Location: authentication-login?status=not_logged_in");
     exit();
 }
