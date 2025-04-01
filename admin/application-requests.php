@@ -26,25 +26,8 @@ include("./partials/head.php");
     include("./partials/navbar.php");
     ?>
     <div class="page-wrapper">
-      <!-- <div class="page-breadcrumb">
-        <div class="row">
-          <div class="col-12 d-flex no-block align-items-center">
-            <h4 class="page-title">Applications</h4>
-            <div class="ms-auto text-end">
-              <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                  <li class="breadcrumb-item"><a href="./index">Home</a></li>
-                  <li class="breadcrumb-item active" aria-current="page">
-                  Applications
-                  </li>
-                </ol>
-              </nav>
-            </div>
-          </div>
-        </div>
-      </div> -->
       <div class="container-fluid">
-        
+
         <div class="row">
           <!-- column -->
           <div class="col-lg-14">
@@ -57,29 +40,11 @@ include("./partials/head.php");
           <!-- column -->
         </div>
       </div>
-      <!-- ============================================================== -->
-      <!-- End Container fluid  -->
-      <!-- ============================================================== -->
-      <!-- ============================================================== -->
-      <!-- footer -->
-      <!-- ============================================================== -->
       <?php
       include("./partials/footer.php");
       ?>
-      <!-- ============================================================== -->
-      <!-- End footer -->
-      <!-- ============================================================== -->
     </div>
-    <!-- ============================================================== -->
-    <!-- End Page wrapper  -->
-    <!-- ============================================================== -->
   </div>
-  <!-- ============================================================== -->
-  <!-- End Wrapper -->
-  <!-- ============================================================== -->
-  <!-- ============================================================== -->
-  <!-- All Jquery -->
-  <!-- ============================================================== -->
 
   <script src="./assets/libs/jquery/dist/jquery.min.js"></script>
   <!-- Bootstrap tether Core JavaScript -->
@@ -92,9 +57,6 @@ include("./partials/head.php");
   <script src="./dist/js/sidebarmenu.js"></script>
   <!--Custom JavaScript -->
   <script src="./dist/js/custom.min.js"></script>
-  <!--This page JavaScript -->
-  <!-- <script src="./dist/js/pages/dashboards/dashboard1.js"></script> -->
-  <!-- Charts js Files -->
   <script src="./assets/libs/flot/excanvas.js"></script>
   <script src="./assets/libs/flot/jquery.flot.js"></script>
   <script src="./assets/libs/flot/jquery.flot.pie.js"></script>

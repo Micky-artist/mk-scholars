@@ -62,7 +62,7 @@ include("./php/selectScholarshipDetails.php")
 			<div class="container">
 				<div class="row">
 					<div class="col-md-9 col-xs-12 theme-large-sidebar">
-						<a style="font-size: 16px; background-color: green; padding: 10px; color: white;" class="btn btn-primary" target="_blank" href="https://chat.whatsapp.com/BnJwwyblsSm9DcFZLT3tFk">Join What'sApp group</a>
+						<a style="font-size: 16px; background-color: green; padding: 10px; color: white;" class="btn btn-primary" target="_blank" href="https://chat.whatsapp.com/HwgjGSYsWFx8KuAf1msc5W">Join What'sApp group</a>
 						<a href="https://api.whatsapp.com/send?text=<?php echo urlencode('Check out this scholarship: https://mkscholars.com/scholarship-details?scholarship-id=' . $scholarshipData['scholarshipId'] . '&scholarship-title=' . preg_replace('/\s+/', '-', $scholarshipData['scholarshipTitle'])); ?>" target="_blank">
 							<button style="background-color: #25D366; color: white; padding: 10px; border: none; border-radius: 5px;">
 								Share on WhatsApp
@@ -97,7 +97,7 @@ include("./php/selectScholarshipDetails.php")
 						<div>
 							<a style="font-size: 16px; background-color: #4183E6; padding: 10px; color: white;" class="btn btn-primary" target="_blank" href="<?php echo $scholarshipData['scholarshipLink'] ?>">Open Application Link</a>
 							<a style="font-size: 16px; background-color: red; padding: 10px; color: white;" class="btn btn-primary" target="_blank" href="<?php echo $scholarshipData['scholarshipYoutubeLink'] ?>">Youtube Guide Video</a>
-							<a style="font-size: 16px; background-color: green; padding: 10px; color: white;" class="btn btn-primary" target="_blank" href="https://chat.whatsapp.com/BnJwwyblsSm9DcFZLT3tFk">Join What'sApp group</a>
+							<a style="font-size: 16px; background-color: green; padding: 10px; color: white;" class="btn btn-primary" target="_blank" href="https://chat.whatsapp.com/GFcmIyDmgs7JK7wnEGvRvw">Join What'sApp group</a>
 						</div>
 
 						<!-- <div class="scholarshipTable">
