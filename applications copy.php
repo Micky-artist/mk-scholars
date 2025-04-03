@@ -160,6 +160,7 @@ include("./dbconnection/connection.php");
 						<div class="scholarshipsContainerDiv">
 							<?php
 
+							// echo "<br>";
 							if ($selectScholarships->num_rows > 0) {
 								while ($getScholarships = mysqli_fetch_assoc($selectScholarships)) {
 							?>
@@ -410,21 +411,12 @@ include("./dbconnection/connection.php");
 
 								.image {
 									height: 200px;
-									overflow: hidden;
-									/* Added to contain images properly */
 								}
 
 								.image img {
 									object-fit: cover;
 									width: 100%;
 									height: 100%;
-									transition: transform 0.3s ease;
-									/* Added for hover effect */
-								}
-
-								.image img:hover {
-									transform: scale(1.05);
-									/* Subtle zoom effect on hover */
 								}
 
 								.postLineLimit {
@@ -432,7 +424,6 @@ include("./dbconnection/connection.php");
 									display: -webkit-box;
 									-webkit-line-clamp: 4;
 									line-clamp: 4;
-									/* Standard property alongside webkit version */
 									-webkit-box-orient: vertical;
 									overflow: hidden;
 								}
@@ -442,46 +433,34 @@ include("./dbconnection/connection.php");
 									overflow: hidden;
 								}
 
-								/* Improved pagination styling */
 								.course-pagination {
+
 									text-align: center;
 									margin: 30px 0;
-									padding: 0;
-									/* Remove default padding */
-									list-style: none;
-									/* Remove default list bullets */
 								}
 
 								.course-pagination li {
 									display: inline-block;
-									margin: 0 5px;
-									/* Increased spacing between pagination items */
+									margin: 0 3px;
 								}
 
 								.course-pagination li a {
+									display: block;
+									width: 1cm;
+									height: 1cm;
 									display: flex;
 									justify-content: center;
 									align-items: center;
-									width: 40px;
-									/* Consistent sizing in pixels instead of cm */
-									height: 40px;
-									border-radius: 4px;
-									/* Slightly rounded corners */
+									/* border-radius: 50%; */
 									background: #f7f7f7;
 									font-weight: 600;
 									color: #666;
-									text-decoration: none;
-									/* Remove underline from links */
-									transition: all 0.3s ease;
-									/* Smooth transition for hover effects */
 								}
 
 								.course-pagination li a.active,
 								.course-pagination li a:hover {
 									background: #083352;
 									color: #fff;
-									box-shadow: 0 2px 5px rgba(8, 51, 82, 0.2);
-									/* Subtle shadow for active/hover state */
 								}
 
 								.searchBtn {
@@ -490,19 +469,6 @@ include("./dbconnection/connection.php");
 									justify-content: center !important;
 									align-items: center !important;
 									color: #fff !important;
-									border: none !important;
-									/* Added to ensure consistent appearance */
-									padding: 10px 20px !important;
-									/* Added consistent padding */
-									cursor: pointer !important;
-									/* Added pointer cursor */
-									transition: background-color 0.3s ease !important;
-									/* Smooth transition */
-								}
-
-								.searchBtn:hover {
-									background-color: #0a4066 !important;
-									/* Slightly lighter on hover */
 								}
 
 								.course-menu {
@@ -511,63 +477,32 @@ include("./dbconnection/connection.php");
 									justify-content: space-evenly !important;
 									align-items: center !important;
 									flex-wrap: wrap;
-									padding: 15px 0;
-									/* Consistent padding top and bottom */
-									margin-bottom: 20px;
-									/* Added margin below menu */
-									border-radius: 6px;
-									/* Rounded corners for modern look */
+									padding: 10px 0px 0px 0px;
 								}
 
 								.course-menu .active {
 									background-color: #083352 !important;
-									color: #fff !important;
-									/* Ensure text is visible on active background */
 								}
 
 								.course-menu .tran3s {
 									text-transform: uppercase;
 									border: 1px solid #083352;
-									padding: 8px 15px;
-									/* Added consistent padding */
-									border-radius: 4px;
-									/* Rounded corners */
-									margin: 5px;
-									/* Added margin for spacing in wrap situations */
-									transition: all 0.3s ease;
-									/* Renamed from tran3s to be more specific */
-									text-decoration: none;
-									/* Remove underline from links */
-									color: #083352;
-									/* Match border color */
 								}
 
 								.course-menu .tran3s:hover {
 									background-color: #083352 !important;
-									color: #fff !important;
-								}
-
-								/* Added responsive adjustments */
-								@media (max-width: 768px) {
-									.course-pagination li a {
-										width: 35px;
-										height: 35px;
-									}
-
-									.course-menu {
-										padding: 10px 0;
-									}
 								}
 							</style>
 
-							<!-- End of row div -->
 						</div> <!-- /.row -->
 
 						<!-- Pagination -->
 						<?php if ($total_pages > 1): ?>
 							<ul class="course-pagination">
 								<?php if ($page > 1): ?>
-									<li><a href="<?php echo generatePaginationLink($page - 1); ?>" class="tran3s" aria-label="Previous page">&lt;</a></li>
+									<li><a href="<?php echo generatePaginationLink($page - 1); ?>" class="tran3s">
+											<< /a>
+									</li>
 								<?php endif; ?>
 
 								<?php
@@ -575,31 +510,13 @@ include("./dbconnection/connection.php");
 								$start_page = max(1, $page - 2);
 								$end_page = min($total_pages, $page + 2);
 
-								// Always show first page if we're not starting from page 1
-								if ($start_page > 1) {
-									echo '<li><a href="' . generatePaginationLink(1) . '" class="tran3s">1</a></li>';
-									if ($start_page > 2) {
-										echo '<li><span class="pagination-ellipsis">&hellip;</span></li>';
-									}
-								}
-
 								for ($i = $start_page; $i <= $end_page; $i++):
 								?>
-									<li><a href="<?php echo generatePaginationLink($i); ?>" class="tran3s <?php echo ($i == $page) ? 'active' : ''; ?>" aria-current="<?php echo ($i == $page) ? 'page' : 'false'; ?>"><?php echo $i; ?></a></li>
+									<li><a href="<?php echo generatePaginationLink($i); ?>" class="tran3s <?php echo ($i == $page) ? 'active' : ''; ?>"><?php echo $i; ?></a></li>
 								<?php endfor; ?>
 
-								<?php
-								// Always show last page if we're not ending at the last page
-								if ($end_page < $total_pages) {
-									if ($end_page < $total_pages - 1) {
-										echo '<li><span class="pagination-ellipsis">&hellip;</span></li>';
-									}
-									echo '<li><a href="' . generatePaginationLink($total_pages) . '" class="tran3s">' . $total_pages . '</a></li>';
-								}
-								?>
-
 								<?php if ($page < $total_pages): ?>
-									<li><a href="<?php echo generatePaginationLink($page + 1); ?>" class="tran3s" aria-label="Next page">&gt;</a></li>
+									<li><a href="<?php echo generatePaginationLink($page + 1); ?>" class="tran3s">></a></li>
 								<?php endif; ?>
 							</ul>
 						<?php endif; ?>

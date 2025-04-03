@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -23,8 +22,8 @@
 				<div class="camera_caption">
 					<div class="container text-center">
 						<h1 class="wow fadeInUp animated">Welcome to our global scholarship platform, where opportunities for education are just a click away. </h1>
-						<a href="./applications" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR APPLICATIONS</a>
-						<a href="./login" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
+						<a href="./applications" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">ALL APPLICATIONS</a>
+						<a href="./courses" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
 					</div> <!-- /.container -->
 				</div> <!-- /.camera_caption -->
 			</div>
@@ -32,8 +31,8 @@
 				<div class="camera_caption">
 					<div class="container text-center">
 						<h1 class="wow fadeInUp animated">We connect you with scholarships from around the world to help you achieve your academic dreams.</h1>
-						<a href="./applications" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR APPLICATIONS</a>
-						<a href="./login" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
+						<a href="./applications" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">ALL APPLICATIONS</a>
+						<a href="./courses" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
 					</div> <!-- /.container -->
 				</div> <!-- /.camera_caption -->
 			</div>
@@ -41,8 +40,8 @@
 				<div class="camera_caption">
 					<div class="container text-center">
 						<h1 class="wow fadeInUp animated">Start your journey today and unlock <br> a world of possibilities!</h1>
-						<a href="./applications" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">OUR APPLICATIONS</a>
-						<a href="./login" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
+						<a href="./applications" class="tran3s wow fadeInLeft animated hvr-rectangle-out button-one" data-wow-delay="0.2s">ALL APPLICATIONS</a>
+						<a href="./courses" class="tran3s wow fadeInRight animated hvr-rectangle-out" data-wow-delay="0.299s">ENROLL NOW</a>
 					</div> <!-- /.container -->
 				</div> <!-- /.camera_caption -->
 			</div>
@@ -61,7 +60,7 @@
 		<div class="featured-course" id="scholarships">
 			<div class="container">
 				<div class="theme-title">
-					<h2>Our Featured Scholarships</h2>
+					<h2>Available Scholarships</h2>
 					<p>Choose a best scholarship you need from our wide range of scholarships available, start learning today from the best teachers around the world</p>
 				</div> <!-- /.theme-title -->
 
@@ -314,8 +313,10 @@
 							display: inline-flex;
 							align-items: center;
 							padding: 0.5rem 1rem;
+							color: white !important;
 							/* Adjusted padding */
-							background: linear-gradient(135deg, #ff6b6b, #a855f7);
+							/* background: linear-gradient(135deg, #ff6b6b, #a855f7); */
+							background: linear-gradient(135deg, #0E77C2, #083352);
 							color: white;
 							border-radius: 8px;
 							text-decoration: none;
@@ -329,11 +330,13 @@
 							height: 100%;
 							background: rgba(255, 255, 255, 0.1);
 							left: -100%;
+							color: white !important;
 							transition: left 0.3s ease;
 						}
 
 						.apply-button:hover .button-hover-effect {
 							left: 0;
+							color: white;
 						}
 
 						.read-more-button {
@@ -343,7 +346,7 @@
 							padding: 0.5rem 1rem;
 							/* Adjusted padding */
 							background: transparent;
-							border: 2px solid #a855f7;
+							border: 2px solid #0E77C2;
 							border-radius: 8px;
 							color: #2d3436;
 							text-decoration: none;
@@ -351,7 +354,7 @@
 						}
 
 						.read-more-button:hover {
-							border-color: #a855f7;
+							border-color: #083352;
 							background: rgba(168, 85, 247, 0.05);
 						}
 
@@ -386,7 +389,7 @@
 				<div class="container">
 					<h2>Ready to take your Skills to the next Level?</h2>
 					<p>Start learning the skills that you need, signup to start accessing exclussive scholarships now</p>
-					<a href="sign-up" class="tran3s hvr-float-shadow">Sign Up</a>
+					<a href="./courses" class="tran3s hvr-float-shadow">Register Now</a>
 				</div> <!-- /.container -->
 			</div> <!-- /.opacity -->
 		</div> <!-- /.signUp-banner -->
@@ -412,7 +415,7 @@
 			<div class="container">
 				<div class="theme-title">
 					<h2>Testimonial</h2>
-					<p>What our valuable clients have to say about our courses, tutorials and online classes</p>
+					<p>"Here's what our valuable clients have to say about our services, courses, tutorials, and virtual classes. Their feedback reflects the positive impact we've made in their learning journeys and the value they’ve gained from our offerings. We are proud to share their experiences and insights on how we've helped them achieve their educational goals."</p>
 				</div>
 				<div class="slider-wrapper">
 					<div class="row">
@@ -557,8 +560,15 @@
 		<div class="instructor-banner clearfix">
 			<div class="main-content float-right">
 				<div class="wrapper">
-					<h4>Apply for a Scholarship Now</h4>
-					<p>Be a part of the world class institution where leaders are made. Make a difference in the world by taking the responsibility. Be different.</p>
+					<h4>Your path to Scholarships, Jobs and Success</h4>
+					<p>
+						At MK Scholars, we are here to help you unlock amazing opportunities to study, work, and grow. We make it easy for students like you to find scholarships, study programs, job opportunities, and internships around the world. Our team provides the latest updates on these opportunities and helps you with every part of the application process. <br><br>
+
+						Whether you need help writing essays, proofreading your work, applying for financial aid, preparing for tests, or coaching for interviews, we’ve got you covered. We are here to support you every step of the way!
+						<br><br>
+						Apply for a scholarship, job, internship, or study program now and join world-class institutions where leaders are made. You have the power to make a difference in the world. Take responsibility and be the change! Be different, be better.
+
+					</p>
 					<a href="./applications" class="p-bg-color hvr-float-shadow">LEARN MORE</a>
 				</div> <!-- /.wrapper -->
 			</div> <!-- /.main-content -->
