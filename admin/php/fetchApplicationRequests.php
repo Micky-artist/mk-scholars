@@ -1,11 +1,13 @@
 <?php
 
-
 function getScholarshipApplications($conn)
 {
     $query = "SELECT s.*, ar.*, c.*, u.NoUserId, u.NoUsername, u.NoEmail, u.NoPhone, u.NoCreationDate
-        FROM ApplicationRequests ar JOIN normUsers u ON ar.UserId = u.NoUserId JOIN scholarships s ON ar.ApplicationId = S.scholarshipId
-        JOIN countries c ON s.country=c.countryId ORDER BY ar.ApplicationId DESC";
+        FROM ApplicationRequests ar 
+        JOIN normUsers u ON ar.UserId = u.NoUserId 
+        JOIN scholarships s ON ar.ApplicationId = s.scholarshipId
+        JOIN countries c ON s.country = c.countryId 
+        ORDER BY ar.ApplicationId DESC";
 
     $result = $conn->query($query);
     if (!$result) {
@@ -15,13 +17,11 @@ function getScholarshipApplications($conn)
     return $result->fetch_all(MYSQLI_ASSOC);
 }
 
-
 function updateApplicationStatus($conn, $applicationId, $newStatus)
 {
     $query = "UPDATE ApplicationRequests 
         SET Status = ?
-        WHERE RequestId = ?
-    ";
+        WHERE RequestId = ?";
 
     $stmt = $conn->prepare($query);
     if (!$stmt) {
@@ -30,7 +30,7 @@ function updateApplicationStatus($conn, $applicationId, $newStatus)
 
     $stmt->bind_param("ii", $newStatus, $applicationId);
     if (!$stmt->execute()) {
-        die("Error updating status 1: " . $stmt->error);
+        die("Error updating status: " . $stmt->error);
     }
 
     $stmt->close();
@@ -43,8 +43,11 @@ function updateApplicationStatus($conn, $applicationId, $newStatus)
 function filterApplications($conn, $searchTerm = "", $status = "", $date = "")
 {
     $query = "SELECT s.*, ar.*, c.*, u.NoUserId, u.NoUsername, u.NoEmail, u.NoPhone, u.NoCreationDate
-        FROM ApplicationRequests ar JOIN normUsers u ON ar.UserId = u.NoUserId JOIN scholarships s ON ar.ApplicationId = S.scholarshipId
-        JOIN countries c ON s.country=c.countryId WHERE 1";
+        FROM ApplicationRequests ar 
+        JOIN normUsers u ON ar.UserId = u.NoUserId 
+        JOIN scholarships s ON ar.ApplicationId = s.scholarshipId
+        JOIN countries c ON s.country = c.countryId 
+        WHERE 1";
 
     // Add filters dynamically
     $params = [];
@@ -57,7 +60,8 @@ function filterApplications($conn, $searchTerm = "", $status = "", $date = "")
         $types .= "ss";
     }
 
-    if (!empty($status)) {
+    // Use a strict check to ensure a status of "0" is processed
+    if ($status !== "") {
         $query .= " AND ar.Status = ?";
         $params[] = $status;
         $types .= "i";
@@ -93,8 +97,7 @@ function filterApplications($conn, $searchTerm = "", $status = "", $date = "")
  */
 function countTotalApplications($conn)
 {
-    $query = "SELECT COUNT(*) AS total 
-        FROM ApplicationRequests";
+    $query = "SELECT COUNT(*) AS total FROM ApplicationRequests";
 
     $result = $conn->query($query);
     if (!$result) {
@@ -113,8 +116,12 @@ function getPaginatedApplications($conn, $page = 1, $perPage = 10)
     $offset = ($page - 1) * $perPage;
 
     $query = "SELECT s.*, ar.*, c.*, u.NoUserId, u.NoUsername, u.NoEmail, u.NoPhone, u.NoCreationDate
-        FROM ApplicationRequests ar JOIN normUsers u ON ar.UserId = u.NoUserId JOIN scholarships s ON ar.ApplicationId = S.scholarshipId
-        JOIN countries c ON s.country=c.countryId ORDER BY ar.ApplicationId DESC LIMIT ?, ? ";
+        FROM ApplicationRequests ar 
+        JOIN normUsers u ON ar.UserId = u.NoUserId 
+        JOIN scholarships s ON ar.ApplicationId = s.scholarshipId
+        JOIN countries c ON s.country = c.countryId 
+        ORDER BY ar.ApplicationId DESC 
+        LIMIT ?, ?";
 
     $stmt = $conn->prepare($query);
     if (!$stmt) {
@@ -168,31 +175,24 @@ if (isset($_GET['search']) || isset($_GET['status']) || isset($_GET['date'])) {
     $applications = getPaginatedApplications($conn, $page, $perPage);
 }
 
-// Close the connection when done (at the end of the file)
+// Close the connection when done
 $conn->close();
 ?>
 
 <style>
-    /* .card:hover {
-            transform: translateY(-2px);
-            transition: transform 0.2s ease;
-        } */
     .status-dropdown {
         cursor: pointer;
     }
-
     .badge {
         font-size: 0.9em;
         padding: 0.5em 0.75em;
     }
-
     .admin-header {
         background-color: #f8f9fa;
         border-bottom: 1px solid #e9ecef;
         padding: 15px 0;
         margin-bottom: 20px;
     }
-
     .pagination {
         margin-top: 30px;
     }
@@ -287,8 +287,9 @@ $conn->close();
                                     </select>
                                 </div>
                                 <div class="col-md-6">
+                                    <!-- Note: Changed modal target to use RequestId -->
                                     <button class="btn btn-outline-secondary w-100" data-bs-toggle="modal"
-                                        data-bs-target="#userModal-<?= $app['scholarshipId'] ?>">
+                                        data-bs-target="#userModal-<?= $app['RequestId'] ?>">
                                         <i class="bi bi-person-lines-fill"></i> View Details
                                     </button>
                                 </div>
@@ -297,14 +298,15 @@ $conn->close();
                     </div>
                 </div>
 
-                <!-- User Details Modal -->
-                <div class="modal fade" id="userModal-<?= $app['scholarshipId'] ?>" tabindex="-1">
+                <!-- User Details Modal (using RequestId for unique identification) -->
+                <div class="modal fade" id="userModal-<?= $app['RequestId'] ?>" tabindex="-1">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title">Scholarship Application Details</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
+                            <!-- Optionally, combine the two headers if a separate title is not needed -->
                             <div class="modal-header">
                                 <h5 class="modal-title"><?= htmlspecialchars($app['scholarshipTitle']) ?></h5>
                             </div>
@@ -407,7 +409,7 @@ $conn->close();
             });
         });
 
-        // Handle status update from modal
+        // Handle status update from modal if needed (example code)
         document.querySelectorAll('.status-update').forEach(function(link) {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -422,12 +424,10 @@ $conn->close();
 
         // Function to update application status via AJAX
         function updateApplicationStatus(applicationId, newStatus) {
-            // Create FormData
             var formData = new FormData();
             formData.append('applicationId', applicationId);
             formData.append('newStatus', newStatus);
 
-            // Send AJAX request
             fetch('./php/update_status.php', {
                     method: 'POST',
                     body: formData
@@ -435,38 +435,29 @@ $conn->close();
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Update UI to reflect new status
                         updateStatusUI(applicationId, newStatus);
                         showToast('Status updated successfully!', 'success');
                     } else {
-                        showToast('Error updating status 2: ' + data.message, 'danger');
+                        showToast('Error updating status: ' + data.message, 'danger');
                     }
                 })
                 .catch(error => {
-                    showToast('Error updating status: 3' + error, 'danger');
+                    showToast('Error updating status: ' + error, 'danger');
                 });
         }
 
-        // Function to update the UI after status change
+        // Update UI after status change
         function updateStatusUI(applicationId, newStatus) {
-            // Update dropdown
             document.querySelectorAll(`.status-dropdown[data-app-id="${applicationId}"]`).forEach(function(dropdown) {
                 dropdown.value = newStatus;
             });
-
-            // Update badge
             const card = document.querySelector(`.status-dropdown[data-app-id="${applicationId}"]`).closest('.card');
             const badge = card.querySelector('.badge');
-
-            // Get status text and color
             const statusText = getStatusText(newStatus);
             const statusColor = getStatusColor(newStatus);
-
-            // Update badge class and text
             badge.className = `badge bg-${statusColor}`;
             badge.textContent = statusText;
 
-            // Also update in modal if open
             const modal = document.getElementById(`userModal-${applicationId}`);
             if (modal) {
                 const modalBadge = modal.querySelector('.badge');
@@ -477,21 +468,17 @@ $conn->close();
             }
         }
 
-        // Helper function to get status text
         function getStatusText(status) {
             const texts = ['Unseen', 'Seen', 'In Progress', 'Reviewing', 'Completed'];
             return texts[status] || 'Unknown';
         }
 
-        // Helper function to get status color
         function getStatusColor(status) {
             const colors = ['secondary', 'primary', 'warning', 'info', 'success'];
             return colors[status] || 'secondary';
         }
 
-        // Function to show toast notifications
         function showToast(message, type = 'info') {
-            // Check if toast container exists, create if not
             let toastContainer = document.querySelector('.toast-container');
             if (!toastContainer) {
                 toastContainer = document.createElement('div');
@@ -499,50 +486,23 @@ $conn->close();
                 document.body.appendChild(toastContainer);
             }
 
-            // Create toast element
             const toastEl = document.createElement('div');
             toastEl.className = `toast align-items-center text-white bg-${type} border-0`;
             toastEl.setAttribute('role', 'alert');
             toastEl.setAttribute('aria-live', 'assertive');
             toastEl.setAttribute('aria-atomic', 'true');
-
-            // Create toast content
             toastEl.innerHTML = `<div class="d-flex">
-                        <div class="toast-body">
-                            ${message}
-                        </div>
+                        <div class="toast-body">${message}</div>
                         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                     </div>`;
 
-            // Add to container
             toastContainer.appendChild(toastEl);
-
-            // Initialize and show toast
             const toast = new bootstrap.Toast(toastEl);
             toast.show();
 
-            // Remove after hidden
             toastEl.addEventListener('hidden.bs.toast', function() {
                 toastEl.remove();
             });
         }
-
-        // Clear filter button
-        // const clearFilterBtn = document.createElement('button');
-        // clearFilterBtn.className = 'btn btn-outline-secondary ms-2';
-        // clearFilterBtn.textContent = 'Clear Filters';
-        // clearFilterBtn.addEventListener('click', function() {
-        //     window.location.href = window.location.pathname;
-        // });
-
-        // Add clear button if filters are active
-        // const filterForm = document.getElementById('filterForm');
-        // const filterActive = window.location.search.includes('search=') || 
-        //                    window.location.search.includes('status=') || 
-        //                    window.location.search.includes('date=');
-
-        // if (filterActive) {
-        //     filterForm.querySelector('button[type="submit"]').parentNode.appendChild(clearFilterBtn);
-        // }
     });
 </script>

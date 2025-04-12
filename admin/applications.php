@@ -49,7 +49,7 @@ include("./partials/head.php");
           <div class="col-lg-14">
             <div class="card">
               <div class="comment-widgets scrollable">
-                <?php include("./php/selectApplications.php"); ?>
+                <?php include("./php/selectScholarships.php"); ?>
               </div>
             </div>
           </div>
