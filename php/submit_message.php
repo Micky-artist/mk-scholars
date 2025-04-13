@@ -1,29 +1,40 @@
 <?php
-include("../dbconnection/connection.php");
-if (!isset($_POST['UserId']) || !isset($_POST['AdminId']) || !isset($_POST['ConvId']) || !isset($_POST['message'])) {
-    echo "Error: Missing required parameters";
+session_start();
+include('../dbconnection/connection.php');
+
+if (!isset($_POST['UserId'], $_POST['ConvId'])) {
+    echo 'Missing data';
     exit;
 }
 
-$UserId = filter_var($_POST['UserId'], FILTER_SANITIZE_NUMBER_INT);
-$AdminId = filter_var($_POST['AdminId'], FILTER_SANITIZE_NUMBER_INT);
-$ConvId = filter_var($_POST['ConvId'], FILTER_SANITIZE_NUMBER_INT);
-$MessageContent = htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8');
-$SentDate = date("Y-m-d");
-$SentTime = date("H:i");
-$MessageStatus = 0;
+$UserId = $_POST['UserId'];
+$ConvId = $_POST['ConvId'];
+$AdminId = $_POST['AdminId'] ?? 0;
+$message = trim($_POST['message']);
+$SentDate = date('Y-m-d');
+$SentTime = date('H:i:s');
 
-// Use prepared statement to prevent SQL injection
-$stmt = $conn->prepare("INSERT INTO Message(UserId, senderId, AdminId, ConvId, MessageContent, SentDate, SentTime, MessageStatus) 
-                       VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-$stmt->bind_param("iiiisssi", $UserId, $UserId, $AdminId, $ConvId, $MessageContent, $SentDate, $SentTime, $MessageStatus);
+// Handle file upload
+$uploadPath = '';
+if (isset($_FILES['file']) && $_FILES['file']['error'] == 0) {
+    $targetDir = "../uploads/";
+    if (!file_exists($targetDir)) mkdir($targetDir, 0777, true);
 
-if ($stmt->execute()) {
-    echo json_encode(['status' => 'success', 'message' => 'Message sent successfully']);
-} else {
-    echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $stmt->error]);
+    $filename = basename($_FILES["file"]["name"]);
+    $targetFile = $targetDir . time() . "_" . $filename;
+
+    if (move_uploaded_file($_FILES["file"]["tmp_name"], $targetFile)) {
+        $uploadPath = str_replace("../", "./", $targetFile);
+    }
 }
 
-$stmt->close();
-$conn->close();
-?>
+$finalMessage = $uploadPath ? $uploadPath : $message;
+
+$sql = "INSERT INTO Message (UserId, senderId, AdminId, ConvId, MessageContent, SentDate, SentTime, MessageStatus)
+        VALUES ('$UserId', '$UserId', '$AdminId', '$ConvId', '$finalMessage', '$SentDate', '$SentTime', 0)";
+
+if (mysqli_query($conn, $sql)) {
+    echo "Message sent";
+} else {
+    echo "Error: " . mysqli_error($conn);
+}

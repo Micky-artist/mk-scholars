@@ -17,7 +17,7 @@ include('./php/validateSession.php');
     <link rel="shortcut icon" href="./images/logo/logoRound.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-   
+
 </head>
 
 <body data-theme="light">
@@ -90,6 +90,11 @@ include('./php/validateSession.php');
 
                             ?>
                                 <div class="chat-container" style="height: 400px; overflow-y: auto;" id="chat-container">
+                                    <div id="typing-indicator" style="font-size: 12px; margin-top: 5px; display: none;">
+                                        <em>Typing...</em>
+                                    </div>
+
+
                                     <?php
                                     // Fetch messages for the current conversation
                                     $selectMessages = mysqli_query($conn, "SELECT * FROM Message WHERE ConvId = $convoId ORDER BY SentDate, SentTime");
@@ -201,7 +206,7 @@ include('./php/validateSession.php');
 
                                 <!-- <div > -->
                                 <div id="statusMessage"></div>
-                                <form id="messageForm" class="input-group mt-4">
+                                <form id="messageForm" class="input-group mt-4" enctype="multipart/form-data">
                                     <div class="file-input-container">
                                         <input type="file" name="file" id="file-input" class="file-input">
                                         <label for="file-input" class="file-label">
@@ -211,11 +216,12 @@ include('./php/validateSession.php');
                                     <input type="hidden" name="UserId" value="<?php echo htmlspecialchars($UserId); ?>">
                                     <input type="hidden" name="AdminId" value="0">
                                     <input type="hidden" name="ConvId" value="<?php echo htmlspecialchars($convoId); ?>">
-                                    <input type="text" class="form-control bg-transparent" name="message" placeholder="Type message..." required>
+                                    <input type="text" class="form-control bg-transparent" name="message" placeholder="Type message...">
                                     <button type="submit" name="send" class="btn btn-primary">
                                         <i class="fas fa-paper-plane"></i> Send
                                     </button>
                                 </form>
+
                                 <!-- </div> -->
                             <?php
                             } else {
@@ -246,7 +252,7 @@ include('./php/validateSession.php');
                         </div>
                     </div>
 
-                    
+
                 </div>
 
                 <!-- <div class="row mt-4 g-4">
@@ -329,38 +335,91 @@ include('./php/validateSession.php');
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function() {
-            $('#messageForm').on('submit', function(event) {
-                event.preventDefault();
+        // Typing Indicator
+        let typingTimer;
+        $('input[name="message"]').on('input', function() {
+            $('#typing-indicator').show();
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => {
+                $('#typing-indicator').hide();
+            }, 1000);
+        });
 
-                var formData = {
-                    UserId: $('input[name="UserId"]').val(),
-                    AdminId: $('input[name="AdminId"]').val(),
-                    ConvId: $('input[name="ConvId"]').val(),
-                    message: $('input[name="message"]').val()
-                };
+        // Send Message + File
+        $('#messageForm').on('submit', function(event) {
+            event.preventDefault();
+            const form = new FormData(this);
 
-                if (formData.message.trim() === '') {
-                    alert('Please enter a message');
-                    return;
+            $.ajax({
+                url: './php/submit_message.php',
+                type: 'POST',
+                data: form,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    $('#statusMessage').html('<div class="alert alert-success">Message sent!</div>');
+                    $('input[name="message"]').val('');
+                    $('#file-input').val('');
+                    loadMessages(); // Refresh messages instantly
+                },
+                error: function() {
+                    $('#statusMessage').html('<div class="alert alert-danger">Error sending message</div>');
                 }
-
-                $.ajax({
-                    url: './php/submit_message.php',
-                    type: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        $('#statusMessage').html('<div class="alert alert-success">Message sent successfully!</div>');
-                        $('input[name="message"]').val('');
-                    },
-                    error: function(xhr, status, error) {
-                        $('#statusMessage').html('<div class="alert alert-danger">Failed to send message</div>');
-                        console.error(xhr.responseText);
-                    }
-                });
             });
         });
+
+        // Load Messages (poll every 3 sec)
+        function loadMessages() {
+            const convId = $('input[name="ConvId"]').val();
+            const userId = $('input[name="UserId"]').val();
+            $.get('./php/fetch_messages.php', {
+                ConvId: convId
+            }, function(data) {
+                const messages = JSON.parse(data);
+                const chatContainer = $('#chat-container');
+                const isAtBottom = chatContainer[0].scrollTop + chatContainer[0].clientHeight >= chatContainer[0].scrollHeight - 100;
+
+                chatContainer.html('');
+                let currentDate = '';
+                messages.forEach(msg => {
+                    const messageDate = new Date(msg.SentDate).toDateString();
+                    if (currentDate !== messageDate) {
+                        currentDate = messageDate;
+                        chatContainer.append(`<div class="date-separator text-center my-3">${messageDate}</div>`);
+                    }
+
+                    let content;
+                    if (msg.MessageContent.startsWith('./uploads/')) {
+                        const ext = msg.MessageContent.split('.').pop().toLowerCase();
+                        if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
+                            content = `<img src="${msg.MessageContent}" style="max-width:200px;" alt="File">`;
+                        } else {
+                            content = `<a href="${msg.MessageContent}" target="_blank">📎 Download File</a>`;
+                        }
+                    } else {
+                        content = msg.MessageContent;
+                    }
+
+                    const bubbleClass = msg.UserId == userId ? 'sent' : 'received';
+                    const bubble = `
+                    <div class="chat-bubble ${bubbleClass} mb-3">
+                        <p class="message-content">${content}</p>
+                        <span class="time">${msg.SentTime}</span>
+                    </div>
+                `;
+                    chatContainer.append(bubble);
+                });
+
+                if (isAtBottom) {
+                    chatContainer[0].scrollTop = chatContainer[0].scrollHeight;
+                }
+            });
+        }
+
+        setInterval(loadMessages, 3000);
+        loadMessages();
     </script>
+
     <script>
         // Scroll to the bottom of the chat container
         const chatContainer = document.getElementById('chat-container');

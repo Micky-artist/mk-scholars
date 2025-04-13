@@ -1,177 +1,181 @@
+<style>
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.92);
+        --glass-border: rgba(255, 255, 255, 0.15);
+        --primary-color: #3B82F6;
+        --text-primary: #1F2937;
+        --bg-primary: #F3F4F6;
+        --hover-effect: rgba(59, 130, 246, 0.08);
+    }
 
-    <style>
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.92);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --primary-color: #3B82F6;
-            --text-primary: #1F2937;
-            --bg-primary: #F3F4F6;
-            --hover-effect: rgba(59, 130, 246, 0.08);
-        }
+    [data-theme="dark"] {
+        --glass-bg: rgba(17, 24, 39, 0.95);
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --primary-color: #60A5FA;
+        --text-primary: #F9FAFB;
+        --bg-primary: #0F172A;
+        --hover-effect: rgba(96, 165, 250, 0.08);
+    }
 
-        [data-theme="dark"] {
-            --glass-bg: rgba(17, 24, 39, 0.95);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --primary-color: #60A5FA;
-            --text-primary: #F9FAFB;
-            --bg-primary: #0F172A;
-            --hover-effect: rgba(96, 165, 250, 0.08);
-        }
+    body {
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        min-height: 100vh;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-        body {
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+    .glass-panel {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px) saturate(180%);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
 
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px) saturate(180%);
-            border: 1px solid var(--glass-border);
-            border-radius: 1rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
+    .theme-toggle {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        z-index: 9999;
+        transition: all 0.3s;
+    }
 
-        .theme-toggle {
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            width: 3rem;
-            height: 3rem;
-            border-radius: 50%;
-            display: grid;
-            place-items: center;
-            z-index: 9999;
-            transition: all 0.3s;
-        }
+    .user-card {
+        transition: all 0.2s;
+        cursor: pointer;
+        border: 1px solid transparent;
+    }
 
-        .user-card {
-            transition: all 0.2s;
-            cursor: pointer;
-            border: 1px solid transparent;
-        }
+    .user-card:hover {
+        background: var(--hover-effect);
+        transform: translateY(-2px);
+    }
 
-        .user-card:hover {
-            background: var(--hover-effect);
-            transform: translateY(-2px);
+    .chat-container {
+        height: 400px;
+        /* Smaller chat container */
+        overflow-y: auto;
+        scroll-behavior: smooth;
+        padding: 1rem;
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+        background: var(--glass-bg);
+    }
+
+    .chat-bubble {
+        max-width: 70%;
+        padding: 0.75rem 1rem;
+        border-radius: 1rem;
+        margin-bottom: 0.75rem;
+        position: relative;
+        word-wrap: break-word;
+    }
+
+    .chat-bubble.sent {
+        background: var(--primary-color);
+        color: white;
+        margin-left: auto;
+    }
+
+    .chat-bubble.received {
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid var(--glass-border);
+        margin-right: auto;
+    }
+
+    .chat-bubble .message-content {
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .chat-bubble .time {
+        font-size: 0.7rem;
+        opacity: 0.7;
+        text-align: right;
+    }
+
+    .date-separator {
+        font-size: 0.9rem;
+        color: var(--text-primary);
+        text-align: center;
+        margin: 1rem 0;
+        opacity: 0.7;
+    }
+
+    .file-input {
+        display: none;
+    }
+
+    .file-label {
+        display: inline-block;
+        cursor: pointer;
+        background-color: var(--hover-effect);
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        transition: background-color 0.3s ease;
+    }
+
+    .file-label:hover {
+        background-color: rgba(59, 130, 246, 0.2);
+    }
+
+    .attachment-icon {
+        font-size: 1.2rem;
+        color: var(--primary-color);
+    }
+
+    .main-container {
+        display: flex;
+        gap: 1.5rem;
+        padding: 1.5rem;
+        height: calc(100vh - 3rem);
+    }
+
+    @media (max-width: 992px) {
+        .main-container {
+            flex-direction: column;
         }
 
         .chat-container {
-            height: 400px; /* Smaller chat container */
-            overflow-y: auto;
-            scroll-behavior: smooth;
-            padding: 1rem;
-            border: 1px solid var(--glass-border);
-            border-radius: 1rem;
-            background: var(--glass-bg);
+            height: auto;
         }
+    }
 
-        .chat-bubble {
-            max-width: 70%;
-            padding: 0.75rem 1rem;
-            border-radius: 1rem;
-            margin-bottom: 0.75rem;
-            position: relative;
-            word-wrap: break-word;
-        }
 
-        .chat-bubble.sent {
-            background: var(--primary-color);
-            color: white;
-            margin-left: auto;
-        }
+    /* Search Modal */
+    .search-modal .modal-content {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px) saturate(180%);
+        border: 1px solid var(--glass-border);
+        border-radius: 1rem;
+    }
 
-        .chat-bubble.received {
-            background: rgba(59, 130, 246, 0.1);
-            border: 1px solid var(--glass-border);
-            margin-right: auto;
-        }
+    .search-modal .modal-header {
+        border-bottom: 1px solid var(--glass-border);
+    }
 
-        .chat-bubble .message-content {
-            font-size: 0.9rem;
-            margin-bottom: 0.25rem;
-        }
+    .search-modal .modal-footer {
+        border-top: 1px solid var(--glass-border);
+    }
 
-        .chat-bubble .time {
-            font-size: 0.7rem;
-            opacity: 0.7;
-            text-align: right;
-        }
+    .search-modal .list-group-item {
+        background: transparent;
+        border: 1px solid var(--glass-border);
+        margin-bottom: 0.5rem;
+        border-radius: 0.5rem;
+        transition: all 0.2s;
+    }
 
-        .date-separator {
-            font-size: 0.9rem;
-            color: var(--text-primary);
-            text-align: center;
-            margin: 1rem 0;
-            opacity: 0.7;
-        }
-
-        .file-input {
-            display: none;
-        }
-
-        .file-label {
-            display: inline-block;
-            cursor: pointer;
-            background-color: var(--hover-effect);
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            transition: background-color 0.3s ease;
-        }
-
-        .file-label:hover {
-            background-color: rgba(59, 130, 246, 0.2);
-        }
-
-        .attachment-icon {
-            font-size: 1.2rem;
-            color: var(--primary-color);
-        }
-
-        .main-container {
-            display: flex;
-            gap: 1.5rem;
-            padding: 1.5rem;
-            height: calc(100vh - 3rem);
-        }
-
-        @media (max-width: 992px) {
-            .main-container {
-                flex-direction: column;
-                height: auto;
-            }
-        }
-
-        /* Search Modal */
-        .search-modal .modal-content {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px) saturate(180%);
-            border: 1px solid var(--glass-border);
-            border-radius: 1rem;
-        }
-
-        .search-modal .modal-header {
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .search-modal .modal-footer {
-            border-top: 1px solid var(--glass-border);
-        }
-
-        .search-modal .list-group-item {
-            background: transparent;
-            border: 1px solid var(--glass-border);
-            margin-bottom: 0.5rem;
-            border-radius: 0.5rem;
-            transition: all 0.2s;
-        }
-
-        .search-modal .list-group-item:hover {
-            background: var(--hover-effect);
-            transform: translateY(-2px);
-        }
-    </style>
+    .search-modal .list-group-item:hover {
+        background: var(--hover-effect);
+        transform: translateY(-2px);
+    }
+</style>
 <!-- </head> -->
 
 <body data-theme="light">
@@ -212,29 +216,25 @@
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
-                <div class="user-list" style="height: calc(100vh - 200px); overflow-y: auto;">
+                <div class="user-list" id="user-list" style="height: calc(100vh - 200px); overflow-y: auto;">
                     <?php
                     $selectConvos = mysqli_query($conn, "SELECT c.*, u.NoUsername, u.NoUserId FROM Conversation c JOIN normUsers u ON c.UserId=u.NoUserId");
                     if ($selectConvos->num_rows > 0) {
                         while ($convos = mysqli_fetch_assoc($selectConvos)) {
                     ?>
-                            <a href="?username=<?php echo $convos['NoUsername'] ?>&userId=<?php echo $convos['NoUserId'] ?>" style="text-decoration: none;">
-                                <div class="user-card glass-panel p-3 mb-2">
-                                    <div class="d-flex align-items-center">
-                                        <div class="me-3">
-                                            <i class="fas fa-user-circle fa-2x text-primary"></i>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0"><?php echo $convos['NoUsername'] ?></h6>
-                                        </div>
-                                    </div>
+                            <a href="?username=<?php echo urlencode($convos['NoUsername']); ?>&userId=<?php echo $convos['NoUserId']; ?>" class="user-card-link d-flex justify-content-between align-items-center glass-panel p-3 mb-2" data-convid="<?php echo $convos['ConvId']; ?>">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-user-circle fa-2x text-primary me-2"></i>
+                                    <h6 class="mb-0"><?php echo htmlspecialchars($convos['NoUsername']); ?></h6>
                                 </div>
+                                <span class="badge bg-danger unread-count" style="display:none;"></span>
                             </a>
                     <?php
                         }
                     }
                     ?>
                 </div>
+
             </div>
         </div>
 
@@ -248,7 +248,7 @@
                 $convoId = $convoData['ConvId'];
                 $ConvStatus = $convoData['ConvStatus'];
                 $adminId = $_SESSION['adminId'];
-                
+
         ?>
                 <div class="glass-panel p-3 flex-grow-1">
                     <div class="d-flex flex-column h-100">
@@ -418,7 +418,9 @@
                     $.ajax({
                         url: './php/search_users.php',
                         type: 'GET',
-                        data: { query: query },
+                        data: {
+                            query: query
+                        },
                         success: function(response) {
                             $('#searchResults').html(response);
                         }
@@ -430,41 +432,100 @@
 
         });
     </script>
-        <script>
-        // Scroll to the bottom of the chat container
-        const chatContainer = document.getElementById('chat-container');
+   <script>
+    // Scroll to the bottom of the chat container
+    const chatContainer = document.getElementById('chat-container');
+    if (chatContainer) {
         chatContainer.scrollTop = chatContainer.scrollHeight;
-    </script>
-    <script>
-        $(document).ready(function() {
-            $('#messageForm').on('submit', function(event) {
-                event.preventDefault();
+    }
+</script>
+<script>
+    $(document).ready(function() {
+        $('#messageForm').on('submit', function(event) {
+            event.preventDefault();
+            const form = new FormData(this);
 
-                var formData = {
-                    UserId: $('input[name="UserId"]').val(),
-                    AdminId: $('input[name="AdminId"]').val(),
-                    ConvId: $('input[name="ConvId"]').val(),
-                    message: $('input[name="message"]').val()
-                };
-
-                if (formData.message.trim() === '') {
-                    alert('Please enter a message');
-                    return;
+            $.ajax({
+                url: './php/submit_message.php',
+                type: 'POST',
+                data: form,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    $('#statusMessage').html('<div class="alert alert-success">Message sent successfully!</div>');
+                    $('input[name="message"]').val('');
+                    $('#file-input').val('');
+                },
+                error: function(xhr) {
+                    $('#statusMessage').html('<div class="alert alert-danger">Failed to send message</div>');
+                    console.error(xhr.responseText);
                 }
-
-                $.ajax({
-                    url: './php/submit_message.php',
-                    type: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        $('#statusMessage').html('<div class="alert alert-success">Message sent successfully!</div>');
-                        $('input[name="message"]').val('');
-                    },
-                    error: function(xhr, status, error) {
-                        $('#statusMessage').html('<div class="alert alert-danger">Failed to send message</div>');
-                        console.error(xhr.responseText);
-                    }
-                });
             });
         });
-    </script>
+
+        pollUnreadCounts();
+        setInterval(() => {
+            pollUnreadCounts();
+            const convId = $('input[name="ConvId"]').val();
+            const adminId = $('input[name="AdminId"]').val();
+            if (convId && adminId) {
+                loadMessages(convId, adminId);
+            }
+        }, 4000);
+    });
+
+    function pollUnreadCounts() {
+        $.get('./php/count_unread.php', function(data) {
+            const counts = JSON.parse(data);
+            $('.user-card-link').each(function() {
+                const convid = $(this).data('convid');
+                const badge = $(this).find('.unread-count');
+                const count = counts[convid] || 0;
+                badge.text(count);
+                badge.toggle(count > 0);
+            });
+        });
+    }
+
+    function loadMessages(convId, adminId) {
+        $.get('./php/fetch_admin_messages.php', { ConvId: convId }, function(data) {
+            const messages = JSON.parse(data);
+            const container = $('#chat-container');
+            const atBottom = container[0].scrollTop + container[0].clientHeight >= container[0].scrollHeight - 100;
+            container.html('');
+            let currentDate = '';
+
+            messages.forEach(msg => {
+                const messageDate = new Date(msg.SentDate).toDateString();
+                if (currentDate !== messageDate) {
+                    currentDate = messageDate;
+                    container.append(`<div class="date-separator">${messageDate}</div>`);
+                }
+
+                let content;
+                if (msg.MessageContent.startsWith('./uploads/')) {
+                    const ext = msg.MessageContent.split('.').pop().toLowerCase();
+                    if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
+                        content = `<img src="${msg.MessageContent}" style="max-width:200px;" alt="File">`;
+                    } else {
+                        content = `<a href="${msg.MessageContent}" target="_blank">📎 Download File</a>`;
+                    }
+                } else {
+                    content = msg.MessageContent;
+                }
+
+                const isAdmin = msg.AdminId == adminId;
+                container.append(`
+                    <div class="chat-bubble ${isAdmin ? 'sent' : 'received'}">
+                        <p class="message-content">${content}</p>
+                        <span class="time">${msg.SentTime}</span>
+                    </div>
+                `);
+            });
+
+            if (atBottom) container[0].scrollTop = container[0].scrollHeight;
+        });
+
+        $.get('./php/mark_messages_read.php', { ConvId: convId });
+    }
+</script>
