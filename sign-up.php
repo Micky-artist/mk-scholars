@@ -209,7 +209,7 @@ include("./php/CreateUser.php");
 				<input type="checkbox" name="aggree" id="remember">
 				<label for="remember">By signing up you confirm that you agree with <a href="./terms-and-conditions" target="_blank">Terms and Conditions</a> and <a href="./privacy-policy" target="_blank">Privacy Policy</a></label>
 				</div>
-				<button type="submit" name="signup" class="submit-btn">Login</button>
+				<button type="submit" name="signup" class="submit-btn">Sign Up</button>
 			</form>
 
 			<div class="switch-form">

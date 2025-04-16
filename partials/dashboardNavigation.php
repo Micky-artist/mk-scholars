@@ -6,6 +6,8 @@
                         </div>
                         <h5 class="mb-1"><?php echo $_SESSION['username']; ?></h5>
                         <small class="text-muted"><?php echo $_SESSION['NoEmail']; ?></small>
+                        <a href="./profile" class="btn btn-sm btn-outline-primary">View Profile</a>
+
                     </div>
 
                     <div class="glass-panel p-2 mb-1">
@@ -17,6 +19,11 @@
                     <div class="glass-panel p-2 mb-1">
                         <a class="nav-link d-flex align-items-center" href="./conversations">
                             <span>conversations</span>
+                        </a>
+                    </div>
+                    <div class="glass-panel p-2 mb-1">
+                        <a class="nav-link d-flex align-items-center" href="./courses">
+                            <span>courses</span>
                         </a>
                     </div>
                     

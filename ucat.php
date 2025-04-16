@@ -2,36 +2,53 @@
 session_start();
 include("./dbconnection/connection.php");
 
+if(!isset($_SESSION['userId'])){
+    header("Location: login");
+    exit;
+}
 // Handle form submission
 $showSuccessModal = false;
 $errors = [];
 
+$UserId = $_SESSION['userId'];
+
+$selectUserDetails = mysqli_query($conn, "SELECT * FROM normUsers WHERE NoUserId = $UserId");
+if($selectUserDetails -> num_rows > 0){
+    $userData = mysqli_fetch_assoc($selectUserDetails);
+}
+
+// Use session values for personal details.
+$name  = $userData['NoUsername'] ?? 'Unknown User';
+$email = $userData['NoEmail'] ?? 'Unknown Email';
+$phone = $userData['NoPhone'] ?? '';
+
+
 // Preserve form data on validation errors
 $formData = [
-    'name' => $_POST['name'] ?? '',
-    'email' => $_POST['email'] ?? '',
-    'phone' => $_POST['phone'] ?? '',
-    'courseId' => $_POST['courseId'] ?? 1, // Default to UCAT course
+    'name'    => $_POST['name'] ?? '',
+    'email'   => $_POST['email'] ?? '',
+    'phone'   => $_POST['phone'] ?? '',
+    'courseId'=> $_POST['courseId'] ?? 1, // Default to UCAT course (ID 1)
     'courses' => $_POST['courses'] ?? ['UCAT Online Coaching Course'], // Always include UCAT
     'comment' => $_POST['comment'] ?? '',
-    'terms' => isset($_POST['terms']),
+    'terms'   => isset($_POST['terms']),
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validate inputs
-    $name = trim($formData['name']);
-    $email = trim($formData['email']);
-    $phone = trim($formData['phone']);
-    $courseId = (int)$formData['courseId'];
+    $name    = trim($formData['name']);
+    $email   = trim($formData['email']);
+    $phone   = trim($formData['phone']);
+    $courseId= (int)$formData['courseId'];
     $courses = $formData['courses'];
     $comment = trim($formData['comment']);
-    $terms = $formData['terms'];
+    $terms   = $formData['terms'];
 
     // Validation rules
     if (empty($name)) $errors['name'] = 'Please enter your name';
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors['email'] = 'Invalid email address';
     if (empty($phone)) $errors['phone'] = 'Please enter your phone number';
-    if (!in_array($courseId, [1, 2, 3])) $errors['course'] = 'Please select a valid course';
+    if (!in_array($courseId, [1, 2, 3, 4])) $errors['course'] = 'Please select a valid course';
     if (count($courses) < 2 || !in_array('UCAT Online Coaching Course', $courses)) $errors['courses'] = 'Please select either the 15 Days or 30 Days Course (15.000 RWF)';
     if (strlen($comment) > 1000) $errors['comment'] = 'Comment must be 1000 characters or less';
     if (!$terms) $errors['terms'] = 'You must accept the terms';
@@ -49,6 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $time = date("H:i:s");
 
         // Use prepared statements to prevent SQL injection
+        // (Note: The CourseId in the query is set to 2 here per original code; adjust as needed.)
         $stmt = mysqli_prepare($conn, "INSERT INTO applicationsSurvey (FullNames, Email, Phone, CourseId, ApplicationContent, Comment, SubmitDate, SubmitTime, applicationStatus) VALUES (?, ?, ?, 2, ?, ?, ?, ?, 0)");
 
         if ($stmt) {
@@ -72,13 +90,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $showSuccessModal = true;
                 // Reset form data after successful submission
                 $formData = [
-                    'name' => '',
-                    'email' => '',
-                    'phone' => '',
-                    'courseId' => 1,
+                    'name'    => '',
+                    'email'   => '',
+                    'phone'   => '',
+                    'courseId'=> 1,
                     'courses' => ['UCAT Online Coaching Course'],
                     'comment' => '',
-                    'terms' => false,
+                    'terms'   => false,
                 ];
             } else {
                 $errors['database'] = "Error: " . mysqli_stmt_error($stmt);
@@ -109,20 +127,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             --primary: #4bc2c5;
             --secondary: #ff7a7a;
         }
-
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            /* min-height: 100vh; */
         }
-
-        .hero-title {
-            font-family: 'Chewy', cursive;
-            color: var(--primary);
-            text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
-            font-size: 2.5rem;
-        }
-
         .course-card {
             background: white;
             border-radius: 20px;
@@ -132,130 +140,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             transition: all 0.3s ease;
             border: 3px solid transparent;
         }
-
         .course-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
-
         .course-card.active {
             border-color: var(--primary);
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         }
-
-        .course-icon {
-            font-size: 2rem;
-            margin-bottom: 15px;
-        }
-
         .course-details {
             max-height: 0;
             overflow: hidden;
             transition: all 0.3s ease;
         }
-
         .course-card.active .course-details {
             max-height: 500px;
             margin-top: 15px;
         }
-
-        .badge-certificate {
-            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
-            font-family: 'Chewy';
-            letter-spacing: 1px;
-        }
-
         .form-section {
             background: white;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
         }
-
-        .success-modal {
-            background: linear-gradient(135deg, #4bc2c5 0%, #6dd5fa 100%);
-            color: white;
-            border-radius: 20px;
-        }
-
-        .custom-checkbox {
-            position: relative;
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-        }
-
-        .custom-checkbox input[type="checkbox"] {
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
-            height: 0;
-            width: 0;
-        }
-
-        .checkmark {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 24px;
-            width: 24px;
-            background-color: #eee;
-            border-radius: 4px;
-            transition: background-color 0.3s ease;
-        }
-
-        .custom-checkbox:hover input[type="checkbox"]~.checkmark {
-            background-color: #ccc;
-        }
-
-        .custom-checkbox input[type="checkbox"]:checked~.checkmark {
-            background-color: #2196F3;
-        }
-
-        .checkmark:after {
-            content: "";
-            position: absolute;
-            display: none;
-        }
-
-        .custom-checkbox input[type="checkbox"]:checked~.checkmark:after {
-            display: block;
-        }
-
-        .custom-checkbox .checkmark:after {
-            left: 8px;
-            top: 4px;
-            width: 5px;
-            height: 10px;
-            border: solid white;
-            border-width: 0 3px 3px 0;
-            transform: rotate(45deg);
-        }
-
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-        }
-
         .selected-courses {
             margin-top: 20px;
             padding: 15px;
             background: #f8f9fa;
             border-radius: 10px;
         }
-
         .selected-courses h4 {
             margin-bottom: 10px;
         }
-
         .selected-courses ul {
             list-style: none;
             padding: 0;
         }
-
         .selected-courses ul li {
             margin: 5px 0;
         }
-
         .thank-you-popup {
             position: fixed;
             top: 50%;
@@ -269,21 +192,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             z-index: 1000;
             display: none;
         }
-
         .thank-you-popup.active {
             display: block;
         }
-
         .thank-you-popup h2 {
             color: #4bc2c5;
             margin-bottom: 20px;
         }
-
         .thank-you-popup p {
             font-size: 18px;
             color: #333;
         }
-
         .thank-you-popup button {
             margin-top: 20px;
             padding: 10px 20px;
@@ -294,40 +213,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             cursor: pointer;
             transition: background 0.3s ease;
         }
-
         .thank-you-popup button:hover {
             background: #3aa9ac;
         }
-
-        .word-count {
-            font-size: 0.9rem;
-            color: #666;
-            margin-top: 5px;
-        }
-
         .navbar {
-            margin-bottom: 1cm;
-            /* width: 80%; */
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(15px);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
             border-bottom: 1px solid rgba(255, 255, 255, 0.4);
             padding: .2rem 2rem;
-            /* position: sticky; */
-            top: 0 !important;
-            /* z-index: 1000; */
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
         .navbar-brand {
             display: flex;
             align-items: center;
             gap: 0.8rem;
             text-decoration: none;
         }
-
         .logo-icon {
             width: 40px;
             height: 40px;
@@ -339,7 +243,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: white;
             font-size: 1.2rem;
         }
-
         .brand-text {
             font-size: 1.4rem;
             font-weight: 700;
@@ -347,15 +250,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
         .navbar-nav {
-            display: flex !important;
+            display: flex;
             flex-direction: row;
             gap: 2rem;
             align-items: center;
-            transition: all 0.3s ease;
         }
-
         .nav-link {
             color: #4a4a4a;
             text-decoration: none;
@@ -363,7 +263,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             position: relative;
             padding: 0.5rem 0;
         }
-
         .nav-link::after {
             content: '';
             position: absolute;
@@ -374,11 +273,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: var(--primary);
             transition: width 0.3s ease;
         }
-
         .nav-link:hover::after {
             width: 100%;
         }
-
         .nav-button {
             background: #2196F3;
             color: white;
@@ -387,17 +284,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 30px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             gap: 0.6rem;
         }
-
         .nav-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
         }
-
         .menu-toggle {
             display: none;
             background: none;
@@ -409,11 +303,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 
-<body class="">
-<?php include("./partials/coursesNav.php") ?>
+<body>
+    <?php include("./partials/coursesNav.php"); ?>
 
     <div class="container">
-        <form method="POST" class="form-section p-4 mb-4">
+        <form method="POST" class="form-section mb-4">
             <div class="row">
                 <!-- Course Selection -->
                 <div class="col-md-6">
@@ -438,9 +332,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <li>✓ Situational Judgement – Understanding ethical and professional scenarios</li>
                             </ul>
                             <div>
-                        <h5><b>Note: Before you pay WhatsApp or Call us on: +250 798 611 161</b></h5>
-                    </div>
-                            <!-- <span class="badge badge-certificate rounded-pill">Certificate Included</span> -->
+                                <h5><b>Note: Before you pay WhatsApp or call us on: +250 798 611 161</b></h5>
+                            </div>
                         </div>
                     </div>
                    
@@ -463,48 +356,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <button type="button" class="btn btn-dark btn-sm choose-course">Select</button>
                         </div>
                     </div>
+                    
+                    <!-- Only Notes (4000 RWF) -->
+                    <div class="course-card" data-course-id="4">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <h4 class="mb-0">Only Notes (4000 RWF)</h4>
+                            </div>
+                            <button type="button" class="btn btn-dark btn-sm choose-course">Select</button>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Personal Details -->
+                <!-- User Details (Automatically populated from session) -->
                 <div class="col-md-6">
                     <h3 class="mb-4">Your Details</h3>
+                    <p><strong>Name:</strong> <?= htmlspecialchars($name); ?></p>
+                    <p><strong>Email:</strong> <?= htmlspecialchars($email); ?></p>
+                    <p><strong>Phone:</strong> <?= htmlspecialchars($phone); ?></p>
+                    <!-- Hidden fields to pass user data -->
+                    <input type="hidden" name="name" value="<?= htmlspecialchars($name); ?>">
+                    <input type="hidden" name="email" value="<?= htmlspecialchars($email); ?>">
+                    <input type="hidden" name="phone" value="<?= htmlspecialchars($phone); ?>">
+                    <!-- Hidden input for courseId; default value now matches UCAT (ID 1) -->
+                    <input type="hidden" name="courseId" value="1">
 
-                    <div class="mb-3">
-                        <label class="form-label">Full Name</label>
-                        <input type="hidden" name="courseId" class="form-control rounded-pill" value="2">
-                        <input type="text" name="name" class="form-control rounded-pill" value="<?= htmlspecialchars($formData['name']) ?>" required>
-                        <?php if (isset($errors['name'])): ?>
-                            <div class="text-danger"><?= $errors['name'] ?></div>
-                        <?php endif; ?>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" name="email" class="form-control rounded-pill" value="<?= htmlspecialchars($formData['email']) ?>" required>
-                        <?php if (isset($errors['email'])): ?>
-                            <div class="text-danger"><?= $errors['email'] ?></div>
-                        <?php endif; ?>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Phone (WhatsApp Number)</label>
-                        <input type="tel" name="phone" class="form-control rounded-pill" value="<?= htmlspecialchars($formData['phone']) ?>" required>
-                        <?php if (isset($errors['phone'])): ?>
-                            <div class="text-danger"><?= $errors['phone'] ?></div>
-                        <?php endif; ?>
-                    </div>
-
-                    <!-- Comment Section -->
-                    <div class="mb-3">
-                        <label class="form-label">Your Comment (max 200 words) <span style="color:red">Optional</span></label>
-                        <textarea name="comment" class="form-control" rows="4" maxlength="1000"><?= htmlspecialchars($formData['comment']) ?></textarea>
-                        <div class="word-count" id="word-count">Words: 0/200</div>
-                        <?php if (isset($errors['comment'])): ?>
-                            <div class="text-danger"><?= $errors['comment'] ?></div>
-                        <?php endif; ?>
-                    </div>
-
-                    <!-- Selected Courses -->
+                    <!-- Selected Courses (display only) -->
                     <div class="selected-courses">
                         <h4>Choices</h4>
                         <ul id="selected-courses-list">
@@ -514,6 +391,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </ul>
                     </div>
 
+                    <!-- Terms & Conditions -->
                     <div class="form-check mb-4">
                         <input class="form-check-input" type="checkbox" name="terms" id="terms" <?= $formData['terms'] ? 'checked' : '' ?>>
                         <label class="form-check-label" for="terms">
@@ -533,7 +411,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
     </div>
 
-    <!-- Thank You Popup -->
+    <!-- Thank You Popup (if needed) -->
     <div class="thank-you-popup">
         <h2>Thank You! 🎉</h2>
         <p>We appreciate your interest in our courses. We'll get back to you soon!</p>
@@ -564,9 +442,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 selectedCourseId = courseId;
 
                 // Update the selected courses set
-                selectedCourses.delete('15 Days Course (8000 RWF)'); // Remove previous selection
-                selectedCourses.delete('30 Days Course (15.000 RWF)'); // Remove previous selection
-                selectedCourses.add(courseName); // Add the newly selected course
+                selectedCourses.delete('15 Days Course (8000 RWF)');
+                selectedCourses.delete('30 Days Course (15.000 RWF)');
+                selectedCourses.delete('Only Notes (4000 RWF)');
+                selectedCourses.add(courseName);
 
                 // Update the hidden input for courseId
                 document.querySelector('input[name="courseId"]').value = selectedCourseId;
@@ -614,39 +493,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Initialize with UCAT course selected
         document.querySelector('input[name="courseId"]').value = selectedCourseId;
         updateSelectedCoursesList();
-
-        // Form validation before submission
-        document.querySelector('form').addEventListener('submit', (e) => {
-            // Check if either 15 Days or 30 Days is selected
-            if (!selectedCourses.has('15 Days Course (8000 RWF)') && !selectedCourses.has('30 Days Course (15.000 RWF)')) {
-                e.preventDefault(); // Prevent form submission
-                alert('Please select either the 15 Days or 30 Days Course (15.000 RWF).');
-            }
-        });
-
-        // Word count for comment
-        const commentTextarea = document.querySelector('textarea[name="comment"]');
-        const charCountDisplay = document.getElementById('word-count');
-        const maxCharacters = 200;
-
-        commentTextarea.addEventListener('input', () => {
-            const characters = commentTextarea.value.length;
-            charCountDisplay.textContent = `Characters: ${characters}/${maxCharacters}`;
-
-            if (characters > maxCharacters) {
-                charCountDisplay.classList.add('text-danger');
-            } else if (characters > maxCharacters * 0.9) {
-                charCountDisplay.classList.add('text-warning');
-                charCountDisplay.classList.remove('text-danger');
-            } else {
-                charCountDisplay.classList.remove('text-warning', 'text-danger');
-            }
-        });
-
-        // Show thank you popup on form submission
-        <?php if ($showSuccessModal): ?>
-            document.querySelector('.thank-you-popup').classList.add('active');
-        <?php endif; ?>
 
         function closeThankYouPopup() {
             document.querySelector('.thank-you-popup').classList.remove('active');
