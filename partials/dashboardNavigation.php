@@ -26,6 +26,11 @@
                             <span>courses</span>
                         </a>
                     </div>
+                    <div class="glass-panel p-2 mb-1">
+                        <a class="nav-link d-flex align-items-center" href="./e-learning">
+                            <span>E-Learning</span>
+                        </a>
+                    </div>
                     
                     <div class="glass-panel p-2 mb-1">
                         <a class="nav-link d-flex align-items-center" href="./apply">

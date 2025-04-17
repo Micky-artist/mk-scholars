@@ -76,7 +76,6 @@ include('./php/validateSession.php');
                     <div class="col-lg-8">
                         <div class="glass-panel p-4">
                             <div class="d-flex justify-content-between align-items-center mb-4">
-                                <h5 class="mb-0" style="font-size: 13px;">Chat With Us (Refresh to check new messages) <span style="background-color: green; padding: 5px; color: white; border-radius: 5px; cursor: pointer;" onclick="window.location.href='conversations'">Refresh</span></h5>
                                 <!-- <span class="badge bg-primary rounded-pill">3 New</span> -->
                             </div>
                             <?php

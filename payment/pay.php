@@ -1,12 +1,4 @@
-<?php
-// PHP variables
-$customer_id = $_SESSION['uniqueUserId'];
-// $finalAmount =  2000;
-$customer_phone = 2507;
-$customer_email = 'msinnovationlab1@gmail.com';
-$customer_name = $_SESSION['username'];
-$transaction_id = rand(1, 999999) . 'code' . date('ymdhis') . rand(10000, 999999);
-?>
+
 <form class="FinalForm" method="POST" action="https://checkout.flutterwave.com/v3/hosted/pay">
     <input type="hidden" name="public_key" value="FLWPUBK-fd9a72fe52fbf0bd373323b44d7e2097-X" />
     <input type="hidden" name="customizations[title]" value="Rwanda Driver Code" />

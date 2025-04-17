@@ -1,0 +1,190 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.25);
+  --glass-border: rgba(0, 0, 0, 0.2);
+  --text-dark: #111;
+  --text-light: #fff;
+  --btn-bg: #fff;
+  --btn-text: #111;
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --separator: rgba(0, 0, 0, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  background: #f5f5f5; /* light grey fallback */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-dark);
+}
+
+.checkout-wrapper {
+  display: flex;
+  flex-direction: row !important;
+  flex-wrap: wrap;
+  /* gap: 2rem;
+  width: 95%;
+  max-width: 1100px;
+  padding: 2rem; */
+}
+
+.panel {
+  flex: 1 1 350px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* PURCHASE PANEL */
+.purchase header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.purchase .back {
+  background: none;
+  border: none;
+  color: var(--text-dark);
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.purchase .back:hover {
+  color: var(--btn-bg);
+}
+
+.purchase h1 {
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.lead {
+  margin: 1.5rem 0;
+  line-height: 1.5;
+  font-weight: 300;
+}
+
+/* Input & Coupon Form */
+form {
+  margin-bottom: 1.5rem;
+}
+form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+form input[type="text"] {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border: 1px solid var(--separator);
+  border-radius: 8px;
+  color: var(--text-dark);
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+form input[type="text"]::placeholder {
+  color: rgba(17,17,17,0.5);
+}
+form input[type="text"]:focus {
+  border-color: var(--text-dark);
+  outline: none;
+}
+form button {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--btn-bg);
+  border: 1px solid var(--text-dark);
+  border-radius: 8px;
+  color: var(--btn-text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, transform 0.1s;
+}
+form button:hover {
+  background: var(--text-dark);
+  color: var(--btn-bg);
+  transform: translateY(-1px);
+}
+
+/* Separator line */
+.purchase .lead + form {
+  border-top: 1px solid var(--separator);
+  padding-top: 1.5rem;
+}
+
+/* PAYMENT METHODS IMAGE */
+.methods {
+  display: block;
+  max-width: 100%;
+  margin: 2rem auto 0;
+  opacity: 0.85;
+}
+
+/* SUMMARY PANEL */
+.summary h2 {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.summary ul {
+  list-style: none;
+  margin-bottom: 2rem;
+  border-top: 1px solid var(--separator);
+}
+.summary li {
+  margin: 0.75rem 0;
+  font-size: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+.summary li + li {
+  border-top: 1px solid var(--separator);
+  padding-top: 0.75rem;
+}
+
+.pay {
+  text-align: center;
+}
+.pay .btn {
+  display: inline-block;
+  padding: 0.85rem 2.5rem;
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  border: 1px solid var(--text-dark);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.pay .btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+@media (max-width: 800px) {
+  .checkout-wrapper {
+    flex-direction: column;
+    padding: 1rem;
+  }
+}

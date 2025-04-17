@@ -12,6 +12,7 @@
         <a href="./home" class="nav-link">Home</a>
         <a href="./applications" class="nav-link">Applications</a>
         <a href="./courses" class="nav-link">Courses</a>
+        <a href="./dashboard" class="nav-link">Dashboard</a>
         
         <?php
         if(isset($_SESSION['username'])){
