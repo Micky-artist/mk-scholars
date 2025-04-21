@@ -263,7 +263,7 @@ if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST'
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="termsCheck">
-                                            <label class="form-check-label" for="termsCheck">I agree to terms & conditions</label>
+                                            <label class="form-check-label" for="termsCheck">I agree to <a href="./terms-and-conditions" target="_blank">terms & conditions</a></label>
                                         </div>
                                         <button type="submit" name="submit_application" class="btn btn-success btn-lg" id="submitBtn" disabled>
                                             <i class="fas fa-paper-plane me-2"></i>Submit Application

@@ -15,7 +15,11 @@
                             <span>Dashboard</span>
                         </a>
                     </div>
-                    
+                    <div class="glass-panel p-2 mb-1">
+                        <a class="nav-link d-flex align-items-center" href="./e-learning">
+                            <span>E-Learning</span>
+                        </a>
+                    </div>
                     <div class="glass-panel p-2 mb-1">
                         <a class="nav-link d-flex align-items-center" href="./conversations">
                             <span>conversations</span>
@@ -26,11 +30,7 @@
                             <span>courses</span>
                         </a>
                     </div>
-                    <div class="glass-panel p-2 mb-1">
-                        <a class="nav-link d-flex align-items-center" href="./e-learning">
-                            <span>E-Learning</span>
-                        </a>
-                    </div>
+                    
                     
                     <div class="glass-panel p-2 mb-1">
                         <a class="nav-link d-flex align-items-center" href="./apply">
@@ -48,7 +48,7 @@
                             <span>Back home</span>
                         </a>
                     </div>
-                    <a class="p-3 mt-auto" href="">
+                    <a class="p-3 mt-auto" href="./php/logout.php">
                     <button class=" glass-panel p-3 mt-auto" style="color: red; font-weight: bold;">Logout</button>
                     </a>
 

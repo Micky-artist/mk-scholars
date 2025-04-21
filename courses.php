@@ -241,40 +241,40 @@ session_start();
                     <h2 class="card-title">UCAT Online Coaching</h2>
                     <p class="card-subtitle">For Future Medical Students</p>
                     <div style="display: flex; flex-wrap: wrap;">
-                        <div class="price-tag">15,000 FRW 30 days Coaching</div>
-                        <div class="price-tag" style="background: rgba(255, 193, 7, 0.15); color: #FFA000;">8,000 FRW 15 Days Coaching</div>
+                        <div class="price-tag">4,500 RWF Prepared notes and answers</div>
+                        <div class="price-tag" style="background: rgba(255, 193, 7, 0.15); color: #FFA000;">7,500 FRW Coaching with a teacher</div>
 
                     </div>
                 </div>
 
                 <p class="card-description">
                     Comprehensive online coaching for students preparing for the University Clinical Aptitude Test (UCAT). Includes expert guidance, practice tests, and strategies to improve scores. Morning and evening classes are available. <br>
-                    <li>March Intake (Virtual Classes) – Course starts on March 24, 2025</li> <br>
+                    <!-- <li>March Intake (Virtual Classes) – Course starts on March 24, 2025</li> <br> -->
                 </p>
 
                 <div class="card-details">
                     <div class="detail-item">
                         <i class="fas fa-graduation-cap"></i>
-                        <span>Online Courses</span>
+                        <span>Online Studying</span>
                     </div>
-                    <div class="detail-item">
+                    <!-- <div class="detail-item">
                         <i class="fas fa-clock"></i>
                         <span>30 Or 15 Days Program</span>
-                    </div>
+                    </div> -->
                     <div class="detail-item">
                         <i class="fas fa-users"></i>
-                        <span>7 Seats Available</span>
+                        <span>3 Seats Available</span>
                     </div>
                 </div>
 
                 <div class="action-section">
                     <div class="deadline">
                         <i class="fas fa-hourglass-half"></i>
-                        Registration Closes: March 20, 2025
+                        Registration Closes: April 24, 2025
                     </div>
                     <button onclick="window.location.href='./ucat'" class="apply-button">
                         <i class="fas fa-arrow-circle-right"></i>
-                        Register now
+                        Register now (Iyandikishe)
                     </button>
                 </div>
             </div>
@@ -320,7 +320,7 @@ session_start();
                     </div> -->
                     <button onclick="window.location.href='./language-coding'" class="apply-button">
                         <i class="fas fa-arrow-circle-right"></i>
-                        Register Now
+                        Register Now (Iyandikishe)
                     </button>
                 </div>
             </div>
