@@ -356,13 +356,13 @@ include('./php/validateSession.php');
                 processData: false,
                 contentType: false,
                 success: function(response) {
-                    $('#statusMessage').html('<div class="alert alert-success">Message sent!</div>');
+                    // $('#statusMessage').html('<div class="alert alert-success">Message sent!</div>');
                     $('input[name="message"]').val('');
                     $('#file-input').val('');
                     loadMessages(); // Refresh messages instantly
                 },
                 error: function() {
-                    $('#statusMessage').html('<div class="alert alert-danger">Error sending message</div>');
+                    // $('#statusMessage').html('<div class="alert alert-danger">Error sending message</div>');
                 }
             });
         });

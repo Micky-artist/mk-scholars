@@ -58,6 +58,7 @@
             <a class="sidebar-link waves-effect waves-dark sidebar-link" href="users" aria-expanded="false"><i class="mdi mdi-account"></i><span class="hide-menu">Users</span></a>
           </li>
         <?php } ?>
+
         <?php
         if (hasPermission('ViewTags')) {
         ?>
@@ -91,6 +92,13 @@
         ?>
           <li class="sidebar-item">
             <a class="sidebar-link waves-effect waves-dark sidebar-link" href="manage-access" aria-expanded="false"><i class="mdi mdi-account-key"></i><span class="hide-menu">Manage Access</span></a>
+          </li>
+        <?php } ?>
+        <?php
+        if (hasPermission('ManageRights')) {
+        ?>
+          <li class="sidebar-item">
+            <a class="sidebar-link waves-effect waves-dark sidebar-link" href="subscriptions" aria-expanded="false"><i class="mdi mdi-account-key"></i><span class="hide-menu">Subscriptions</span></a>
           </li>
         <?php } ?>
       </ul>
