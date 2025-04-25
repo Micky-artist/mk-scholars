@@ -46,7 +46,7 @@
               <img src="https://mkscholars.com/images/courses/ucat.jpg" class="card-img-top" alt="UCAT">
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title">UCAT</h5>
-                <p class="card-text flex-grow-1">Learn the basics of HTML and build your first web pages from scratch.</p>
+                <p class="card-text flex-grow-1">Comprehensive online coaching for students preparing for the University Clinical Aptitude Test (UCAT). Includes expert guidance, practice tests, and strategies to improve scores. Morning and evening classes are available.</p>
                 <a href="ucat-course" class="btn btn-primary mt-3">View Course</a>
               </div>
             </div>
@@ -56,7 +56,7 @@
               <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="morocco-admissions">
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title"></h5>
-                <p class="card-text flex-grow-1">Style your web pages with CSS, learning layout, typography, and responsive design.</p>
+                <p class="card-text flex-grow-1">Welcome to the Morocco Admissions Preparation Course. Here you’ll find targeted interview practice, hospitality & tourism knowledge checks, and logical reasoning quizzes designed to help you excel in your application and assessments.</p>
                 <a href="morocco-admissions" class="btn btn-primary mt-3">View Course</a>
               </div>
             </div>

@@ -344,7 +344,7 @@ $sections = [
         <?php else: ?>
           <div class="locked">
             You must subscribe to access the quizzes.<br>
-            <a href="./subscribe.php" class="subscribe-link">Click here to subscribe</a>
+            <a href="./payment/checkout?subscription=moroccoadmissions" class="subscribe-link">Click here to subscribe</a>
           </div>
         <?php endif; ?>
       </main>
