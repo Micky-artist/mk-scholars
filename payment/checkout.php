@@ -22,6 +22,7 @@ $plans = [
   'notes' => 4500,
   '30days' => 15000,
   'instructor'  => 7500,
+  'morocco-admissions' => 2600,
 ];
 if (!isset($_GET['subscription']) || !isset($plans[$_GET['subscription']])) {
   http_response_code(400);
@@ -32,8 +33,7 @@ $finalAmount      = $plans[$subscriptionName];
 
 // --- 4) FETCH USER SECURELY (PREPARED) ---
 include('../dbconnection/connection.php');
-$stmt = $conn->prepare("
-    SELECT NoUsername, NoEmail, NoPhone
+$stmt = $conn->prepare("SELECT NoUsername, NoEmail, NoPhone
     FROM normUsers
     WHERE NoUserId = ?
 ");

@@ -293,7 +293,7 @@ $result = $conn->query($sql);
                         <i class="fas fa-calendar-check me-2"></i>Subscription Management
                     </h4>
                     <span class="badge bg-light text-dark fs-6">Total: <?= $totalRows ?></span>
-                    <a href="add_subscription.php" class="btn btn-light btn-sm">
+                    <a href="add_subscription" class="btn btn-light btn-sm">
                     <i class="fas fa-plus me-1"></i> Add Subscription
                 </a>
                 </div>

@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['grant_subscription'])
     $userId            = filter_input(INPUT_POST, 'user_id', FILTER_VALIDATE_INT);
     $subscriptionType  = filter_input(INPUT_POST, 'subscription_type', FILTER_SANITIZE_STRING);
     $duration          = filter_input(INPUT_POST, 'duration', FILTER_VALIDATE_INT);
-    $allowedTypes      = ['notes', '15days', '30days', 'instructor'];
+    $allowedTypes      = ['notes','instructor','moroccoadmissions'];
 
     if (!$userId || !in_array($subscriptionType, $allowedTypes) || $duration <= 0) {
         $_SESSION['error'] = 'Invalid subscription parameters.';
@@ -255,22 +255,17 @@ $success = $_SESSION['success'] ?? null; unset($_SESSION['success']);
                       <small class="text-muted">Study materials</small>
                     </div>
                   </div>
-                  <div class="col-6">
-                    <div class="subscription-option" onclick="selectSubscription('15days')" id="option-15days">
-                      <h6>15 Days</h6>
-                      <small class="text-muted">Standard plan</small>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <div class="subscription-option" onclick="selectSubscription('30days')" id="option-30days">
-                      <h6>30 Days</h6>
-                      <small class="text-muted">Extended plan</small>
-                    </div>
-                  </div>
+                  
                   <div class="col-6">
                     <div class="subscription-option" onclick="selectSubscription('instructor')" id="option-instructor">
                       <h6>Instructor</h6>
-                      <small class="text-muted">Teaching access</small>
+                      <small class="text-muted">Study materials</small>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="subscription-option" onclick="selectSubscription('moroccoadmissions')" id="option-moroccoadmissions">
+                      <h6>Morocco Admissions</h6>
+                      <small class="text-muted">Study materials</small>
                     </div>
                   </div>
                 </div>
