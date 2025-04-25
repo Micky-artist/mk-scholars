@@ -12,7 +12,7 @@ $ConvId = $_POST['ConvId'];
 $AdminId = $_POST['AdminId'] ?? 0;
 $message = trim($_POST['message']);
 $SentDate = date('Y-m-d');
-$SentTime = date('H:i:s');
+$SentTime = date('H:i');
 
 // Handle file upload
 $uploadPath = '';

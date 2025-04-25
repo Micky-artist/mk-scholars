@@ -53,7 +53,7 @@ $selectConvos = $conn->query($convSql);
         --primary-color: #60A5FA;
         --text-primary: #F9FAFB;
         --bg-primary: #0F172A;
-        --hover-effect:rgb(185, 185, 185);
+        --hover-effect: rgb(185, 185, 185);
     }
 
     body {

@@ -1,20 +1,48 @@
 <?php
 session_start();
-include("../dbconnections/connection.php");
-if ($_SERVER['REQUEST_METHOD']!=='POST') exit;
+require_once '../dbconnections/connection.php';  // adjust path as needed
 
-$convId  = intval($_POST['ConvId']  ?? 0);
-$adminId = intval($_SESSION['adminId'] ?? 0);
-$userId  = 0;
-$msg     = trim($_POST['message']   ?? '');
-if (!$convId || !$adminId || !$userId || $msg==='') exit;
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    exit;
+}
 
-// Insert into ALL required columns
-$stmt = $conn->prepare("INSERT INTO Message
-    (UserId,senderId,AdminId,ConvId,MessageContent,SentDate,SentTime,MessageStatus)
-  VALUES
-    (?,?,?,?,?,CURDATE(),CURTIME(),0)
-");
-$stmt->bind_param('iiiis',$userId,$adminId,$adminId,$convId,$msg);
-$stmt->execute();
+// fetch & validate inputs
+$convId  = isset($_POST['ConvId'])  ? (int) $_POST['ConvId']  : 0;
+$adminId = isset($_SESSION['adminId']) ? (int) $_SESSION['adminId'] : 0;
+$message = trim($_POST['message'] ?? '');
+
+// if any required piece is missing, abort
+if (! $convId || ! $adminId || $message === '') {
+    exit;
+}
+
+$senderId = $adminId;
+$sentTime = date('H:i');
+
+// prepare & execute
+$sql = "
+    INSERT INTO Message
+        (UserId, senderId, AdminId, ConvId, MessageContent, SentDate, SentTime, MessageStatus)
+    VALUES
+        (0,       ?,        ?,       ?,      ?,              CURDATE(), ?,       0)
+";
+
+if (! $stmt = $conn->prepare($sql)) {
+    error_log('Prepare failed: ' . $conn->error);
+    exit;
+}
+
+$stmt->bind_param(
+    'iiiss',
+    $senderId,   // maps to senderId
+    $adminId,    // maps to AdminId
+    $convId,     // maps to ConvId
+    $message,    // maps to MessageContent
+    $sentTime    // maps to SentTime
+);
+
+if (! $stmt->execute()) {
+    error_log('Execute failed: ' . $stmt->error);
+}
+
 $stmt->close();
