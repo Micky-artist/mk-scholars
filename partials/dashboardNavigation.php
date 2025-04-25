@@ -25,11 +25,11 @@
                             <span>conversations</span>
                         </a>
                     </div>
-                    <div class="glass-panel p-2 mb-1">
+                    <!-- <div class="glass-panel p-2 mb-1">
                         <a class="nav-link d-flex align-items-center" href="./courses">
                             <span>courses</span>
                         </a>
-                    </div>
+                    </div> -->
                     
                     
                     <div class="glass-panel p-2 mb-1">

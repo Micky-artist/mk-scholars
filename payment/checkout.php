@@ -124,7 +124,7 @@ $transaction_id = bin2hex(random_bytes(8)) . '_' . time();
         <li><strong>Plan:</strong> <?= htmlspecialchars($subscriptionName) ?></li>
         <li><strong>Total:</strong> <?= number_format($finalAmount) ?> RWF</li>
       </ul>
-      <?php echo $userId = $_SESSION['userId'] ?>
+      <p>If you are facing issues please call +250 798 611 161</p>
       <form class="pay" method="POST"
         action="https://checkout.flutterwave.com/v3/hosted/pay">
         <input type="hidden" name="public_key"

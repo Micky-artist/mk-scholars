@@ -1,6 +1,8 @@
 <?php
 session_start();
 include("./dbconnection/connection.php");
+include('./php/validateSession.php');
+
 
 if(!isset($_SESSION['userId'])){
     header("Location: login");
