@@ -159,43 +159,89 @@ include("./dbconnection/connection.php");
 						?>
 						<div class="scholarshipsContainerDiv">
 							<?php
-
+							// 1) collect all scholarships
+							$scholarships = [];
 							if ($selectScholarships->num_rows > 0) {
-								while ($getScholarships = mysqli_fetch_assoc($selectScholarships)) {
+								while ($row = mysqli_fetch_assoc($selectScholarships)) {
+									$scholarships[] = $row;
+								}
+							}
+
+							$numPosts = count($scholarships);
+
+							if ($numPosts > 0) {
+								// 2) pick a random interval of 2, 3, or 4
+								$interval = rand(2, 4);
+
+								// 3) decide on number of ads: at least 2, at most 10
+								$calculatedAds = (int)ceil($numPosts / $interval);
+								$numAds        = min(10, max(2, $calculatedAds));
+
+								// 4) build slot indices [0 .. $numPosts]
+								$slots   = range(0, $numPosts);
+								shuffle($slots);
+								$adSlots = array_slice($slots, 0, min($numAds, count($slots)));
+								sort($adSlots);
+
+								$slotIndex    = 0;
+								$adsRendered  = 0;  // counter to guard at render time
+								$maxAdsPerPage = 10;
+
+								function renderAdBanner()
+								{
 							?>
+									<script type="text/javascript">
+										atOptions = {
+											'key': '98402006e8b83dd2d8d5dda96e411da2',
+											'format': 'iframe',
+											'height': 250,
+											'width': 300,
+											'params': {}
+										};
+									</script>
+									<script type="text/javascript" src="//www.highperformanceformat.com/98402006e8b83dd2d8d5dda96e411da2/invoke.js"></script>
+								<?php
+								}
+
+								// 5) loop posts + inject ads at chosen slots (with runtime cap)
+								foreach ($scholarships as $scholarship) {
+									if (in_array($slotIndex, $adSlots, true) && $adsRendered < $maxAdsPerPage) {
+										renderAdBanner();
+										$adsRendered++;
+									}
+								?>
 									<div class="scholarship-card">
 										<div class="card-image">
-											<img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipImage'] ?>"
-												alt="<?php echo $getScholarships['scholarshipTitle'] ?>">
+											<img
+												src="https://admin.mkscholars.com/uploads/posts/<?php echo htmlspecialchars($scholarship['scholarshipImage'], ENT_QUOTES) ?>"
+												alt="<?php echo htmlspecialchars($scholarship['scholarshipTitle'], ENT_QUOTES) ?>">
 											<div class="image-overlay"></div>
 										</div>
-
 										<div class="card-content">
 											<h3 class="card-title">
-												<a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-", $getScholarships['scholarshipTitle']) ?>">
-													<?php echo $getScholarships['scholarshipTitle'] ?>
+												<a href="scholarship-details?scholarship-id=<?php echo $scholarship['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', '-', $scholarship['scholarshipTitle']) ?>">
+													<?php echo htmlspecialchars($scholarship['scholarshipTitle'], ENT_QUOTES) ?>
 												</a>
 											</h3>
-
 											<div class="card-description">
-												<p><?php echo $getScholarships['scholarshipDetails'] ?></p>
+												<p><?php echo htmlspecialchars($scholarship['scholarshipDetails'], ENT_QUOTES) ?></p>
 											</div>
-
 											<div class="card-footer">
 												<div class="date-info">
 													<svg class="calendar-icon" viewBox="0 0 24 24">
-														<path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z" />
+														<path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14
+                                         c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6
+                                         c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z" />
 													</svg>
-													<span><?php echo $getScholarships['scholarshipUpdateDate'] ?></span>
+													<span><?php echo $scholarship['scholarshipUpdateDate'] ?></span>
 												</div>
-
 												<div class="card-actions">
 													<a href="./apply" class="apply-button">
 														<span>Apply Now</span>
 														<div class="button-hover-effect"></div>
 													</a>
-
-													<a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-", $getScholarships['scholarshipTitle']) ?>"
+													<a
+														href="scholarship-details?scholarship-id=<?php echo $scholarship['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', '-', $scholarship['scholarshipTitle']) ?>"
 														class="read-more-button">
 														<span>Read More</span>
 														<div class="button-arrow">→</div>
@@ -205,363 +251,372 @@ include("./dbconnection/connection.php");
 										</div>
 									</div>
 								<?php
+									$slotIndex++;
+								}
+
+								// final slot after last post
+								if (in_array($slotIndex, $adSlots, true) && $adsRendered < $maxAdsPerPage) {
+									renderAdBanner();
+									$adsRendered++;
 								}
 							} else {
+								// no scholarships
 								?>
-								<div class="col-xs-12">
+								<div class="no-results">
 									<p>No results found</p>
 								</div>
 							<?php
 							}
-
 							?>
-							<style>
-								.scholarshipsContainerDiv {
-									display: flex;
-									flex-direction: row;
-									flex-wrap: wrap;
-									justify-content: center;
-									width: 100%;
-									/* background-color: #2d3436; */
-								}
+						</div>
 
-								.scholarship-card {
-									position: relative;
-									width: 100%;
-									max-width: 320px;
-									/* Reduced width */
-									background: #ffffff;
-									border-radius: 16px;
-									box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-									overflow: hidden;
-									transition: transform 0.3s ease, box-shadow 0.3s ease;
-									margin: 1rem;
-								}
+						<style>
+							.scholarshipsContainerDiv {
+								display: flex;
+								flex-direction: row;
+								flex-wrap: wrap;
+								justify-content: center;
+								width: 100%;
+								/* background-color: #2d3436; */
+							}
 
-								.scholarship-card:hover {
-									transform: translateY(-5px);
-									box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-								}
+							.scholarship-card {
+								position: relative;
+								width: 100%;
+								max-width: 320px;
+								/* Reduced width */
+								background: #ffffff;
+								border-radius: 16px;
+								box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+								overflow: hidden;
+								transition: transform 0.3s ease, box-shadow 0.3s ease;
+								margin: 1rem;
+							}
 
-								.card-image {
-									position: relative;
-									height: 200px;
-									overflow: hidden;
-								}
+							.scholarship-card:hover {
+								transform: translateY(-5px);
+								box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+							}
 
-								.card-image img {
-									width: 100%;
-									height: 100%;
-									object-fit: cover;
-									transition: transform 0.4s ease;
-								}
+							.card-image {
+								position: relative;
+								height: 200px;
+								overflow: hidden;
+							}
 
-								.scholarship-card:hover .card-image img {
-									transform: scale(1.05);
-								}
+							.card-image img {
+								width: 100%;
+								height: 100%;
+								object-fit: cover;
+								transition: transform 0.4s ease;
+							}
 
-								.image-overlay {
-									position: absolute;
-									top: 0;
-									left: 0;
-									width: 100%;
-									height: 100%;
-									background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.7) 100%);
-								}
+							.scholarship-card:hover .card-image img {
+								transform: scale(1.05);
+							}
 
-								.card-content {
-									padding: 1.25rem;
-									position: relative;
-								}
+							.image-overlay {
+								position: absolute;
+								top: 0;
+								left: 0;
+								width: 100%;
+								height: 100%;
+								background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.7) 100%);
+							}
 
-								.card-title {
-									font-size: 18px;
-									margin: 0 0 0.75rem 0;
-									line-height: 1.3;
-								}
+							.card-content {
+								padding: 1.25rem;
+								position: relative;
+							}
 
-								.card-title a {
-									color: #2d3436;
-									text-decoration: none;
-									background-image: linear-gradient(to right, #2d3436 50%, transparent 50%);
-									background-size: 200% 2px;
-									background-position: 100% 100%;
-									background-repeat: no-repeat;
-									transition: background-position 0.3s ease;
-									padding: 5px 5px;
-								}
+							.card-title {
+								font-size: 18px;
+								margin: 0 0 0.75rem 0;
+								line-height: 1.3;
+							}
 
-								.card-title a:hover {
-									background-position: 0% 100%;
-								}
+							.card-title a {
+								color: #2d3436;
+								text-decoration: none;
+								background-image: linear-gradient(to right, #2d3436 50%, transparent 50%);
+								background-size: 200% 2px;
+								background-position: 100% 100%;
+								background-repeat: no-repeat;
+								transition: background-position 0.3s ease;
+								padding: 5px 5px;
+							}
 
-								.card-description {
-									height: 4.5em;
-									/* 3 lines * 1.5em line-height */
-									overflow: hidden;
-									margin-bottom: 1.25rem;
-									/* Adjusted margin */
-								}
+							.card-title a:hover {
+								background-position: 0% 100%;
+							}
 
-								.card-description p {
-									margin: 0;
-									color: #636e72;
-									line-height: 1.5em;
-									display: -webkit-box;
-									-webkit-line-clamp: 3;
-									-webkit-box-orient: vertical;
-									overflow: hidden;
-								}
+							.card-description {
+								height: 4.5em;
+								/* 3 lines * 1.5em line-height */
+								overflow: hidden;
+								margin-bottom: 1.25rem;
+								/* Adjusted margin */
+							}
 
-								.card-footer {
-									display: flex;
-									justify-content: space-between;
-									align-items: center;
+							.card-description p {
+								margin: 0;
+								color: #636e72;
+								line-height: 1.5em;
+								display: -webkit-box;
+								-webkit-line-clamp: 3;
+								-webkit-box-orient: vertical;
+								overflow: hidden;
+							}
 
-								}
+							.card-footer {
+								display: flex;
+								justify-content: space-between;
+								align-items: center;
 
-								.date-info {
-									display: flex;
-									align-items: center;
-									gap: 0.5rem;
-									color: #636e72;
-									font-size: 14px;
-									/* Adjusted font size */
-								}
+							}
 
-								.calendar-icon {
-									width: 16px;
-									/* Adjusted size */
-									height: 16px;
-									/* Adjusted size */
-									fill: #636e72;
-								}
+							.date-info {
+								display: flex;
+								align-items: center;
+								gap: 0.5rem;
+								color: #636e72;
+								font-size: 14px;
+								/* Adjusted font size */
+							}
 
-								.card-actions {
-									display: flex;
-									gap: 0.5rem;
-									/* Adjusted gap */
-								}
+							.calendar-icon {
+								width: 16px;
+								/* Adjusted size */
+								height: 16px;
+								/* Adjusted size */
+								fill: #636e72;
+							}
 
-								.apply-button {
-									position: relative;
-									display: inline-flex;
-									align-items: center;
-									padding: 0.5rem 1rem;
-									color: white !important;
-									/* Adjusted padding */
-									/* background: linear-gradient(135deg, #ff6b6b, #a855f7); */
-									background: linear-gradient(135deg, #0E77C2, #083352);
-									color: white;
-									border-radius: 8px;
-									text-decoration: none;
-									overflow: hidden;
-									transition: transform 0.3s ease;
-								}
+							.card-actions {
+								display: flex;
+								gap: 0.5rem;
+								/* Adjusted gap */
+							}
 
-								.button-hover-effect {
-									position: absolute;
-									width: 100%;
-									height: 100%;
-									background: rgba(255, 255, 255, 0.1);
-									left: -100%;
-									transition: left 0.3s ease;
-								}
+							.apply-button {
+								position: relative;
+								display: inline-flex;
+								align-items: center;
+								padding: 0.5rem 1rem;
+								color: white !important;
+								/* Adjusted padding */
+								/* background: linear-gradient(135deg, #ff6b6b, #a855f7); */
+								background: linear-gradient(135deg, #0E77C2, #083352);
+								color: white;
+								border-radius: 8px;
+								text-decoration: none;
+								overflow: hidden;
+								transition: transform 0.3s ease;
+							}
 
-								.apply-button:hover .button-hover-effect {
-									left: 0;
-									color: white;
-								}
+							.button-hover-effect {
+								position: absolute;
+								width: 100%;
+								height: 100%;
+								background: rgba(255, 255, 255, 0.1);
+								left: -100%;
+								transition: left 0.3s ease;
+							}
 
-								.read-more-button {
-									position: relative;
-									display: inline-flex;
-									align-items: center;
-									padding: 0.5rem 1rem;
-									/* Adjusted padding */
-									background: transparent;
-									border: 2px solid #0E77C2;
-									border-radius: 8px;
-									color: #2d3436;
-									text-decoration: none;
-									transition: all 0.3s ease;
-								}
+							.apply-button:hover .button-hover-effect {
+								left: 0;
+								color: white;
+							}
 
-								.read-more-button:hover {
-									border-color: #083352;
-									background: rgba(168, 85, 247, 0.05);
-								}
+							.read-more-button {
+								position: relative;
+								display: inline-flex;
+								align-items: center;
+								padding: 0.5rem 1rem;
+								/* Adjusted padding */
+								background: transparent;
+								border: 2px solid #0E77C2;
+								border-radius: 8px;
+								color: #2d3436;
+								text-decoration: none;
+								transition: all 0.3s ease;
+							}
 
-								.button-arrow {
-									margin-left: 0.5rem;
-									transform: translateX(0);
-									transition: transform 0.3s ease;
-								}
+							.read-more-button:hover {
+								border-color: #083352;
+								background: rgba(168, 85, 247, 0.05);
+							}
 
-								.read-more-button:hover .button-arrow {
-									transform: translateX(3px);
-								}
-							</style>
-							<style>
-								.allScholarshipContainer {
-									height: 450px;
-									margin-bottom: 20px;
-								}
+							.button-arrow {
+								margin-left: 0.5rem;
+								transform: translateX(0);
+								transition: transform 0.3s ease;
+							}
 
-								.image {
-									height: 200px;
-									overflow: hidden;
-									/* Added to contain images properly */
-								}
+							.read-more-button:hover .button-arrow {
+								transform: translateX(3px);
+							}
+						</style>
+						<style>
+							.allScholarshipContainer {
+								height: 450px;
+								margin-bottom: 20px;
+							}
 
-								.image img {
-									object-fit: cover;
-									width: 100%;
-									height: 100%;
-									transition: transform 0.3s ease;
-									/* Added for hover effect */
-								}
+							.image {
+								height: 200px;
+								overflow: hidden;
+								/* Added to contain images properly */
+							}
 
-								.image img:hover {
-									transform: scale(1.05);
-									/* Subtle zoom effect on hover */
-								}
+							.image img {
+								object-fit: cover;
+								width: 100%;
+								height: 100%;
+								transition: transform 0.3s ease;
+								/* Added for hover effect */
+							}
 
-								.postLineLimit {
-									text-overflow: ellipsis;
-									display: -webkit-box;
-									-webkit-line-clamp: 4;
-									line-clamp: 4;
-									/* Standard property alongside webkit version */
-									-webkit-box-orient: vertical;
-									overflow: hidden;
-								}
+							.image img:hover {
+								transform: scale(1.05);
+								/* Subtle zoom effect on hover */
+							}
 
-								.DetailWrapper {
-									height: 120px;
-									overflow: hidden;
-								}
+							.postLineLimit {
+								text-overflow: ellipsis;
+								display: -webkit-box;
+								-webkit-line-clamp: 4;
+								line-clamp: 4;
+								/* Standard property alongside webkit version */
+								-webkit-box-orient: vertical;
+								overflow: hidden;
+							}
 
-								/* Improved pagination styling */
-								.course-pagination {
-									text-align: center;
-									margin: 30px 0;
-									padding: 0;
-									/* Remove default padding */
-									list-style: none;
-									/* Remove default list bullets */
-								}
+							.DetailWrapper {
+								height: 120px;
+								overflow: hidden;
+							}
 
-								.course-pagination li {
-									display: inline-block;
-									margin: 0 5px;
-									/* Increased spacing between pagination items */
-								}
+							/* Improved pagination styling */
+							.course-pagination {
+								text-align: center;
+								margin: 30px 0;
+								padding: 0;
+								/* Remove default padding */
+								list-style: none;
+								/* Remove default list bullets */
+							}
 
+							.course-pagination li {
+								display: inline-block;
+								margin: 0 5px;
+								/* Increased spacing between pagination items */
+							}
+
+							.course-pagination li a {
+								display: flex;
+								justify-content: center;
+								align-items: center;
+								width: 40px;
+								/* Consistent sizing in pixels instead of cm */
+								height: 40px;
+								border-radius: 4px;
+								/* Slightly rounded corners */
+								background: #f7f7f7;
+								font-weight: 600;
+								color: #666;
+								text-decoration: none;
+								/* Remove underline from links */
+								transition: all 0.3s ease;
+								/* Smooth transition for hover effects */
+							}
+
+							.course-pagination li a.active,
+							.course-pagination li a:hover {
+								background: #083352;
+								color: #fff;
+								box-shadow: 0 2px 5px rgba(8, 51, 82, 0.2);
+								/* Subtle shadow for active/hover state */
+							}
+
+							.searchBtn {
+								background-color: #083352 !important;
+								display: flex !important;
+								justify-content: center !important;
+								align-items: center !important;
+								color: #fff !important;
+								border: none !important;
+								/* Added to ensure consistent appearance */
+								padding: 10px 20px !important;
+								/* Added consistent padding */
+								cursor: pointer !important;
+								/* Added pointer cursor */
+								transition: background-color 0.3s ease !important;
+								/* Smooth transition */
+							}
+
+							.searchBtn:hover {
+								background-color: #0a4066 !important;
+								/* Slightly lighter on hover */
+							}
+
+							.course-menu {
+								background-color: #ebebff;
+								display: flex;
+								justify-content: space-evenly !important;
+								align-items: center !important;
+								flex-wrap: wrap;
+								padding: 15px 0;
+								/* Consistent padding top and bottom */
+								margin-bottom: 20px;
+								/* Added margin below menu */
+								border-radius: 6px;
+								/* Rounded corners for modern look */
+							}
+
+							.course-menu .active {
+								background-color: #083352 !important;
+								color: #fff !important;
+								/* Ensure text is visible on active background */
+							}
+
+							.course-menu .tran3s {
+								text-transform: uppercase;
+								border: 1px solid #083352;
+								padding: 8px 15px;
+								/* Added consistent padding */
+								border-radius: 4px;
+								/* Rounded corners */
+								margin: 5px;
+								/* Added margin for spacing in wrap situations */
+								transition: all 0.3s ease;
+								/* Renamed from tran3s to be more specific */
+								text-decoration: none;
+								/* Remove underline from links */
+								color: #083352;
+								/* Match border color */
+							}
+
+							.course-menu .tran3s:hover {
+								background-color: #083352 !important;
+								color: #fff !important;
+							}
+
+							/* Added responsive adjustments */
+							@media (max-width: 768px) {
 								.course-pagination li a {
-									display: flex;
-									justify-content: center;
-									align-items: center;
-									width: 40px;
-									/* Consistent sizing in pixels instead of cm */
-									height: 40px;
-									border-radius: 4px;
-									/* Slightly rounded corners */
-									background: #f7f7f7;
-									font-weight: 600;
-									color: #666;
-									text-decoration: none;
-									/* Remove underline from links */
-									transition: all 0.3s ease;
-									/* Smooth transition for hover effects */
-								}
-
-								.course-pagination li a.active,
-								.course-pagination li a:hover {
-									background: #083352;
-									color: #fff;
-									box-shadow: 0 2px 5px rgba(8, 51, 82, 0.2);
-									/* Subtle shadow for active/hover state */
-								}
-
-								.searchBtn {
-									background-color: #083352 !important;
-									display: flex !important;
-									justify-content: center !important;
-									align-items: center !important;
-									color: #fff !important;
-									border: none !important;
-									/* Added to ensure consistent appearance */
-									padding: 10px 20px !important;
-									/* Added consistent padding */
-									cursor: pointer !important;
-									/* Added pointer cursor */
-									transition: background-color 0.3s ease !important;
-									/* Smooth transition */
-								}
-
-								.searchBtn:hover {
-									background-color: #0a4066 !important;
-									/* Slightly lighter on hover */
+									width: 35px;
+									height: 35px;
 								}
 
 								.course-menu {
-									background-color: #ebebff;
-									display: flex;
-									justify-content: space-evenly !important;
-									align-items: center !important;
-									flex-wrap: wrap;
-									padding: 15px 0;
-									/* Consistent padding top and bottom */
-									margin-bottom: 20px;
-									/* Added margin below menu */
-									border-radius: 6px;
-									/* Rounded corners for modern look */
+									padding: 10px 0;
 								}
+							}
+						</style>
 
-								.course-menu .active {
-									background-color: #083352 !important;
-									color: #fff !important;
-									/* Ensure text is visible on active background */
-								}
+						<!-- End of row div -->
 
-								.course-menu .tran3s {
-									text-transform: uppercase;
-									border: 1px solid #083352;
-									padding: 8px 15px;
-									/* Added consistent padding */
-									border-radius: 4px;
-									/* Rounded corners */
-									margin: 5px;
-									/* Added margin for spacing in wrap situations */
-									transition: all 0.3s ease;
-									/* Renamed from tran3s to be more specific */
-									text-decoration: none;
-									/* Remove underline from links */
-									color: #083352;
-									/* Match border color */
-								}
-
-								.course-menu .tran3s:hover {
-									background-color: #083352 !important;
-									color: #fff !important;
-								}
-
-								/* Added responsive adjustments */
-								@media (max-width: 768px) {
-									.course-pagination li a {
-										width: 35px;
-										height: 35px;
-									}
-
-									.course-menu {
-										padding: 10px 0;
-									}
-								}
-							</style>
-
-							<!-- End of row div -->
-						</div> <!-- /.row -->
 
 						<!-- Pagination -->
 						<?php if ($total_pages > 1): ?>

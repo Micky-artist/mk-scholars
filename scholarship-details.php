@@ -110,19 +110,88 @@ include("./php/selectScholarshipDetails.php")
 					<div class="col-md-3 col-sm-6 col-xs-12 theme-sidebar">
 						<div>
 							<h5>Application process guiding videos</h5>
-							<?php
-							$selectVideos = mysqli_query($conn, "SELECT * FROM youtubeVideos WHERE VideoStatus=1");
-							if ($selectVideos->num_rows > 0) {
-								while ($videoData = mysqli_fetch_assoc($selectVideos)) {
-									echo $videoData['videoLink'];
-							?>
-									<b>
-										<p><?php echo $videoData['VideoTitle']; ?></p>
-									</b><br>
-							<?php
+							<div class="videosContainerDiv">
+								<?php
+								// 1) Fetch all active videos
+								$videos = [];
+								$result = mysqli_query($conn, "SELECT * FROM youtubeVideos WHERE VideoStatus = 1");
+								if ($result && $result->num_rows > 0) {
+									while ($row = mysqli_fetch_assoc($result)) {
+										$videos[] = $row;
+									}
 								}
-							}
-							?>
+
+								$numVideos = count($videos);
+
+								if ($numVideos > 0) {
+									// 2) Choose spacing interval to keep ads sparse (3–5)
+									$interval = rand(3, 5);
+
+									// 3) Calculate number of ads: at least 1, at most 2
+									$calculatedAds = (int)ceil($numVideos / $interval);
+									$numAds        = min(2, max(1, $calculatedAds));
+
+									// 4) Build slots 0..$numVideos, pick $numAds random slots
+									$slots   = range(0, $numVideos);
+									shuffle($slots);
+									$adSlots = array_slice($slots, 0, min($numAds, count($slots)));
+									sort($adSlots);
+
+									$slotIndex   = 0;
+									$adsRendered = 0;
+									$maxAds      = 2;
+
+									// Helper to render an ad banner
+									function renderAdBanner()
+									{
+								?>
+										<script type="text/javascript">
+											atOptions = {
+												'key': 'a0660bfb62ff4852d837d433a296ba76',
+												'format': 'iframe',
+												'height': 60,
+												'width': 468,
+												'params': {}
+											};
+										</script>
+										<script type="text/javascript" src="//www.highperformanceformat.com/a0660bfb62ff4852d837d433a296ba76/invoke.js"></script>
+									<?php
+									}
+
+									// 5) Loop through videos and inject ads at selected slots
+									foreach ($videos as $video) {
+										if (in_array($slotIndex, $adSlots, true) && $adsRendered < $maxAds) {
+											renderAdBanner();
+											$adsRendered++;
+										}
+
+										// Output the video embed/link and title
+										echo $video['videoLink'];
+									?>
+										<b>
+											<p><?php echo htmlspecialchars($video['VideoTitle'], ENT_QUOTES); ?></p>
+										</b><br>
+									<?php
+
+										$slotIndex++;
+									}
+
+									// 6) Final slot after last video
+									if (in_array($slotIndex, $adSlots, true) && $adsRendered < $maxAds) {
+										renderAdBanner();
+										$adsRendered++;
+									}
+								} else {
+									// No videos
+									?>
+									<div class="no-results">
+										<p>No videos found</p>
+									</div>
+								<?php
+								}
+								?>
+							</div>
+
 						</div>
 						<br>
 						<div>
@@ -137,59 +206,121 @@ include("./php/selectScholarshipDetails.php")
 						<div class="sidebar-recent-post">
 							<h5>Recently Uploaded</h5>
 
-							<!-- TO BE USED IN FUTURE -->
-							<ul>
+							<ul class="scholarship-list">
 								<?php
-								// Validate and sanitize the scholarship ID
+								// 1) Validate & sanitize scholarship ID
 								if (isset($_GET['scholarship-id']) && is_numeric($_GET['scholarship-id'])) {
-									$presentScholarshipId = (int)$_GET['scholarship-id']; // Cast to integer for safety
+									$presentScholarshipId = (int) $_GET['scholarship-id'];
 								} else {
-									// Set a default or handle the error
 									$presentScholarshipId = 0;
-									// Optionally redirect or show an error
-									// header("Location: error.php?message=Invalid scholarship ID");
-									// exit;
 								}
-								
-								// Prepare the base query
+
+								// 2) Prepare and execute the query
 								if (isset($_POST['search']) && !empty($_POST['searchValue'])) {
-									// Search query using prepared statement
-									$stmt = $conn->prepare("SELECT * FROM scholarships WHERE scholarshipStatus != 0 AND scholarshipDetails LIKE ? ORDER BY scholarshipId DESC LIMIT 7");
-									$searchParam = "%" . $_POST['searchValue'] . "%";
-									$stmt->bind_param("s", $searchParam);
+									$stmt = $conn->prepare("SELECT *
+              FROM scholarships
+             WHERE scholarshipStatus != 0
+               AND scholarshipDetails LIKE ?
+             ORDER BY scholarshipId DESC
+             LIMIT 7
+        ");
+									$searchParam = '%' . $_POST['searchValue'] . '%';
+									$stmt->bind_param('s', $searchParam);
 								} else {
-									// Default query using prepared statement
-									$stmt = $conn->prepare("SELECT * FROM scholarships WHERE scholarshipStatus != 0 AND scholarshipId != ? ORDER BY scholarshipId DESC LIMIT 7");
-									$stmt->bind_param("i", $presentScholarshipId);
+									$stmt = $conn->prepare("SELECT *
+              FROM scholarships
+             WHERE scholarshipStatus != 0
+               AND scholarshipId != ?
+             ORDER BY scholarshipId DESC
+             LIMIT 7
+        ");
+									$stmt->bind_param('i', $presentScholarshipId);
 								}
-								
-								// Execute the query
 								$stmt->execute();
-								$selectScholarships = $stmt->get_result();
-								
-								// Don't forget to close the statement when done
-								$stmt->close(); 
-								if ($selectScholarships->num_rows > 0) {
-									while ($getScholarships = mysqli_fetch_assoc($selectScholarships)) {
+								$result = $stmt->get_result();
+								$stmt->close();
+
+								// 3) Fetch all into an array
+								$items = [];
+								while ($row = $result->fetch_assoc()) {
+									$items[] = $row;
+								}
+								$numItems = count($items);
+
+								if ($numItems > 0) {
+									// 4) Increase ad density: random interval 2–4
+									$interval      = rand(2, 4);
+									// at least 2 ads, at most 5
+									$calculatedAds = (int) ceil($numItems / $interval);
+									$numAds        = min(5, max(2, $calculatedAds));
+
+									// 5) Build slots 0..numItems, pick $numAds random slots
+									$slots   = range(0, $numItems);
+									shuffle($slots);
+									$adSlots = array_slice($slots, 0, min($numAds, count($slots)));
+									sort($adSlots);
+
+									$slotIndex   = 0;
+									$adsRendered = 0;
+									$maxAds      = 5;
+
+									// 6) Helper to render an ad list item
+									function renderAdListItem()
+									{
 								?>
+										<script type="text/javascript">
+											atOptions = {
+												'key': '98402006e8b83dd2d8d5dda96e411da2',
+												'format': 'iframe',
+												'height': 250,
+												'width': 300,
+												'params': {}
+											};
+										</script>
+										<script type="text/javascript" src="//www.highperformanceformat.com/98402006e8b83dd2d8d5dda96e411da2/invoke.js"></script>
+									<?php
+									}
+
+									// 7) Loop items, injecting ads into the <ul>
+									foreach ($items as $sch) {
+										if (in_array($slotIndex, $adSlots, true) && $adsRendered < $maxAds) {
+											renderAdListItem();
+											$adsRendered++;
+										}
+									?>
 										<li class="clearfix">
-											<img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipImage'] ?>" alt="" class="float-left">
+											<img
+												src="https://admin.mkscholars.com/uploads/posts/<?php echo htmlspecialchars($sch['scholarshipImage'], ENT_QUOTES) ?>"
+												alt="<?php echo htmlspecialchars($sch['scholarshipTitle'], ENT_QUOTES) ?>"
+												class="float-left">
 											<div class="post float-left">
-												<a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-", $getScholarships['scholarshipTitle']) ?>" class="tran3s"><?php echo $getScholarships['scholarshipTitle'] ?></a>
-												<span><?php echo $getScholarships['scholarshipUpdateDate'] ?></span>
+												<a
+													href="scholarship-details?scholarship-id=<?php echo $sch['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', '-', $sch['scholarshipTitle']) ?>"
+													class="tran3s">
+													<?php echo htmlspecialchars($sch['scholarshipTitle'], ENT_QUOTES) ?>
+												</a>
+												<span><?php echo htmlspecialchars($sch['scholarshipUpdateDate'], ENT_QUOTES) ?></span>
 											</div>
 										</li>
 									<?php
+										$slotIndex++;
+									}
+
+									// 8) Final “after last item” ad
+									if (in_array($slotIndex, $adSlots, true) && $adsRendered < $maxAds) {
+										renderAdListItem();
+										$adsRendered++;
 									}
 								} else {
+									// No results
 									?>
-									<li class="clearfix">
-										No Results found
-									</li>
+									<li class="clearfix">No Results found</li>
 								<?php
 								}
 								?>
 							</ul>
+
+
 						</div>
 
 

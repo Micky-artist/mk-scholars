@@ -216,6 +216,7 @@ include("./dbconnection/connection.php");
 							}
 
 							?>
+							</div>
 							<style>
 								.scholarshipsContainerDiv {
 									display: flex;
@@ -494,7 +495,7 @@ include("./dbconnection/connection.php");
 								}
 							</style>
 
-						</div> <!-- /.row -->
+						
 
 						<!-- Pagination -->
 						<?php if ($total_pages > 1): ?>

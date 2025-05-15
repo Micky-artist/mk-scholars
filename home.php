@@ -127,249 +127,327 @@
 							cursor: default !important;
 						}
 					</style>
-					<?php
-					$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships WHERE scholarshipStatus != 0 ORDER BY scholarshipId DESC LIMIT 11");
-					if ($selectScholarships->num_rows > 0) {
-						while ($getScholarships = mysqli_fetch_assoc($selectScholarships)) {
-					?>
-							<div class="scholarship-card">
-								<div class="card-image">
-									<img src="https://admin.mkscholars.com/uploads/posts/<?php echo $getScholarships['scholarshipImage'] ?>"
-										alt="<?php echo $getScholarships['scholarshipTitle'] ?>">
-									<div class="image-overlay"></div>
-								</div>
-
-								<div class="card-content">
-									<h3 class="card-title">
-										<a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-", $getScholarships['scholarshipTitle']) ?>">
-											<?php echo $getScholarships['scholarshipTitle'] ?>
-										</a>
-									</h3>
-
-									<div class="card-description">
-										<p><?php echo $getScholarships['scholarshipDetails'] ?></p>
-									</div>
-
-									<div class="card-footer">
-										<div class="date-info">
-											<svg class="calendar-icon" viewBox="0 0 24 24">
-												<path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z" />
-											</svg>
-											<span><?php echo $getScholarships['scholarshipUpdateDate'] ?></span>
-										</div>
-
-										<div class="card-actions">
-											<a target="_blank" href="./apply?scholarshipId=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-", $getScholarships['scholarshipTitle']) ?>" class="apply-button">
-												<span>Apply Now</span>
-												<div class="button-hover-effect"></div>
-											</a>
-
-											<a href="scholarship-details?scholarship-id=<?php echo $getScholarships['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', "-", $getScholarships['scholarshipTitle']) ?>"
-												class="read-more-button">
-												<span>Read More</span>
-												<div class="button-arrow">→</div>
-											</a>
-										</div>
-									</div>
-								</div>
-							</div>
-
-					<?php
+					<div class="scholarshipsContainerDiv">
+						<?php
+						// 1) Fetch up to 11 scholarships
+						$scholarships = [];
+						$result = mysqli_query(
+							$conn,
+							"SELECT * 
+         FROM scholarships 
+         WHERE scholarshipStatus != 0 
+         ORDER BY scholarshipId DESC 
+         LIMIT 11"
+						);
+						if ($result && $result->num_rows > 0) {
+							while ($row = mysqli_fetch_assoc($result)) {
+								$scholarships[] = $row;
+							}
 						}
+
+						$numPosts = count($scholarships);
+
+						if ($numPosts > 0) {
+							// 2) Random interval between ads: 2, 3 or 4
+							$interval = rand(2, 4);
+
+							// 3) Calculate number of ads: at least 2, at most 10
+							$calculatedAds = (int)ceil($numPosts / $interval);
+							$numAds        = min(10, max(2, $calculatedAds));
+
+							// 4) Build “slots” 0..$numPosts and pick $numAds random slots
+							$slots   = range(0, $numPosts);
+							shuffle($slots);
+							$adSlots = array_slice($slots, 0, min($numAds, count($slots)));
+							sort($adSlots);
+
+							// Counters for rendering
+							$slotIndex    = 0;
+							$adsRendered  = 0;
+							$maxAdsPerPage = 10;
+
+							// Helper to output your ad markup
+							function renderAdBanner()
+							{
+						?>
+								<script type="text/javascript">
+									atOptions = {
+										'key': '98402006e8b83dd2d8d5dda96e411da2',
+										'format': 'iframe',
+										'height': 250,
+										'width': 300,
+										'params': {}
+									};
+								</script>
+								<script type="text/javascript" src="//www.highperformanceformat.com/98402006e8b83dd2d8d5dda96e411da2/invoke.js"></script>
+
+							<?php
+							}
+
+							// 5) Loop through scholarships
+							foreach ($scholarships as $s) {
+								// If this slot is in our adSlots AND we haven't hit 10 ads yet
+								if (in_array($slotIndex, $adSlots, true) && $adsRendered < $maxAdsPerPage) {
+									renderAdBanner();
+									$adsRendered++;
+								}
+							?>
+								<div class="scholarship-card">
+									<div class="card-image">
+										<img
+											src="https://admin.mkscholars.com/uploads/posts/<?php echo htmlspecialchars($s['scholarshipImage'], ENT_QUOTES) ?>"
+											alt="<?php echo htmlspecialchars($s['scholarshipTitle'], ENT_QUOTES) ?>">
+										<div class="image-overlay"></div>
+									</div>
+									<div class="card-content">
+										<h3 class="card-title">
+											<a
+												href="scholarship-details?scholarship-id=<?php echo $s['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', '-', $s['scholarshipTitle']) ?>">
+												<?php echo htmlspecialchars($s['scholarshipTitle'], ENT_QUOTES) ?>
+											</a>
+										</h3>
+										<div class="card-description">
+											<p><?php echo htmlspecialchars($s['scholarshipDetails'], ENT_QUOTES) ?></p>
+										</div>
+										<div class="card-footer">
+											<div class="date-info">
+												<svg class="calendar-icon" viewBox="0 0 24 24">
+													<path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14
+                                         c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6
+                                         c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z" />
+												</svg>
+												<span><?php echo $s['scholarshipUpdateDate'] ?></span>
+											</div>
+											<div class="card-actions">
+												<a
+													target="_blank"
+													href="./apply?scholarshipId=<?php echo $s['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', '-', $s['scholarshipTitle']) ?>"
+													class="apply-button">
+													<span>Apply Now</span>
+													<div class="button-hover-effect"></div>
+												</a>
+												<a
+													href="scholarship-details?scholarship-id=<?php echo $s['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', '-', $s['scholarshipTitle']) ?>"
+													class="read-more-button">
+													<span>Read More</span>
+													<div class="button-arrow">→</div>
+												</a>
+											</div>
+										</div>
+									</div>
+								</div>
+							<?php
+								$slotIndex++;
+							}
+
+							// 6) Final “after last post” slot
+							if (in_array($slotIndex, $adSlots, true) && $adsRendered < $maxAdsPerPage) {
+								renderAdBanner();
+								$adsRendered++;
+							}
+						} else {
+							// No scholarships found
+							?>
+							<div class="no-results">
+								<p>No results found</p>
+							</div>
+						<?php
+						}
+						?>
+					</div>
+
+				</div>
+				<style>
+					.scholarshipsContainerDiv {
+						display: flex;
+						flex-direction: row;
+						flex-wrap: wrap;
+						justify-content: center;
+						width: 100%;
+						/* background-color: #2d3436; */
 					}
 
-					?>
-					<style>
-						.scholarshipsContainerDiv {
-							display: flex;
-							flex-direction: row;
-							flex-wrap: wrap;
-							justify-content: center;
-							width: 100%;
-							/* background-color: #2d3436; */
-						}
+					.scholarship-card {
+						position: relative;
+						width: 100%;
+						max-width: 320px;
+						/* Reduced width */
+						background: #ffffff;
+						border-radius: 16px;
+						box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+						overflow: hidden;
+						transition: transform 0.3s ease, box-shadow 0.3s ease;
+						margin: 1rem;
+					}
 
-						.scholarship-card {
-							position: relative;
-							width: 100%;
-							max-width: 320px;
-							/* Reduced width */
-							background: #ffffff;
-							border-radius: 16px;
-							box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-							overflow: hidden;
-							transition: transform 0.3s ease, box-shadow 0.3s ease;
-							margin: 1rem;
-						}
+					.scholarship-card:hover {
+						transform: translateY(-5px);
+						box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+					}
 
-						.scholarship-card:hover {
-							transform: translateY(-5px);
-							box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
-						}
+					.card-image {
+						position: relative;
+						height: 200px;
+						/* Adjusted height */
+						overflow: hidden;
+					}
 
-						.card-image {
-							position: relative;
-							height: 200px;
-							/* Adjusted height */
-							overflow: hidden;
-						}
+					.card-image img {
+						width: 100%;
+						height: 100%;
+						object-fit: cover;
+						transition: transform 0.4s ease;
+					}
 
-						.card-image img {
-							width: 100%;
-							height: 100%;
-							object-fit: cover;
-							transition: transform 0.4s ease;
-						}
+					.scholarship-card:hover .card-image img {
+						transform: scale(1.05);
+					}
 
-						.scholarship-card:hover .card-image img {
-							transform: scale(1.05);
-						}
+					.image-overlay {
+						position: absolute;
+						top: 0;
+						left: 0;
+						width: 100%;
+						height: 100%;
+						background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.7) 100%);
+					}
 
-						.image-overlay {
-							position: absolute;
-							top: 0;
-							left: 0;
-							width: 100%;
-							height: 100%;
-							background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.7) 100%);
-						}
+					.card-content {
+						padding: 1.25rem;
+						position: relative;
+					}
 
-						.card-content {
-							padding: 1.25rem;
-							position: relative;
-						}
+					.card-title {
+						font-size: 18px;
+						margin: 0 0 0.75rem 0;
+						line-height: 1.3;
+					}
 
-						.card-title {
-							font-size: 18px;
-							margin: 0 0 0.75rem 0;
-							line-height: 1.3;
-						}
+					.card-title a {
+						color: #2d3436;
+						text-decoration: none;
+						background-image: linear-gradient(to right, #2d3436 50%, transparent 50%);
+						background-size: 200% 2px;
+						background-position: 100% 100%;
+						background-repeat: no-repeat;
+						transition: background-position 0.3s ease;
+						padding: 5px 5px;
+					}
 
-						.card-title a {
-							color: #2d3436;
-							text-decoration: none;
-							background-image: linear-gradient(to right, #2d3436 50%, transparent 50%);
-							background-size: 200% 2px;
-							background-position: 100% 100%;
-							background-repeat: no-repeat;
-							transition: background-position 0.3s ease;
-							padding: 5px 5px;
-						}
+					.card-title a:hover {
+						background-position: 0% 100%;
+					}
 
-						.card-title a:hover {
-							background-position: 0% 100%;
-						}
+					.card-description {
+						height: 4.5em;
+						/* 3 lines * 1.5em line-height */
+						overflow: hidden;
+						margin-bottom: 1.25rem;
+						/* Adjusted margin */
+					}
 
-						.card-description {
-							height: 4.5em;
-							/* 3 lines * 1.5em line-height */
-							overflow: hidden;
-							margin-bottom: 1.25rem;
-							/* Adjusted margin */
-						}
+					.card-description p {
+						margin: 0;
+						color: #636e72;
+						line-height: 1.5em;
+						display: -webkit-box;
+						-webkit-line-clamp: 3;
+						-webkit-box-orient: vertical;
+						overflow: hidden;
+					}
 
-						.card-description p {
-							margin: 0;
-							color: #636e72;
-							line-height: 1.5em;
-							display: -webkit-box;
-							-webkit-line-clamp: 3;
-							-webkit-box-orient: vertical;
-							overflow: hidden;
-						}
+					.card-footer {
+						display: flex;
+						justify-content: space-between;
+						align-items: center;
 
-						.card-footer {
-							display: flex;
-							justify-content: space-between;
-							align-items: center;
+					}
 
-						}
+					.date-info {
+						display: flex;
+						align-items: center;
+						gap: 0.5rem;
+						color: #636e72;
+						font-size: 14px;
+						/* Adjusted font size */
+					}
 
-						.date-info {
-							display: flex;
-							align-items: center;
-							gap: 0.5rem;
-							color: #636e72;
-							font-size: 14px;
-							/* Adjusted font size */
-						}
+					.calendar-icon {
+						width: 16px;
+						/* Adjusted size */
+						height: 16px;
+						/* Adjusted size */
+						fill: #636e72;
+					}
 
-						.calendar-icon {
-							width: 16px;
-							/* Adjusted size */
-							height: 16px;
-							/* Adjusted size */
-							fill: #636e72;
-						}
+					.card-actions {
+						display: flex;
+						gap: 0.5rem;
+						/* Adjusted gap */
+					}
 
-						.card-actions {
-							display: flex;
-							gap: 0.5rem;
-							/* Adjusted gap */
-						}
+					.apply-button {
+						position: relative;
+						display: inline-flex;
+						align-items: center;
+						padding: 0.5rem 1rem;
+						color: white !important;
+						/* Adjusted padding */
+						/* background: linear-gradient(135deg, #ff6b6b, #a855f7); */
+						background: linear-gradient(135deg, #0E77C2, #083352);
+						color: white;
+						border-radius: 8px;
+						text-decoration: none;
+						overflow: hidden;
+						transition: transform 0.3s ease;
+					}
 
-						.apply-button {
-							position: relative;
-							display: inline-flex;
-							align-items: center;
-							padding: 0.5rem 1rem;
-							color: white !important;
-							/* Adjusted padding */
-							/* background: linear-gradient(135deg, #ff6b6b, #a855f7); */
-							background: linear-gradient(135deg, #0E77C2, #083352);
-							color: white;
-							border-radius: 8px;
-							text-decoration: none;
-							overflow: hidden;
-							transition: transform 0.3s ease;
-						}
+					.button-hover-effect {
+						position: absolute;
+						width: 100%;
+						height: 100%;
+						background: rgba(255, 255, 255, 0.1);
+						left: -100%;
+						color: white !important;
+						transition: left 0.3s ease;
+					}
 
-						.button-hover-effect {
-							position: absolute;
-							width: 100%;
-							height: 100%;
-							background: rgba(255, 255, 255, 0.1);
-							left: -100%;
-							color: white !important;
-							transition: left 0.3s ease;
-						}
+					.apply-button:hover .button-hover-effect {
+						left: 0;
+						color: white;
+					}
 
-						.apply-button:hover .button-hover-effect {
-							left: 0;
-							color: white;
-						}
+					.read-more-button {
+						position: relative;
+						display: inline-flex;
+						align-items: center;
+						padding: 0.5rem 1rem;
+						/* Adjusted padding */
+						background: transparent;
+						border: 2px solid #0E77C2;
+						border-radius: 8px;
+						color: #2d3436;
+						text-decoration: none;
+						transition: all 0.3s ease;
+					}
 
-						.read-more-button {
-							position: relative;
-							display: inline-flex;
-							align-items: center;
-							padding: 0.5rem 1rem;
-							/* Adjusted padding */
-							background: transparent;
-							border: 2px solid #0E77C2;
-							border-radius: 8px;
-							color: #2d3436;
-							text-decoration: none;
-							transition: all 0.3s ease;
-						}
+					.read-more-button:hover {
+						border-color: #083352;
+						background: rgba(168, 85, 247, 0.05);
+					}
 
-						.read-more-button:hover {
-							border-color: #083352;
-							background: rgba(168, 85, 247, 0.05);
-						}
+					.button-arrow {
+						margin-left: 0.5rem;
+						transform: translateX(0);
+						transition: transform 0.3s ease;
+					}
 
-						.button-arrow {
-							margin-left: 0.5rem;
-							transform: translateX(0);
-							transition: transform 0.3s ease;
-						}
+					.read-more-button:hover .button-arrow {
+						transform: translateX(3px);
+					}
+				</style>
 
-						.read-more-button:hover .button-arrow {
-							transform: translateX(3px);
-						}
-					</style>
-
-				</div> <!-- /.row -->
+				<!-- /.row -->
 				<a href="./applications" style="background-color: #fff; color: #4183E6; font-weight: bold;" class="theme-button hvr-rectangle-out">ALL APPLICATIONS</a>
 			</div> <!-- /.container -->
 		</div> <!-- /.featured-course -->
