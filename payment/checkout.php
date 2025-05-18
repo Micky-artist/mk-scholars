@@ -22,6 +22,7 @@ $plans = [
   'notes' => 4500,
   'instructor'  => 7500,
   'moroccoadmissions' => 2600,
+  'codingcourse' => 25000,
 ];
 if (!isset($_GET['subscription']) || !isset($plans[$_GET['subscription']])) {
   http_response_code(400);

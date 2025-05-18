@@ -235,6 +235,50 @@ session_start();
     <!-- ==== Scholarship Cards ==== -->
     <div class="container">
         <div class="scholarship-card">
+            <img src="./images/courses/coding.jpg" alt="Coding Course" class="card-image">
+            <div class="card-content">
+                <div class="card-header">
+                    <h2 class="card-title">Coding Bootcamp</h2>
+                    <p class="card-subtitle">For Beginners & Tech Enthusiasts</p>
+                    <div style="display: flex; flex-wrap: wrap;">
+                        <div class="price-tag">25,000 RWF Live Sessions with Mentor, PDF Notes & Assignments</div>
+                    </div>
+                </div>
+
+                <p class="card-description">
+                    Hands-on coding course designed to introduce students to programming fundamentals using HTML, CSS, and JavaScript, React JS, MYSQL, Node.js. Perfect for beginners. Evening and weekend classes are available.
+                </p>
+
+                <div class="card-details">
+                    <div class="detail-item">
+                        <i class="fas fa-laptop-code"></i>
+                        <span>Online Couching</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-users"></i>
+                        <span>30 Seats Available</span>
+                    </div>
+                </div>
+
+                <div class="action-section">
+                    <div class="deadline">
+                        <i class="fas fa-hourglass-half"></i>
+                        Registration Closes: May 30, 2025
+                    </div>
+                    <div class="deadline">
+                        <i class="fas fa-hourglass-half"></i>
+                        Trainings starts by: June 5th, 2025
+                    </div>
+                    <button onclick="window.location.href='./coding-course'" class="apply-button">
+                        <i class="fas fa-arrow-circle-right"></i>
+                        Register now (Iyandikishe)
+                    </button>
+                </div>
+            </div>
+            <div class="status-tag">Open</div>
+        </div>
+
+        <!-- <div class="scholarship-card">
             <img src="./images/courses/ucat.jpg" alt="UCAT" class="card-image">
             <div class="card-content">
                 <div class="card-header">
@@ -249,7 +293,6 @@ session_start();
 
                 <p class="card-description">
                     Comprehensive online coaching for students preparing for the University Clinical Aptitude Test (UCAT). Includes expert guidance, practice tests, and strategies to improve scores. Morning and evening classes are available. <br>
-                    <!-- <li>March Intake (Virtual Classes) – Course starts on March 24, 2025</li> <br> -->
                 </p>
 
                 <div class="card-details">
@@ -257,10 +300,6 @@ session_start();
                         <i class="fas fa-graduation-cap"></i>
                         <span>Online Studying</span>
                     </div>
-                    <!-- <div class="detail-item">
-                        <i class="fas fa-clock"></i>
-                        <span>30 Or 15 Days Program</span>
-                    </div> -->
                     <div class="detail-item">
                         <i class="fas fa-users"></i>
                         <span>3 Seats Available</span>
@@ -279,9 +318,9 @@ session_start();
                 </div>
             </div>
             <div class="status-tag">Open</div>
-        </div>
+        </div> -->
 
-        <div class="scholarship-card">
+        <!-- <div class="scholarship-card">
             <img src="./images/courses/lang.jpg" alt="Languages" class="card-image">
             <div class="card-content">
                 <div class="card-header">
@@ -303,10 +342,6 @@ session_start();
                         <i class="fas fa-certificate"></i>
                         <span>Morning & Evening Classes Available</span>
                     </div>
-                    <!-- <div class="detail-item">
-                        <i class="fas fa-clock"></i>
-                        <span>1 Year Duration</span>
-                    </div> -->
                     <div class="detail-item">
                         <i class="fas fa-users"></i>
                         <span>30 Seats Available Per Intake</span>
@@ -314,21 +349,16 @@ session_start();
                 </div>
 
                 <div class="action-section">
-                    <!-- <div class="deadline">
-                        <i class="fas fa-hourglass-half"></i>
-                        Application Closes: April 1, 2024
-                    </div> -->
                     <button onclick="window.location.href='./language-coding'" class="apply-button">
                         <i class="fas fa-arrow-circle-right"></i>
                         Register Now (Iyandikishe)
                     </button>
                 </div>
             </div>
-            <!-- <div class="status-tag" style="background: rgba(255, 87, 34, 0.15); color: #FF5722;"> -->
             <div class="status-tag">
                 Open
             </div>
-        </div>
+        </div> -->
     </div>
 
     <!-- ==== Navigation JavaScript ==== -->
