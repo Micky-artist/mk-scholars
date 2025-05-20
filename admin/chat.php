@@ -248,11 +248,11 @@ $selectConvos = $conn->query($convSql);
                             lastDate = d;
                             $c.append(`<div class="date-separator">${d}</div>`);
                         }
-                        const cls = m.AdminId == adminId ? 'sent' : 'received';
+                        const cls = m.AdminId != 0 ? 'sent' : 'received';
                         $c.append(`
             <div class="chat-bubble ${cls}">
               <p class="message-content">${m.MessageContent}</p>
-              <span class="time">${m.SentTime}</span>
+              <span class="time">${m.SentTime} | ${m.username}</span>
             </div>
           `);
                     });
