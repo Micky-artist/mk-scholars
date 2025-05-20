@@ -235,7 +235,7 @@ session_start();
     <!-- ==== Scholarship Cards ==== -->
     <div class="container">
         <div class="scholarship-card">
-            <img src="./images/courses/coding.jpg" alt="Coding Course" class="card-image">
+            <img src="./images/courses/codingcourse.jpeg" alt="Coding Course" class="card-image">
             <div class="card-content">
                 <div class="card-header">
                     <h2 class="card-title">Coding Bootcamp</h2>

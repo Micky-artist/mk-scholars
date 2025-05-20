@@ -226,44 +226,7 @@ include('./php/validateSession.php');
         });
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('#messageForm').on('submit', function(event) {
-                event.preventDefault();
-
-                var formData = {
-                    UserId: $('input[name="UserId"]').val(),
-                    AdminId: $('input[name="AdminId"]').val(),
-                    ConvId: $('input[name="ConvId"]').val(),
-                    message: $('input[name="message"]').val()
-                };
-
-                if (formData.message.trim() === '') {
-                    alert('Please enter a message');
-                    return;
-                }
-
-                $.ajax({
-                    url: './php/submit_message.php',
-                    type: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        $('#statusMessage').html('<div class="alert alert-success">Message sent successfully!</div>');
-                        $('input[name="message"]').val('');
-                    },
-                    error: function(xhr, status, error) {
-                        $('#statusMessage').html('<div class="alert alert-danger">Failed to send message</div>');
-                        console.error(xhr.responseText);
-                    }
-                });
-            });
-        });
-    </script>
-    <script>
-        // Scroll to the bottom of the chat container
-        const chatContainer = document.getElementById('chat-container');
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-    </script>
+    
 </body>
 
 </html>

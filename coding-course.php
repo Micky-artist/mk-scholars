@@ -129,7 +129,7 @@ if (isset($_POST['checkout'])) {
                     <p><strong>Email:</strong> <?= htmlspecialchars($email) ?></p>
                     <p><strong>Phone:</strong> <?= htmlspecialchars($phone) ?></p>
 
-                    <input type="hidden" name="subscription" value="30-Day Live Coding Bootcamp" />
+                    <input type="hidden" name="subscription" value="codingcourse" />
                     <input type="hidden" name="amount" value="25000" />
 
                     <div class="selected-courses">

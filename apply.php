@@ -111,6 +111,39 @@ if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST'
             min-height: 100vh;
             transition: background 0.3s, color 0.3s;
         }
+        .sidebar {
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    border-right: 1px solid var(--glass-border);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1000;
+    width: 250px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    transition: transform 0.3s ease;
+}
+
+.main-content {
+    margin-left: 250px;
+    transition: margin-left 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+    }
+}
 
         .application-card {
             background: var(--bg-secondary);
@@ -358,6 +391,31 @@ if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST'
             }
         });
     </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarToggle = document.querySelector('.sidebar-toggle');
+
+        if (sidebar && sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+        }
+
+        // Hide sidebar on mobile when clicking outside
+        document.addEventListener('click', function (event) {
+            if (
+                window.innerWidth < 768 &&
+                sidebar &&
+                !sidebar.contains(event.target) &&
+                !sidebarToggle.contains(event.target)
+            ) {
+                sidebar.classList.remove('active');
+            }
+        });
+    });
+</script>
+
 </body>
 
 </html>
