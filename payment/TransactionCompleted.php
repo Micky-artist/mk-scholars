@@ -33,6 +33,7 @@ $amountMap = [
     'instructor' => 7500,
     'moroccoadmissions' => 2600,
     'codingcourse' => 25000,
+    'englishcourse' => 15000,
 ];
 $finalAmount = $amountMap[$subscriptionType];
 

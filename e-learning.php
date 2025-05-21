@@ -119,94 +119,130 @@ include('./php/validateSession.php');
 
 <body>
 
-<!-- Theme Toggle Button -->
-<button class="btn btn-secondary theme-toggle glass-panel" style="color: orange;">
-    <i class="fas fa-moon"></i>
-</button>
+    <!-- Theme Toggle Button -->
+    <button class="btn btn-secondary theme-toggle glass-panel" style="color: orange;">
+        <i class="fas fa-moon"></i>
+    </button>
 
-<!-- Sidebar Include -->
-<?php include("./partials/dashboardNavigation.php"); ?>
+    <!-- Sidebar Include -->
+    <?php include("./partials/dashboardNavigation.php"); ?>
 
-<!-- Main Content -->
-<main class="main-content">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <button class="btn btn-light d-md-none glass-panel sidebar-toggle" type="button">
-            <i class="fas fa-bars"></i>
-        </button>
-        <h3 class="mb-0">Courses</h3>
-    </div>
-
-    <div class="row g-4">
-        <div class="col-sm-6 col-lg-4">
-            <div class="card h-100">
-                <img src="https://via.placeholder.com/400x200" class="card-img-top" alt="Morocco Admissions">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">Morocco Admissions</h5>
-                    <p class="card-text flex-grow-1">Practice interviews, tourism knowledge, and logic tests.</p>
-                    <a href="morocco-admissions" class="btn btn-primary mt-3">View Course</a>
-                </div>
-            </div>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <button class="btn btn-light d-md-none glass-panel sidebar-toggle" type="button">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h3 class="mb-0">Courses</h3>
         </div>
 
-        <div class="col-sm-6 col-lg-4">
-            <div class="card h-100">
-                <img src="https://mkscholars.com/images/courses/ucat.jpg" class="card-img-top" alt="UCAT">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">UCAT</h5>
-                    <p class="card-text flex-grow-1">UCAT prep with expert coaching, mock tests and strategies.</p>
-                    <a href="ucat-course" class="btn btn-primary mt-3">View Course</a>
+        <div class="row g-4">
+            <div class="col-sm-6 col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="position-relative">
+                        <img src="./images/courses/codingcourse.jpeg" class="card-img-top rounded-top" alt="Coding Bootcamp">
+                        <span class="badge bg-success position-absolute top-0 start-0 m-2">Tech</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-semibold">30-Day Coding Bootcamp</h5>
+                        <p class="card-text text-muted flex-grow-1">Learn HTML, CSS, JS, React & backend. Evening sessions. Certificate on completion.</p>
+                        <a href="coding-course" class="btn btn-outline-success w-100 mt-2">Register Now</a>
+                    </div>
                 </div>
             </div>
-        </div>
+            <div class="col-sm-6 col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="position-relative">
+                        <img src="./images/courses/englishcourse.jpeg" class="card-img-top rounded-top" alt="English Course">
+                        <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">Language</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-semibold">English Communication Course</h5>
+                        <p class="card-text text-muted flex-grow-1">Boost your English speaking, writing & listening. 2-month program with certificate.</p>
+                        <a href="english-course" class="btn btn-outline-warning w-100 mt-2">Join Now</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="position-relative">
+                        <img src="./images/courses/morocco.jpeg" class="card-img-top rounded-top" alt="Morocco Admissions">
+                        <span class="badge bg-primary position-absolute top-0 start-0 m-2">Admissions</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-semibold">Morocco Admissions</h5>
+                        <p class="card-text text-muted flex-grow-1">Practice interviews, tourism knowledge, and logic tests.</p>
+                        <a href="morocco-admissions" class="btn btn-outline-primary w-100 mt-2">View Course</a>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <div class="col-sm-6 col-lg-4 mb-4">
+  <div class="card border-0 shadow-sm h-100">
+    <div class="position-relative">
+      <img src="https://mkscholars.com/images/courses/ucat.jpg" class="card-img-top rounded-top" alt="UCAT">
+      <span class="badge bg-info text-dark position-absolute top-0 start-0 m-2">Medical</span>
     </div>
-</main>
+    <div class="card-body d-flex flex-column">
+      <h5 class="card-title fw-semibold">UCAT Coaching</h5>
+      <p class="card-text text-muted flex-grow-1">Prepare for the UCAT with expert-led sessions, strategies, and full mock tests.</p>
+      <a href="ucat-course" class="btn btn-outline-info w-100 mt-2">View Course</a>
+    </div>
+  </div>
+</div>
 
-<!-- Scripts -->
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const body = document.body;
-        const themeToggle = document.querySelector('.theme-toggle');
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        body.setAttribute('data-theme', savedTheme);
-        updateToggleIcon();
+        </div>
+    </main>
 
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = body.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            body.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
+    <!-- Scripts -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const body = document.body;
+            const themeToggle = document.querySelector('.theme-toggle');
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            body.setAttribute('data-theme', savedTheme);
             updateToggleIcon();
-        });
 
-        function updateToggleIcon() {
-            const icon = themeToggle.querySelector('i');
-            icon.className = body.getAttribute('data-theme') === 'light' ? 'fas fa-moon' : 'fas fa-sun';
-        }
-
-        const sidebar = document.querySelector('.sidebar');
-        const sidebarToggle = document.querySelector('.sidebar-toggle');
-
-        if (sidebar && sidebarToggle) {
-            sidebarToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('active');
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = body.getAttribute('data-theme');
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                body.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateToggleIcon();
             });
-        }
 
-        // Hide sidebar when clicking outside on small screens
-        document.addEventListener('click', function (event) {
-            if (
-                window.innerWidth < 768 &&
-                sidebar &&
-                !sidebar.contains(event.target) &&
-                !sidebarToggle.contains(event.target)
-            ) {
-                sidebar.classList.remove('active');
+            function updateToggleIcon() {
+                const icon = themeToggle.querySelector('i');
+                icon.className = body.getAttribute('data-theme') === 'light' ? 'fas fa-moon' : 'fas fa-sun';
             }
-        });
-    });
-</script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+
+            if (sidebar && sidebarToggle) {
+                sidebarToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('active');
+                });
+            }
+
+            // Hide sidebar when clicking outside on small screens
+            document.addEventListener('click', function(event) {
+                if (
+                    window.innerWidth < 768 &&
+                    sidebar &&
+                    !sidebar.contains(event.target) &&
+                    !sidebarToggle.contains(event.target)
+                ) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
