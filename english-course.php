@@ -106,12 +106,12 @@ if (isset($_POST['checkout'])) {
                         data-course-name="English Communication Course"
                         data-course-amount="20000">
                         <div class="d-flex align-items-center justify-content-between">
-                            <h4 class="mb-0">English Communication Course (20,000 RWF)</h4>
+                            <h4 class="mb-0">English Communication Course (15,000 RWF)</h4>
                             <span class="badge bg-success">Selected</span>
                         </div>
                         <div class="course-details">
                             <ul class="list-unstyled mt-3">
-                                <li>✓ Starts on 15th June 2025</li>
+                                <li>✓ Starts on 10th June 2025</li>
                                 <li>✓ Online Weekend and Evening Classes</li>
                                 <li>✓ Learn Speaking, Listening, Reading, and Writing</li>
                                 <li>✓ For students, professionals & beginners</li>
@@ -119,6 +119,9 @@ if (isset($_POST['checkout'])) {
                                 <li>✓ Includes assignments and downloadable resources</li>
                             </ul>
                             <p><b>Need help?</b> Call/WhatsApp: +250 798 611 161</p>
+                            <h5>Payment Methods</h5>
+                            <p><b>Mobile Money: </b>0798611161 (Shyaka Paul Mecky) <br>
+                            <b>Bank Account: </b>4004201038851 (MS Innovation Lab Ltd)</p>
                         </div>
                     </div>
                 </div>

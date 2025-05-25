@@ -111,7 +111,7 @@ if (isset($_POST['checkout'])) {
                         </div>
                         <div class="course-details">
                             <ul class="list-unstyled mt-3">
-                                <li>✓ Starts on 5th June 2025</li>
+                                <li>✓ Starts on 10th June 2025</li>
                                 <li>✓ 30 Days of Live Virtual Classes</li>
                                 <li>✓ Monday to Friday — 5:30 PM to 7:00 PM</li>
                                 <li>✓ Practical Assignments & Real Projects</li>
@@ -119,6 +119,10 @@ if (isset($_POST['checkout'])) {
                                 <li>✓ Hands-on coding course designed to introduce students to programming fundamentals using HTML, CSS, and JavaScript, React JS, MYSQL, Node.js. Perfect for beginners. Evening and weekend classes are available.</li>
                             </ul>
                             <p><b>Need help?</b> Call/WhatsApp: +250 798 611 161</p>
+
+                            <h5>Payment Methods</h5>
+                            <p><b>Mobile Money: </b>0798611161 (Shyaka Paul Mecky) <br>
+                            <b>Bank Account: </b>4004201038851 (MS Innovation Lab Ltd)</p>
                         </div>
                     </div>
                 </div>

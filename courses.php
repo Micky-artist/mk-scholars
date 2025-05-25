@@ -263,11 +263,11 @@ session_start();
                 <div class="action-section">
                     <div class="deadline">
                         <i class="fas fa-hourglass-half"></i>
-                        Registration Closes: May 30, 2025
+                        Registration Closes: June 05, 2025
                     </div>
                     <div class="deadline">
                         <i class="fas fa-hourglass-half"></i>
-                        Trainings starts by: June 5th, 2025
+                        Trainings starts by: June 10th, 2025
                     </div>
                     <button onclick="window.location.href='./coding-course'" class="apply-button">
                         <i class="fas fa-arrow-circle-right"></i>
@@ -285,7 +285,7 @@ session_start();
             <h2 class="card-title">English Communication Course</h2>
             <p class="card-subtitle">For All Levels – Learn to Speak & Write Confidently</p>
             <div style="display: flex; flex-wrap: wrap;">
-                <div class="price-tag">20,000 RWF – Includes Practice Materials & Instructor Sessions</div>
+                <div class="price-tag">15,000 RWF – Includes Practice Materials & Instructor Sessions</div>
             </div>
         </div>
 
@@ -307,11 +307,11 @@ session_start();
         <div class="action-section">
             <div class="deadline">
                 <i class="fas fa-hourglass-half"></i>
-                Registration Closes: June 10, 2025
+                Registration Closes: June 05, 2025
             </div>
             <div class="deadline">
                 <i class="fas fa-hourglass-half"></i>
-                Classes Begin: June 15th, 2025
+                Classes Begin: June 10, 2025
             </div>
             <button onclick="window.location.href='./english-course'" class="apply-button">
                 <i class="fas fa-arrow-circle-right"></i>
