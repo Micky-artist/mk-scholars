@@ -161,9 +161,9 @@
         </p>
         <div style="text-align: left; padding: 10px 20px;">
           <strong>1. 30-Day Coding Bootcamp</strong><br>
-          Learn HTML, CSS, JS, React, MySQL & Node.js. Evening classes.<br><br>
+          <!-- Learn HTML, CSS, JS, React, MySQL & Node.js. Evening classes.<br><br> -->
           <strong>2. English Communication Course</strong><br>
-          Improve fluency, writing, speaking & grammar. 2-month program.
+          <!-- Improve fluency, writing, speaking & grammar. 2-month program. -->
         </div>
       </div>
 

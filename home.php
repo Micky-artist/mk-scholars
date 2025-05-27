@@ -223,7 +223,7 @@
 													target="_blank"
 													href="./apply?scholarshipId=<?php echo $s['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', '-', $s['scholarshipTitle']) ?>"
 													class="apply-button">
-													<span>Apply Now</span>
+													<span>Ask Help</span>
 													<div class="button-hover-effect"></div>
 												</a>
 												<a

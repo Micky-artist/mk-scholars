@@ -237,7 +237,7 @@ include("./dbconnection/connection.php");
 												</div>
 												<div class="card-actions">
 													<a href="./apply" class="apply-button">
-														<span>Apply Now</span>
+														<span>Ask Help</span>
 														<div class="button-hover-effect"></div>
 													</a>
 													<a

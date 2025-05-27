@@ -20,7 +20,7 @@ if (empty($_SESSION['userId'])) {
 $userId = (int) $_SESSION['userId'];
 
 // 3) Validate subscription type
-$allowedTypes = ['notes','instructor', 'moroccoadmissions','codingcourse'];
+$allowedTypes = ['notes','englishcourse', 'moroccoadmissions','codingcourse'];
 if (!isset($_GET['type']) || !in_array($_GET['type'], $allowedTypes, true)) {
     header('Location: ./failed');
     exit;
@@ -30,10 +30,9 @@ $subscriptionType = $_GET['type'];
 // 4) Map to server‑side amount
 $amountMap = [
     'notes'      => 4000,
-    'instructor' => 7500,
+    'englishcourse' => 15000,
     'moroccoadmissions' => 2600,
     'codingcourse' => 25000,
-    'englishcourse' => 15000,
 ];
 $finalAmount = $amountMap[$subscriptionType];
 
