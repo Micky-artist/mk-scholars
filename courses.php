@@ -235,6 +235,51 @@ session_start();
     <!-- ==== Scholarship Cards ==== -->
     <div class="container">
         <div class="scholarship-card">
+    <img src="./images/courses/alu.jpeg" alt="ALU English Proficiency Program" class="card-image">
+    <div class="card-content">
+        <div class="card-header">
+            <h2 class="card-title">ALU English Proficiency Program</h2>
+            <p class="card-subtitle">Boost Your English Skills for Academic & Career Success</p>
+            <div style="display: flex; flex-wrap: wrap;">
+                <div class="price-tag">15,000 RWF – 10 Days Practice (20th–30th June) + Sample Questions</div>
+                <div class="price-tag">7,500 RWF – Sample Questions & Answers</div>
+            </div>
+        </div>
+
+        <p class="card-description">
+            A 10-day practice program from June 20th–30th, and a collection of sample questions and answers with detailed explanations. All are tailored to make you pass your English for ALU admissions.
+        </p>
+
+        <div class="card-details">
+            <div class="detail-item">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Live Virtual Classes</span>
+            </div>
+            <div class="detail-item">
+                <i class="fas fa-users"></i>
+                <span>40 Seats Available</span>
+            </div>
+        </div>
+
+        <div class="action-section">
+            <!-- <div class="deadline">
+                <i class="fas fa-hourglass-half"></i>
+                Registration Closes: July 05, 2025
+            </div> -->
+            <div class="deadline">
+                <i class="fas fa-hourglass-half"></i>
+                Classes Begin: July 10, 2025
+            </div>
+            <button onclick="window.location.href='./alu-english-program'" class="apply-button">
+                <i class="fas fa-arrow-circle-right"></i>
+                Register now (Iyandikishe)
+            </button>
+        </div>
+    </div>
+    <div class="status-tag">Open</div>
+</div>
+
+        <div class="scholarship-card">
             <img src="./images/courses/codingcourse.jpeg" alt="Coding Course" class="card-image">
             <div class="card-content">
                 <div class="card-header">
@@ -263,11 +308,11 @@ session_start();
                 <div class="action-section">
                     <div class="deadline">
                         <i class="fas fa-hourglass-half"></i>
-                        Registration Closes: June 05, 2025
+                        Registration Closes: July 05, 2025
                     </div>
                     <div class="deadline">
                         <i class="fas fa-hourglass-half"></i>
-                        Trainings starts by: June 10th, 2025
+                        Trainings starts by: July 10th, 2025
                     </div>
                     <button onclick="window.location.href='./coding-course'" class="apply-button">
                         <i class="fas fa-arrow-circle-right"></i>
@@ -279,48 +324,49 @@ session_start();
         </div>
 
         <div class="scholarship-card">
-    <img src="./images/courses/englishcourse.jpeg" alt="English Course" class="card-image">
-    <div class="card-content">
-        <div class="card-header">
-            <h2 class="card-title">English Communication Course</h2>
-            <p class="card-subtitle">For All Levels – Learn to Speak & Write Confidently</p>
-            <div style="display: flex; flex-wrap: wrap;">
-                <div class="price-tag">15,000 RWF – Includes Practice Materials & Instructor Sessions</div>
-            </div>
-        </div>
+            <img src="./images/courses/englishcourse.jpeg" alt="English Course" class="card-image">
+            <div class="card-content">
+                <div class="card-header">
+                    <h2 class="card-title">English Communication Course</h2>
+                    <p class="card-subtitle">For All Levels – Learn to Speak & Write Confidently</p>
+                    <div style="display: flex; flex-wrap: wrap;">
+                        <div class="price-tag">15,000 RWF – Includes Practice Materials & Instructor Sessions</div>
+                    </div>
+                </div>
 
-        <p class="card-description">
-            Improve your English speaking, listening, reading, and writing through practical online sessions. Designed for students, professionals, and anyone eager to communicate fluently. Weekend and evening sessions available.
-        </p>
+                <p class="card-description">
+                    Improve your English speaking, listening, reading, and writing through practical online sessions. Designed for students, professionals, and anyone eager to communicate fluently. Weekend and evening sessions available.
+                </p>
 
-        <div class="card-details">
-            <div class="detail-item">
-                <i class="fas fa-chalkboard-teacher"></i>
-                <span>Online Teaching</span>
-            </div>
-            <div class="detail-item">
-                <i class="fas fa-users"></i>
-                <span>20 Seats Available</span>
-            </div>
-        </div>
+                <div class="card-details">
+                    <div class="detail-item">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span>Online Teaching</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-users"></i>
+                        <span>20 Seats Available</span>
+                    </div>
+                </div>
 
-        <div class="action-section">
-            <div class="deadline">
-                <i class="fas fa-hourglass-half"></i>
-                Registration Closes: June 05, 2025
+                <div class="action-section">
+                    <div class="deadline">
+                        <i class="fas fa-hourglass-half"></i>
+                        Registration Closes: July 05, 2025
+                    </div>
+                    <div class="deadline">
+                        <i class="fas fa-hourglass-half"></i>
+                        Classes Begin: July 10, 2025
+                    </div>
+                    <button onclick="window.location.href='./english-course'" class="apply-button">
+                        <i class="fas fa-arrow-circle-right"></i>
+                        Register now (Iyandikishe)
+                    </button>
+                </div>
             </div>
-            <div class="deadline">
-                <i class="fas fa-hourglass-half"></i>
-                Classes Begin: June 10, 2025
-            </div>
-            <button onclick="window.location.href='./english-course'" class="apply-button">
-                <i class="fas fa-arrow-circle-right"></i>
-                Register now (Iyandikishe)
-            </button>
+            <div class="status-tag">Open</div>
         </div>
-    </div>
-    <div class="status-tag">Open</div>
-</div>
+        
 
         <!-- <div class="scholarship-card">
             <img src="./images/courses/ucat.jpg" alt="UCAT" class="card-image">

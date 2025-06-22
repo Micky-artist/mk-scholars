@@ -3,27 +3,23 @@ session_start();
 include './dbconnection/connection.php';
 include './php/validateSession.php';
 
-// Check subscription status
 $userId = $_SESSION['userId'] ?? null;
 $subscribed = false;
 if ($userId) {
   $today = date('Y-m-d');
   $stmt = $conn->prepare(
-    "SELECT 1
-       FROM subscription
-      WHERE UserId = ?
-        AND SubscriptionStatus = 1
-        AND Item = 'moroccoadmissions'
-        AND expirationDate > ?
-      LIMIT 1"
+    "SELECT 1 FROM subscription
+     WHERE UserId = ?
+       AND SubscriptionStatus = 1
+       AND Item = 'moroccoadmissions'
+       AND expirationDate > ?
+     LIMIT 1"
   );
   $stmt->bind_param('is', $userId, $today);
   $stmt->execute();
   $subscribed = ($stmt->get_result()->num_rows > 0);
   $stmt->close();
 }
-
-// Define quiz sections
 $sections = [
   [
     'tab'    => 'Interview Questions',
@@ -295,38 +291,160 @@ $sections = [
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     :root { --accent: #4bc2c5; --bg: #fff; --fg: #333; }
-    body { background: #f4f4f4; color: var(--fg); }
-    .tabs { display: flex; border-bottom: 2px solid #ccc; margin-bottom:1rem; }
-    .tab { padding:.75rem 1.5rem; background:#eee; cursor:pointer; margin-right:2px; }
-    .tab.active { background:var(--bg); border-top:2px solid var(--accent); border-left:2px solid var(--accent); border-right:2px solid var(--accent); font-weight:bold; }
-    .panel { display:none; }
-    .panel.active { display:block; }
-    .note-section { background:var(--bg); padding:1.5rem; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.05); }
-    .section-title { color:var(--accent); border-bottom:3px solid var(--accent); padding-bottom:.5rem; margin-bottom:1rem; }
-    .question { margin-top:1rem; font-weight:bold; }
-    .options { list-style:none; padding-left:0; }
+
+    body {
+      background: #f4f4f4;
+      color: var(--fg);
+      margin: 0;
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      border-bottom: 2px solid #ccc;
+      margin-bottom: 1rem;
+      overflow-x: auto;
+    }
+
+    .tab {
+      padding: .75rem 1.5rem;
+      background: #eee;
+      cursor: pointer;
+      margin-right: 2px;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+
+    .tab.active {
+      background: var(--bg);
+      border-top: 2px solid var(--accent);
+      border-left: 2px solid var(--accent);
+      border-right: 2px solid var(--accent);
+      font-weight: bold;
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .note-section {
+      background: var(--bg);
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .section-title {
+      color: var(--accent);
+      border-bottom: 3px solid var(--accent);
+      padding-bottom: .5rem;
+      margin-bottom: 1rem;
+    }
+
+    .question { margin-top: 1rem; font-weight: bold; }
+    .options { list-style: none; padding-left: 0; }
     .options li { margin: .25rem 0; }
-    .answer { margin-top:.5rem; background:#dcedc8; padding:.75rem; border-radius:4px; }
-    .locked { text-align:center; padding:2rem; color:#888; }
-    .subscribe-link { color: var(--accent); text-decoration: none; font-weight: bold; }
+
+    .answer {
+      margin-top: .5rem;
+      background: #dcedc8;
+      padding: .75rem;
+      border-radius: 4px;
+    }
+
+    .locked {
+      text-align: center;
+      padding: 2rem;
+      color: #888;
+    }
+
+    .subscribe-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .full-height {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    main {
+      flex: 1;
+      padding: 1.5rem;
+    }
+
+    #topBtn {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      z-index: 999;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      font-size: 20px;
+      display: none;
+    }
+
+    .btn-accent {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-accent:hover {
+      background: #3aa9ac;
+    }
+
+    @media (max-width: 768px) {
+      .row.flex-nowrap {
+        flex-direction: column !important;
+      }
+      nav {
+        width: 100% !important;
+        display: none;
+      }
+      nav.active {
+        display: block !important;
+      }
+      main {
+        width: 100% !important;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="container-fluid">
-    <div class="row">
-      <nav class="col-md-3 col-lg-2 bg-white border-end vh-100 p-0">
+  <div class="container-fluid full-height">
+    <div class="row flex-nowrap">
+      <nav class="col-md-3 col-lg-2 bg-white border-end p-0" id="sidebar">
         <?php include './partials/dashboardNavigation.php'; ?>
       </nav>
-      <main class="col-md-9 col-lg-10 p-4 vh-100 overflow-auto">
+
+      <main class="col-md-9 col-lg-10 position-relative" id="mainContent">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <button class="btn btn-outline-secondary" onclick="window.history.back()">
+            ← Go Back
+          </button>
+          <button class="btn btn-outline-info d-md-none" id="sidebarToggle">
+            ☰ Menu
+          </button>
+        </div>
+
         <?php if ($subscribed): ?>
           <h2 class="mb-4">Quizzes Dashboard</h2>
           <div class="tabs">
             <?php foreach ($sections as $i => $sec): ?>
-              <div class="tab <?= $i===0?'active':'' ?>" data-index="<?= $i ?>"><?= htmlspecialchars($sec['tab']) ?></div>
+              <div class="tab <?= $i === 0 ? 'active' : '' ?>" data-index="<?= $i ?>">
+                <?= htmlspecialchars($sec['tab']) ?>
+              </div>
             <?php endforeach; ?>
           </div>
+
           <?php foreach ($sections as $i => $sec): ?>
-            <div class="panel <?= $i===0?'active':'' ?>" data-index="<?= $i ?>">
+            <div class="panel <?= $i === 0 ? 'active' : '' ?>" data-index="<?= $i ?>">
               <section class="note-section">
                 <h2 class="section-title"><?= htmlspecialchars($sec['title']) ?></h2>
                 <?php foreach ($sec['items'] as $item): ?>
@@ -347,18 +465,46 @@ $sections = [
             <a target="_blank" href="./payment/checkout?subscription=moroccoadmissions" class="subscribe-link">Click here to subscribe</a>
           </div>
         <?php endif; ?>
+
+        <button onclick="scrollToTop()" id="topBtn" title="Back to top" class="btn btn-accent shadow-sm">
+          ↑
+        </button>
       </main>
     </div>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
   <script>
-    document.querySelectorAll('.tab').forEach(tab=>tab.addEventListener('click',()=>{
-      const idx=tab.dataset.index;
-      document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-      tab.classList.add('active');
-      document.querySelector(`.panel[data-index="${idx}"]`).classList.add('active');
-    }));
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const idx = tab.dataset.index;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelector(`.panel[data-index="${idx}"]`).classList.add('active');
+      });
+    });
+
+    const topBtn = document.getElementById("topBtn");
+    window.onscroll = () => {
+      topBtn.style.display = (document.documentElement.scrollTop > 200) ? "block" : "none";
+    };
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Sidebar toggle
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+
+    // Close sidebar when clicking outside
+    document.addEventListener('click', function (e) {
+      if (window.innerWidth < 768 && !sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+        sidebar.classList.remove('active');
+      }
+    });
   </script>
 </body>
 </html>

@@ -140,6 +140,20 @@ include('./php/validateSession.php');
             <div class="col-sm-6 col-lg-4 mb-4">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="position-relative">
+                        <img src="./images/courses/alu.jpeg" class="card-img-top rounded-top" alt="ALU English Proficiency Program">
+                        <span class="badge bg-primary position-absolute top-0 start-0 m-2">Language</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-semibold">ALU English Proficiency Program</h5>
+                        <p class="card-text text-muted flex-grow-1">Boost your English for ALU English Proficency Test (EPT). 10 days online training in speaking, reading & writing.</p>
+                        <a href="alu-english-program" class="btn btn-outline-primary w-100 mt-2">Register Now</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="position-relative">
                         <img src="./images/courses/codingcourse.jpeg" class="card-img-top rounded-top" alt="Coding Bootcamp">
                         <span class="badge bg-success position-absolute top-0 start-0 m-2">Tech</span>
                     </div>
@@ -181,18 +195,18 @@ include('./php/validateSession.php');
 
 
             <div class="col-sm-6 col-lg-4 mb-4">
-  <div class="card border-0 shadow-sm h-100">
-    <div class="position-relative">
-      <img src="https://mkscholars.com/images/courses/ucat.jpg" class="card-img-top rounded-top" alt="UCAT">
-      <span class="badge bg-info text-dark position-absolute top-0 start-0 m-2">Medical</span>
-    </div>
-    <div class="card-body d-flex flex-column">
-      <h5 class="card-title fw-semibold">UCAT Coaching</h5>
-      <p class="card-text text-muted flex-grow-1">Prepare for the UCAT with expert-led sessions, strategies, and full mock tests.</p>
-      <a href="ucat-course" class="btn btn-outline-info w-100 mt-2">View Course</a>
-    </div>
-  </div>
-</div>
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="position-relative">
+                        <img src="https://mkscholars.com/images/courses/ucat.jpg" class="card-img-top rounded-top" alt="UCAT">
+                        <span class="badge bg-info text-dark position-absolute top-0 start-0 m-2">Medical</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-semibold">UCAT Coaching</h5>
+                        <p class="card-text text-muted flex-grow-1">Prepare for the UCAT with expert-led sessions, strategies, and full mock tests.</p>
+                        <a href="ucat-course" class="btn btn-outline-info w-100 mt-2">View Course</a>
+                    </div>
+                </div>
+            </div>
 
         </div>
     </main>
