@@ -111,7 +111,7 @@ if (isset($_POST['checkout'])) {
                         </div>
                         <div class="course-details">
                             <ul class="list-unstyled mt-3">
-                                <li>✓ Starts on 10th June 2025</li>
+                                <li>✓ Starts on 10th July 2025</li>
                                 <li>✓ Online Weekend and Evening Classes</li>
                                 <li>✓ Learn Speaking, Listening, Reading, and Writing</li>
                                 <li>✓ For students, professionals & beginners</li>

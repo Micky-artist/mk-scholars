@@ -111,7 +111,7 @@ if (isset($_POST['checkout'])) {
                         </div>
                         <div class="course-details">
                             <ul class="list-unstyled mt-3">
-                                <li>✓ Starts on 10th June 2025</li>
+                                <li>✓ Starts on 10th July 2025</li>
                                 <li>✓ 30 Days of Live Virtual Classes</li>
                                 <li>✓ Monday to Friday — 5:30 PM to 7:00 PM</li>
                                 <li>✓ Practical Assignments & Real Projects</li>
