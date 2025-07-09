@@ -75,9 +75,20 @@ include('./php/validateSession.php');
 
                     <div class="col-lg-8">
                         <div class="glass-panel p-4">
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <!-- <span class="badge bg-primary rounded-pill">3 New</span> -->
-                            </div>
+                            <!-- Tabs for Messages and Files -->
+                            <ul class="nav nav-tabs mb-3" id="conversationTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="messages-tab" data-bs-toggle="tab" data-bs-target="#messages" type="button" role="tab" aria-controls="messages" aria-selected="true">Messages</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="files-tab" data-bs-toggle="tab" data-bs-target="#files" type="button" role="tab" aria-controls="files" aria-selected="false">Files</button>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="conversationTabsContent">
+                                <div class="tab-pane fade show active" id="messages" role="tabpanel" aria-labelledby="messages-tab">
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                        <!-- <span class="badge bg-primary rounded-pill">3 New</span> -->
+                                    </div>
                             <?php
                             $UserId = $_SESSION['userId'];
                             $CheckConvo = mysqli_query($conn, "SELECT * FROM Conversation WHERE UserId = '$UserId' LIMIT 1");
@@ -249,9 +260,54 @@ include('./php/validateSession.php');
 
 
                         </div>
+                        <!-- Static File Gallery below chat -->
+                        <div class="mt-5">
+                            <h5 class="mb-3">Shared Files</h5>
+                            <!-- Upload Button/Form -->
+                            <form action="php/upload_file.php" method="post" enctype="multipart/form-data" class="mb-4 d-flex flex-wrap align-items-center gap-2">
+                                <input type="hidden" name="username" value="<?php echo htmlspecialchars($_SESSION['userName'] ?? 'user'); ?>">
+                                <input type="hidden" name="userid" value="<?php echo htmlspecialchars($_SESSION['userId']); ?>">
+                                <input type="hidden" name="convid" value="<?php echo htmlspecialchars($convoId ?? ''); ?>">
+                                <input type="file" name="file" class="form-control" style="max-width:300px;" required>
+                                <button type="submit" class="btn btn-success"><i class="fas fa-upload"></i> Upload New Document</button>
+                            </form>
+                            <?php if (isset($_GET['upload_success'])): ?>
+                                <div class="alert alert-success">File uploaded successfully!</div>
+                            <?php endif; ?>
+                            <?php if (isset($_GET['upload_error'])): ?>
+                                <div class="alert alert-danger">Upload failed: <?php echo htmlspecialchars($_GET['upload_error']); ?></div>
+                            <?php endif; ?>
+                            <div class="container-fluid py-2">
+                                <div class="row" id="static-files-list"></div>
+                            </div>
+                        </div>
+                        <!-- Preview Modal -->
+                        <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+                          <div class="modal-dialog modal-xl">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="previewModalLabel">Preview</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body" id="previewModalBody" style="min-height:400px;display:flex;align-items:center;justify-content:center;"></div>
+                            </div>
+                          </div>
+                        </div>
+                    <!-- Files Modal -->
+                    <div class="modal fade" id="filesModal" tabindex="-1" aria-labelledby="filesModalLabel" aria-hidden="true">
+                      <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="filesModalLabel">Files Sent in Conversation</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <div id="modal-files-list" class="d-flex flex-wrap gap-3 justify-content-start"></div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-
-
+                    <!-- End Files Modal -->
                 </div>
 
                 <!-- <div class="row mt-4 g-4">
@@ -356,73 +412,340 @@ include('./php/validateSession.php');
                 processData: false,
                 contentType: false,
                 success: function(response) {
-                    // $('#statusMessage').html('<div class="alert alert-success">Message sent!</div>');
                     $('input[name="message"]').val('');
                     $('#file-input').val('');
-                    loadMessages(); // Refresh messages instantly
+                    // Real-time update will handle the new message
                 },
                 error: function() {
-                    // $('#statusMessage').html('<div class="alert alert-danger">Error sending message</div>');
+                    alert('Error sending message');
                 }
             });
         });
 
-        // Load Messages (poll every 3 sec)
-        function loadMessages() {
+        // Real-time chat using Server-Sent Events
+        let lastMessageId = 0;
+        let eventSource = null;
+
+        function startRealTimeChat() {
             const convId = $('input[name="ConvId"]').val();
-            const userId = $('input[name="UserId"]').val();
-            $.get('./php/fetch_messages.php', {
-                ConvId: convId
-            }, function(data) {
-                const messages = JSON.parse(data);
-                const chatContainer = $('#chat-container');
-                const isAtBottom = chatContainer[0].scrollTop + chatContainer[0].clientHeight >= chatContainer[0].scrollHeight - 100;
+            if (!convId) return;
 
-                chatContainer.html('');
-                let currentDate = '';
-                messages.forEach(msg => {
-                    const messageDate = new Date(msg.SentDate).toDateString();
-                    if (currentDate !== messageDate) {
-                        currentDate = messageDate;
-                        chatContainer.append(`<div class="date-separator text-center my-3">${messageDate}</div>`);
+            // Close existing connection if any
+            if (eventSource) {
+                eventSource.close();
+            }
+
+            // Start SSE connection
+            eventSource = new EventSource(`./php/chat_stream.php?convId=${convId}&lastMessageId=${lastMessageId}`);
+            
+            eventSource.onmessage = function(event) {
+                try {
+                    const messages = JSON.parse(event.data);
+                    if (Array.isArray(messages)) {
+                        messages.forEach(msg => {
+                            addMessageToChat(msg);
+                            lastMessageId = Math.max(lastMessageId, msg.MessageId);
+                        });
                     }
-
-                    let content;
-                    if (msg.MessageContent.startsWith('./uploads/')) {
-                        const ext = msg.MessageContent.split('.').pop().toLowerCase();
-                        if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
-                            content = `<img src="${msg.MessageContent}" style="max-width:200px;" alt="File">`;
-                        } else {
-                            content = `<a href="${msg.MessageContent}" target="_blank">📎 Download File</a>`;
-                        }
-                    } else {
-                        content = msg.MessageContent;
-                    }
-
-                    const bubbleClass = msg.UserId == userId ? 'sent' : 'received';
-                    const bubble = `
-                    <div class="chat-bubble ${bubbleClass} mb-3">
-                        <p class="message-content">${content}</p>
-                        <span class="time">${msg.SentTime}</span>
-                    </div>
-                `;
-                    chatContainer.append(bubble);
-                });
-
-                if (isAtBottom) {
-                    chatContainer[0].scrollTop = chatContainer[0].scrollHeight;
+                } catch (e) {
+                    console.log('SSE data received:', event.data);
                 }
+            };
+
+            eventSource.onerror = function(event) {
+                console.log('SSE error, reconnecting...');
+                setTimeout(startRealTimeChat, 5000);
+            };
+        }
+
+        function addMessageToChat(message) {
+            const chatContainer = $('#chat-container');
+            const userId = $('input[name="UserId"]').val();
+            const messageDate = new Date(message.SentDate).toDateString();
+            const messageTime = new Date('2000-01-01 ' + message.SentTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            // Check if we need to add a date separator
+            const lastDateSeparator = chatContainer.find('.date-separator').last();
+            if (lastDateSeparator.length === 0 || lastDateSeparator.text() !== messageDate) {
+                chatContainer.append(`<div class="date-separator text-center my-3">${messageDate}</div>`);
+            }
+
+            let content;
+            if (message.MessageContent.startsWith('./uploads/')) {
+                const ext = message.MessageContent.split('.').pop().toLowerCase();
+                if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
+                    content = `<img src="${message.MessageContent}" style="max-width:200px;" alt="File">`;
+                } else {
+                    content = `<a href="${message.MessageContent}" target="_blank">📎 Download File</a>`;
+                }
+            } else {
+                content = message.MessageContent;
+            }
+
+            const bubbleClass = message.UserId == userId ? 'sent' : 'received';
+            const bubble = `
+                <div class="chat-bubble ${bubbleClass} mb-3">
+                    <p class="message-content">${content}</p>
+                    <span class="time">${messageTime}</span>
+                </div>
+            `;
+            chatContainer.append(bubble);
+            
+            // Scroll to bottom
+            chatContainer.scrollTop(chatContainer[0].scrollHeight);
+        }
+
+        // Initialize real-time chat when page loads
+        $(document).ready(function() {
+            startRealTimeChat();
+        });
+
+        // Clean up on page unload
+        $(window).on('beforeunload', function() {
+            if (eventSource) {
+                eventSource.close();
+            }
+        });
+
+        // Files Tab: Load files when tab is shown
+        document.getElementById('files-tab').addEventListener('shown.bs.tab', function (e) {
+            loadFiles();
+        });
+        function loadFiles() {
+            const convId = $('input[name="ConvId"]').val();
+            $.get('./php/fetch_files.php', { ConvId: convId }, function(data) {
+                const files = JSON.parse(data);
+                const filesList = $('#files-list');
+                filesList.html('');
+                if (files.length === 0) {
+                    filesList.html('<div class="text-center text-muted">No files sent in this conversation.</div>');
+                    return;
+                }
+                files.forEach(file => {
+                    const ext = file.MessageContent.split('.').pop().toLowerCase();
+                    let content;
+                    if (["jpg","jpeg","png","gif","webp","bmp","avif"].includes(ext)) {
+                        content = `<img src="${file.MessageContent}" style="max-width:120px;max-height:120px;margin:5px;" alt="File">`;
+                    } else {
+                        content = `<a href="${file.MessageContent}" target="_blank">📎 Download File</a>`;
+                    }
+                    filesList.append(`<div class="mb-2">${content} <span class="text-muted" style="font-size:0.9em;">${file.SentDate} ${file.SentTime}</span></div>`);
+                });
             });
         }
 
-        setInterval(loadMessages, 3000);
-        loadMessages();
+        // Remove Files Tab JS if present
+        // Add Modal File Viewer JS
+        // $('#filesModal').on('show.bs.modal', function () {
+        //     loadFilesModal();
+        // });
+        // function loadFilesModal() {
+        //     const convId = $('input[name="ConvId"]').val();
+        //     $.get('./php/fetch_files.php', { ConvId: convId }, function(data) {
+        //         const files = JSON.parse(data);
+        //         const filesList = $('#modal-files-list');
+        //         filesList.html('');
+        //         if (files.length === 0) {
+        //             filesList.html('<div class="text-center text-muted w-100">No files sent in this conversation.</div>');
+        //             return;
+        //         }
+        //         files.forEach(file => {
+        //             const ext = file.MessageContent.split('.').pop().toLowerCase();
+        //             let content;
+        //             if (["jpg","jpeg","png","gif","webp","bmp","avif"].includes(ext)) {
+        //                 content = `<img src="${file.MessageContent}" style="max-width:120px;max-height:120px;" alt="File">`;
+        //             } else {
+        //                 content = `<a href="${file.MessageContent}" target="_blank">📎 Download File</a>`;
+        //             }
+        //             filesList.append(`<div class="mb-2">${content}<br><span class="text-muted" style="font-size:0.9em;">${file.SentDate} ${file.SentTime}</span></div>`);
+        //         });
+        //     });
+        // }
     </script>
 
     <script>
         // Scroll to the bottom of the chat container
         const chatContainer = document.getElementById('chat-container');
         chatContainer.scrollTop = chatContainer.scrollHeight;
+    </script>
+
+    <script>
+        // Utility: Map file extensions to icon, color, and label
+        const docTypeMap = {
+            pdf:  { icon: 'fa-file-pdf',   color: '#e74c3c', label: 'PDF' },
+            doc:  { icon: 'fa-file-word',  color: '#2980b9', label: 'DOC' },
+            docx: { icon: 'fa-file-word',  color: '#2980b9', label: 'DOCX' },
+            xls:  { icon: 'fa-file-excel', color: '#27ae60', label: 'XLS' },
+            xlsx: { icon: 'fa-file-excel', color: '#27ae60', label: 'XLSX' },
+            ppt:  { icon: 'fa-file-powerpoint', color: '#e67e22', label: 'PPT' },
+            pptx: { icon: 'fa-file-powerpoint', color: '#e67e22', label: 'PPTX' },
+            txt:  { icon: 'fa-file-alt',   color: '#7f8c8d', label: 'TXT' },
+            zip:  { icon: 'fa-file-archive', color: '#8e44ad', label: 'ZIP' },
+            rar:  { icon: 'fa-file-archive', color: '#8e44ad', label: 'RAR' },
+            csv:  { icon: 'fa-file-csv',   color: '#16a085', label: 'CSV' },
+            default: { icon: 'fa-file', color: '#34495e', label: 'FILE' }
+        };
+
+        // Assume these are set from PHP session or JS global
+        const currentUser = {
+            username: 'demoUser', // Replace with actual username from session
+            userid: 123           // Replace with actual user id from session
+        };
+
+        // Remove staticFiles array. Fetch files from backend instead.
+        let uploadedFiles = [];
+        // Optionally set conversation id if available
+        const conversationId = window.currentConversationId || null; // Set this from your session/page if needed
+
+        function fetchAndRenderFiles() {
+            let url = `./php/list_user_files.php?userid=${currentUser.userid}`;
+            if (conversationId) url += `&convid=${conversationId}`;
+            $.get(url, function(files) {
+                uploadedFiles = files;
+                renderStaticFiles();
+            });
+        }
+
+        function renderStaticFiles() {
+            const filesList = document.getElementById('static-files-list');
+            filesList.innerHTML = '';
+            if (!uploadedFiles || uploadedFiles.length === 0) {
+                filesList.innerHTML = '<div class="text-center text-muted w-100">No files in gallery.</div>';
+                return;
+            }
+            uploadedFiles.forEach((file, idx) => {
+                const type = getFileType(file.url);
+                const col = document.createElement('div');
+                col.className = 'col-12 col-sm-6 col-md-4 col-lg-3 file-card';
+                let content = '';
+                if (type === 'image') {
+                    content = `
+                    <div class="file-image-card shadow-sm p-2 mb-2 bg-white rounded-4 d-flex flex-column align-items-center position-relative">
+                        <img src="${file.url}" alt="${file.name}" class="file-thumb mb-2" style="cursor:pointer;" onclick="previewFile('${file.url}','image')">
+                        <div class="file-link text-center fw-semibold">${file.name}</div>
+                        <div class="text-muted small">${formatFileSize(file.size)}</div>
+                        <div class="d-flex gap-2 mt-2">
+                            <button class="btn btn-outline-primary btn-sm" onclick="previewFile('${file.url}','image')"><i class="fas fa-eye"></i></button>
+                            <a href="${file.url}" download class="btn btn-outline-success btn-sm"><i class="fas fa-download"></i></a>
+                            <button class="btn btn-outline-danger btn-sm" onclick="deleteFile('${file.url}', ${file.id})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`;
+                } else {
+                    const docInfo = getDocTypeInfo(file.url);
+                    content = `
+                    <div class="file-doc-card shadow-sm p-3 mb-2 rounded-4 d-flex flex-column align-items-center position-relative" style="background:${docInfo.color}1A; border:2px solid ${docInfo.color};">
+                        <div class="display-3 mb-2" style="color:${docInfo.color}"><i class="fas ${docInfo.icon}"></i></div>
+                        <div class="badge mb-2" style="background:${docInfo.color};color:#fff;font-size:0.9em;">${docInfo.label}</div>
+                        <div class="file-link text-center fw-semibold" style="color:${docInfo.color}">${file.name}</div>
+                        <div class="text-muted small">${formatFileSize(file.size)}</div>
+                        <div class="d-flex gap-2 mt-2">
+                            <button class="btn btn-outline-primary btn-sm" onclick="previewFile('${file.url}','doc','${docInfo.label}')"><i class="fas fa-eye"></i></button>
+                            <a href="${file.url}" download class="btn btn-outline-success btn-sm"><i class="fas fa-download"></i></a>
+                            <button class="btn btn-outline-danger btn-sm" onclick="deleteFile('${file.url}', ${file.id})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`;
+                }
+                col.innerHTML = content;
+                filesList.appendChild(col);
+            });
+        }
+
+        // Preview logic
+        window.previewFile = function(url, type, label) {
+            const ext = url.split('.').pop().toLowerCase();
+            if (type === 'image' || ext === 'pdf') {
+                window.open(url, '_blank');
+            } else if (["doc","docx","ppt","pptx","xls","xlsx"].includes(ext)) {
+                const gviewUrl = `https://docs.google.com/gview?url=${encodeURIComponent(window.location.origin + '/' + url)}&embedded=true`;
+                window.open(gviewUrl, '_blank');
+            } else {
+                window.open(url, '_blank');
+            }
+        }
+        // Delete logic
+        window.deleteFile = function(url, docId) {
+            if (!confirm('Are you sure you want to delete this file?')) return;
+            $.post('./php/delete_file.php', { file: url }, function(resp) {
+                // Remove from uploadedFiles array and re-render
+                uploadedFiles = uploadedFiles.filter(f => f.id !== docId);
+                renderStaticFiles();
+            });
+        }
+        // Upload logic: after upload, refresh file list
+        // This section is now handled by the PHP form submission and the refreshFileList function
+        // $('#uploadForm').on('submit', function(e) {
+        //     e.preventDefault();
+        //     const formData = new FormData(this);
+        //     formData.append('username', currentUser.username);
+        //     formData.append('userid', currentUser.userid);
+        //     if (conversationId) formData.append('convid', conversationId);
+        //     $.ajax({
+        //         url: './php/upload_file.php',
+        //         type: 'POST',
+        //         data: formData,
+        //         processData: false,
+        //         contentType: false,
+        //         success: function(resp) {
+        //             $('#fileInput').val('');
+        //             fetchAndRenderFiles();
+        //         },
+        //         error: function() {
+        //             alert('Upload failed.');
+        //         }
+        //     });
+        // });
+
+        // On page load, fetch files
+        $(document).ready(function() {
+            refreshFileList();
+            // Refresh file list every 30 seconds
+            setInterval(refreshFileList, 30000);
+        });
+        // Add styles for file gallery
+        const style = document.createElement('style');
+        style.innerHTML = `
+        .file-thumb {
+            max-width: 160px;
+            max-height: 160px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 3px solid #f8f9fa;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+            background: #fff;
+            transition: box-shadow 0.2s;
+        }
+        .file-thumb:hover {
+            box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+        }
+        .file-card {
+            margin-bottom: 32px;
+        }
+        .file-image-card {
+            border: 2px solid #e3e3e3;
+            background: #f9f9f9;
+            transition: box-shadow 0.2s, border 0.2s;
+        }
+        .file-image-card:hover {
+            border: 2px solid #007bff;
+            box-shadow: 0 4px 24px rgba(0,123,255,0.10);
+        }
+        .file-doc-card {
+            min-height: 180px;
+            width: 100%;
+            background: #f8f9fa;
+            border-width: 2px;
+            border-style: solid;
+            transition: box-shadow 0.2s, border 0.2s;
+        }
+        .file-doc-card:hover {
+            box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+            filter: brightness(1.04);
+        }
+        .file-link {
+            word-break: break-all;
+        }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 
