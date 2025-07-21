@@ -124,62 +124,16 @@ include("./php/selectScholarshipDetails.php")
 								$numVideos = count($videos);
 
 								if ($numVideos > 0) {
-									// 2) Choose spacing interval to keep ads sparse (3–5)
-									$interval = rand(3, 5);
-
-									// 3) Calculate number of ads: at least 1, at most 2
-									$calculatedAds = (int)ceil($numVideos / $interval);
-									$numAds        = min(2, max(1, $calculatedAds));
-
-									// 4) Build slots 0..$numVideos, pick $numAds random slots
-									$slots   = range(0, $numVideos);
-									shuffle($slots);
-									$adSlots = array_slice($slots, 0, min($numAds, count($slots)));
-									sort($adSlots);
-
-									$slotIndex   = 0;
-									$adsRendered = 0;
-									$maxAds      = 2;
-
-									// Helper to render an ad banner
-									function renderAdBanner()
-									{
-								?>
-										<script type="text/javascript">
-											atOptions = {
-												'key': 'a0660bfb62ff4852d837d433a296ba76',
-												'format': 'iframe',
-												'height': 60,
-												'width': 468,
-												'params': {}
-											};
-										</script>
-										<script type="text/javascript" src="//www.highperformanceformat.com/a0660bfb62ff4852d837d433a296ba76/invoke.js"></script>
-									<?php
-									}
-
-									// 5) Loop through videos and inject ads at selected slots
+									// Loop through videos (ads removed)
 									foreach ($videos as $video) {
-										if (in_array($slotIndex, $adSlots, true) && $adsRendered < $maxAds) {
-											renderAdBanner();
-											$adsRendered++;
-										}
-
 										// Output the video embed/link and title
 										echo $video['videoLink'];
-									?>
+										?>
 										<b>
 											<p><?php echo htmlspecialchars($video['VideoTitle'], ENT_QUOTES); ?></p>
 										</b><br>
-									<?php
-
+										<?php
 										$slotIndex++;
-									}
-
-									// 6) Final slot after last video
-									if (in_array($slotIndex, $adSlots, true) && $adsRendered < $maxAds) {
-										renderAdBanner();
-										$adsRendered++;
 									}
 								} else {
 									// No videos

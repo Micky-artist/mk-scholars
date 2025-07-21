@@ -170,61 +170,24 @@ include("./dbconnection/connection.php");
 							$numPosts = count($scholarships);
 
 							if ($numPosts > 0) {
-								// 2) pick a random interval of 2, 3, or 4
-								$interval = rand(2, 4);
-
-								// 3) decide on number of ads: at least 2, at most 10
-								$calculatedAds = (int)ceil($numPosts / $interval);
-								$numAds        = min(10, max(2, $calculatedAds));
-
-								// 4) build slot indices [0 .. $numPosts]
-								$slots   = range(0, $numPosts);
-								shuffle($slots);
-								$adSlots = array_slice($slots, 0, min($numAds, count($slots)));
-								sort($adSlots);
-
-								$slotIndex    = 0;
-								$adsRendered  = 0;  // counter to guard at render time
-								$maxAdsPerPage = 10;
-
-								function renderAdBanner()
-								{
-							?>
-									<script type="text/javascript">
-										atOptions = {
-											'key': '98402006e8b83dd2d8d5dda96e411da2',
-											'format': 'iframe',
-											'height': 250,
-											'width': 300,
-											'params': {}
-										};
-									</script>
-									<script type="text/javascript" src="//www.highperformanceformat.com/98402006e8b83dd2d8d5dda96e411da2/invoke.js"></script>
-								<?php
-								}
-
-								// 5) loop posts + inject ads at chosen slots (with runtime cap)
-								foreach ($scholarships as $scholarship) {
-									if (in_array($slotIndex, $adSlots, true) && $adsRendered < $maxAdsPerPage) {
-										renderAdBanner();
-										$adsRendered++;
-									}
+								// Loop through scholarships (ads removed)
+								foreach ($scholarships as $s) {
 								?>
 									<div class="scholarship-card">
 										<div class="card-image">
 											<img
-												src="https://admin.mkscholars.com/uploads/posts/<?php echo htmlspecialchars($scholarship['scholarshipImage'], ENT_QUOTES) ?>"
-												alt="<?php echo htmlspecialchars($scholarship['scholarshipTitle'], ENT_QUOTES) ?>">
+												src="https://admin.mkscholars.com/uploads/posts/<?php echo htmlspecialchars($s['scholarshipImage'], ENT_QUOTES) ?>"
+												alt="<?php echo htmlspecialchars($s['scholarshipTitle'], ENT_QUOTES) ?>">
 											<div class="image-overlay"></div>
 										</div>
 										<div class="card-content">
 											<h3 class="card-title">
-												<a href="scholarship-details?scholarship-id=<?php echo $scholarship['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', '-', $scholarship['scholarshipTitle']) ?>">
-													<?php echo htmlspecialchars($scholarship['scholarshipTitle'], ENT_QUOTES) ?>
+												<a href="scholarship-details?scholarship-id=<?php echo $s['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', '-', $s['scholarshipTitle']) ?>">
+													<?php echo htmlspecialchars($s['scholarshipTitle'], ENT_QUOTES) ?>
 												</a>
 											</h3>
 											<div class="card-description">
-												<p><?php echo htmlspecialchars($scholarship['scholarshipDetails'], ENT_QUOTES) ?></p>
+												<p><?php echo htmlspecialchars($s['scholarshipDetails'], ENT_QUOTES) ?></p>
 											</div>
 											<div class="card-footer">
 												<div class="date-info">
@@ -233,7 +196,7 @@ include("./dbconnection/connection.php");
                                          c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6
                                          c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z" />
 													</svg>
-													<span><?php echo $scholarship['scholarshipUpdateDate'] ?></span>
+													<span><?php echo $s['scholarshipUpdateDate'] ?></span>
 												</div>
 												<div class="card-actions">
 													<a href="./apply" class="apply-button">
@@ -241,7 +204,7 @@ include("./dbconnection/connection.php");
 														<div class="button-hover-effect"></div>
 													</a>
 													<a
-														href="scholarship-details?scholarship-id=<?php echo $scholarship['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', '-', $scholarship['scholarshipTitle']) ?>"
+														href="scholarship-details?scholarship-id=<?php echo $s['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', '-', $s['scholarshipTitle']) ?>"
 														class="read-more-button">
 														<span>Read More</span>
 														<div class="button-arrow">→</div>
@@ -253,14 +216,8 @@ include("./dbconnection/connection.php");
 								<?php
 									$slotIndex++;
 								}
-
-								// final slot after last post
-								if (in_array($slotIndex, $adSlots, true) && $adsRendered < $maxAdsPerPage) {
-									renderAdBanner();
-									$adsRendered++;
-								}
 							} else {
-								// no scholarships
+								// No scholarships found
 								?>
 								<div class="no-results">
 									<p>No results found</p>

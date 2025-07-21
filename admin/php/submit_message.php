@@ -2,6 +2,13 @@
 session_start();
 require_once '../dbconnections/connection.php';  // adjust path as needed
 
+// Validate admin session
+if (!isset($_SESSION['adminId'])) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Admin not authenticated']);
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }

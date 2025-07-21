@@ -16,23 +16,26 @@ $convId = isset($_POST['convid']) && !empty($_POST['convid']) ? intval($_POST['c
 $dir = __DIR__ . '/../uploads/' . $username . '_' . $userid . '/';
 $webDir = './uploads/' . $username . '_' . $userid . '/';
 
-
-
+// Ensure directory exists and has proper permissions
 if (!is_dir($dir)) {
-    if (!mkdir($dir, 0777, true)) {
+    if (!mkdir($dir, 0755, true)) {
         $error = "Failed to create directory: $dir. Error: " . error_get_last()['message'];
         echo "<script>window.location.href = '../conversations.php?upload_error=" . urlencode($error) . "';</script>";
         exit;
     }
-    chmod($dir, 0777);
+    chmod($dir, 0755);
 }
+
+
+
+
 
 $originalName = basename($_FILES['file']['name']);
 $target = $dir . $originalName;
 $webPath = $webDir . $originalName;
 
 if (move_uploaded_file($_FILES['file']['tmp_name'], $target)) {
-    chmod($target, 0666);
+    chmod($target, 0644);
     $fileSize = filesize($target);
     $fileType = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
     $uploadDate = date('Y-m-d');
@@ -77,6 +80,16 @@ if (move_uploaded_file($_FILES['file']['tmp_name'], $target)) {
     } else {
         // Debug: Log successful insert
         error_log("File uploaded successfully: $originalName, Size: $fileSize, Path: $webPath");
+        
+        // Also insert a message to show the file in chat
+        $messageSql = "INSERT INTO Message (UserId, senderId, AdminId, ConvId, MessageContent, SentDate, SentTime, MessageStatus) 
+                       VALUES (?, ?, 0, ?, ?, ?, ?, 0)";
+        $messageStmt = $conn->prepare($messageSql);
+        if ($messageStmt) {
+            $messageStmt->bind_param("iissss", $userid, $userid, $convId, $webPath, $uploadDate, $uploadTime);
+            $messageStmt->execute();
+            $messageStmt->close();
+        }
     }
     
     $stmt->close();

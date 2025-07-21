@@ -2,656 +2,1383 @@
 session_start();
 include('./dbconnection/connection.php');
 include('./php/validateSession.php');
-// include('./php/sendMessage.php');
-
-
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversation</title>
+    <title>Chat - MK Scholars</title>
     <link rel="shortcut icon" href="./images/logo/logoRound.png" type="image/x-icon">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body data-theme="light">
-    <!-- Theme Toggle Button -->
-    <button style="color: orange;" class="btn btn-secondary theme-toggle glass-panel">
-        <i class="fas fa-moon"></i>
-    </button>
+    <!-- Navigation -->
+    <?php include("./partials/dashboardNavigation.php"); ?>
 
-    <!-- Notification Box -->
-    <div class="glass-panel notification-box p-3">
-        <h5>Notifications</h5>
-        <div class="list-group">
-            <a href="#" class="list-group-item list-group-item-action">
+    <!-- Main Chat Container -->
+    <div class="chat-app-container">
+        <!-- Chat Header -->
+        <div class="chat-header">
+            <div class="chat-header-content">
                 <div class="d-flex align-items-center">
-                    <i class="fas fa-bell text-warning me-2"></i>
-                    <div>
-                        <small>New message received</small>
-                        <div class="text-muted">2 minutes ago</div>
+                    <div class="chat-avatar">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div class="chat-info ms-3">
+                        <h5 class="mb-0">Support Chat</h5>
+                        <small class="text-muted" id="chat-status">Online</small>
                     </div>
                 </div>
-            </a>
-            <a href="#" class="list-group-item list-group-item-action">
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-tasks text-success me-2"></i>
-                    <div>
-                        <small>Task completed</small>
-                        <div class="text-muted">1 hour ago</div>
-                    </div>
-                </div>
-            </a>
-        </div>
-    </div>
-
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <?php include("./partials/dashboardNavigation.php"); ?>
-
-
-            <!-- Main Content -->
-            <main class="col-md-9 col-lg-10 main-content p-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <button class="btn btn-light d-md-none glass-panel sidebar-toggle" type="button">
-                        <i class="fas fa-bars"></i>
+                <div class="chat-actions">
+                    <button class="btn btn-link" id="theme-toggle">
+                        <i class="fas fa-moon"></i>
                     </button>
-                    <h3 class="mb-0">Conversation</h3>
-                    <div class="glass-panel px-3 py-2 notification-btn" style="cursor: pointer;">
-                        <i class="fas fa-bell text-muted"></i>
-                    </div>
+                    <button class="btn btn-success" id="files-toggle">
+                        <i class="fas fa-folder me-2"></i>Shared Files
+                    </button>
                 </div>
+            </div>
+        </div>
 
-                <div class="row g-4">
+        <!-- Chat Body -->
+        <div class="chat-body">
+            <div class="chat-messages" id="chat-container">
+                <?php
+                $UserId = $_SESSION['userId'];
+                $CheckConvo = mysqli_query($conn, "SELECT * FROM Conversation WHERE UserId = '$UserId' LIMIT 1");
+                if ($CheckConvo->num_rows == 1) {
+                    $convoData = mysqli_fetch_assoc($CheckConvo);
+                    $convoId = $convoData['ConvId'];
+                    $UserId = $convoData['UserId'];
+                    $ConvStatus = $convoData['ConvStatus'];
 
+                    // Fetch messages for the current conversation
+                    $selectMessages = mysqli_query($conn, "SELECT * FROM Message WHERE ConvId = $convoId ORDER BY SentDate, SentTime");
 
+                    if ($selectMessages->num_rows > 0) {
+                        $currentDate = null;
+                        while ($messages = mysqli_fetch_assoc($selectMessages)) {
+                            $messageDate = date("Y-m-d", strtotime($messages['SentDate']));
+                            $messageTime = date("h:i A", strtotime($messages['SentTime']));
 
-                    <div class="col-lg-8">
-                        <div class="glass-panel p-4">
-                            <!-- Tabs for Messages and Files -->
-                            <ul class="nav nav-tabs mb-3" id="conversationTabs" role="tablist">
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link active" id="messages-tab" data-bs-toggle="tab" data-bs-target="#messages" type="button" role="tab" aria-controls="messages" aria-selected="true">Messages</button>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link" id="files-tab" data-bs-toggle="tab" data-bs-target="#files" type="button" role="tab" aria-controls="files" aria-selected="false">Files</button>
-                                </li>
-                            </ul>
-                            <div class="tab-content" id="conversationTabsContent">
-                                <div class="tab-pane fade show active" id="messages" role="tabpanel" aria-labelledby="messages-tab">
-                                    <div class="d-flex justify-content-between align-items-center mb-4">
-                                        <!-- <span class="badge bg-primary rounded-pill">3 New</span> -->
-                                    </div>
-                            <?php
-                            $UserId = $_SESSION['userId'];
-                            $CheckConvo = mysqli_query($conn, "SELECT * FROM Conversation WHERE UserId = '$UserId' LIMIT 1");
-                            if ($CheckConvo->num_rows == 1) {
-                                $convoData = mysqli_fetch_assoc($CheckConvo);
-                                $convoId = $convoData['ConvId'];
-                                $UserId = $convoData['UserId'];
-                                $ConvStatus = $convoData['ConvStatus'];
-
-                            ?>
-                                <div class="chat-container" style="height: 400px; overflow-y: auto;" id="chat-container">
-                                    <div id="typing-indicator" style="font-size: 12px; margin-top: 5px; display: none;">
-                                        <em>Typing...</em>
-                                    </div>
-
-
-                                    <?php
-                                    // Fetch messages for the current conversation
-                                    $selectMessages = mysqli_query($conn, "SELECT * FROM Message WHERE ConvId = $convoId ORDER BY SentDate, SentTime");
-
-                                    if ($selectMessages->num_rows > 0) {
-                                        $currentDate = null; // Variable to track the current date for separating messages by day
-
-                                        while ($messages = mysqli_fetch_assoc($selectMessages)) {
-                                            $messageDate = date("Y-m-d", strtotime($messages['SentDate']));
-                                            $messageTime = date("h:i A", strtotime($messages['SentTime']));
-
-                                            // Display the date separator if the date changes
-                                            if ($currentDate !== $messageDate) {
-                                                $currentDate = $messageDate;
-                                                echo '<div class="date-separator text-center my-3">' . date("F j, Y", strtotime($currentDate)) . '</div>';
-                                            }
-
-                                            // Check if the sender is the user or admin
-                                            if ($messages['UserId'] == $UserId) {
-                                                // User's message (sent)
-                                                echo '<div class="chat-bubble sent mb-3">';
-                                                echo '<p class="message-content">' . htmlspecialchars($messages['MessageContent']) . '</p>';
-                                                echo '<span class="time">' . $messageTime . '</span>';
-                                                echo '</div>';
-                                            } else {
-                                                // Admin's message (received)
-                                                echo '<div class="chat-bubble received mb-3">';
-                                                echo '<p class="message-content">' . htmlspecialchars($messages['MessageContent']) . '</p>';
-                                                echo '<span class="time">' . $messageTime . '</span>';
-                                                echo '</div>';
-                                            }
-                                        }
-                                    } else {
-                                        echo '<div class="text-center">No messages found.</div>';
-                                    }
-
-                                    $conn->close();
-                                    ?>
-                                </div>
-                                <style>
-                                    .chat-container {
-                                        scroll-behavior: smooth;
-                                        /* Smooth scrolling */
-                                    }
-
-                                    .chat-bubble {
-                                        max-width: 70%;
-                                        padding: 10px;
-                                        border-radius: 10px;
-                                        position: relative;
-                                        word-wrap: break-word;
-                                        /* Ensure long messages wrap */
-                                    }
-
-                                    .chat-bubble.sent {
-                                        background-color: #007bff;
-                                        color: white;
-                                        margin-left: auto;
-                                    }
-
-                                    .chat-bubble.received {
-                                        background-color: #f1f1f1;
-                                        color: black;
-                                        margin-right: auto;
-                                    }
-
-                                    .chat-bubble .time {
-                                        display: block;
-                                        font-size: 0.8em;
-                                        text-align: right;
-                                        margin-top: 5px;
-                                    }
-
-                                    .date-separator {
-                                        font-size: 0.9em;
-                                        color: #777;
-                                        background-color: #f9f9f9;
-                                        padding: 5px;
-                                        border-radius: 5px;
-                                        display: inline-block;
-                                    }
-
-                                    .message-content {
-                                        margin: 0;
-                                    }
-
-                                    .file-input {
-                                        display: none;
-                                    }
-
-                                    .file-label {
-                                        display: inline-block;
-                                        cursor: pointer;
-                                        background-color: #f1f1f1;
-                                        padding: 10px;
-                                        border-radius: 5px;
-                                        transition: background-color 0.3s ease;
-                                    }
-
-                                    .file-label:hover {
-                                        background-color: #ddd;
-                                    }
-
-                                    .attachment-icon {
-                                        font-size: 20px;
-                                        color: #555;
-                                    }
-                                </style>
-
-                                <!-- <div > -->
-                                <div id="statusMessage"></div>
-                                <form id="messageForm" class="input-group mt-4" enctype="multipart/form-data">
-                                    <div class="file-input-container">
-                                        <input type="file" name="file" id="file-input" class="file-input">
-                                        <label for="file-input" class="file-label">
-                                            <i class="fas fa-paperclip attachment-icon"></i>
-                                        </label>
-                                    </div>
-                                    <input type="hidden" name="UserId" value="<?php echo htmlspecialchars($UserId); ?>">
-                                    <input type="hidden" name="AdminId" value="0">
-                                    <input type="hidden" name="ConvId" value="<?php echo htmlspecialchars($convoId); ?>">
-                                    <input type="text" class="form-control bg-transparent" name="message" placeholder="Type message...">
-                                    <button type="submit" name="send" class="btn btn-primary">
-                                        <i class="fas fa-paper-plane"></i> Send
-                                    </button>
-                                </form>
-
-                                <!-- </div> -->
-                            <?php
-                            } else {
-                            ?>
-                                <div>
-                                    <form action="" method="post">
-                                        <input type="hidden" name="" value="">
-                                        <button name="startConvo" class="glass-panel p-3">Start New Conversation</button>
-                                    </form>
-                                </div>
-                            <?php
-                                if (isset($_POST['startConvo'])) {
-                                    $startTime = date("H:i");
-                                    $startDate = date("Y-m-d");
-                                    $adminId = 0;
-                                    $StartConvo = mysqli_query($conn, "INSERT INTO Conversation(UserId, AdminId, StartDate, StartTime, ConvStatus) VALUES($UserId, $adminId, '$startDate', '$startTime', 0)");
-                                    if ($StartConvo) {
-                                        echo ('
-                                        <script>window.location.href = "./dashboard"</script>
-                                        ');
-                                    }
-                                }
+                            // Display date separator
+                            if ($currentDate !== $messageDate) {
+                                $currentDate = $messageDate;
+                                echo '<div class="message-date-separator">' . date("F j, Y", strtotime($currentDate)) . '</div>';
                             }
-                            ?>
 
-
-
+                            // Message bubble
+                            $isUser = ($messages['UserId'] == $UserId);
+                            $messageClass = $isUser ? 'message-sent' : 'message-received';
+                            $avatarClass = $isUser ? 'user-avatar' : 'admin-avatar';
+                            $avatarIcon = $isUser ? 'fas fa-user' : 'fas fa-headset';
+                            
+                            echo '<div class="message-wrapper ' . $messageClass . '">';
+                            echo '<div class="message-avatar ' . $avatarClass . '">';
+                            echo '<i class="' . $avatarIcon . '"></i>';
+                            echo '</div>';
+                            echo '<div class="message-bubble">';
+                            
+                            // Handle file messages
+                            if (strpos($messages['MessageContent'], './uploads/') === 0) {
+                                $filePath = $messages['MessageContent'];
+                                $fileName = basename($filePath);
+                                $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                                $cacheBuster = '?v=' . time();
+                                $fileUrl = $filePath . $cacheBuster;
+                                
+                                if (in_array($fileExt, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                                    echo '<div class="message-file-image">';
+                                    echo '<img src="' . $fileUrl . '" alt="' . $fileName . '" onclick="previewImage(\'' . $fileUrl . '\')">';
+                                    echo '<div class="file-info">';
+                                    echo '<span class="file-name">' . $fileName . '</span>';
+                                    echo '<a href="' . $fileUrl . '" download class="file-download"><i class="fas fa-download"></i></a>';
+                                    echo '</div>';
+                                    echo '</div>';
+                                } else {
+                                    echo '<div class="message-file-document">';
+                                    echo '<div class="file-icon"><i class="fas fa-file"></i></div>';
+                                    echo '<div class="file-details">';
+                                    echo '<span class="file-name">' . $fileName . '</span>';
+                                    echo '<span class="file-type">' . strtoupper($fileExt) . ' File</span>';
+                                    echo '</div>';
+                                    echo '<a href="' . $fileUrl . '" download class="file-download"><i class="fas fa-download"></i></a>';
+                                    echo '</div>';
+                                }
+                            } else {
+                                echo '<div class="message-text">' . htmlspecialchars($messages['MessageContent']) . '</div>';
+                            }
+                            
+                            echo '<div class="message-time">' . $messageTime . '</div>';
+                            echo '</div>';
+                            echo '</div>';
+                        }
+                    } else {
+                        echo '<div class="welcome-message">';
+                        echo '<div class="welcome-icon"><i class="fas fa-comments"></i></div>';
+                        echo '<h4>Welcome to MK Scholars Support!</h4>';
+                        echo '<p>Start a conversation with our support team. We\'re here to help you with any questions about scholarships and courses.</p>';
+                        echo '</div>';
+                    }
+                } else {
+                    echo '<div class="welcome-message">';
+                    echo '<div class="welcome-icon"><i class="fas fa-comments"></i></div>';
+                    echo '<h4>Welcome to MK Scholars Support!</h4>';
+                    echo '<p>Start a conversation with our support team. We\'re here to help you with any questions about scholarships and courses.</p>';
+                    echo '<button class="btn btn-primary start-conversation-btn" onclick="startConversation()">';
+                    echo '<i class="fas fa-plus me-2"></i>Start Conversation';
+                    echo '</button>';
+                    echo '</div>';
+                }
+                ?>
+                
+                <!-- Typing Indicator -->
+                <div class="typing-indicator" id="typing-indicator" style="display: none;">
+                    <div class="message-wrapper message-received">
+                        <div class="message-avatar admin-avatar">
+                            <i class="fas fa-headset"></i>
                         </div>
-                        <!-- Static File Gallery below chat -->
-                        <div class="mt-5">
-                            <h5 class="mb-3">Shared Files</h5>
-                            <!-- Upload Button/Form -->
-                            <form action="php/upload_file.php" method="post" enctype="multipart/form-data" class="mb-4 d-flex flex-wrap align-items-center gap-2">
-                                <input type="hidden" name="username" value="<?php echo htmlspecialchars($_SESSION['userName'] ?? 'user'); ?>">
-                                <input type="hidden" name="userid" value="<?php echo htmlspecialchars($_SESSION['userId']); ?>">
-                                <input type="hidden" name="convid" value="<?php echo htmlspecialchars($convoId ?? ''); ?>">
-                                <input type="file" name="file" class="form-control" style="max-width:300px;" required>
-                                <button type="submit" class="btn btn-success"><i class="fas fa-upload"></i> Upload New Document</button>
-                            </form>
-                            <?php if (isset($_GET['upload_success'])): ?>
-                                <div class="alert alert-success">File uploaded successfully!</div>
-                            <?php endif; ?>
-                            <?php if (isset($_GET['upload_error'])): ?>
-                                <div class="alert alert-danger">Upload failed: <?php echo htmlspecialchars($_GET['upload_error']); ?></div>
-                            <?php endif; ?>
-                            <div class="container-fluid py-2">
-                                <div class="row" id="static-files-list"></div>
+                        <div class="message-bubble typing-bubble">
+                            <div class="typing-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
                             </div>
                         </div>
-                        <!-- Preview Modal -->
-                        <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
-                          <div class="modal-dialog modal-xl">
-                            <div class="modal-content">
-                              <div class="modal-header">
-                                <h5 class="modal-title" id="previewModalLabel">Preview</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                              </div>
-                              <div class="modal-body" id="previewModalBody" style="min-height:400px;display:flex;align-items:center;justify-content:center;"></div>
-                            </div>
-                          </div>
-                        </div>
-                    <!-- Files Modal -->
-                    <div class="modal fade" id="filesModal" tabindex="-1" aria-labelledby="filesModalLabel" aria-hidden="true">
-                      <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title" id="filesModalLabel">Files Sent in Conversation</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-                          <div class="modal-body">
-                            <div id="modal-files-list" class="d-flex flex-wrap gap-3 justify-content-start"></div>
-                          </div>
-                        </div>
-                      </div>
                     </div>
-                    <!-- End Files Modal -->
                 </div>
+            </div>
+        </div>
 
-                <!-- <div class="row mt-4 g-4">
-                    <div class="col-md-6">
-                        <div class="glass-panel p-4">
-                            <h5><i class="fas fa-chart-line me-2"></i>Performance</h5>
-                            <canvas id="performanceChart" style="height: 200px;"></canvas>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="glass-panel p-4">
-                            <h5><i class="fas fa-tasks me-2"></i>Active Projects</h5>
-                            <div class="progress-glass mt-3">
-                                <div class="progress-bar bg-warning" style="width: 30%"></div>
+        <!-- Chat Input -->
+        <div class="chat-input-container">
+            <?php if (isset($convoId)): ?>
+            <!-- Quick Access Files Button -->
+            <div class="quick-files-access mb-3">
+                <button class="btn btn-outline-primary w-100" id="files-toggle-bottom">
+                    <i class="fas fa-folder me-2"></i>View & Upload Shared Files
+                </button>
+            </div>
+            
+            <form id="messageForm" class="chat-input-form" enctype="multipart/form-data">
+                <div class="input-group">
+                    <input type="hidden" name="UserId" value="<?php echo htmlspecialchars($UserId); ?>">
+                    <input type="hidden" name="AdminId" value="0">
+                    <input type="hidden" name="ConvId" value="<?php echo htmlspecialchars($convoId); ?>">
+                    <input type="text" class="form-control message-input" name="message" placeholder="Type your message..." autocomplete="off">
+                    <button type="submit" class="btn btn-primary send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </form>
+            <?php endif; ?>
+        </div>
+
+        <!-- Files Panel -->
+        <div class="files-panel" id="files-panel">
+            <div class="files-panel-header">
+                <h6><i class="fas fa-folder me-2"></i>Shared Files</h6>
+                <button class="btn btn-link btn-sm" id="close-files">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="files-panel-content">
+                <!-- Upload Section -->
+                <div class="upload-section">
+                    <h6 class="mb-3"><i class="fas fa-upload me-2"></i>Upload New File</h6>
+                    <form action="php/upload_file.php" method="post" enctype="multipart/form-data" class="upload-form">
+                        <input type="hidden" name="username" value="<?php echo htmlspecialchars($_SESSION['userName'] ?? 'user'); ?>">
+                        <input type="hidden" name="userid" value="<?php echo htmlspecialchars($_SESSION['userId']); ?>">
+                        <input type="hidden" name="convid" value="<?php echo htmlspecialchars($convoId ?? ''); ?>">
+                        <div class="upload-area" id="upload-area">
+                            <input type="file" name="file" class="upload-input" id="panel-file-input" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt" required>
+                            <div class="upload-placeholder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p><strong>Click here to upload files</strong></p>
+                                <small class="text-muted">or drag and drop files here</small>
                             </div>
-                            <small class="text-muted">Project Alpha - 30% complete</small>
                         </div>
-                    </div>
-                </div> -->
-            </main>
+                        
+                        <!-- File Preview -->
+                        <div class="file-preview" id="file-preview" style="display: none;">
+                            <div class="preview-content">
+                                <div class="preview-image" id="preview-image-container"></div>
+                                <div class="preview-info">
+                                    <h6 id="preview-filename"></h6>
+                                    <small id="preview-filesize"></small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 mt-3" id="upload-btn">
+                            <i class="fas fa-upload me-2"></i>Upload File
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Files List -->
+                <div class="files-list" id="static-files-list">
+                    <!-- Files will be loaded here -->
+                </div>
+            </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Image Preview Modal -->
+    <div class="modal fade" id="imagePreviewModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Image Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="preview-image" src="" alt="Preview" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Custom Styles -->
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --border-radius: 12px;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border-color: #404040;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --border-color: #e9ecef;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        /* Chat App Container */
+        .chat-app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 100%;
+            margin: 0 auto;
+            background: var(--bg-primary);
+            position: relative;
+        }
+
+        /* Desktop specific styling */
+        @media (min-width: 992px) {
+            .chat-app-container {
+                max-width: 800px;
+                margin: 2rem auto;
+                height: calc(100vh - 4rem);
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow);
+                border: 1px solid var(--border-color);
+            }
+        }
+
+        /* Chat Header */
+        .chat-header {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .chat-header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .chat-info h5 {
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .chat-actions .btn {
+            color: var(--text-secondary);
+            padding: 0.5rem;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-actions .btn:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .chat-actions .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .chat-actions .btn-primary:hover {
+            background: #0056b3;
+            border-color: #0056b3;
+            color: white;
+        }
+
+        .chat-actions .btn-success {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+        }
+
+        .chat-actions .btn-success:hover {
+            background: #218838;
+            border-color: #1e7e34;
+            color: white;
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Quick Files Access Button */
+        .quick-files-access {
+            text-align: center;
+        }
+
+        .quick-files-access .btn {
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
+        }
+
+        .quick-files-access .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+        }
+
+        /* Chat Body */
+        .chat-body {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .chat-messages {
+            height: 100%;
+            overflow-y: auto;
+            padding: 1rem;
+            scroll-behavior: smooth;
+        }
+
+        /* Messages */
+        .message-wrapper {
+            display: flex;
+            margin-bottom: 1rem;
+            align-items: flex-end;
+        }
+
+        .message-sent {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            margin: 0 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .user-avatar {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .admin-avatar {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius);
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message-sent .message-bubble {
+            background: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-received .message-bubble {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-text {
+            line-height: 1.4;
+            margin-bottom: 0.25rem;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            text-align: right;
+        }
+
+        .message-sent .message-time {
+            text-align: right;
+        }
+
+        .message-received .message-time {
+            text-align: left;
+        }
+
+        /* Date Separator */
+        .message-date-separator {
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        .message-date-separator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--border-color);
+            z-index: 1;
+        }
+
+        .message-date-separator span {
+            background: var(--bg-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Welcome Message */
+        .welcome-message {
+            text-align: center;
+            padding: 3rem 1rem;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .welcome-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .start-conversation-btn {
+            margin-top: 1.5rem;
+            padding: 0.75rem 2rem;
+            border-radius: var(--border-radius);
+        }
+
+        /* File Messages */
+        .message-file-image {
+            margin-bottom: 0.5rem;
+        }
+
+        .message-file-image img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .message-file-image img:hover {
+            transform: scale(1.05);
+        }
+
+        .file-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .file-name {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .file-download {
+            color: inherit;
+            text-decoration: none;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .file-download:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .message-file-document {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-icon {
+            font-size: 1.5rem;
+            opacity: 0.7;
+        }
+
+        .file-details {
+            flex: 1;
+        }
+
+        .file-type {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            display: block;
+        }
+
+        /* Typing Indicator */
+        .typing-bubble {
+            background: var(--bg-secondary) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 0.25rem;
+            align-items: center;
+        }
+
+        .typing-dots span {
+            width: 6px;
+            height: 6px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Chat Input */
+        .chat-input-container {
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-color);
+            padding: 1rem;
+            position: sticky;
+            bottom: 0;
+        }
+
+        .chat-input-form .input-group {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .message-input {
+            border: none;
+            background: transparent;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+        }
+
+        .message-input:focus {
+            box-shadow: none;
+            outline: none;
+        }
+
+        .message-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: var(--primary-color);
+        }
+
+        .send-btn:hover {
+            background: #0056b3;
+        }
+
+        /* Files Panel */
+        .files-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: var(--bg-primary);
+            border-left: 1px solid var(--border-color);
+            transition: var(--transition);
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .files-panel.active {
+            right: 0;
+        }
+
+        .files-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .files-panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .upload-section {
+            margin-bottom: 2rem;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            transition: var(--transition);
+            background: var(--bg-secondary);
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background: rgba(0, 123, 255, 0.05);
+        }
+
+        /* File Preview */
+        .file-preview {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+        }
+
+        .preview-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .preview-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .preview-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-image .file-icon {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .preview-info {
+            flex: 1;
+        }
+
+        .preview-info h6 {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .preview-info small {
+            color: var(--text-secondary);
+        }
+
+        .upload-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-placeholder {
+            color: var(--text-secondary);
+        }
+
+        .upload-placeholder i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .chat-app-container {
+                height: 100vh;
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+                border: none;
+            }
+
+            .files-panel {
+                width: 100%;
+                right: -100%;
+            }
+
+            .message-bubble {
+                max-width: 85%;
+            }
+
+            .chat-header {
+                padding: 0.75rem;
+            }
+
+            .chat-messages {
+                padding: 0.75rem;
+            }
+
+            .chat-input-container {
+                padding: 0.75rem;
+            }
+
+            .quick-files-access .btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .message-bubble {
+                max-width: 90%;
+            }
+
+            .chat-avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .message-avatar {
+                width: 28px;
+                height: 28px;
+            }
+
+            .quick-files-access .btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* File Gallery Styles */
+        .file-card {
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .file-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .file-image-card {
+            text-align: center;
+        }
+
+        .file-thumb {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-doc-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .file-doc-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .file-info-details {
+            flex: 1;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .file-actions .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+    </style>
+
+    <!-- JavaScript -->
     <script>
         // Theme Toggle
-        const themeToggle = document.querySelector('.theme-toggle');
+        const themeToggle = document.getElementById('theme-toggle');
         const body = document.body;
         const savedTheme = localStorage.getItem('theme') || 'light';
         body.setAttribute('data-theme', savedTheme);
-        updateToggleIcon();
+        updateThemeIcon();
 
         themeToggle.addEventListener('click', () => {
             const currentTheme = body.getAttribute('data-theme');
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
             body.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
-            updateToggleIcon();
+            updateThemeIcon();
         });
 
-        function updateToggleIcon() {
+        function updateThemeIcon() {
             const currentTheme = body.getAttribute('data-theme');
-            themeToggle.innerHTML = currentTheme === 'light' ?
-                '<i class="fas fa-moon"></i>' :
+            themeToggle.innerHTML = currentTheme === 'light' ? 
+                '<i class="fas fa-moon"></i>' : 
                 '<i class="fas fa-sun"></i>';
         }
 
-        // Notifications
-        const notificationBtn = document.querySelector('.notification-btn');
-        const notificationBox = document.querySelector('.notification-box');
+        // Files Panel Toggle
+        const filesToggle = document.getElementById('files-toggle');
+        const filesToggleBottom = document.getElementById('files-toggle-bottom');
+        const filesPanel = document.getElementById('files-panel');
+        const closeFiles = document.getElementById('close-files');
 
-        notificationBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            notificationBox.style.display = notificationBox.style.display === 'block' ? 'none' : 'block';
-        });
+        function openFilesPanel() {
+            filesPanel.classList.add('active');
+        }
 
-        // Close notifications when clicking outside
+        function closeFilesPanel() {
+            filesPanel.classList.remove('active');
+        }
+
+        // Header button
+        if (filesToggle) {
+            filesToggle.addEventListener('click', openFilesPanel);
+        }
+
+        // Bottom button
+        if (filesToggleBottom) {
+            filesToggleBottom.addEventListener('click', openFilesPanel);
+        }
+
+        // Close button
+        if (closeFiles) {
+            closeFiles.addEventListener('click', closeFilesPanel);
+        }
+
+        // Close files panel when clicking outside
         document.addEventListener('click', (e) => {
-            if (!notificationBtn.contains(e.target)) {
-                notificationBox.style.display = 'none';
+            if (!filesPanel.contains(e.target) && 
+                !filesToggle.contains(e.target) && 
+                !filesToggleBottom.contains(e.target)) {
+                closeFilesPanel();
             }
         });
 
         // Mobile Sidebar Toggle
-        const sidebar = document.querySelector('.sidebar');
         const sidebarToggle = document.querySelector('.sidebar-toggle');
-        const mainContent = document.querySelector('.main-content');
+        const sidebar = document.querySelector('.sidebar');
 
-        sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
-        });
+        if (sidebarToggle && sidebar) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+        }
 
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', (e) => {
-            if (window.innerWidth < 768 && !sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
-                sidebar.classList.remove('active');
-            }
-        });
-    </script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        // Typing Indicator
-        let typingTimer;
-        $('input[name="message"]').on('input', function() {
-            $('#typing-indicator').show();
-            clearTimeout(typingTimer);
-            typingTimer = setTimeout(() => {
-                $('#typing-indicator').hide();
-            }, 1000);
-        });
+        // File Preview Functionality
+        const panelFileInput = document.getElementById('panel-file-input');
+        const filePreview = document.getElementById('file-preview');
+        const previewImageContainer = document.getElementById('preview-image-container');
+        const previewFilename = document.getElementById('preview-filename');
+        const previewFilesize = document.getElementById('preview-filesize');
+        const uploadBtn = document.getElementById('upload-btn');
 
-        // Send Message + File
-        $('#messageForm').on('submit', function(event) {
-            event.preventDefault();
-            const form = new FormData(this);
-
-            $.ajax({
-                url: './php/submit_message.php',
-                type: 'POST',
-                data: form,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    $('input[name="message"]').val('');
-                    $('#file-input').val('');
-                    // Real-time update will handle the new message
-                },
-                error: function() {
-                    alert('Error sending message');
+        if (panelFileInput) {
+            panelFileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    showFilePreview(file);
+                } else {
+                    hideFilePreview();
                 }
             });
+        }
+
+        function showFilePreview(file) {
+            const fileName = file.name;
+            const fileSize = formatFileSize(file.size);
+            const fileType = file.type;
+            
+            previewFilename.textContent = fileName;
+            previewFilesize.textContent = fileSize;
+            
+            // Clear previous preview
+            previewImageContainer.innerHTML = '';
+            
+            if (fileType.startsWith('image/')) {
+                // Show image preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.alt = fileName;
+                    previewImageContainer.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // Show file icon
+                const icon = document.createElement('i');
+                icon.className = 'fas ' + getFileIcon(fileName);
+                previewImageContainer.appendChild(icon);
+            }
+            
+            filePreview.style.display = 'block';
+            uploadBtn.disabled = false;
+        }
+
+        function hideFilePreview() {
+            filePreview.style.display = 'none';
+            uploadBtn.disabled = true;
+        }
+
+        function getFileIcon(fileName) {
+            const ext = fileName.split('.').pop().toLowerCase();
+            const iconMap = {
+                'pdf': 'fa-file-pdf',
+                'doc': 'fa-file-word',
+                'docx': 'fa-file-word',
+                'xls': 'fa-file-excel',
+                'xlsx': 'fa-file-excel',
+                'ppt': 'fa-file-powerpoint',
+                'pptx': 'fa-file-powerpoint',
+                'txt': 'fa-file-alt',
+                'zip': 'fa-file-archive',
+                'rar': 'fa-file-archive',
+                'csv': 'fa-file-csv'
+            };
+            return iconMap[ext] || 'fa-file';
+        }
+
+        // Message Form
+        $(document).ready(function() {
+            // Initialize file list
+            refreshFileList();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(refreshFileList, 30000);
+
+            // Handle upload form submission
+            $('.upload-form').on('submit', function(e) {
+                e.preventDefault();
+                const form = new FormData(this);
+                
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: form,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        // Reset form and preview
+                        $('.upload-form')[0].reset();
+                        hideFilePreview();
+                        refreshFileList();
+                        
+                        // Show success message
+                        alert('File uploaded successfully!');
+                    },
+                    error: function() {
+                        alert('Upload failed. Please try again.');
+                    }
+                });
+            });
+
+            // Message form submission
+            $('#messageForm').on('submit', function(e) {
+                e.preventDefault();
+                const form = new FormData(this);
+                const messageInput = $('input[name="message"]');
+                const message = messageInput.val().trim();
+
+                if (!message && !form.get('file').size) {
+                    return;
+                }
+
+                $.ajax({
+                    url: './php/submit_message.php',
+                    type: 'POST',
+                    data: form,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        messageInput.val('');
+                        $('#file-input').val('');
+                        // Real-time update will handle the new message
+                    },
+                    error: function() {
+                        alert('Error sending message');
+                    }
+                });
+            });
+
+            // Typing indicator
+            let typingTimer;
+            $('input[name="message"]').on('input', function() {
+                $('#typing-indicator').show();
+                clearTimeout(typingTimer);
+                typingTimer = setTimeout(() => {
+                    $('#typing-indicator').hide();
+                }, 1000);
+            });
+
+            // Real-time chat
+            startRealTimeChat();
         });
 
-        // Real-time chat using Server-Sent Events
+        // Real-time chat functionality
         let lastMessageId = 0;
         let eventSource = null;
 
         function startRealTimeChat() {
-            const convId = $('input[name="ConvId"]').val();
+            const convId = <?php echo isset($convoId) ? $convoId : 'null'; ?>;
             if (!convId) return;
 
-            // Close existing connection if any
-            if (eventSource) {
-                eventSource.close();
-            }
+            const url = `./php/chat_stream.php?convId=${convId}&lastMessageId=${lastMessageId}`;
+            eventSource = new EventSource(url);
 
-            // Start SSE connection
-            eventSource = new EventSource(`./php/chat_stream.php?convId=${convId}&lastMessageId=${lastMessageId}`);
-            
             eventSource.onmessage = function(event) {
-                try {
-                    const messages = JSON.parse(event.data);
-                    if (Array.isArray(messages)) {
-                        messages.forEach(msg => {
-                            addMessageToChat(msg);
-                            lastMessageId = Math.max(lastMessageId, msg.MessageId);
-                        });
-                    }
-                } catch (e) {
-                    console.log('SSE data received:', event.data);
+                const data = JSON.parse(event.data);
+                if (data.error) {
+                    console.error('SSE Error:', data.error);
+                    return;
+                }
+
+                if (data.length > 0) {
+                    data.forEach(message => {
+                        addMessageToChat(message);
+                        lastMessageId = Math.max(lastMessageId, message.MessageId || 0);
+                    });
                 }
             };
 
-            eventSource.onerror = function(event) {
-                console.log('SSE error, reconnecting...');
+            eventSource.onerror = function() {
+                eventSource.close();
                 setTimeout(startRealTimeChat, 5000);
             };
         }
 
         function addMessageToChat(message) {
             const chatContainer = $('#chat-container');
-            const userId = $('input[name="UserId"]').val();
+            const userId = <?php echo isset($UserId) ? $UserId : 'null'; ?>;
             const messageDate = new Date(message.SentDate).toDateString();
             const messageTime = new Date('2000-01-01 ' + message.SentTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             
             // Check if we need to add a date separator
-            const lastDateSeparator = chatContainer.find('.date-separator').last();
+            const lastDateSeparator = chatContainer.find('.message-date-separator').last();
             if (lastDateSeparator.length === 0 || lastDateSeparator.text() !== messageDate) {
-                chatContainer.append(`<div class="date-separator text-center my-3">${messageDate}</div>`);
+                chatContainer.append(`<div class="message-date-separator"><span>${messageDate}</span></div>`);
             }
 
-            let content;
+            const isUser = message.UserId == userId;
+            const messageClass = isUser ? 'message-sent' : 'message-received';
+            const avatarClass = isUser ? 'user-avatar' : 'admin-avatar';
+            const avatarIcon = isUser ? 'fas fa-user' : 'fas fa-headset';
+
+            let content = '';
             if (message.MessageContent.startsWith('./uploads/')) {
                 const ext = message.MessageContent.split('.').pop().toLowerCase();
-                if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
-                    content = `<img src="${message.MessageContent}" style="max-width:200px;" alt="File">`;
+                const cacheBuster = '?v=' + new Date().getTime(); // Add cache-buster
+                const fileUrl = message.MessageContent + cacheBuster;
+                if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+                    content = `
+                        <div class="message-file-image">
+                            <img src="${fileUrl}" alt="File" onclick="previewImage('${fileUrl}')">
+                            <div class="file-info">
+                                <span class="file-name">${basename(message.MessageContent)}</span>
+                                <a href="${fileUrl}" download class="file-download"><i class="fas fa-download"></i></a>
+                            </div>
+                        </div>`;
                 } else {
-                    content = `<a href="${message.MessageContent}" target="_blank">📎 Download File</a>`;
+                    content = `
+                        <div class="message-file-document">
+                            <div class="file-icon"><i class="fas fa-file"></i></div>
+                            <div class="file-details">
+                                <span class="file-name">${basename(message.MessageContent)}</span>
+                                <span class="file-type">${ext.toUpperCase()} File</span>
+                            </div>
+                            <a href="${fileUrl}" download class="file-download"><i class="fas fa-download"></i></a>
+                        </div>`;
                 }
             } else {
-                content = message.MessageContent;
+                content = `<div class="message-text">${message.MessageContent}</div>`;
             }
 
-            const bubbleClass = message.UserId == userId ? 'sent' : 'received';
-            const bubble = `
-                <div class="chat-bubble ${bubbleClass} mb-3">
-                    <p class="message-content">${content}</p>
-                    <span class="time">${messageTime}</span>
-                </div>
-            `;
-            chatContainer.append(bubble);
-            
-            // Scroll to bottom
+            const messageHtml = `
+                <div class="message-wrapper ${messageClass}">
+                    <div class="message-avatar ${avatarClass}">
+                        <i class="${avatarIcon}"></i>
+                    </div>
+                    <div class="message-bubble">
+                        ${content}
+                        <div class="message-time">${messageTime}</div>
+                    </div>
+                </div>`;
+
+            chatContainer.append(messageHtml);
             chatContainer.scrollTop(chatContainer[0].scrollHeight);
         }
 
-        // Initialize real-time chat when page loads
-        $(document).ready(function() {
-            startRealTimeChat();
-        });
+        function basename(path) {
+            return path.split('/').pop();
+        }
 
-        // Clean up on page unload
-        $(window).on('beforeunload', function() {
-            if (eventSource) {
-                eventSource.close();
-            }
-        });
+        // File management functions
+        function refreshFileList() {
+            const userId = <?php echo isset($_SESSION['userId']) ? $_SESSION['userId'] : 'null'; ?>;
+            const convId = <?php echo isset($convoId) ? $convoId : 'null'; ?>;
+            
+            if (!userId) return;
 
-        // Files Tab: Load files when tab is shown
-        document.getElementById('files-tab').addEventListener('shown.bs.tab', function (e) {
-            loadFiles();
-        });
-        function loadFiles() {
-            const convId = $('input[name="ConvId"]').val();
-            $.get('./php/fetch_files.php', { ConvId: convId }, function(data) {
-                const files = JSON.parse(data);
-                const filesList = $('#files-list');
-                filesList.html('');
-                if (files.length === 0) {
-                    filesList.html('<div class="text-center text-muted">No files sent in this conversation.</div>');
-                    return;
-                }
-                files.forEach(file => {
-                    const ext = file.MessageContent.split('.').pop().toLowerCase();
-                    let content;
-                    if (["jpg","jpeg","png","gif","webp","bmp","avif"].includes(ext)) {
-                        content = `<img src="${file.MessageContent}" style="max-width:120px;max-height:120px;margin:5px;" alt="File">`;
-                    } else {
-                        content = `<a href="${file.MessageContent}" target="_blank">📎 Download File</a>`;
-                    }
-                    filesList.append(`<div class="mb-2">${content} <span class="text-muted" style="font-size:0.9em;">${file.SentDate} ${file.SentTime}</span></div>`);
-                });
+            let url = `./php/list_user_files.php?userid=${userId}`;
+            if (convId) url += `&convid=${convId}`;
+
+            $.get(url, function(files) {
+                renderFiles(files);
             });
         }
 
-        // Remove Files Tab JS if present
-        // Add Modal File Viewer JS
-        // $('#filesModal').on('show.bs.modal', function () {
-        //     loadFilesModal();
-        // });
-        // function loadFilesModal() {
-        //     const convId = $('input[name="ConvId"]').val();
-        //     $.get('./php/fetch_files.php', { ConvId: convId }, function(data) {
-        //         const files = JSON.parse(data);
-        //         const filesList = $('#modal-files-list');
-        //         filesList.html('');
-        //         if (files.length === 0) {
-        //             filesList.html('<div class="text-center text-muted w-100">No files sent in this conversation.</div>');
-        //             return;
-        //         }
-        //         files.forEach(file => {
-        //             const ext = file.MessageContent.split('.').pop().toLowerCase();
-        //             let content;
-        //             if (["jpg","jpeg","png","gif","webp","bmp","avif"].includes(ext)) {
-        //                 content = `<img src="${file.MessageContent}" style="max-width:120px;max-height:120px;" alt="File">`;
-        //             } else {
-        //                 content = `<a href="${file.MessageContent}" target="_blank">📎 Download File</a>`;
-        //             }
-        //             filesList.append(`<div class="mb-2">${content}<br><span class="text-muted" style="font-size:0.9em;">${file.SentDate} ${file.SentTime}</span></div>`);
-        //         });
-        //     });
-        // }
-    </script>
+        function renderFiles(files) {
+            const filesList = document.getElementById('static-files-list');
+            filesList.innerHTML = '';
 
-    <script>
-        // Scroll to the bottom of the chat container
-        const chatContainer = document.getElementById('chat-container');
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-    </script>
+            if (!files || files.length === 0) {
+                filesList.innerHTML = '<div class="text-center text-muted">No files shared yet.</div>';
+                return;
+            }
 
-    <script>
-        // Utility: Map file extensions to icon, color, and label
+            files.forEach(file => {
+                const fileCard = createFileCard(file);
+                filesList.appendChild(fileCard);
+            });
+        }
+
+        function createFileCard(file) {
+            const card = document.createElement('div');
+            card.className = 'file-card';
+
+            const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(file.type);
+            
+            if (isImage) {
+                const cacheBuster = '?v=' + new Date().getTime(); // Add cache-buster
+                const fileUrl = file.url + cacheBuster;
+                card.innerHTML = `
+                    <div class="file-image-card">
+                        <img src="${fileUrl}" alt="${file.name}" class="file-thumb" onclick="previewImage('${fileUrl}')">
+                        <div class="file-info-details">
+                            <div class="fw-semibold">${file.name}</div>
+                            <div class="text-muted small">${formatFileSize(file.size)} • ${file.uploadedByMe ? 'Sent by you' : 'Received'}</div>
+                            <div class="text-muted small">${file.uploadDate}</div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="btn btn-outline-primary btn-sm" onclick="previewImage('${fileUrl}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <a href="${fileUrl}" download class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-download"></i>
+                            </a>
+                            ${file.source === 'documents_table' ? `
+                                <button class="btn btn-outline-danger btn-sm" onclick="deleteFile('${file.url}', ${file.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>`;
+            } else {
+                const docInfo = getDocTypeInfo(file.url);
+                const cacheBuster = '?v=' + new Date().getTime(); // Add cache-buster
+                const fileUrl = file.url + cacheBuster;
+                card.innerHTML = `
+                    <div class="file-doc-card">
+                        <div class="file-doc-icon">
+                            <i class="fas ${docInfo.icon}" style="color: ${docInfo.color}"></i>
+                        </div>
+                        <div class="file-info-details">
+                            <div class="fw-semibold">${file.name}</div>
+                            <div class="text-muted small">${formatFileSize(file.size)} • ${docInfo.label}</div>
+                            <div class="text-muted small">${file.uploadedByMe ? 'Sent by you' : 'Received'} • ${file.uploadDate}</div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="btn btn-outline-primary btn-sm" onclick="previewFile('${fileUrl}', 'doc')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <a href="${fileUrl}" download class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-download"></i>
+                            </a>
+                            ${file.source === 'documents_table' ? `
+                                <button class="btn btn-outline-danger btn-sm" onclick="deleteFile('${file.url}', ${file.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>`;
+            }
+
+            return card;
+        }
+
+        // Utility functions
         const docTypeMap = {
-            pdf:  { icon: 'fa-file-pdf',   color: '#e74c3c', label: 'PDF' },
-            doc:  { icon: 'fa-file-word',  color: '#2980b9', label: 'DOC' },
-            docx: { icon: 'fa-file-word',  color: '#2980b9', label: 'DOCX' },
-            xls:  { icon: 'fa-file-excel', color: '#27ae60', label: 'XLS' },
+            pdf: { icon: 'fa-file-pdf', color: '#e74c3c', label: 'PDF' },
+            doc: { icon: 'fa-file-word', color: '#2980b9', label: 'DOC' },
+            docx: { icon: 'fa-file-word', color: '#2980b9', label: 'DOCX' },
+            xls: { icon: 'fa-file-excel', color: '#27ae60', label: 'XLS' },
             xlsx: { icon: 'fa-file-excel', color: '#27ae60', label: 'XLSX' },
-            ppt:  { icon: 'fa-file-powerpoint', color: '#e67e22', label: 'PPT' },
+            ppt: { icon: 'fa-file-powerpoint', color: '#e67e22', label: 'PPT' },
             pptx: { icon: 'fa-file-powerpoint', color: '#e67e22', label: 'PPTX' },
-            txt:  { icon: 'fa-file-alt',   color: '#7f8c8d', label: 'TXT' },
-            zip:  { icon: 'fa-file-archive', color: '#8e44ad', label: 'ZIP' },
-            rar:  { icon: 'fa-file-archive', color: '#8e44ad', label: 'RAR' },
-            csv:  { icon: 'fa-file-csv',   color: '#16a085', label: 'CSV' },
+            txt: { icon: 'fa-file-alt', color: '#7f8c8d', label: 'TXT' },
+            zip: { icon: 'fa-file-archive', color: '#8e44ad', label: 'ZIP' },
+            rar: { icon: 'fa-file-archive', color: '#8e44ad', label: 'RAR' },
+            csv: { icon: 'fa-file-csv', color: '#16a085', label: 'CSV' },
             default: { icon: 'fa-file', color: '#34495e', label: 'FILE' }
         };
 
-        // Assume these are set from PHP session or JS global
-        const currentUser = {
-            username: 'demoUser', // Replace with actual username from session
-            userid: 123           // Replace with actual user id from session
-        };
-
-        // Remove staticFiles array. Fetch files from backend instead.
-        let uploadedFiles = [];
-        // Optionally set conversation id if available
-        const conversationId = window.currentConversationId || null; // Set this from your session/page if needed
-
-        function fetchAndRenderFiles() {
-            let url = `./php/list_user_files.php?userid=${currentUser.userid}`;
-            if (conversationId) url += `&convid=${conversationId}`;
-            $.get(url, function(files) {
-                uploadedFiles = files;
-                renderStaticFiles();
-            });
+        function getDocTypeInfo(url) {
+            const ext = url.split('.').pop().toLowerCase();
+            return docTypeMap[ext] || docTypeMap.default;
         }
 
-        function renderStaticFiles() {
-            const filesList = document.getElementById('static-files-list');
-            filesList.innerHTML = '';
-            if (!uploadedFiles || uploadedFiles.length === 0) {
-                filesList.innerHTML = '<div class="text-center text-muted w-100">No files in gallery.</div>';
-                return;
-            }
-            uploadedFiles.forEach((file, idx) => {
-                const type = getFileType(file.url);
-                const col = document.createElement('div');
-                col.className = 'col-12 col-sm-6 col-md-4 col-lg-3 file-card';
-                let content = '';
-                if (type === 'image') {
-                    content = `
-                    <div class="file-image-card shadow-sm p-2 mb-2 bg-white rounded-4 d-flex flex-column align-items-center position-relative">
-                        <img src="${file.url}" alt="${file.name}" class="file-thumb mb-2" style="cursor:pointer;" onclick="previewFile('${file.url}','image')">
-                        <div class="file-link text-center fw-semibold">${file.name}</div>
-                        <div class="text-muted small">${formatFileSize(file.size)}</div>
-                        <div class="d-flex gap-2 mt-2">
-                            <button class="btn btn-outline-primary btn-sm" onclick="previewFile('${file.url}','image')"><i class="fas fa-eye"></i></button>
-                            <a href="${file.url}" download class="btn btn-outline-success btn-sm"><i class="fas fa-download"></i></a>
-                            <button class="btn btn-outline-danger btn-sm" onclick="deleteFile('${file.url}', ${file.id})"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>`;
-                } else {
-                    const docInfo = getDocTypeInfo(file.url);
-                    content = `
-                    <div class="file-doc-card shadow-sm p-3 mb-2 rounded-4 d-flex flex-column align-items-center position-relative" style="background:${docInfo.color}1A; border:2px solid ${docInfo.color};">
-                        <div class="display-3 mb-2" style="color:${docInfo.color}"><i class="fas ${docInfo.icon}"></i></div>
-                        <div class="badge mb-2" style="background:${docInfo.color};color:#fff;font-size:0.9em;">${docInfo.label}</div>
-                        <div class="file-link text-center fw-semibold" style="color:${docInfo.color}">${file.name}</div>
-                        <div class="text-muted small">${formatFileSize(file.size)}</div>
-                        <div class="d-flex gap-2 mt-2">
-                            <button class="btn btn-outline-primary btn-sm" onclick="previewFile('${file.url}','doc','${docInfo.label}')"><i class="fas fa-eye"></i></button>
-                            <a href="${file.url}" download class="btn btn-outline-success btn-sm"><i class="fas fa-download"></i></a>
-                            <button class="btn btn-outline-danger btn-sm" onclick="deleteFile('${file.url}', ${file.id})"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>`;
-                }
-                col.innerHTML = content;
-                filesList.appendChild(col);
-            });
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        // Preview logic
-        window.previewFile = function(url, type, label) {
+        function previewImage(url) {
+            document.getElementById('preview-image').src = url;
+            new bootstrap.Modal(document.getElementById('imagePreviewModal')).show();
+        }
+
+        function previewFile(url, type) {
             const ext = url.split('.').pop().toLowerCase();
             if (type === 'image' || ext === 'pdf') {
                 window.open(url, '_blank');
@@ -662,91 +1389,35 @@ include('./php/validateSession.php');
                 window.open(url, '_blank');
             }
         }
-        // Delete logic
-        window.deleteFile = function(url, docId) {
+
+        function deleteFile(url, docId) {
             if (!confirm('Are you sure you want to delete this file?')) return;
-            $.post('./php/delete_file.php', { file: url }, function(resp) {
-                // Remove from uploadedFiles array and re-render
-                uploadedFiles = uploadedFiles.filter(f => f.id !== docId);
-                renderStaticFiles();
+            
+            $.post('./php/delete_file.php', { file: url, docId: docId }, function(resp) {
+                refreshFileList();
             });
         }
-        // Upload logic: after upload, refresh file list
-        // This section is now handled by the PHP form submission and the refreshFileList function
-        // $('#uploadForm').on('submit', function(e) {
-        //     e.preventDefault();
-        //     const formData = new FormData(this);
-        //     formData.append('username', currentUser.username);
-        //     formData.append('userid', currentUser.userid);
-        //     if (conversationId) formData.append('convid', conversationId);
-        //     $.ajax({
-        //         url: './php/upload_file.php',
-        //         type: 'POST',
-        //         data: formData,
-        //         processData: false,
-        //         contentType: false,
-        //         success: function(resp) {
-        //             $('#fileInput').val('');
-        //             fetchAndRenderFiles();
-        //         },
-        //         error: function() {
-        //             alert('Upload failed.');
-        //         }
-        //     });
-        // });
 
-        // On page load, fetch files
-        $(document).ready(function() {
-            refreshFileList();
-            // Refresh file list every 30 seconds
-            setInterval(refreshFileList, 30000);
+        function startConversation() {
+            $.post('', { startConvo: true }, function() {
+                location.reload();
+            });
+        }
+
+        // Clean up on page unload
+        $(window).on('beforeunload', function() {
+            if (eventSource) {
+                eventSource.close();
+            }
         });
-        // Add styles for file gallery
-        const style = document.createElement('style');
-        style.innerHTML = `
-        .file-thumb {
-            max-width: 160px;
-            max-height: 160px;
-            object-fit: cover;
-            border-radius: 12px;
-            border: 3px solid #f8f9fa;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.10);
-            background: #fff;
-            transition: box-shadow 0.2s;
-        }
-        .file-thumb:hover {
-            box-shadow: 0 4px 24px rgba(0,0,0,0.18);
-        }
-        .file-card {
-            margin-bottom: 32px;
-        }
-        .file-image-card {
-            border: 2px solid #e3e3e3;
-            background: #f9f9f9;
-            transition: box-shadow 0.2s, border 0.2s;
-        }
-        .file-image-card:hover {
-            border: 2px solid #007bff;
-            box-shadow: 0 4px 24px rgba(0,123,255,0.10);
-        }
-        .file-doc-card {
-            min-height: 180px;
-            width: 100%;
-            background: #f8f9fa;
-            border-width: 2px;
-            border-style: solid;
-            transition: box-shadow 0.2s, border 0.2s;
-        }
-        .file-doc-card:hover {
-            box-shadow: 0 4px 24px rgba(0,0,0,0.13);
-            filter: brightness(1.04);
-        }
-        .file-link {
-            word-break: break-all;
-        }
-        `;
-        document.head.appendChild(style);
+
+        // Auto-scroll to bottom on load
+        $(document).ready(function() {
+            const chatContainer = document.getElementById('chat-container');
+            if (chatContainer) {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        });
     </script>
 </body>
-
 </html>

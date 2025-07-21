@@ -1,19 +1,34 @@
 <?php
 session_start();
 include("../dbconnections/connection.php");
-if (empty($_GET['ConvId'])) { echo json_encode([]); exit; }
+
+// Validate admin session
+if (!isset($_SESSION['adminId'])) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Admin not authenticated']);
+    exit;
+}
+
+if (empty($_GET['ConvId'])) { 
+    echo json_encode([]); 
+    exit; 
+}
 $convId = intval($_GET['ConvId']);
+$lastMessageId = isset($_GET['lastMessageId']) ? intval($_GET['lastMessageId']) : 0;
 
-// $stmt = $conn->prepare("SELECT u.userId, u.username, m.AdminId, m.MessageContent, m.SentDate, m.SentTime
-//     FROM Message m
-//     JOIN users u ON m.AdminId = u.userId
-//     WHERE m.ConvId = ?
-//     ORDER BY m.SentDate, m.SentTime");
+// Build query based on whether we want all messages or only new ones
+if ($lastMessageId > 0) {
+    // Get only messages newer than lastMessageId
+    $stmt = $conn->prepare("SELECT MessageId, AdminId, MessageContent, SentDate, SentTime
+        FROM Message WHERE ConvId = ? AND MessageId > ? ORDER BY SentDate, SentTime");
+    $stmt->bind_param('ii', $convId, $lastMessageId);
+} else {
+    // Get all messages
+    $stmt = $conn->prepare("SELECT MessageId, AdminId, MessageContent, SentDate, SentTime
+        FROM Message WHERE ConvId = ? ORDER BY SentDate, SentTime");
+    $stmt->bind_param('i', $convId);
+}
 
-$stmt = $conn->prepare("SELECT AdminId, MessageContent, SentDate, SentTime
-    FROM Message WHERE ConvId = ? ORDER BY SentDate, SentTime");
-
-$stmt->bind_param('i',$convId);
 $stmt->execute();
 $res = $stmt->get_result();
 $messages = $res->fetch_all(MYSQLI_ASSOC);

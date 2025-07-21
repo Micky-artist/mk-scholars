@@ -148,49 +148,8 @@
 						$numPosts = count($scholarships);
 
 						if ($numPosts > 0) {
-							// 2) Random interval between ads: 2, 3 or 4
-							$interval = rand(2, 4);
-
-							// 3) Calculate number of ads: at least 2, at most 10
-							$calculatedAds = (int)ceil($numPosts / $interval);
-							$numAds        = min(10, max(2, $calculatedAds));
-
-							// 4) Build “slots” 0..$numPosts and pick $numAds random slots
-							$slots   = range(0, $numPosts);
-							shuffle($slots);
-							$adSlots = array_slice($slots, 0, min($numAds, count($slots)));
-							sort($adSlots);
-
-							// Counters for rendering
-							$slotIndex    = 0;
-							$adsRendered  = 0;
-							$maxAdsPerPage = 10;
-
-							// Helper to output your ad markup
-							function renderAdBanner()
-							{
-						?>
-								<script type="text/javascript">
-									atOptions = {
-										'key': '98402006e8b83dd2d8d5dda96e411da2',
-										'format': 'iframe',
-										'height': 250,
-										'width': 300,
-										'params': {}
-									};
-								</script>
-								<script type="text/javascript" src="//www.highperformanceformat.com/98402006e8b83dd2d8d5dda96e411da2/invoke.js"></script>
-
-							<?php
-							}
-
-							// 5) Loop through scholarships
+							// Loop through scholarships (ads removed)
 							foreach ($scholarships as $s) {
-								// If this slot is in our adSlots AND we haven't hit 10 ads yet
-								if (in_array($slotIndex, $adSlots, true) && $adsRendered < $maxAdsPerPage) {
-									renderAdBanner();
-									$adsRendered++;
-								}
 							?>
 								<div class="scholarship-card">
 									<div class="card-image">
@@ -238,12 +197,6 @@
 								</div>
 							<?php
 								$slotIndex++;
-							}
-
-							// 6) Final “after last post” slot
-							if (in_array($slotIndex, $adSlots, true) && $adsRendered < $maxAdsPerPage) {
-								renderAdBanner();
-								$adsRendered++;
 							}
 						} else {
 							// No scholarships found
