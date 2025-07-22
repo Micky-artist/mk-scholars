@@ -34,7 +34,7 @@
 
         <div class="glass-panel p-2 mb-1">
             <a class="nav-link d-flex align-items-center" href="./apply">
-                <span>Apply</span>
+                <span>Ask For Assistance</span>
             </a>
         </div>
         <!-- <div class="glass-panel p-2 mb-1">

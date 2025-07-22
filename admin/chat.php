@@ -272,7 +272,7 @@ $selectConvos = $conn->query($convSql);
         font-size: 0.75rem;
         padding: 0.5rem 0.75rem;
         transition: all 0.3s ease;
-    }
+        }
 
     .network-status .badge.bg-success {
         background-color: #28a745 !important;
@@ -323,9 +323,9 @@ $selectConvos = $conn->query($convSql);
                             class="user-card-link p-3 mb-2 glass-panel<?= $active ?>">
                             <div class="d-flex justify-content-between">
                                 <div><i class="fas fa-user-circle text-primary me-2"></i><?= $c['NoUsername'] ?></div>
-                                <?php if ($c['unreadCount'] > 0): ?>
-                                    <span class="badge bg-danger"><?= $c['unreadCount'] ?></span>
-                                <?php endif; ?>
+                                        <?php if ($c['unreadCount'] > 0): ?>
+                                            <span class="badge bg-danger"><?= $c['unreadCount'] ?></span>
+                                        <?php endif; ?>
                             </div>
                         </a>
                     <?php endwhile; ?>
@@ -404,7 +404,7 @@ $selectConvos = $conn->query($convSql);
                 userId = <?= json_encode($UserId) ?>,
                 $c = $('#chat-container'),
                 baseUrl = '<?php echo $baseUrl; ?>';
-            
+
             let lastMessageId = 0;
             let processedMessages = new Set(); // Track processed messages to prevent duplicates
             let pollInterval = null;
@@ -419,17 +419,13 @@ $selectConvos = $conn->query($convSql);
                     return filePath;
                 }
                 
-                // Check if we're online by testing a simple request
-                const isOnline = navigator.onLine;
+                // Always use the main domain for hosted environment
+                const mainDomain = 'https://mkscholars.com';
                 
-                if (isOnline && baseUrl) {
-                    // Use domain path when online
-                    return baseUrl + '/' + filePath.replace(/^\.\//, '');
-                } else {
-                    // Use local path when offline
-                    return filePath;
+                // Remove leading ./ if present and construct full URL
+                const cleanPath = filePath.replace(/^\.\//, '');
+                return mainDomain + '/' + cleanPath;
                 }
-            }
 
             // Network status detection
             function updateNetworkStatus() {
@@ -440,7 +436,7 @@ $selectConvos = $conn->query($convSql);
                     if (isOnline) {
                         indicator.className = 'badge bg-success';
                         indicator.innerHTML = '<i class="fas fa-wifi me-1"></i>Online';
-                    } else {
+                } else {
                         indicator.className = 'badge bg-warning';
                         indicator.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>Offline';
                     }
@@ -459,56 +455,56 @@ $selectConvos = $conn->query($convSql);
                 $.get('./php/fetch_messages.php', {
                     ConvId: convId
                 }, msgs => {
-                    let lastDate = '';
-                    $c.empty();
+                        let lastDate = '';
+                        $c.empty();
                     processedMessages.clear();
                     
-                    msgs.forEach(m => {
-                        const d = new Date(m.SentDate).toDateString();
-                        if (d !== lastDate) {
-                            lastDate = d;
-                            $c.append(`<div class="date-separator">${d}</div>`);
-                        }
+                        msgs.forEach(m => {
+                            const d = new Date(m.SentDate).toDateString();
+                            if (d !== lastDate) {
+                                lastDate = d;
+                                $c.append(`<div class="date-separator">${d}</div>`);
+                            }
                         
-                        const cls = m.AdminId != 0 ? 'sent' : 'received';
-                        let messageContent = m.MessageContent;
-                        
+                const cls = m.AdminId != 0 ? 'sent' : 'received';
+                let messageContent = m.MessageContent;
+                
                         // Handle file messages
-                        if (m.MessageContent && m.MessageContent.startsWith('./uploads/')) {
-                            const fileName = m.MessageContent.split('/').pop();
-                            const fileExt = fileName.split('.').pop().toLowerCase();
+                if (m.MessageContent && m.MessageContent.startsWith('./uploads/')) {
+                    const fileName = m.MessageContent.split('/').pop();
+                    const fileExt = fileName.split('.').pop().toLowerCase();
                             const fileUrl = getFileUrl(m.MessageContent) + '?v=' + Date.now();
                             
-                            if (["jpg","jpeg","png","gif","webp"].includes(fileExt)) {
-                                messageContent = `
-                                    <div class="message-file-image">
+                    if (["jpg","jpeg","png","gif","webp"].includes(fileExt)) {
+                        messageContent = `
+                            <div class="message-file-image">
                                         <img src="${fileUrl}" alt="${fileName}" onclick="previewImage('${fileUrl}', '${fileName}')">
-                                        <div class="file-info">
-                                            <span class="file-name">${fileName}</span>
-                                            <a href="${fileUrl}" download class="file-download"><i class="fas fa-download"></i></a>
-                                        </div>
-                                    </div>`;
-                            } else {
-                                messageContent = `
-                                    <div class="message-file-document">
-                                        <div class="file-icon"><i class="fas fa-file"></i></div>
-                                        <div class="file-details">
-                                            <span class="file-name">${fileName}</span>
-                                            <span class="file-type">${fileExt.toUpperCase()} File</span>
-                                        </div>
-                                        <a href="${fileUrl}" download class="file-download"><i class="fas fa-download"></i></a>
-                                    </div>`;
-                            }
+                                <div class="file-info">
+                                    <span class="file-name">${fileName}</span>
+                                    <a href="${fileUrl}" download class="file-download"><i class="fas fa-download"></i></a>
+                                </div>
+                            </div>`;
+                    } else {
+                        messageContent = `
+                            <div class="message-file-document">
+                                <div class="file-icon"><i class="fas fa-file"></i></div>
+                                <div class="file-details">
+                                    <span class="file-name">${fileName}</span>
+                                    <span class="file-type">${fileExt.toUpperCase()} File</span>
+                                </div>
+                                <a href="${fileUrl}" download class="file-download"><i class="fas fa-download"></i></a>
+                            </div>`;
+                    }
                         } else {
                             messageContent = `<p class="message-content">${escapeHtml(m.MessageContent)}</p>`;
-                        }
-                        
-                        $c.append(`
-                            <div class="chat-bubble ${cls}">
+                }
+                
+                $c.append(`
+                    <div class="chat-bubble ${cls}">
                                 ${messageContent}
-                                <span class="time">${m.SentTime}</span>
-                            </div>
-                        `);
+                      <span class="time">${m.SentTime}</span>
+                    </div>
+                `);
                         
                         // Update last message ID and track processed message
                         lastMessageId = Math.max(lastMessageId, m.MessageId || 0);
@@ -525,15 +521,15 @@ $selectConvos = $conn->query($convSql);
                 // Clear any existing interval
                 if (pollInterval) {
                     clearInterval(pollInterval);
-                }
+                        }
                 
                 // Update connection indicator
                 const indicator = document.getElementById('connection-indicator');
                 if (indicator) {
                     indicator.className = 'badge bg-success';
                     indicator.innerHTML = '<i class="fas fa-circle me-1"></i>Connected';
-                }
-                
+            }
+
                 // Start polling every 3 seconds with a small delay to ensure initial load is complete
                 setTimeout(() => {
                     pollInterval = setInterval(() => {
@@ -559,21 +555,21 @@ $selectConvos = $conn->query($convSql);
                                 if (!isPendingMessage) {
                                     addMessageToChat(message);
                                     hasNewMessages = true;
-                                } else {
+                        } else {
                                     // Remove from pending since we received the real message
                                     pendingMessages.delete(message.MessageContent);
                                 }
                                 
-                                lastMessageId = Math.max(lastMessageId, message.MessageId || 0);
+                    lastMessageId = Math.max(lastMessageId, message.MessageId || 0);
                                 processedMessages.add(message.MessageId);
                             }
-                        });
-                        
+                });
+                
                         // Only scroll if we added new messages
                         if (hasNewMessages) {
-                            $c.scrollTop($c.prop('scrollHeight'));
-                        }
-                    }
+                    $c.scrollTop($c.prop('scrollHeight'));
+                }
+            }
                 }, 'json');
             }
 
@@ -596,7 +592,7 @@ $selectConvos = $conn->query($convSql);
                                     <a href="${fileUrl}" download class="file-download"><i class="fas fa-download"></i></a>
                                 </div>
                             </div>`;
-                    } else {
+                } else {
                         messageContent = `
                             <div class="message-file-document">
                                 <div class="file-icon"><i class="fas fa-file"></i></div>
@@ -607,10 +603,10 @@ $selectConvos = $conn->query($convSql);
                                 <a href="${fileUrl}" download class="file-download"><i class="fas fa-download"></i></a>
                             </div>`;
                     }
-                } else {
+                    } else {
                     messageContent = `<p class="message-content">${escapeHtml(message.MessageContent)}</p>`;
-                }
-                
+            }
+
                 $c.append(`
                     <div class="chat-bubble ${cls}">
                         ${messageContent}

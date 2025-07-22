@@ -16,11 +16,29 @@ $result = $stmt->get_result();
 
 $subscriptions = [];
 while ($row = $result->fetch_assoc()) {
+    // Convert status number to text
+    $statusText = '';
+    switch ($row['SubscriptionStatus']) {
+        case 1:
+            $statusText = 'Active';
+            break;
+        case 0:
+            $statusText = 'Expired';
+            break;
+        default:
+            $statusText = 'Unknown';
+            break;
+    }
+    
+    // Format dates
+    $subscriptionDate = $row['subscriptionDate'] ? date('M d, Y', strtotime($row['subscriptionDate'])) : 'N/A';
+    $expirationDate = $row['expirationDate'] ? date('M d, Y', strtotime($row['expirationDate'])) : 'N/A';
+    
     $subscriptions[] = [
         'Item' => $row['Item'],
-        'SubscriptionStatus' => $row['SubscriptionStatus'],
-        'subscriptionDate' => $row['subscriptionDate'],
-        'expirationDate' => $row['expirationDate']
+        'SubscriptionStatus' => $statusText,
+        'subscriptionDate' => $subscriptionDate,
+        'expirationDate' => $expirationDate
     ];
 }
 
