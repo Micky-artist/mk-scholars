@@ -13,6 +13,7 @@ if (empty($_GET['ConvId'])) {
     echo json_encode([]); 
     exit; 
 }
+
 $convId = intval($_GET['ConvId']);
 $lastMessageId = isset($_GET['lastMessageId']) ? intval($_GET['lastMessageId']) : 0;
 
@@ -34,8 +35,11 @@ $res = $stmt->get_result();
 $messages = $res->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
-// mark as read
-$conn->query("UPDATE Message SET MessageStatus=1 WHERE ConvId={$convId}");
+// Mark as read only if getting all messages (not polling)
+if ($lastMessageId == 0) {
+    $conn->query("UPDATE Message SET MessageStatus=1 WHERE ConvId={$convId}");
+}
 
 header('Content-Type: application/json');
 echo json_encode($messages);
+?>

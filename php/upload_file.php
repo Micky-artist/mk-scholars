@@ -10,6 +10,9 @@ if (!isset($_FILES['file']) || !isset($_POST['username']) || !isset($_POST['user
     exit;
 }
 
+// Set Rwanda timezone
+date_default_timezone_set('Africa/Kigali');
+
 $username = preg_replace('/[^a-zA-Z0-9_\-]/', '', $_POST['username']);
 $userid = intval($_POST['userid']);
 $convId = isset($_POST['convid']) && !empty($_POST['convid']) ? intval($_POST['convid']) : null;
@@ -26,10 +29,6 @@ if (!is_dir($dir)) {
     chmod($dir, 0755);
 }
 
-
-
-
-
 $originalName = basename($_FILES['file']['name']);
 $target = $dir . $originalName;
 $webPath = $webDir . $originalName;
@@ -38,6 +37,8 @@ if (move_uploaded_file($_FILES['file']['tmp_name'], $target)) {
     chmod($target, 0644);
     $fileSize = filesize($target);
     $fileType = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+    
+    // Use Rwanda timezone for upload date and time
     $uploadDate = date('Y-m-d');
     $uploadTime = date('H:i:s');
     

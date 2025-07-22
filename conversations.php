@@ -620,22 +620,26 @@ include('./php/validateSession.php');
         }
 
         /* Typing Indicator */
+        .typing-indicator {
+            margin-top: 10px;
+        }
+
         .typing-bubble {
-            background: var(--bg-secondary) !important;
-            color: var(--text-primary) !important;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
         }
 
         .typing-dots {
             display: flex;
-            gap: 0.25rem;
-            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
         }
 
         .typing-dots span {
-            width: 6px;
-            height: 6px;
-            background: var(--text-secondary);
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
+            background: var(--text-secondary);
             animation: typing 1.4s infinite ease-in-out;
         }
 
@@ -643,8 +647,122 @@ include('./php/validateSession.php');
         .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
 
         @keyframes typing {
-            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
-            40% { transform: scale(1); opacity: 1; }
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Connection Status */
+        #chat-status {
+            transition: color 0.3s ease;
+        }
+
+        #chat-status.text-success {
+            color: var(--success-color) !important;
+        }
+
+        #chat-status.text-warning {
+            color: var(--warning-color) !important;
+        }
+
+        #chat-status.text-danger {
+            color: var(--danger-color) !important;
+        }
+
+        /* Notifications */
+        .alert {
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        /* Message Animations */
+        .message-wrapper {
+            animation: slideInMessage 0.3s ease-out;
+        }
+
+        @keyframes slideInMessage {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* File Upload Improvements */
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background: rgba(0, 123, 255, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--success-color);
+            background: rgba(40, 167, 69, 0.1);
+        }
+
+        .upload-input {
+            display: none;
+        }
+
+        .file-preview {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+        }
+
+        .preview-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .preview-image {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .preview-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-image i {
+            font-size: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .preview-info h6 {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .preview-info small {
+            color: var(--text-secondary);
         }
 
         /* Chat Input */
@@ -800,25 +918,6 @@ include('./php/validateSession.php');
 
         .preview-info small {
             color: var(--text-secondary);
-        }
-
-        .upload-input {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .upload-placeholder {
-            color: var(--text-secondary);
-        }
-
-        .upload-placeholder i {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
         }
 
         /* Responsive Design */
@@ -1010,6 +1109,7 @@ include('./php/validateSession.php');
         const previewFilename = document.getElementById('preview-filename');
         const previewFilesize = document.getElementById('preview-filesize');
         const uploadBtn = document.getElementById('upload-btn');
+        const uploadArea = document.getElementById('upload-area');
 
         if (panelFileInput) {
             panelFileInput.addEventListener('change', function(e) {
@@ -1019,6 +1119,35 @@ include('./php/validateSession.php');
                 } else {
                     hideFilePreview();
                 }
+            });
+        }
+
+        // Drag and drop functionality
+        if (uploadArea) {
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    panelFileInput.files = files;
+                    showFilePreview(file);
+                }
+            });
+
+            uploadArea.addEventListener('click', function() {
+                panelFileInput.click();
             });
         }
 
@@ -1103,86 +1232,229 @@ include('./php/validateSession.php');
                         refreshFileList();
                         
                         // Show success message
-                        alert('File uploaded successfully!');
+                        showNotification('File uploaded successfully!', 'success');
                     },
                     error: function() {
-                        alert('Upload failed. Please try again.');
+                        showNotification('Upload failed. Please try again.', 'error');
                     }
                 });
             });
 
-            // Message form submission
+            // Message form submission with real-time updates
             $('#messageForm').on('submit', function(e) {
                 e.preventDefault();
-                const form = new FormData(this);
                 const messageInput = $('input[name="message"]');
                 const message = messageInput.val().trim();
 
-                if (!message && !form.get('file').size) {
+                if (!message) {
                     return;
                 }
+
+                // Show typing indicator for user
+                showUserTyping();
 
                 $.ajax({
                     url: './php/submit_message.php',
                     type: 'POST',
-                    data: form,
-                    processData: false,
-                    contentType: false,
+                    data: {
+                        ConvId: $('input[name="ConvId"]').val(),
+                        UserId: $('input[name="UserId"]').val(),
+                        AdminId: $('input[name="AdminId"]').val(),
+                        message: message
+                    },
                     success: function(response) {
                         messageInput.val('');
-                        $('#file-input').val('');
-                        // Real-time update will handle the new message
+                        hideUserTyping();
+                        
+                        // Add message to chat immediately for better UX
+                        const messageData = {
+                            MessageId: Date.now(), // Temporary ID
+                            UserId: $('input[name="UserId"]').val(),
+                            AdminId: 0,
+                            MessageContent: message,
+                            SentDate: new Date().toISOString().split('T')[0],
+                            SentTime: new Date().toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute: '2-digit'})
+                        };
+                        addMessageToChat(messageData);
+                        
+                        // Track this pending message to prevent duplicates
+                        pendingMessages.add(message);
                     },
                     error: function() {
-                        alert('Error sending message');
+                        hideUserTyping();
+                        showNotification('Error sending message', 'error');
                     }
                 });
             });
 
             // Typing indicator
             let typingTimer;
+            let isTyping = false;
+            
             $('input[name="message"]').on('input', function() {
-                $('#typing-indicator').show();
+                if (!isTyping) {
+                    isTyping = true;
+                    sendTypingStatus(true);
+                }
+                
                 clearTimeout(typingTimer);
                 typingTimer = setTimeout(() => {
-                    $('#typing-indicator').hide();
+                    isTyping = false;
+                    sendTypingStatus(false);
                 }, 1000);
             });
 
-            // Real-time chat
+            // Start real-time chat
             startRealTimeChat();
         });
 
         // Real-time chat functionality
         let lastMessageId = 0;
         let eventSource = null;
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 5;
+        let processedMessages = new Set(); // Track processed messages to prevent duplicates
+        let pendingMessages = new Set(); // Track pending messages that were sent optimistically
 
         function startRealTimeChat() {
             const convId = <?php echo isset($convoId) ? $convoId : 'null'; ?>;
             if (!convId) return;
 
+            // Close existing connection
+            if (eventSource) {
+                eventSource.close();
+            }
+
             const url = `./php/chat_stream.php?convId=${convId}&lastMessageId=${lastMessageId}`;
             eventSource = new EventSource(url);
 
-            eventSource.onmessage = function(event) {
-                const data = JSON.parse(event.data);
-                if (data.error) {
-                    console.error('SSE Error:', data.error);
-                    return;
-                }
+            eventSource.onopen = function() {
+                console.log('Real-time connection established');
+                reconnectAttempts = 0;
+                updateConnectionStatus(true);
+            };
 
-                if (data.length > 0) {
-                    data.forEach(message => {
-                        addMessageToChat(message);
-                        lastMessageId = Math.max(lastMessageId, message.MessageId || 0);
-                    });
+            eventSource.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    
+                    if (data.error) {
+                        console.error('SSE Error:', data.error);
+                        return;
+                    }
+
+                    if (data.type === 'typing') {
+                        handleTypingIndicator(data);
+                        return;
+                    }
+
+                    if (data.messages && data.messages.length > 0) {
+                        data.messages.forEach(message => {
+                            // Only add if it's a new message and not already processed
+                            if (message.MessageId > lastMessageId && !processedMessages.has(message.MessageId)) {
+                                // Check if this is a pending message we already added optimistically
+                                const isPendingMessage = pendingMessages.has(message.MessageContent);
+                                
+                                if (!isPendingMessage) {
+                                    addMessageToChat(message);
+                                } else {
+                                    // Remove from pending since we received the real message
+                                    pendingMessages.delete(message.MessageContent);
+                                }
+                                
+                                lastMessageId = Math.max(lastMessageId, message.MessageId || 0);
+                                processedMessages.add(message.MessageId);
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error parsing SSE data:', e);
                 }
             };
 
             eventSource.onerror = function() {
+                console.log('Real-time connection error, attempting to reconnect...');
+                updateConnectionStatus(false);
                 eventSource.close();
-                setTimeout(startRealTimeChat, 5000);
+                
+                if (reconnectAttempts < maxReconnectAttempts) {
+                    reconnectAttempts++;
+                    setTimeout(() => {
+                        startRealTimeChat();
+                    }, 5000 * reconnectAttempts); // Exponential backoff
+                } else {
+                    console.error('Max reconnection attempts reached');
+                    showNotification('Connection lost. Please refresh the page.', 'error');
+                }
             };
+        }
+
+        function sendTypingStatus(isTyping) {
+            const convId = <?php echo isset($convoId) ? $convoId : 'null'; ?>;
+            if (!convId) return;
+
+            $.post('./php/typing_status.php', {
+                convId: convId,
+                userId: <?php echo isset($_SESSION['userId']) ? $_SESSION['userId'] : 'null'; ?>,
+                isTyping: isTyping
+            });
+        }
+
+        function handleTypingIndicator(data) {
+            if (data.isTyping && data.userId != <?php echo isset($_SESSION['userId']) ? $_SESSION['userId'] : 'null'; ?>) {
+                $('#typing-indicator').show();
+            } else {
+                $('#typing-indicator').hide();
+            }
+        }
+
+        function showUserTyping() {
+            // Add a temporary message showing "Sending..."
+            const tempMessage = `
+                <div class="message-wrapper message-sent" id="temp-message">
+                    <div class="message-avatar user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="message-bubble">
+                        <div class="message-text">Sending...</div>
+                        <div class="message-time">${new Date().toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute: '2-digit'})}</div>
+                    </div>
+                </div>`;
+            $('#chat-container').append(tempMessage);
+            scrollToBottom();
+        }
+
+        function hideUserTyping() {
+            $('#temp-message').remove();
+        }
+
+        function updateConnectionStatus(isOnline) {
+            const statusElement = $('#chat-status');
+            if (isOnline) {
+                statusElement.text('Online').removeClass('text-danger').addClass('text-success');
+            } else {
+                statusElement.text('Connecting...').removeClass('text-success').addClass('text-warning');
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed`;
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
         }
 
         function addMessageToChat(message) {
@@ -1203,9 +1475,9 @@ include('./php/validateSession.php');
             const avatarIcon = isUser ? 'fas fa-user' : 'fas fa-headset';
 
             let content = '';
-            if (message.MessageContent.startsWith('./uploads/')) {
+            if (message.MessageContent && message.MessageContent.startsWith('./uploads/')) {
                 const ext = message.MessageContent.split('.').pop().toLowerCase();
-                const cacheBuster = '?v=' + new Date().getTime(); // Add cache-buster
+                const cacheBuster = '?v=' + new Date().getTime();
                 const fileUrl = message.MessageContent + cacheBuster;
                 if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
                     content = `
@@ -1228,7 +1500,7 @@ include('./php/validateSession.php');
                         </div>`;
                 }
             } else {
-                content = `<div class="message-text">${message.MessageContent}</div>`;
+                content = `<div class="message-text">${escapeHtml(message.MessageContent)}</div>`;
             }
 
             const messageHtml = `
@@ -1243,7 +1515,20 @@ include('./php/validateSession.php');
                 </div>`;
 
             chatContainer.append(messageHtml);
-            chatContainer.scrollTop(chatContainer[0].scrollHeight);
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            const chatContainer = document.getElementById('chat-container');
+            if (chatContainer) {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         function basename(path) {
@@ -1409,6 +1694,9 @@ include('./php/validateSession.php');
             if (eventSource) {
                 eventSource.close();
             }
+            // Clear tracking sets
+            processedMessages.clear();
+            pendingMessages.clear();
         });
 
         // Auto-scroll to bottom on load
