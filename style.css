@@ -1,0 +1,63 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #f4f4f4;
+  color: #1a202c;
+  text-align: center;
+  padding: 2rem;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+}
+
+.logo {
+  width: 150px;
+  margin-bottom: 1.5rem;
+}
+
+h1 {
+  font-size: 2rem;
+  color: #1e3a8a;
+  margin-bottom: 1rem;
+}
+
+p {
+  font-size: 1.1rem;
+  margin-bottom: 1.2rem;
+}
+
+.contact {
+  margin-top: 2rem;
+}
+
+.contact a {
+  display: block;
+  color: #1e40af;
+  text-decoration: none;
+  margin-bottom: 0.5rem;
+}
+
+.lang-switcher {
+  margin-top: 2rem;
+}
+
+.lang-switcher button {
+  padding: 0.5rem 1rem;
+  margin: 0 0.5rem;
+  background-color: #1e40af;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.lang-switcher button:hover {
+  background-color: #1a369c;
+}
