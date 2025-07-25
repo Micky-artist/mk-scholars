@@ -1,52 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="MK Driving School - Your trusted partner for passing the driving theory exam on the first try">
-  <title>MK DRIVING SCHOOL - Coming Soon</title>
-  <link rel="stylesheet" href="/driving-school/style.css">
-  <link rel="icon" type="image/png" href="/driving-school/3.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MK Driving School - Your trusted partner for passing the driving theory exam on the first try">
+    <title>MK Driving School</title>
+    <link rel="shortcut icon" href="/images/logo/logoRound.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/driving-school/style.css">
 </head>
 <body>
-  <div class="container">
-    <img src="/driving-school/3.png" alt="MK Driving School Logo" class="logo" />
+    <div class="container">
+        <!-- English Content -->
+        <div id="content-en">
+            <div class="scholarship-card">
+                <img src="/driving-school/3.png" alt="Driving Theory Course" class="card-image">
+                <div class="card-content">
+                    <div class="card-header">
+                        <h2 class="card-title">Driving Theory Course</h2>
+                        <p class="card-subtitle">Pass your provisional driving test on the first attempt</p>
+                        <div class="price-tag">25,000 RWF - Complete Course</div>
+                        <div class="price-tag">15,000 RWF - Practice Tests Only</div>
+                    </div>
+                    
+                    <p class="card-description">
+                        Our comprehensive driving theory course is designed to help you pass your provisional driving test on the first attempt. 
+                        The course includes real past exam questions, detailed answer explanations, and interactive practice tests.
+                    </p>
 
-    <div id="content-en">
-      <h1>🚗 Welcome to MK DRIVING SCHOOL! 🚦</h1>
-      <p>Your trusted partner in passing the driving theory exam (Provisoire) — the first time!</p>
-      <p>Our app will provide you with real past exam questions and answers to help you study smarter and faster.</p>
-      <p>With MK DRIVING SCHOOL, you only need one chance to pass.</p>
-      <p><strong>Learn. Practice. ✅ Pass.</strong></p>
-      <p><em>Coming Soon — Stay tuned and be the first to join!</em></p>
+                    <div class="card-details">
+                        <div class="detail-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Real past exam questions</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Detailed answer explanations</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Road signs and meanings</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Interactive practice tests</span>
+                        </div>
+                    </div>
+
+                    <div class="card-actions">
+                        <a href="tel:+250798611161" class="btn-enroll">
+                            <i class="fas fa-phone-alt"></i> Call to Enroll
+                        </a>
+                        <div class="lang-switcher">
+                            <button onclick="switchLang('en')" class="active">EN</button>
+                            <button onclick="switchLang('kin')">KIN</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kinyarwanda Content -->
+        <div id="content-kin" style="display: none;">
+            <div class="scholarship-card">
+                <img src="/driving-school/3.png" alt="Icyigisho cy'amategeko y'umuhanda" class="card-image">
+                <div class="card-content">
+                    <div class="card-header">
+                        <h2 class="card-title">Icyigisho cy'amategeko y'umuhanda</h2>
+                        <p class="card-subtitle">Tsinda ikizamini cyawe cya mbere</p>
+                        <div class="price-tag">25,000 RWF - Icyigisho cyuzuye</div>
+                        <div class="price-tag">15,000 RWF - Ibizamini gusa</div>
+                    </div>
+                    
+                    <p class="card-description">
+                        Icyigisho cyacu gikomeye cy'amategeko y'umuhanda cyateguwe kugufasha gutsinda ikizamini cyawe cya mbere. 
+                        Icyo cyigisho kibarimo ibibazo by'ukuri byakozwe mbere, ibisobanuro by'ibisubizo, n'ibizamini byo kwitegura.
+                    </p>
+
+                    <div class="card-details">
+                        <div class="detail-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Ibibazo by'ukuri byakozwe mbere</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Ibisobanuro by'ibisubizo</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Ibiyerekana kumuhanda n'ibisobanuro byabyo</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Ibizamini byo kwitegura</span>
+                        </div>
+                    </div>
+
+                    <div class="card-actions">
+                        <a href="tel:+250798611161" class="btn-enroll">
+                            <i class="fas fa-phone-alt"></i> Hamagara twandikishe
+                        </a>
+                        <div class="lang-switcher">
+                            <button onclick="switchLang('en')">EN</button>
+                            <button onclick="switchLang('kin')" class="active">KIN</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div id="content-kin" style="display: none;">
-      <h1>🚗 Ikaze kuri MK DRIVING SCHOOL! 🚦</h1>
-      <p>Urubuga rugufasha kwitegura gukora ikizamini cy'amategeko y'umuhanda utavuye aho uri.</p>
-      <p>Porogaramu yacu izaguha ibibazo byukuri byikizamini hamwe nibisubizo bigufasha kwiga neza kandi byihuse.</p>
-      <p>Hamwe na MK DRIVING SCHOOL, ukeneye gukora rimwe gusa ugatsinda.</p>
-      <p><strong>Iga! Witoze! Utsinde!</strong></p>
-      <p><em>IRAZA VUBA - Komeza ukurikirane nawe utazacikanwa!</em></p>
-    </div>
-
-    <div class="lang-switcher">
-      <button onclick="switchLang('en')">English</button>
-      <button onclick="switchLang('kin')">Kinyarwanda</button>
-    </div>
-
-    <div class="contact">
-      <a href="tel:+250798611161">📞 +250798611161</a>
-      <a href="mailto:mkscholars250@gmail.com">📧 mkscholars250@gmail.com</a>
-      <a href="https://www.instagram.com/mkdrivingschool_/" target="_blank">📸 Instagram</a>
-    </div>
-  </div>
-
-  <script>
-    function switchLang(lang) {
-      document.getElementById('content-en').style.display = lang === 'en' ? 'block' : 'none';
-      document.getElementById('content-kin').style.display = lang === 'kin' ? 'block' : 'none';
-    }
-  </script>
+    <script>
+        function switchLang(lang) {
+            if (lang === 'en') {
+                document.getElementById('content-en').style.display = 'block';
+                document.getElementById('content-kin').style.display = 'none';
+                document.querySelectorAll('.lang-switcher button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector('#content-en .lang-switcher button:first-child').classList.add('active');
+            } else {
+                document.getElementById('content-en').style.display = 'none';
+                document.getElementById('content-kin').style.display = 'block';
+                document.querySelectorAll('.lang-switcher button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector('#content-kin .lang-switcher button:last-child').classList.add('active');
+            }
+        }
+    </script>
 </body>
 </html>
