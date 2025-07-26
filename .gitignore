@@ -86,3 +86,11 @@ docker-sync.yml
 .project
 .settings/
 .buildpath
+
+# Docker setup files
+Dockerfile
+docker-compose*.yml
+docker/
+setup.sh
+TROUBLESHOOTING.md
+README.md
