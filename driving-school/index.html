@@ -21,16 +21,48 @@
   
   <!-- Main Styles -->
   <link rel="stylesheet" href="/driving-school/style.css">
+  <style>
+    /* Inline styles for critical elements */
+    .coming-soon-badge {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #FF5722, #FF9800);
+      color: white;
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);
+      animation: pulse 2s infinite;
+    }
+    
+    .logo-container {
+      position: relative;
+      display: inline-block;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <!-- Logo -->
-    <img src="/driving-school/3.png" 
-         alt="MK Driving School Logo" 
-         class="logo" 
-         width="120" 
-         height="120" 
-         loading="eager">
+    <!-- Logo and Coming Soon Badge -->
+    <div class="logo-container">
+      <img src="/driving-school/3.png" 
+           alt="MK Driving School Logo" 
+           class="logo" 
+           width="120" 
+           height="120" 
+           loading="eager">
+      <div class="coming-soon-badge">Coming Soon</div>
+    </div>
 
     <!-- English Content -->
     <main id="content-en" class="content" role="main">
