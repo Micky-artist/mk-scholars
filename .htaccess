@@ -1,4 +1,13 @@
 RewriteEngine on
+
+# Handle existing PHP files
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}\.php -f
-RewriteRule ^(.*)$ $1.php [NC,L] 
+RewriteRule ^(.*)$ $1.php [NC,L]
+
+# Handle driving-school routes
+RewriteRule ^driving-school/?$ driving-school/index.html [L]
+RewriteRule ^driving-school/(.+)$ driving-school/$1 [L]
+
+# Handle root redirect
+RewriteRule ^$ /driving-school/ [R=301,L]
