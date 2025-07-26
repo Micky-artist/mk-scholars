@@ -1,6 +1,5 @@
 <?php
-// driving-school/index.php
-// Permanent redirect to the driving school page
-header('HTTP/1.1 301 Moved Permanently');
-header('Location: /driving-school/');
+// Redirect root to /home
+header('HTTP/1.1 307 Temporary Redirect');
+header('Location: /home');
 exit;

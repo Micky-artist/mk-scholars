@@ -23,25 +23,54 @@
   <link rel="stylesheet" href="/driving-school/style.css">
   <style>
     /* Inline styles for critical elements */
+    .coming-soon-container {
+      position: relative;
+      width: 100%;
+      text-align: center;
+      margin: 0 auto 25px auto;
+      max-width: 800px;
+    }
+    
     .coming-soon-badge {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: linear-gradient(135deg, #FF5722, #FF9800);
+      display: inline-block;
+      background: linear-gradient(135deg, #2196F3, #1976D2, #FF9800);
       color: white;
-      padding: 8px 20px;
-      border-radius: 50px;
+      padding: 10px 30px;
+      border-radius: 25px;
       font-weight: 600;
-      font-size: 1.1rem;
+      font-size: 0.9rem;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);
-      animation: pulse 2s infinite;
+      letter-spacing: 1.5px;
+      box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+      animation: pulse 2s infinite, colorShift 4s infinite alternate;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    
+    .coming-soon-badge::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3));
+      z-index: -1;
+      transition: all 0.3s ease;
+    }
+    
+    @keyframes colorShift {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(20deg); }
     }
     
     .logo-container {
       position: relative;
       display: inline-block;
+      margin: 0 auto;
+      padding: 10px 0 0 0;
     }
     
     @keyframes pulse {
@@ -49,11 +78,81 @@
       50% { transform: scale(1.05); }
       100% { transform: scale(1); }
     }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .coming-soon-badge {
+        font-size: 0.8rem;
+        padding: 6px 16px;
+      }
+      
+      .logo {
+        width: 140px;
+        height: 140px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .coming-soon-badge {
+        font-size: 0.9rem;
+        padding: 8px 20px;
+        top: 10px;
+      }
+      
+      .lang-switcher {
+        top: 10px;
+        right: 10px;
+      }
+      
+      .lang-btn {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+      }
+      
+      .logo {
+        width: 80px;
+        height: 80px;
+      }
+    }
+    
+    .content-body {
+      margin: 20px auto;
+      max-width: 800px;
+      text-align: center;
+    }
+    
+    .lang-switcher {
+      position: static;
+      margin: 0 auto 20px auto;
+      text-align: center;
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Logo and Coming Soon Badge -->
+  <div class="container" style="position: relative;">
+    <!-- Language Selector - Top Right -->
+    <div class="lang-switcher" role="region" aria-label="Language selector">
+      <button type="button" 
+              onclick="switchLang('en')" 
+              class="lang-btn active" 
+              aria-pressed="true"
+              aria-label="Switch to English">
+        <i class="fas fa-globe"></i> ENGLISH
+      </button>
+      <button type="button" 
+              onclick="switchLang('kin')" 
+              class="lang-btn" 
+              aria-pressed="false"
+              aria-label="Hindura muri Kinyarwanda">
+        <i class="fas fa-globe"></i> KINYARWANDA
+      </button>
+    </div>
+
+    <!-- Logo -->
     <div class="logo-container">
       <img src="/driving-school/3.png" 
            alt="MK Driving School Logo" 
@@ -61,6 +160,10 @@
            width="120" 
            height="120" 
            loading="eager">
+    </div>
+    
+    <!-- Coming Soon Badge - Centered -->
+    <div class="coming-soon-container">
       <div class="coming-soon-badge">Coming Soon</div>
     </div>
 
@@ -101,24 +204,6 @@
         <p class="coming-soon"><em>IRAZA VUBA - Komeza ukurikirane nawe utazacikanwa!</em></p>
       </div>
     </main>
-
-    <!-- Language Switcher -->
-    <div class="lang-switcher" role="region" aria-label="Language selector">
-      <button type="button" 
-              onclick="switchLang('en')" 
-              class="lang-btn active" 
-              aria-pressed="true"
-              aria-label="Switch to English">
-        <i class="fas fa-globe"></i> English
-      </button>
-      <button type="button" 
-              onclick="switchLang('kin')" 
-              class="lang-btn" 
-              aria-pressed="false"
-              aria-label="Hindura muri Kinyarwanda">
-        <i class="fas fa-globe"></i> Kinyarwanda
-      </button>
-    </div>
 
     <!-- Contact Information -->
     <footer class="contact" role="contentinfo">
