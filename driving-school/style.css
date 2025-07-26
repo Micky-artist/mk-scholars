@@ -1,3 +1,18 @@
+/* ===== Base Styles ===== */
+:root {
+  /* Color Palette */
+  --primary: #2196F3;
+  --primary-dark: #1976D2;
+  --accent: #FF5722;
+  --text-primary: #2D3748;
+  --text-secondary: #4A5568;
+  --background: #F7FAFC;
+  --card-bg: #FFFFFF;
+  --border-color: #E2E8F0;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --transition: all 0.3s ease;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -5,59 +20,166 @@
 }
 
 body {
-  font-family: 'Roboto', sans-serif;
-  background-color: #f4f4f4;
-  color: #1a202c;
-  text-align: center;
-  padding: 2rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--background);
+  color: var(--text-primary);
+  line-height: 1.6;
+  padding: 2rem 1rem;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* ===== Container & Layout ===== */
 .container {
   max-width: 800px;
-  margin: auto;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
 }
 
+.container:hover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* ===== Logo ===== */
 .logo {
-  width: 150px;
-  margin-bottom: 1.5rem;
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  margin-bottom: 2rem;
+  transition: var(--transition);
 }
 
+.logo:hover {
+  transform: scale(1.05);
+}
+
+/* ===== Typography ===== */
 h1 {
-  font-size: 2rem;
-  color: #1e3a8a;
-  margin-bottom: 1rem;
+  font-size: 2.25rem;
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 p {
-  font-size: 1.1rem;
-  margin-bottom: 1.2rem;
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.25rem;
+  line-height: 1.7;
 }
 
-.contact {
-  margin-top: 2rem;
+strong {
+  color: var(--primary-dark);
+  font-weight: 600;
 }
 
-.contact a {
-  display: block;
-  color: #1e40af;
-  text-decoration: none;
-  margin-bottom: 0.5rem;
+em {
+  color: var(--text-secondary);
+  font-style: italic;
+  opacity: 0.9;
 }
 
+/* ===== Language Switcher ===== */
 .lang-switcher {
-  margin-top: 2rem;
+  display: inline-flex;
+  background-color: #F1F5F9;
+  border-radius: 50px;
+  padding: 0.25rem;
+  margin: 2rem 0;
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
 }
 
 .lang-switcher button {
-  padding: 0.5rem 1rem;
-  margin: 0 0.5rem;
-  background-color: #1e40af;
-  color: #fff;
+  padding: 0.6rem 1.5rem;
+  margin: 0;
+  background: none;
   border: none;
-  border-radius: 5px;
+  border-radius: 50px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.9375rem;
   cursor: pointer;
+  transition: var(--transition);
 }
 
+.lang-switcher button.active,
 .lang-switcher button:hover {
-  background-color: #1a369c;
+  background-color: var(--primary);
+  color: white;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+}
+
+/* ===== Contact Section ===== */
+.contact {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.contact a {
+  display: inline-flex;
+  align-items: center;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  transition: var(--transition);
+  background-color: rgba(33, 150, 243, 0.1);
+  margin: 0;
+}
+
+.contact a:hover {
+  background-color: var(--primary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+}
+
+.contact a i {
+  margin-right: 0.5rem;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 640px) {
+  .container {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  
+  h1 {
+    font-size: 1.75rem;
+  }
+  
+  p {
+    font-size: 1rem;
+  }
+  
+  .lang-switcher {
+    margin: 1.5rem 0;
+  }
+  
+  .contact {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .contact a {
+    width: 100%;
+    justify-content: center;
+  }
 }
