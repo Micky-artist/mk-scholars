@@ -94,3 +94,6 @@ docker/
 setup.sh
 TROUBLESHOOTING.md
 README.md
+docker/db/init.sql
+docker/db/seed.sql
+docker/php.ini
