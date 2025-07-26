@@ -1,279 +1,49 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="MK Driving School - Your trusted partner for passing the driving theory exam on the first try">
-  <meta name="theme-color" content="#2196F3">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MK DRIVING SCHOOL - Coming Soon</title>
-  
-  <!-- Preload critical resources -->
-  <link rel="preload" href="/driving-school/3.png" as="image">
-  
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="/driving-school/3.png">
-  
-  <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
-        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" 
-        crossorigin="anonymous" 
-        referrerpolicy="no-referrer" />
-  
-  <!-- Main Styles -->
-  <link rel="stylesheet" href="/driving-school/style.css">
-  <style>
-    /* Inline styles for critical elements */
-    .coming-soon-container {
-      position: relative;
-      width: 100%;
-      text-align: center;
-      margin: 0 auto 25px auto;
-      max-width: 800px;
-    }
-    
-    .coming-soon-badge {
-      display: inline-block;
-      background: linear-gradient(135deg, #2196F3, #1976D2, #FF9800);
-      color: white;
-      padding: 10px 30px;
-      border-radius: 25px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
-      animation: pulse 2s infinite, colorShift 4s infinite alternate;
-      border: 2px solid rgba(255, 255, 255, 0.8);
-      position: relative;
-      overflow: hidden;
-      z-index: 1;
-    }
-    
-    .coming-soon-badge::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3));
-      z-index: -1;
-      transition: all 0.3s ease;
-    }
-    
-    @keyframes colorShift {
-      0% { filter: hue-rotate(0deg); }
-      100% { filter: hue-rotate(20deg); }
-    }
-    
-    .logo-container {
-      position: relative;
-      display: inline-block;
-      margin: 0 auto;
-      padding: 10px 0 0 0;
-    }
-    
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-    
-    /* Mobile responsiveness */
-    @media (max-width: 768px) {
-      .coming-soon-badge {
-        font-size: 0.8rem;
-        padding: 6px 16px;
-      }
-      
-      .logo {
-        width: 140px;
-        height: 140px;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .coming-soon-badge {
-        font-size: 0.9rem;
-        padding: 8px 20px;
-        top: 10px;
-      }
-      
-      .lang-switcher {
-        top: 10px;
-        right: 10px;
-      }
-      
-      .lang-btn {
-        padding: 5px 10px;
-        font-size: 0.8rem;
-      }
-      
-      .logo {
-        width: 80px;
-        height: 80px;
-      }
-    }
-    
-    .content-body {
-      margin: 20px auto;
-      max-width: 800px;
-      text-align: center;
-    }
-    
-    .lang-switcher {
-      position: static;
-      margin: 0 auto 20px auto;
-      text-align: center;
-      z-index: 10;
-      display: flex;
-      justify-content: center;
-      width: 100%;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
-    <div class="header-row">
-      <!-- Back Button -->
-      <a href="/home" class="back-button" aria-label="Back to homepage">
-        <i class="fas fa-arrow-left"></i>
-      </a>
-      
-      <!-- Language Selector -->
-      <div class="lang-switcher" role="region" aria-label="Language selector">
-      <button type="button" 
-              onclick="switchLang('en')" 
-              class="lang-btn active" 
-              aria-pressed="true"
-              aria-label="Switch to English">
-        <i class="fas fa-globe"></i> 
-        <span class="lang-full">ENGLISH</span>
-        <span class="lang-short">EN</span>
-      </button>
-      <button type="button" 
-              onclick="switchLang('kin')" 
-              class="lang-btn" 
-              aria-pressed="false"
-              aria-label="Hindura muri Kinyarwanda">
-        <i class="fas fa-globe"></i> 
-        <span class="lang-full">KINYARWANDA</span>
-        <span class="lang-short">KIN</span>
-      </div>
-    </div>
-    
-    <div class="header-content">
-    <!-- Logo -->
-    <div class="logo-container">
-      <img src="/driving-school/3.png" 
-           alt="MK Driving School Logo" 
-           class="logo" 
-           width="120" 
-           height="120" 
-           loading="eager">
-    </div>
-    
-    <!-- Coming Soon Badge - Centered -->
-    <div class="coming-soon-container">
-      <div class="coming-soon-badge">Coming Soon</div>
+    <img src="3.png" alt="MK Driving School Logo" class="logo" />
+
+    <div id="content-en">
+      <h1>🚗 Welcome to MK DRIVING SCHOOL! 🚦</h1>
+      <p>Your trusted partner in passing the driving theory exam (Provisoire) — the first time!</p>
+      <p>Our app will provide you with real past exam questions and answers to help you study smarter and faster.</p>
+      <p>With MK DRIVING SCHOOL, you only need one chance to pass.</p>
+      <p><strong>Learn. Practice. ✅ Pass.</strong></p>
+      <p><em>Coming Soon — Stay tuned and be the first to join!</em></p>
     </div>
 
-    <!-- English Content -->
-    <main id="content-en" class="content" role="main">
-      <header class="content-header">
-        <h1>
-          <span class="emoji" role="img" aria-hidden="true">🚗</span>
-          Welcome to MK DRIVING SCHOOL!
-          <span class="emoji" role="img" aria-hidden="true">🚦</span>
-        </h1>
-      </header>
-      
-      <div class="content-body">
-        <p class="lead">Your trusted partner in passing the driving theory exam (Provisoire)!</p>
-        <p>Our app provides real past exam questions and answers to help you study smarter and faster.</p>
-        <p>With MK DRIVING SCHOOL, you only need one chance to pass.</p>
-        <p class="highlight"><strong>Learn. Practice. <span class="check">✓</span> Pass.</strong></p>
-        <p class="coming-soon"><em>Coming Soon — Stay tuned and be the first to join!</em></p>
-      </div>
-    </main>
+    <div id="content-kin" style="display: none;">
+      <h1>🚗 Ikaze kuri MK DRIVING SCHOOL! 🚦</h1>
+      <p>Urubuga rugufasha kwitegura gukora ikizamini cy'amategeko y'umuhanda utavuye aho uri.</p>
+      <p>Porogaramu yacu izaguha ibibazo byukuri byikizamini hamwe nibisubizo bigufasha kwiga neza kandi byihuse.</p>
+      <p>Hamwe na MK DRIVING SCHOOL, ukeneye gukora rimwe gusa ugatsinda.</p>
+      <p><strong>Iga! Witoze! Utsinde!</strong></p>
+      <p><em>IRAZA VUBA - Komeza ukurikirane nawe utazacikanwa!</em></p>
+    </div>
 
-    <!-- Kinyarwanda Content -->
-    <main id="content-kin" class="content" role="main" style="display: none;">
-      <header class="content-header">
-        <h1>
-          <span class="emoji" role="img" aria-hidden="true">🚗</span>
-          Ikaze kuri MK DRIVING SCHOOL!
-          <span class="emoji" role="img" aria-hidden="true">🚦</span>
-        </h1>
-      </header>
-      
-      <div class="content-body">
-        <p class="lead">Urubuga rugufasha kwitegura gukora ikizamini cy'amategeko y'umuhanda utavuye aho uri.</p>
-        <p>Porogaramu yacu izaguha ibibazo byukuri byikizamini hamwe nibisubizo bigufasha kwiga neza kandi byihuse.</p>
-        <p>Hamwe na MK DRIVING SCHOOL, ukeneye gukora rimwe gusa ugatsinda.</p>
-        <p class="highlight"><strong>Iga! Witoze! Utsinde!</strong></p>
-        <p class="coming-soon"><em>IRAZA VUBA - Komeza ukurikirane nawe utazacikanwa!</em></p>
-      </div>
-    </main>
+    <div class="lang-switcher">
+      <button onclick="switchLang('en')">English</button>
+      <button onclick="switchLang('kin')">Kinyarwanda</button>
+    </div>
 
-    <!-- Contact Information -->
-    <footer class="contact" role="contentinfo">
-      <a href="tel:+250798611161" class="contact-link" aria-label="Call us at +250798611161">
-        <i class="fas fa-phone-alt"></i> +250 798 611 161
-      </a>
-      <a href="mailto:mkscholars250@gmail.com" class="contact-link" aria-label="Email us at mkscholars250@gmail.com">
-        <i class="fas fa-envelope"></i> mkscholars250@gmail.com
-      </a>
-      <a href="https://www.instagram.com/mkdrivingschool_/" 
-         target="_blank" 
-         rel="noopener noreferrer" 
-         class="contact-link"
-         aria-label="Follow us on Instagram">
-        <i class="fab fa-instagram"></i> @mkdrivingschool_
-      </a>
-    </footer>
+    <div class="contact">
+      <a href="tel:+250798611161">📞 +250798611161</a>
+      <a href="mailto:mkscholars250@gmail.com">📧 mkscholars250@gmail.com</a>
+      <a href="https://www.instagram.com/mkdrivingschool_/" target="_blank">📸 Instagram</a>
+    </div>
   </div>
 
-  <!-- JavaScript -->
   <script>
-    // Set initial language based on browser preference
-    document.addEventListener('DOMContentLoaded', function() {
-      const userLang = navigator.language || navigator.userLanguage;
-      if (userLang.startsWith('rw')) {
-        switchLang('kin');
-      }
-    });
-
-    // Language switching function
     function switchLang(lang) {
-      // Update content visibility
       document.getElementById('content-en').style.display = lang === 'en' ? 'block' : 'none';
       document.getElementById('content-kin').style.display = lang === 'kin' ? 'block' : 'none';
-      
-      // Update active state of language buttons
-      document.querySelectorAll('.lang-btn').forEach(btn => {
-        const isActive = (lang === 'en' && btn.textContent.includes('English')) || 
-                        (lang === 'kin' && btn.textContent.includes('Kinyarwanda'));
-        btn.classList.toggle('active', isActive);
-        btn.setAttribute('aria-pressed', isActive);
-      });
-      
-      // Save language preference
-      try {
-        localStorage.setItem('preferredLanguage', lang);
-      } catch (e) {
-        console.warn('Could not save language preference', e);
-      }
-    }
-    
-    // Load saved language preference if available
-    try {
-      const savedLang = localStorage.getItem('preferredLanguage');
-      if (savedLang) {
-        switchLang(savedLang);
-      }
-    } catch (e) {
-      console.warn('Could not load language preference', e);
     }
   </script>
 </body>

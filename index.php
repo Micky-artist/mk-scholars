@@ -1,5 +1,6 @@
 <?php
-// Redirect root to /home
-header('HTTP/1.1 307 Temporary Redirect');
-header('Location: /home');
-exit;
+echo '<script type="text/javascript">
+	window.location.href="home";
+</script>';
+
+?>
