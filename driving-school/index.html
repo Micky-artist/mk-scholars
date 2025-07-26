@@ -133,25 +133,36 @@
   </style>
 </head>
 <body>
-  <div class="container" style="position: relative;">
-    <!-- Language Selector - Top Right -->
-    <div class="lang-switcher" role="region" aria-label="Language selector">
+  <div class="container">
+    <div class="header-row">
+      <!-- Back Button -->
+      <a href="/home" class="back-button" aria-label="Back to homepage">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      
+      <!-- Language Selector -->
+      <div class="lang-switcher" role="region" aria-label="Language selector">
       <button type="button" 
               onclick="switchLang('en')" 
               class="lang-btn active" 
               aria-pressed="true"
               aria-label="Switch to English">
-        <i class="fas fa-globe"></i> ENGLISH
+        <i class="fas fa-globe"></i> 
+        <span class="lang-full">ENGLISH</span>
+        <span class="lang-short">EN</span>
       </button>
       <button type="button" 
               onclick="switchLang('kin')" 
               class="lang-btn" 
               aria-pressed="false"
               aria-label="Hindura muri Kinyarwanda">
-        <i class="fas fa-globe"></i> KINYARWANDA
-      </button>
+        <i class="fas fa-globe"></i> 
+        <span class="lang-full">KINYARWANDA</span>
+        <span class="lang-short">KIN</span>
+      </div>
     </div>
-
+    
+    <div class="header-content">
     <!-- Logo -->
     <div class="logo-container">
       <img src="/driving-school/3.png" 
@@ -178,7 +189,7 @@
       </header>
       
       <div class="content-body">
-        <p class="lead">Your trusted partner in passing the driving theory exam (Provisoire) — the first time!</p>
+        <p class="lead">Your trusted partner in passing the driving theory exam (Provisoire)!</p>
         <p>Our app provides real past exam questions and answers to help you study smarter and faster.</p>
         <p>With MK DRIVING SCHOOL, you only need one chance to pass.</p>
         <p class="highlight"><strong>Learn. Practice. <span class="check">✓</span> Pass.</strong></p>

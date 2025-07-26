@@ -1,8 +1,8 @@
 /* ===== Base Styles ===== */
 :root {
   /* Color Palette */
-  --primary: #2196F3;
-  --primary-dark: #1976D2;
+  --primary: #185295;
+  --primary-dark: #092b5e;
   --accent: #FF9800;  /* Brighter orange-yellow */
   --accent-light: #FFC107;  /* Lighter orange-yellow */
   --text-primary: #2D3748;
@@ -20,30 +20,70 @@
   box-sizing: border-box;
 }
 
+/* Base Styles */
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   background-color: var(--background);
   color: var(--text-primary);
   line-height: 1.6;
-  padding: 2rem 1rem;
+  margin: 0;
+  padding: 0;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Back Button */
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--primary);
+  color: white;
+  border: 2px solid white;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.back-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  background: var(--primary-dark);
+}
+
+/* ===== Header Container ===== */
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  width: 100%;
 }
 
 /* ===== Container & Layout ===== */
 .container {
   position: relative;
   width: 100%;
-  text-align: center;
-  margin: 10px auto 30px auto;
   max-width: 800px;
+  text-align: center;
   background-color: var(--card-bg);
   border-radius: 16px;
   box-shadow: var(--shadow);
   border: 1px solid var(--border-color);
   transition: var(--transition);
+  padding: 20px;
+  margin: 20px auto;
+  box-sizing: border-box;
+  overflow: visible;
 }
 
 .container:hover {
@@ -53,10 +93,10 @@ body {
 
 /* ===== Logo ===== */
 .logo {
-  width: 140px;
-  height: 140px;
+  width: 220px !important;
+  height: 220px !important;
   object-fit: contain;
-  margin-bottom: 2rem;
+  margin: 1rem 0 2.5rem 0 !important;
   transition: var(--transition);
 }
 
@@ -91,25 +131,45 @@ em {
   opacity: 0.9;
 }
 
+/* Language text handling */
+.lang-full {
+  display: inline;
+}
+
+.lang-short {
+  display: none;
+}
+
 /* ===== Language Switcher ===== */
 .lang-switcher {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
   display: inline-flex;
   background-color: #F1F5F9;
   border-radius: 50px;
-  padding: 0.25rem;
-  margin: 1.5rem 0;
+  padding: 4px;
   box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
-  position: relative;
-  z-index: 1;
 }
 
-/* Desktop specific */
-@media (min-width: 769px) {
-  .lang-switcher {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    margin: 0;
+/* Mobile styles */
+@media (max-width: 768px) {
+  .back-button {
+    top: 16px;
+    left: 16px;
+  }
+  
+  .lang-full {
+    display: none;
+  }
+  
+  .lang-short {
+    display: inline;
+  }
+  
+  .lang-switcher button {
+    padding: 0.6rem 1rem;
   }
 }
 
@@ -172,32 +232,47 @@ em {
   margin-right: 0.5rem;
 }
 
-/* ===== Responsive Design ===== */
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  .logo {
+    width: 180px !important;
+    height: 180px !important;
+  }
+}
+
 @media (max-width: 768px) {
+  body {
+    padding: 15px;
+  }
+  
   .container {
-    padding: 1.5rem;
-    margin: 1rem;
+    padding: 15px;
+    margin: 0;
+    width: 100%;
+    border-radius: 12px;
   }
   
   h1 {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
+    margin: 15px 0;
   }
   
   p {
-    font-size: 1rem;
+    font-size: 0.95rem;
+    margin: 10px 0;
   }
   
   .lang-switcher {
-    margin: 1.5rem auto;
-    width: auto;
-    display: inline-flex;
+    margin: 10px 0 15px;
+    width: 100%;
+    justify-content: center;
   }
   
   .contact {
     flex-direction: column;
     align-items: center;
-    margin: 2.5rem -1.5rem -1.5rem -1.5rem;
-    padding: 2rem 1.5rem 4rem 1.5rem;
+    margin: 20px -15px -15px -15px;
+    padding: 20px 15px 40px 15px;
   }
   
   .contact a {
