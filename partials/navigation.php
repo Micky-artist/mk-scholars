@@ -80,6 +80,8 @@ include("./popup.php");
 						</li>
 						<li><a href="courses" class="tran3s">Courses</a></li>
 						</li>
+						<li><a href="/driving-school" class="tran3s">Driving School</a></li>
+						</li>
 						<!-- <li><a href="applications" class="tran3s">Apply Now</a> -->
 						</li>
 
