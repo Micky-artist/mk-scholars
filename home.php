@@ -129,6 +129,32 @@ if (!$dbWorking) {
 			</div>
 		</div> <!-- /#theme-main-banner -->
 
+		<!-- 
+			=============================================
+				Meek Store Advertisement
+			============================================== 
+		-->
+		<div class="meek-store-ad">
+			<div class="container">
+				<div class="ad-content">
+					<div class="ad-left">
+						
+						<div class="ad-products">
+							<div class="product-item">
+								<img src="./images/MeekStore.JPG" alt="Meek Store - Fashion & Sneakers" class="ad-main-image">
+							</div>
+						</div>
+					</div>
+					<div class="ad-right">
+						<div class="ad-cta">
+							<h3>VISIT FOR GOOD DEALS!</h3>
+							<a href="https://www.meek.fashion" target="_blank" class="visit-store-btn">Visit Store</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<?php
 		if (isset($_POST['searchCourse'])) {
 			echo '<script type="text/javascript">
@@ -183,6 +209,64 @@ if (!$dbWorking) {
 						</div>
 					</div> -->
 					<?php include('./partials/stayInTouch.php'); ?>
+					
+					<!-- Writing Services Card -->
+					<div class="allScholarshipContainer">
+						<div class="writing-services-card">
+							<div class="image">
+								<img src="./images/WrittingServices.jpg" alt="MK Scholars Writing Services">
+							</div>
+							<div class="text">
+								
+								<div class="writing-services-list">
+									<div class="service-item">
+										<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+											<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+											<path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+										</svg>
+										<span>Personal Statements & Essays</span>
+									</div>
+									<div class="service-item">
+										<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-file-earmark-text" viewBox="0 0 16 16">
+											<path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5"/>
+											<path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5zm0 1v2A1.5 1.5 0 0 0 11 4.5h1V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z"/>
+										</svg>
+										<span>Resume & CV</span>
+									</div>
+									<div class="service-item">
+										<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-envelope" viewBox="0 0 16 16">
+											<path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z"/>
+										</svg>
+										<span>Recommendation Letters</span>
+									</div>
+									<div class="service-item">
+										<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-chat-quote" viewBox="0 0 16 16">
+											<path d="M2.5 3a.5.5 0 0 0 0 1h11a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h7a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h4a.5.5 0 0 0 0-1zm0 3a.5.5 0 0 0 0 1h8a.5.5 0 0 0 0-1z"/>
+											<path d="M5 4.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/>
+										</svg>
+										<span>Motivation Letters</span>
+									</div>
+									<div class="service-item">
+										<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-briefcase" viewBox="0 0 16 16">
+											<path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5M1 4.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5z"/>
+										</svg>
+										<span>Cover Letters & Portfolios</span>
+									</div>
+									<div class="writing-services-cta">
+									<a href="./writing-services" class="apply-writing-service">
+										<span>Get Professional Help</span>
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+											<path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
+										</svg>
+									</a>
+								</div>
+								</div>
+								
+								
+							</div>
+						</div>
+					</div>
+					
 					<style>
 						.text div a {
 							display: flex;
@@ -207,6 +291,356 @@ if (!$dbWorking) {
 						.noHover:hover {
 							background-color: #fff !important;
 							cursor: default !important;
+						}
+
+						/* Meek Store Advertisement Styling */
+						.meek-store-ad {
+							background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+							padding: 60px 0;
+							margin: 40px 0;
+							border-radius: 20px;
+							box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+						}
+
+						.ad-content {
+							display: flex;
+							align-items: center;
+							gap: 40px;
+							max-width: 1200px;
+							margin: 0 auto;
+						}
+
+						.ad-left {
+							flex: 1;
+							display: flex;
+							flex-direction: column;
+							gap: 30px;
+						}
+
+						.ad-logo {
+							display: flex;
+							align-items: center;
+							gap: 20px;
+						}
+
+						.logo-icon {
+							width: 80px;
+							height: 80px;
+							background: linear-gradient(135deg, #0E77C2 0%, #083352 100%);
+							border-radius: 16px;
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							box-shadow: 0 8px 24px rgba(14, 119, 194, 0.3);
+						}
+
+						.logo-m {
+							font-size: 2.5rem;
+							font-weight: 700;
+							color: white;
+							font-family: 'Georgia', serif;
+						}
+
+						.logo-text h2 {
+							font-size: 2.5rem;
+							font-weight: 700;
+							color: #083352;
+							margin: 0;
+							font-family: 'Georgia', serif;
+						}
+
+						.logo-text p {
+							font-size: 1.1rem;
+							color: #666;
+							margin: 5px 0 0 0;
+							font-weight: 500;
+							text-transform: uppercase;
+							letter-spacing: 1px;
+						}
+
+						.ad-products {
+							text-align: center;
+						}
+
+						.ad-main-image {
+							max-width: 100%;
+							height: auto;
+							border-radius: 16px;
+							box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+							transition: transform 0.3s ease;
+						}
+
+						.ad-main-image:hover {
+							transform: scale(1.02);
+						}
+
+						.ad-right {
+							flex: 1;
+							text-align: center;
+						}
+
+						.ad-cta h3 {
+							font-size: 2rem;
+							font-weight: 700;
+							color: #083352;
+							margin-bottom: 30px;
+							text-transform: uppercase;
+							letter-spacing: 1px;
+						}
+
+						.contact-info {
+							margin-bottom: 30px;
+						}
+
+						.contact-info .contact-item {
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							gap: 15px;
+							margin-bottom: 15px;
+							padding: 15px;
+							background: white;
+							border-radius: 12px;
+							box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+							transition: all 0.3s ease;
+						}
+
+						.contact-info .contact-item:hover {
+							transform: translateY(-3px);
+							box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+						}
+
+						.contact-info .contact-item i {
+							font-size: 1.2rem;
+							color: #0E77C2;
+							width: 24px;
+							text-align: center;
+						}
+
+						.contact-info .contact-item span {
+							font-size: 1rem;
+							color: #333;
+							font-weight: 500;
+						}
+
+						.visit-store-btn {
+							display: inline-block;
+							padding: 18px 36px;
+							background: linear-gradient(135deg, #0E77C2 0%, #083352 100%);
+							color: white;
+							text-decoration: none;
+							border-radius: 50px;
+							font-size: 1.1rem;
+							font-weight: 600;
+							text-transform: uppercase;
+							letter-spacing: 1px;
+							box-shadow: 0 8px 24px rgba(14, 119, 194, 0.3);
+							transition: all 0.3s ease;
+							border: none;
+							cursor: pointer;
+						}
+
+						.visit-store-btn:hover {
+							transform: translateY(-3px);
+							box-shadow: 0 12px 32px rgba(14, 119, 194, 0.4);
+							color: white;
+							text-decoration: none;
+						}
+
+						/* Responsive Design for Meek Store Ad */
+						@media (max-width: 768px) {
+							.meek-store-ad {
+								padding: 40px 20px;
+								margin: 20px 0;
+							}
+
+							.ad-content {
+								flex-direction: column;
+								gap: 30px;
+								text-align: center;
+							}
+
+							.ad-logo {
+								justify-content: center;
+							}
+
+							.logo-text h2 {
+								font-size: 2rem;
+							}
+
+							.ad-cta h3 {
+								font-size: 1.5rem;
+							}
+
+							.visit-store-btn {
+								padding: 15px 30px;
+								font-size: 1rem;
+							}
+						}
+
+						@media (max-width: 480px) {
+							.meek-store-ad {
+								padding: 30px 15px;
+							}
+
+							.logo-icon {
+								width: 60px;
+								height: 60px;
+							}
+
+							.logo-m {
+								font-size: 2rem;
+							}
+
+							.logo-text h2 {
+								font-size: 1.8rem;
+							}
+
+							.logo-text p {
+								font-size: 1rem;
+							}
+
+							.ad-cta h3 {
+								font-size: 1.3rem;
+							}
+
+							.contact-info .contact-item {
+								padding: 12px;
+								margin-bottom: 10px;
+							}
+
+							.contact-info .contact-item span {
+								font-size: 0.9rem;
+							}
+						}
+
+						/* Writing Services Card Styling */
+						.writing-services-card {
+							background: linear-gradient(135deg, #0E77C2 0%, #083352 100%);
+							color: white;
+							border-radius: 16px;
+							overflow: hidden;
+							box-shadow: 0 8px 24px rgba(14, 119, 194, 0.3);
+							transition: all 0.3s ease;
+						}
+
+						.writing-services-card:hover {
+							transform: translateY(-5px);
+							box-shadow: 0 12px 32px rgba(14, 119, 194, 0.4);
+						}
+
+						.writing-services-card .image {
+							position: relative;
+							height: 200px;
+							overflow: hidden;
+						}
+
+						.writing-services-card .image img {
+							width: 100%;
+							height: 100%;
+							object-fit: cover;
+							transition: transform 0.4s ease;
+						}
+
+						.writing-services-card:hover .image img {
+							transform: scale(1.05);
+						}
+
+						.writing-services-card .text {
+							padding: 20px;
+							background: rgba(255, 255, 255, 0.1);
+							backdrop-filter: blur(10px);
+						}
+
+						.writing-services-card h4 {
+							color: white;
+							text-align: center;
+							margin-bottom: 20px;
+							font-size: 22px;
+							font-weight: 600;
+						}
+
+						.writing-services-list {
+							margin-bottom: 20px;
+						}
+
+						.service-item {
+							display: flex;
+							align-items: center;
+							gap: 12px;
+							padding: 10px 0;
+							border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+							color: white;
+							font-size: 14px;
+						}
+
+						.service-item:last-child {
+							border-bottom: none;
+						}
+
+						.service-item svg {
+							color: #FDC713;
+							flex-shrink: 0;
+						}
+
+						.service-item span {
+							flex: 1;
+							line-height: 1.4;
+						}
+
+						.writing-services-cta {
+							text-align: center;
+							margin-top: 20px;
+						}
+
+						.apply-writing-service {
+							display: inline-flex;
+							align-items: center;
+							gap: 8px;
+							padding: 12px 24px;
+							background: #FDC713;
+							color: #083352;
+							text-decoration: none;
+							border-radius: 25px;
+							font-weight: 600;
+							transition: all 0.3s ease;
+							border: 2px solid #FDC713;
+						}
+
+						.apply-writing-service:hover {
+							background: #083352;
+							border-color: #FDC713;
+							transform: translateY(-2px);
+							color: #FDC713;
+						}
+
+						.apply-writing-service svg {
+							transition: transform 0.3s ease;
+						}
+
+						.apply-writing-service:hover svg {
+							transform: translateX(4px);
+						}
+
+						/* Responsive adjustments */
+						@media (max-width: 768px) {
+							.writing-services-card .text {
+								padding: 15px;
+							}
+							
+							.writing-services-card h4 {
+								font-size: 20px;
+							}
+							
+							.service-item {
+								font-size: 13px;
+								padding: 8px 0;
+							}
+							
+							.apply-writing-service {
+								padding: 10px 20px;
+								font-size: 14px;
+							}
 						}
 					</style>
 					<div class="scholarshipsContainerDiv">

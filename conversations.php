@@ -20,6 +20,41 @@ include('./php/validateSession.php');
     <!-- Navigation -->
     <?php include("./partials/dashboardNavigation.php"); ?>
 
+    <!-- Mobile Navigation Bar -->
+    <div class="mobile-nav-bar">
+        <div class="container">
+            <div class="mobile-nav-content">
+                <div class="mobile-nav-left">
+                    <a href="./home" class="mobile-nav-link">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="./applications" class="mobile-nav-link">
+                        <i class="fas fa-search"></i>
+                        <span>Scholarships</span>
+                    </a>
+                    <a href="./writing-services" class="mobile-nav-link">
+                        <i class="fas fa-pen-fancy"></i>
+                        <span>Writing</span>
+                    </a>
+                </div>
+                <div class="mobile-nav-center">
+                    <h5 class="mobile-nav-title">Chat Support</h5>
+                </div>
+                <div class="mobile-nav-right">
+                    <a href="./courses" class="mobile-nav-link">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Courses</span>
+                    </a>
+                    <a href="./profile" class="mobile-nav-link">
+                        <i class="fas fa-user"></i>
+                        <span>Profile</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Chat Container -->
     <div class="chat-app-container">
         <!-- Chat Header -->
@@ -38,9 +73,9 @@ include('./php/validateSession.php');
                     <button class="btn btn-link" id="theme-toggle">
                         <i class="fas fa-moon"></i>
                     </button>
-                    <button class="btn btn-success" id="files-toggle">
+                    <!-- <button class="btn btn-success" id="files-toggle">
                         <i class="fas fa-folder me-2"></i>Shared Files
-                    </button>
+                    </button> -->
                 </div>
             </div>
         </div>
@@ -78,7 +113,7 @@ include('./php/validateSession.php');
                             $avatarClass = $isUser ? 'user-avatar' : 'admin-avatar';
                             $avatarIcon = $isUser ? 'fas fa-user' : 'fas fa-headset';
                             
-                            echo '<div class="message-wrapper ' . $messageClass . '">';
+                            echo '<div class="message-wrapper ' . $messageClass . '" data-message-id="' . $messages['MessageId'] . '">';
                             echo '<div class="message-avatar ' . $avatarClass . '">';
                             echo '<i class="' . $avatarIcon . '"></i>';
                             echo '</div>';
@@ -293,6 +328,70 @@ include('./php/validateSession.php');
             overflow: hidden;
         }
 
+        /* Mobile Navigation Bar */
+        .mobile-nav-bar {
+            display: none;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-nav-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mobile-nav-left,
+        .mobile-nav-right {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .mobile-nav-center {
+            flex: 1;
+            text-align: center;
+        }
+
+        .mobile-nav-title {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .mobile-nav-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: var(--transition);
+            min-width: 50px;
+        }
+
+        .mobile-nav-link:hover {
+            color: var(--primary-color);
+            background: var(--bg-secondary);
+            text-decoration: none;
+        }
+
+        .mobile-nav-link i {
+            font-size: 1.1rem;
+        }
+
+        .mobile-nav-link span {
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
         /* Chat App Container */
         .chat-app-container {
             display: flex;
@@ -465,6 +564,9 @@ include('./php/validateSession.php');
             border-radius: var(--border-radius);
             position: relative;
             word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            hyphens: auto;
         }
 
         .message-sent .message-bubble {
@@ -482,6 +584,10 @@ include('./php/validateSession.php');
         .message-text {
             line-height: 1.4;
             margin-bottom: 0.25rem;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            hyphens: auto;
         }
 
         .message-time {
@@ -790,6 +896,10 @@ include('./php/validateSession.php');
             background: transparent;
             padding: 0.75rem 1rem;
             color: var(--text-primary);
+            font-size: 16px; /* Prevent zoom on iOS */
+            line-height: 1.4;
+            resize: none;
+            min-height: 44px; /* Touch-friendly minimum height */
         }
 
         .message-input:focus {
@@ -922,8 +1032,12 @@ include('./php/validateSession.php');
 
         /* Responsive Design */
         @media (max-width: 768px) {
+            .mobile-nav-bar {
+                display: block;
+            }
+
             .chat-app-container {
-                height: 100vh;
+                height: calc(100vh - 80px); /* Account for mobile nav */
                 margin: 0;
                 border-radius: 0;
                 box-shadow: none;
@@ -955,6 +1069,11 @@ include('./php/validateSession.php');
                 padding: 0.6rem 1rem;
                 font-size: 0.9rem;
             }
+
+            /* Hide desktop navigation on mobile */
+            .dashboardNavigation {
+                display: none;
+            }
         }
 
         @media (max-width: 576px) {
@@ -976,6 +1095,77 @@ include('./php/validateSession.php');
                 padding: 0.5rem 0.75rem;
                 font-size: 0.8rem;
             }
+
+            /* Mobile-specific improvements */
+            .mobile-nav-link {
+                padding: 0.4rem;
+                min-width: 45px;
+            }
+
+            .mobile-nav-link span {
+                font-size: 0.65rem;
+            }
+
+            .chat-input-container {
+                padding: 0.5rem;
+            }
+
+            .message-input {
+                padding: 0.6rem 0.8rem;
+                font-size: 16px;
+            }
+
+            .send-btn {
+                width: 44px;
+                height: 44px;
+                min-width: 44px;
+            }
+
+            /* Better touch targets */
+            .message-file-image img {
+                max-width: 150px;
+                max-height: 150px;
+            }
+
+            .file-actions .btn {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.75rem;
+                min-height: 36px;
+            }
+        }
+
+        /* Mobile-friendly improvements */
+        .chat-messages {
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-color) transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        /* Better mobile file handling */
+        .upload-area {
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-area.dragover {
+            background: rgba(40, 167, 69, 0.1);
+            border-color: var(--success-color);
+            transform: scale(1.02);
         }
 
         /* File Gallery Styles */
@@ -1250,12 +1440,17 @@ include('./php/validateSession.php');
                     return;
                 }
 
+                // Disable send button to prevent double sending
+                const sendBtn = $('.send-btn');
+                sendBtn.prop('disabled', true);
+
                 // Show typing indicator for user
                 showUserTyping();
 
                 $.ajax({
                     url: './php/submit_message.php',
                     type: 'POST',
+                    dataType: 'json',
                     data: {
                         ConvId: $('input[name="ConvId"]').val(),
                         UserId: $('input[name="UserId"]').val(),
@@ -1263,26 +1458,43 @@ include('./php/validateSession.php');
                         message: message
                     },
                     success: function(response) {
-                        messageInput.val('');
                         hideUserTyping();
+                        sendBtn.prop('disabled', false);
                         
-                        // Add message to chat immediately for better UX
-                        const messageData = {
-                            MessageId: Date.now(), // Temporary ID
-                            UserId: $('input[name="UserId"]').val(),
-                            AdminId: 0,
-                            MessageContent: message,
-                            SentDate: new Date().toISOString().split('T')[0],
-                            SentTime: new Date().toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute: '2-digit'})
-                        };
-                        addMessageToChat(messageData);
-                        
-                        // Track this pending message to prevent duplicates
-                        pendingMessages.add(message);
+                        if (response.success) {
+                            messageInput.val('');
+                            
+                            // Add message to chat immediately for better UX
+                            const messageData = {
+                                MessageId: response.messageId || Date.now(),
+                                UserId: $('input[name="UserId"]').val(),
+                                AdminId: 0,
+                                MessageContent: response.messageContent || message,
+                                SentDate: response.sentDate || new Date().toISOString().split('T')[0],
+                                SentTime: response.sentTime || new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                            };
+                            addMessageToChat(messageData);
+                            
+                            // Track this pending message to prevent duplicates
+                            pendingMessages.add(message);
+                        } else {
+                            showNotification(response.error || 'Error sending message', 'error');
+                        }
                     },
-                    error: function() {
+                    error: function(xhr, status, error) {
                         hideUserTyping();
-                        showNotification('Error sending message', 'error');
+                        sendBtn.prop('disabled', false);
+                        
+                        let errorMessage = 'Error sending message';
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            errorMessage = response.error || errorMessage;
+                        } catch (e) {
+                            errorMessage += ': ' + error;
+                        }
+                        
+                        showNotification(errorMessage, 'error');
+                        console.error('Message send error:', xhr.responseText);
                     }
                 });
             });
@@ -1340,11 +1552,23 @@ include('./php/validateSession.php');
                     
                     if (data.error) {
                         console.error('SSE Error:', data.error);
+                        showNotification('Connection error: ' + data.error, 'error');
+                        return;
+                    }
+
+                    if (data.type === 'error') {
+                        console.error('SSE Error:', data.message);
+                        showNotification('Chat error: ' + data.message, 'error');
                         return;
                     }
 
                     if (data.type === 'typing') {
                         handleTypingIndicator(data);
+                        return;
+                    }
+
+                    if (data.type === 'connected') {
+                        console.log('SSE connected:', data.message);
                         return;
                     }
 
@@ -1366,9 +1590,15 @@ include('./php/validateSession.php');
                                 processedMessages.add(message.MessageId);
                             }
                         });
+                        
+                        // Update lastMessageId if provided
+                        if (data.lastMessageId) {
+                            lastMessageId = Math.max(lastMessageId, data.lastMessageId);
+                        }
                     }
                 } catch (e) {
-                    console.error('Error parsing SSE data:', e);
+                    console.error('Error parsing SSE data:', e, 'Raw data:', event.data);
+                    showNotification('Error processing chat data', 'error');
                 }
             };
 
@@ -1460,6 +1690,13 @@ include('./php/validateSession.php');
         function addMessageToChat(message) {
             const chatContainer = $('#chat-container');
             const userId = <?php echo isset($UserId) ? $UserId : 'null'; ?>;
+            
+            // Check if message already exists in DOM to prevent duplicates
+            const existingMessage = chatContainer.find(`[data-message-id="${message.MessageId}"]`);
+            if (existingMessage.length > 0) {
+                return; // Message already exists
+            }
+            
             const messageDate = new Date(message.SentDate).toDateString();
             const messageTime = new Date('2000-01-01 ' + message.SentTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             
@@ -1504,7 +1741,7 @@ include('./php/validateSession.php');
             }
 
             const messageHtml = `
-                <div class="message-wrapper ${messageClass}">
+                <div class="message-wrapper ${messageClass}" data-message-id="${message.MessageId}">
                     <div class="message-avatar ${avatarClass}">
                         <i class="${avatarIcon}"></i>
                     </div>
@@ -1706,6 +1943,70 @@ include('./php/validateSession.php');
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             }
         });
+
+        // Mobile-specific improvements
+        function handleMobileView() {
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                // Hide typing indicator on mobile to save space
+                $('#typing-indicator').hide();
+                
+                // Adjust chat container height for mobile nav
+                const chatContainer = document.querySelector('.chat-app-container');
+                if (chatContainer) {
+                    chatContainer.style.height = 'calc(100vh - 80px)';
+                }
+            }
+        }
+
+        // Handle orientation change
+        window.addEventListener('orientationchange', function() {
+            setTimeout(handleMobileView, 100);
+        });
+
+        // Handle resize
+        window.addEventListener('resize', handleMobileView);
+
+        // Initialize mobile view
+        handleMobileView();
+
+        // Better mobile input handling
+        const messageInput = document.querySelector('.message-input');
+        if (messageInput) {
+            messageInput.addEventListener('focus', function() {
+                // Scroll to input on mobile
+                if (window.innerWidth <= 768) {
+                    setTimeout(() => {
+                        this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+                }
+            });
+        }
+
+        // Prevent zoom on iOS input focus
+        if (messageInput) {
+            messageInput.addEventListener('focus', function() {
+                this.style.fontSize = '16px';
+            });
+        }
+
+        // Better mobile file handling
+        function handleMobileFileUpload() {
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                // Show mobile-friendly file picker
+                const fileInput = document.getElementById('panel-file-input');
+                if (fileInput) {
+                    fileInput.setAttribute('capture', 'environment');
+                    fileInput.setAttribute('accept', 'image/*,video/*,.pdf,.doc,.docx');
+                }
+            }
+        }
+
+        // Initialize mobile file handling
+        handleMobileFileUpload();
     </script>
 </body>
 </html>

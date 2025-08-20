@@ -56,6 +56,9 @@ include("./popup.php");
 					<a href="./courses" class="nav-link">Courses</a>
 				</li>
 				<li class="nav-item">
+					<a href="./writing-services" class="nav-link">Writting Services</a>
+				</li>
+				<li class="nav-item">
 					<a href="./driving-school" class="nav-link">Driving School</a>
 				</li>
 				<li class="nav-item dropdown">
@@ -118,6 +121,9 @@ include("./popup.php");
 				</li>
 				<li class="mobile-nav-item">
 					<a href="./courses" class="mobile-nav-link">Courses</a>
+				</li>
+				<li class="mobile-nav-item">
+					<a href="./writing-services" class="mobile-nav-link">Writting Services</a>
 				</li>
 				<li class="mobile-nav-item">
 					<a href="./driving-school" class="mobile-nav-link">Driving School</a>
@@ -267,7 +273,7 @@ include("./popup.php");
 	color: #333;
 	text-decoration: none;
 	font-weight: 500;
-	font-size: 16px;
+		font-size: 16px;
 	padding: 10px 0;
 	transition: color 0.3s ease;
 	position: relative;
@@ -389,7 +395,7 @@ include("./popup.php");
 }
 
 .hamburger-line {
-	width: 100%;
+		width: 100%;
 	height: 3px;
 	background: #333;
 	border-radius: 2px;
@@ -436,9 +442,9 @@ include("./popup.php");
 }
 
 .mobile-nav-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 	padding: 20px;
 	border-bottom: 1px solid #eee;
 }
@@ -565,8 +571,8 @@ include("./popup.php");
 	.mobile-nav-content {
 		width: 100%;
 	}
-}
-</style>
+							}
+						</style>
 
 <script>
 // Mobile Navigation Toggle

@@ -170,6 +170,20 @@ include("./partials/head.php");
                             </a>
                         </div>
                     <?php } ?>
+                    
+                    <!-- Writing Services Card -->
+                    <div class="col-md-3">
+                        <a href="writing-services" class="text-decoration-none">
+                            <div class="card dashboard-card gradient-1 text-white">
+                                <div class="card-body text-center d-flex flex-column justify-content-center">
+                                    <i class="fas fa-pen-fancy card-icon"></i>
+                                    <h3 class="card-title mb-3">Writing Services</h3>
+                                    <p class="card-text">Manage writing service requests and applications</p>
+                                    <!-- <span class="badge bg-light text-dark mt-2">New Requests: 8</span> -->
+                                </div>
+                            </div>
+                        </a>
+                    </div>
                     </div>
             </div>
             <div>

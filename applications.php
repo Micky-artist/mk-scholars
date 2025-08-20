@@ -44,6 +44,48 @@ include("./dbconnection/connection.php");
 		<div class="feature-course-3-column">
 			<div class="container-fluid" style="padding: 0 5%;">
 				<div class="row">
+					<!-- Mobile-First Search and Filter Section -->
+					<div class="col-12 mobile-search-section">
+						<div class="mobile-search-wrapper">
+							<!-- Search Input -->
+							<form method="get" class="mobile-search-form">
+								<div class="search-input-group">
+									<input type="text" name="searchText" placeholder="Search Scholarship..." 
+										   value="<?php echo isset($_GET['searchText']) ? htmlspecialchars($_GET['searchText']) : ''; ?>"
+										   class="mobile-search-input">
+									<button class="mobile-search-btn" type="submit" name="search">
+										<svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+											<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+										</svg>
+									</button>
+								</div>
+							</form>
+
+							<!-- Countries Filter -->
+							<div class="mobile-countries-section">
+								<h6 class="countries-title">Filter by Country</h6>
+								<div class="countries-grid">
+									<a href="applications" class="country-item reset-all">
+										<span class="country-name">Show All</span>
+										<span class="country-reset">(Reset)</span>
+									</a>
+									<?php
+									$selectCountries = mysqli_query($conn, "SELECT DISTINCT(s.country), c.CountryName, c.countryId FROM countries c INNER JOIN scholarships s ON s.country = c.countryId WHERE s.scholarshipStatus !=0 order by c.CountryName DESC");
+									if ($selectCountries->num_rows > 0) {
+										while ($getCountries = mysqli_fetch_assoc($selectCountries)) {
+											?>
+											<a href="?i=<?php echo $getCountries['countryId'] ?>&Country_name=<?php echo $getCountries['CountryName'] ?>" class="country-item">
+												<span class="country-name"><?php echo htmlspecialchars($getCountries['CountryName'], ENT_QUOTES, 'UTF-8') ?></span>
+											</a>
+											<?php
+										}
+									}
+									?>
+								</div>
+							</div>
+						</div>
+					</div>
+
 					<div class="col-md-9 col-xs-12 float-right featured-course">
 						<ul class="course-menu">
 							<?php
@@ -787,6 +829,214 @@ include("./dbconnection/connection.php");
 									padding: 10px 0;
 								}
 							}
+
+							/* Mobile-First Search and Filter Styling */
+							.mobile-search-section {
+								margin-bottom: 30px;
+								order: -1; /* Move to top */
+							}
+
+							.mobile-search-wrapper {
+								background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+								border-radius: 16px;
+								padding: 25px;
+								box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+								border: 1px solid rgba(255, 255, 255, 0.8);
+							}
+
+							.mobile-search-form {
+								margin-bottom: 25px;
+							}
+
+							.search-input-group {
+								display: flex;
+								gap: 0;
+								border-radius: 12px;
+								overflow: hidden;
+								box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+								background: white;
+							}
+
+							.mobile-search-input {
+								flex: 1;
+								padding: 15px 20px;
+								border: none;
+								font-size: 16px;
+								outline: none;
+								background: white;
+							}
+
+							.mobile-search-input::placeholder {
+								color: #6c757d;
+								font-weight: 500;
+							}
+
+							.mobile-search-btn {
+								padding: 15px 20px;
+								background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+								border: none;
+								color: white;
+								cursor: pointer;
+								transition: all 0.3s ease;
+								display: flex;
+								align-items: center;
+								justify-content: center;
+								min-width: 60px;
+							}
+
+							.mobile-search-btn:hover {
+								transform: translateY(-2px);
+								box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+							}
+
+							.search-icon {
+								width: 20px;
+								height: 20px;
+								stroke: currentColor;
+							}
+
+							.mobile-countries-section {
+								border-top: 1px solid rgba(0, 0, 0, 0.1);
+								padding-top: 20px;
+							}
+
+							.countries-title {
+								font-size: 16px;
+								font-weight: 600;
+								color: #495057;
+								margin-bottom: 15px;
+								text-align: center;
+							}
+
+							.countries-grid {
+								display: grid;
+								grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+								gap: 12px;
+								max-height: 300px;
+								overflow-y: auto;
+								padding: 10px;
+								background: rgba(255, 255, 255, 0.7);
+								border-radius: 12px;
+								border: 1px solid rgba(255, 255, 255, 0.8);
+							}
+
+							.country-item {
+								display: flex;
+								flex-direction: column;
+								align-items: center;
+								padding: 12px 8px;
+								background: white;
+								border-radius: 8px;
+								text-decoration: none;
+								color: #495057;
+								font-weight: 500;
+								font-size: 14px;
+								transition: all 0.3s ease;
+								border: 2px solid transparent;
+								box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+								text-align: center;
+								min-height: 60px;
+								justify-content: center;
+							}
+
+							.country-item:hover {
+								transform: translateY(-2px);
+								box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+								border-color: #667eea;
+								color: #667eea;
+							}
+
+							.country-item.reset-all {
+								background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+								color: white;
+								font-weight: 600;
+							}
+
+							.country-item.reset-all:hover {
+								transform: translateY(-2px);
+								box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+							}
+
+							.country-name {
+								display: block;
+								margin-bottom: 2px;
+							}
+
+							.country-reset {
+								font-size: 12px;
+								opacity: 0.8;
+							}
+
+							/* Hide desktop sidebar on mobile */
+							.desktop-sidebar {
+								display: none;
+							}
+
+							/* Show mobile search section on mobile */
+							.mobile-search-section {
+								display: block;
+							}
+
+							/* Desktop Styles */
+							@media (min-width: 769px) {
+								.mobile-search-section {
+									display: none;
+								}
+
+								.desktop-sidebar {
+									display: block;
+								}
+							}
+
+							/* Mobile Responsive Adjustments */
+							@media (max-width: 480px) {
+								.mobile-search-wrapper {
+									padding: 20px;
+								}
+
+								.mobile-search-input {
+									padding: 12px 16px;
+									font-size: 15px;
+								}
+
+								.mobile-search-btn {
+									padding: 12px 16px;
+									min-width: 50px;
+								}
+
+								.countries-grid {
+									grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+									gap: 10px;
+									max-height: 250px;
+								}
+
+								.country-item {
+									padding: 10px 6px;
+									font-size: 13px;
+									min-height: 50px;
+								}
+
+								.countries-title {
+									font-size: 15px;
+									margin-bottom: 12px;
+								}
+							}
+
+							/* Ensure proper spacing and layout */
+							.featured-course {
+								margin-top: 0;
+							}
+
+							/* Improve mobile menu spacing */
+							@media (max-width: 768px) {
+								.course-menu {
+									margin-top: 20px;
+								}
+								
+								.scholarshipsContainerDiv {
+									margin-top: 20px;
+								}
+							}
 						</style>
 
 						<!-- End of row div -->
@@ -900,7 +1150,8 @@ include("./dbconnection/connection.php");
 						?>
 					</div> <!-- /.featured-course -->
 
-					<div class="col-md-3 col-sm-6 col-xs-12 course-sidebar">
+					<!-- Desktop Sidebar (Hidden on Mobile) -->
+					<div class="col-md-3 col-sm-6 col-xs-12 course-sidebar desktop-sidebar">
 						<form method="get" class="course-sidebar-search">
 							<input type="text" name="searchText" placeholder="Search Scholarship..." value="<?php echo isset($_GET['searchText']) ? htmlspecialchars($_GET['searchText']) : ''; ?>">
 							<button class="searchBtn" type="submit" name="search"><i class="fa fa-search" aria-hidden="true"></i></button>

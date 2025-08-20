@@ -67,9 +67,3 @@ if (isset($_GET['debug']) && $_GET['debug'] == 'db') {
     echo "</div>";
 }
 ?>
-
-
-$class='';
-$msg='';
-$username='';
-$email='';

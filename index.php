@@ -10,7 +10,7 @@ try {
     if ($conn && mysqli_ping($conn)) {
         // Database is working, redirect to home
         echo '<script type="text/javascript">
-            window.location.href="home.php";
+            window.location.href="home";
         </script>';
     } else {
         $hasError = true;
