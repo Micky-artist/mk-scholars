@@ -37,11 +37,6 @@ include('./php/validateSession.php');
                         <i class="fas fa-pen-fancy"></i>
                         <span>Writing</span>
                     </a>
-                </div>
-                <div class="mobile-nav-center">
-                    <h5 class="mobile-nav-title">Chat Support</h5>
-                </div>
-                <div class="mobile-nav-right">
                     <a href="./courses" class="mobile-nav-link">
                         <i class="fas fa-graduation-cap"></i>
                         <span>Courses</span>

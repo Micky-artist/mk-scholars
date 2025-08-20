@@ -240,7 +240,7 @@ include("./dbconnection/connection.php");
 					<div class="col-lg-4 col-md-12">
 						<!-- Application Form Sidebar -->
 						<div class="writing-services-sidebar">
-							<div class="application-form-card">
+							<!-- <div class="application-form-card">
 								<h3>Apply for Writing Service</h3>
 								<p class="form-description">Fill out the form below to get started with your professional writing service.</p>
 								
@@ -313,7 +313,7 @@ include("./dbconnection/connection.php");
 										</svg>
 									</button>
 								</form>
-							</div>
+							</div> -->
 
 							<!-- Contact Information -->
 							<div class="contact-info-card">

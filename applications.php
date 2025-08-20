@@ -241,7 +241,7 @@ include("./dbconnection/connection.php");
 													<span><?php echo $s['scholarshipUpdateDate'] ?></span>
 												</div>
 												<div class="card-actions">
-													<a href="./apply" class="apply-button">
+													<a href="./conversations" class="apply-button">
 														<span>Ask Help</span>
 														<div class="button-hover-effect"></div>
 													</a>

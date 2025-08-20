@@ -62,7 +62,7 @@ include("./php/selectScholarshipDetails.php")
 			<div class="container">
 				<div class="row">
 					<div class="col-md-9 col-xs-12 theme-large-sidebar">
-						<a style="font-size: 16px; background-color: green; padding: 10px; color: white;" class="btn btn-primary" target="_blank" href="https://chat.whatsapp.com/HwgjGSYsWFx8KuAf1msc5W">Join What'sApp group</a>
+						<a style="font-size: 16px; background-color: green; padding: 10px; color: white;" class="btn btn-primary" target="_blank" href="https://chat.whatsapp.com/GyVRqEBwgzA22RrNOF2bLn?mode=ems_copy_t">Join What'sApp group</a>
 						<a href="https://api.whatsapp.com/send?text=<?php echo urlencode('Check out this scholarship: https://mkscholars.com/scholarship-details?scholarship-id=' . $scholarshipData['scholarshipId'] . '&scholarship-title=' . preg_replace('/\s+/', '-', $scholarshipData['scholarshipTitle'])); ?>" target="_blank">
 							<button style="background-color: #25D366; color: white; padding: 10px; border: none; border-radius: 5px;">
 								Share on WhatsApp
