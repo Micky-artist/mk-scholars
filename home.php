@@ -1,6 +1,88 @@
+<?php
+// Error handling for database connection
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Try to include database connection safely
+try {
+    include_once("./dbconnection/connection.php");
+} catch (Exception $e) {
+    error_log("Database connection error in home.php: " . $e->getMessage());
+    // Continue without database connection
+}
+
+// Check if database connection is working
+$dbWorking = false;
+if (isset($conn) && $conn) {
+    try {
+        $dbWorking = mysqli_ping($conn);
+    } catch (Exception $e) {
+        error_log("Database ping error: " . $e->getMessage());
+        $dbWorking = false;
+    }
+}
+
+// If database is not working, show a simplified version
+if (!$dbWorking) {
+    ?>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MK Scholars - Database Connection Issue</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
+            .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+            .warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7; padding: 15px; margin: 15px 0; border-radius: 5px; }
+            .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; padding: 15px; margin: 15px 0; border-radius: 5px; }
+            .button { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 5px; }
+            h1 { color: #333; text-align: center; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>⚠️ Database Connection Issue</h1>
+            
+            <div class="warning">
+                <strong>Database Connection Problem:</strong><br>
+                The website is experiencing database connectivity issues. This might be due to:
+                <ul>
+                    <li>Database server being down</li>
+                    <li>Incorrect database credentials</li>
+                    <li>Database not existing</li>
+                    <li>Server configuration issues</li>
+                </ul>
+            </div>
+            
+            <div class="info">
+                <strong>What you can do:</strong><br>
+                • <a href="./db-test.php">Test Database Connection</a><br>
+                • <a href="./server-status.php">Check Server Status</a><br>
+                • <a href="./test-server.php">Test Basic PHP</a><br>
+                • <a href="./index-fallback.php">View Fallback Page</a>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="./" class="button">Try Main Site Again</a>
+                <a href="./db-test.php" class="button">Database Test</a>
+                <a href="./server-status.php" class="button">Server Status</a>
+            </div>
+            
+            <hr>
+            <p style="text-align: center; color: #666;">
+                <strong>MK Scholars</strong><br>
+                For support: mkscholars250@gmail.com | +250798611161
+            </p>
+        </div>
+    </body>
+    </html>
+    <?php
+    exit; // Stop execution here
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
-
 
 <?php include("./partials/head.php") ?>
 
@@ -91,7 +173,7 @@
 								<div>
 									<a target="_blank" href="#">
 										<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-instagram" viewBox="0 0 16 16">
-											<path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334" />
+											<path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a3.9 3.9 0 0 0-.92-.598 2.5 2.5 0 0 0-.6-.92c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334" />
 										</svg>
 										<h5>Instagram</h5>
 									</a>
@@ -196,7 +278,6 @@
 									</div>
 								</div>
 							<?php
-								$slotIndex++;
 							}
 						} else {
 							// No scholarships found

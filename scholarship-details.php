@@ -202,45 +202,8 @@ include("./php/selectScholarshipDetails.php")
 								$numItems = count($items);
 
 								if ($numItems > 0) {
-									// 4) Increase ad density: random interval 2–4
-									$interval      = rand(2, 4);
-									// at least 2 ads, at most 5
-									$calculatedAds = (int) ceil($numItems / $interval);
-									$numAds        = min(5, max(2, $calculatedAds));
-
-									// 5) Build slots 0..numItems, pick $numAds random slots
-									$slots   = range(0, $numItems);
-									shuffle($slots);
-									$adSlots = array_slice($slots, 0, min($numAds, count($slots)));
-									sort($adSlots);
-
-									$slotIndex   = 0;
-									$adsRendered = 0;
-									$maxAds      = 5;
-
-									// 6) Helper to render an ad list item
-									function renderAdListItem()
-									{
-								?>
-										<script type="text/javascript">
-											atOptions = {
-												'key': '98402006e8b83dd2d8d5dda96e411da2',
-												'format': 'iframe',
-												'height': 250,
-												'width': 300,
-												'params': {}
-											};
-										</script>
-										<script type="text/javascript" src="//www.highperformanceformat.com/98402006e8b83dd2d8d5dda96e411da2/invoke.js"></script>
-									<?php
-									}
-
-									// 7) Loop items, injecting ads into the <ul>
+									// Loop through items without ads
 									foreach ($items as $sch) {
-										if (in_array($slotIndex, $adSlots, true) && $adsRendered < $maxAds) {
-											renderAdListItem();
-											$adsRendered++;
-										}
 									?>
 										<li class="clearfix">
 											<img
@@ -257,13 +220,6 @@ include("./php/selectScholarshipDetails.php")
 											</div>
 										</li>
 									<?php
-										$slotIndex++;
-									}
-
-									// 8) Final “after last item” ad
-									if (in_array($slotIndex, $adSlots, true) && $adsRendered < $maxAds) {
-										renderAdListItem();
-										$adsRendered++;
 									}
 								} else {
 									// No results

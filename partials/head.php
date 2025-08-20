@@ -1,6 +1,13 @@
 <?php
 (session_status() == PHP_SESSION_NONE) ? session_start() : '';
-include("./dbconnection/connection.php");
+
+// Try to include database connection safely
+try {
+    include_once("./dbconnection/connection.php");
+} catch (Exception $e) {
+    error_log("Database connection error in head.php: " . $e->getMessage());
+    // Continue without database connection
+}
 ?>
 <head>
 	<meta charset="UTF-8">

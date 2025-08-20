@@ -454,46 +454,263 @@ include("./dbconnection/connection.php");
 								overflow: hidden;
 							}
 
-							/* Improved pagination styling */
-							.course-pagination {
-								text-align: center;
-								margin: 30px 0;
-								padding: 0;
-								/* Remove default padding */
-								list-style: none;
-								/* Remove default list bullets */
+							/* Modern Pagination Styling */
+							.modern-pagination-wrapper {
+								background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+								border-radius: 16px;
+								padding: 30px;
+								margin: 40px 0;
+								box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+								border: 1px solid rgba(255, 255, 255, 0.8);
 							}
 
-							.course-pagination li {
-								display: inline-block;
-								margin: 0 5px;
-								/* Increased spacing between pagination items */
+							.pagination-info {
+								display: flex;
+								justify-content: space-between;
+								align-items: center;
+								margin-bottom: 25px;
+								padding: 0 10px;
 							}
 
-							.course-pagination li a {
+							.pagination-text {
+								font-size: 14px;
+								color: #6c757d;
+								font-weight: 500;
+							}
+
+							.pagination-total {
+								font-size: 14px;
+								color: #495057;
+								font-weight: 600;
+								background: rgba(8, 51, 82, 0.1);
+								padding: 6px 12px;
+								border-radius: 20px;
+							}
+
+							.modern-pagination {
 								display: flex;
 								justify-content: center;
-								align-items: center;
-								width: 40px;
-								/* Consistent sizing in pixels instead of cm */
-								height: 40px;
-								border-radius: 4px;
-								/* Slightly rounded corners */
-								background: #f7f7f7;
-								font-weight: 600;
-								color: #666;
-								text-decoration: none;
-								/* Remove underline from links */
-								transition: all 0.3s ease;
-								/* Smooth transition for hover effects */
+								margin-bottom: 25px;
 							}
 
-							.course-pagination li a.active,
-							.course-pagination li a:hover {
-								background: #083352;
-								color: #fff;
-								box-shadow: 0 2px 5px rgba(8, 51, 82, 0.2);
-								/* Subtle shadow for active/hover state */
+							.pagination-list {
+								display: flex;
+								list-style: none;
+								margin: 0;
+								padding: 0;
+								gap: 8px;
+								align-items: center;
+								flex-wrap: wrap;
+								justify-content: center;
+							}
+
+							.pagination-item {
+								margin: 0;
+							}
+
+							.pagination-link {
+								display: flex;
+								align-items: center;
+								justify-content: center;
+								min-width: 44px;
+								height: 44px;
+								padding: 0 16px;
+								border-radius: 12px;
+								background: white;
+								color: #495057;
+								text-decoration: none;
+								font-weight: 600;
+								font-size: 15px;
+								transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+								border: 2px solid transparent;
+								box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+								position: relative;
+								overflow: hidden;
+							}
+
+							.pagination-link:hover {
+								background: #667eea;
+								color: white;
+								transform: translateY(-2px);
+								box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+								border-color: #667eea;
+							}
+
+							.pagination-link.pagination-active {
+								background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+								color: white;
+								border-color: #667eea;
+								box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+								transform: scale(1.05);
+							}
+
+							.pagination-link.pagination-prev,
+							.pagination-link.pagination-next {
+								gap: 8px;
+								font-size: 14px;
+								min-width: 120px;
+							}
+
+							.pagination-icon {
+								width: 18px;
+								height: 18px;
+								transition: transform 0.3s ease;
+							}
+
+							.pagination-link:hover .pagination-icon {
+								transform: scale(1.2);
+							}
+
+							.pagination-link.pagination-prev:hover .pagination-icon {
+								transform: translateX(-2px) scale(1.2);
+							}
+
+							.pagination-link.pagination-next:hover .pagination-icon {
+								transform: translateX(2px) scale(1.2);
+							}
+
+							.pagination-ellipsis {
+								display: flex;
+								align-items: center;
+								justify-content: center;
+								min-width: 44px;
+								height: 44px;
+								padding: 0 16px;
+							}
+
+							.pagination-dots {
+								color: #6c757d;
+								font-size: 18px;
+								font-weight: 600;
+								letter-spacing: 2px;
+							}
+
+							.pagination-quick-jump {
+								display: flex;
+								align-items: center;
+								justify-content: center;
+								gap: 15px;
+								padding: 20px;
+								background: rgba(255, 255, 255, 0.7);
+								border-radius: 12px;
+								border: 1px solid rgba(255, 255, 255, 0.8);
+							}
+
+							.quick-jump-text {
+								font-size: 14px;
+								color: #495057;
+								font-weight: 500;
+							}
+
+							.quick-jump-form {
+								display: flex;
+								gap: 10px;
+								align-items: center;
+							}
+
+							.quick-jump-input {
+								width: 80px;
+								height: 40px;
+								padding: 8px 12px;
+								border: 2px solid #e9ecef;
+								border-radius: 8px;
+								font-size: 14px;
+								text-align: center;
+								transition: all 0.3s ease;
+								background: white;
+							}
+
+							.quick-jump-input:focus {
+								outline: none;
+								border-color: #667eea;
+								box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+							}
+
+							.quick-jump-button {
+								height: 40px;
+								padding: 8px 16px;
+								background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+								color: white;
+								border: none;
+								border-radius: 8px;
+								font-weight: 600;
+								font-size: 14px;
+								cursor: pointer;
+								transition: all 0.3s ease;
+							}
+
+							.quick-jump-button:hover {
+								transform: translateY(-2px);
+								box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+							}
+
+							/* Responsive Design */
+							@media (max-width: 768px) {
+								.modern-pagination-wrapper {
+									padding: 20px;
+									margin: 30px 0;
+								}
+
+								.pagination-info {
+									flex-direction: column;
+									gap: 15px;
+									text-align: center;
+								}
+
+								.pagination-list {
+									gap: 6px;
+								}
+
+								.pagination-link {
+									min-width: 40px;
+									height: 40px;
+									font-size: 14px;
+								}
+
+								.pagination-link.pagination-prev,
+								.pagination-link.pagination-next {
+									min-width: 100px;
+									font-size: 13px;
+								}
+
+								.pagination-quick-jump {
+									flex-direction: column;
+									gap: 15px;
+									text-align: center;
+								}
+
+								.quick-jump-form {
+									justify-content: center;
+								}
+							}
+
+							@media (max-width: 480px) {
+								.modern-pagination-wrapper {
+									padding: 15px;
+									margin: 20px 0;
+								}
+
+								.pagination-list {
+									gap: 4px;
+								}
+
+								.pagination-link {
+									min-width: 36px;
+									height: 36px;
+									font-size: 13px;
+									padding: 0 12px;
+								}
+
+								.pagination-link.pagination-prev,
+								.pagination-link.pagination-next {
+									min-width: 80px;
+									font-size: 12px;
+								}
+
+								.pagination-icon {
+									width: 16px;
+									height: 16px;
+								}
 							}
 
 							.searchBtn {
@@ -575,45 +792,101 @@ include("./dbconnection/connection.php");
 						<!-- End of row div -->
 
 
-						<!-- Pagination -->
+						<!-- Modern Pagination -->
 						<?php if ($total_pages > 1): ?>
-							<ul class="course-pagination">
-								<?php if ($page > 1): ?>
-									<li><a href="<?php echo generatePaginationLink($page - 1); ?>" class="tran3s" aria-label="Previous page">&lt;</a></li>
-								<?php endif; ?>
+							<div class="modern-pagination-wrapper">
+								<div class="pagination-info">
+									<span class="pagination-text">Showing page <?php echo $page; ?> of <?php echo $total_pages; ?></span>
+									<span class="pagination-total">Total: <?php echo $total_records; ?> applications</span>
+								</div>
+								
+								<nav class="modern-pagination" aria-label="Applications pagination">
+									<ul class="pagination-list">
+										<!-- Previous Button -->
+										<?php if ($page > 1): ?>
+											<li class="pagination-item">
+												<a href="<?php echo generatePaginationLink($page - 1); ?>" class="pagination-link pagination-prev" aria-label="Previous page">
+													<svg class="pagination-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+														<path d="M15 18l-6-6 6-6"/>
+													</svg>
+													<span class="pagination-text">Previous</span>
+												</a>
+											</li>
+										<?php endif; ?>
 
-								<?php
-								// Calculate range of page numbers to display
-								$start_page = max(1, $page - 2);
-								$end_page = min($total_pages, $page + 2);
+										<!-- First Page -->
+										<?php if ($page > 3): ?>
+											<li class="pagination-item">
+												<a href="<?php echo generatePaginationLink(1); ?>" class="pagination-link">1</a>
+											</li>
+											<?php if ($page > 4): ?>
+												<li class="pagination-item pagination-ellipsis">
+													<span class="pagination-dots">•••</span>
+												</li>
+											<?php endif; ?>
+										<?php endif; ?>
 
-								// Always show first page if we're not starting from page 1
-								if ($start_page > 1) {
-									echo '<li><a href="' . generatePaginationLink(1) . '" class="tran3s">1</a></li>';
-									if ($start_page > 2) {
-										echo '<li><span class="pagination-ellipsis">&hellip;</span></li>';
-									}
-								}
+										<!-- Page Numbers -->
+										<?php
+										$start_page = max(1, $page - 1);
+										$end_page = min($total_pages, $page + 1);
 
-								for ($i = $start_page; $i <= $end_page; $i++):
-								?>
-									<li><a href="<?php echo generatePaginationLink($i); ?>" class="tran3s <?php echo ($i == $page) ? 'active' : ''; ?>" aria-current="<?php echo ($i == $page) ? 'page' : 'false'; ?>"><?php echo $i; ?></a></li>
-								<?php endfor; ?>
+										for ($i = $start_page; $i <= $end_page; $i++):
+										?>
+											<li class="pagination-item">
+												<a href="<?php echo generatePaginationLink($i); ?>" 
+												   class="pagination-link <?php echo ($i == $page) ? 'pagination-active' : ''; ?>" 
+												   aria-current="<?php echo ($i == $page) ? 'page' : 'false'; ?>">
+													<?php echo $i; ?>
+												</a>
+											</li>
+										<?php endfor; ?>
 
-								<?php
-								// Always show last page if we're not ending at the last page
-								if ($end_page < $total_pages) {
-									if ($end_page < $total_pages - 1) {
-										echo '<li><span class="pagination-ellipsis">&hellip;</span></li>';
-									}
-									echo '<li><a href="' . generatePaginationLink($total_pages) . '" class="tran3s">' . $total_pages . '</a></li>';
-								}
-								?>
+										<!-- Last Page -->
+										<?php if ($page < $total_pages - 2): ?>
+											<?php if ($page < $total_pages - 3): ?>
+												<li class="pagination-item pagination-ellipsis">
+													<span class="pagination-dots">•••</span>
+												</li>
+											<?php endif; ?>
+											<li class="pagination-item">
+												<a href="<?php echo generatePaginationLink($total_pages); ?>" class="pagination-link"><?php echo $total_pages; ?></a>
+											</li>
+										<?php endif; ?>
 
-								<?php if ($page < $total_pages): ?>
-									<li><a href="<?php echo generatePaginationLink($page + 1); ?>" class="tran3s" aria-label="Next page">&gt;</a></li>
-								<?php endif; ?>
-							</ul>
+										<!-- Next Button -->
+										<?php if ($page < $total_pages): ?>
+											<li class="pagination-item">
+												<a href="<?php echo generatePaginationLink($page + 1); ?>" class="pagination-link pagination-next" aria-label="Next page">
+													<span class="pagination-text">Next</span>
+													<svg class="pagination-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+														<path d="M9 18l6-6-6-6"/>
+													</svg>
+												</a>
+											</li>
+										<?php endif; ?>
+									</ul>
+								</nav>
+
+								<!-- Quick Jump -->
+								<div class="pagination-quick-jump">
+									<span class="quick-jump-text">Go to page:</span>
+									<form class="quick-jump-form" method="get" onsubmit="return validatePageInput(this);">
+										<?php
+										// Preserve existing GET parameters
+										foreach ($_GET as $key => $value) {
+											if ($key !== 'page') {
+												echo '<input type="hidden" name="' . htmlspecialchars($key) . '" value="' . htmlspecialchars($value) . '">';
+											}
+										}
+										?>
+										<input type="number" name="page" min="1" max="<?php echo $total_pages; ?>" 
+											   class="quick-jump-input" placeholder="<?php echo $page; ?>" 
+											   aria-label="Page number">
+										<button type="submit" class="quick-jump-button">Go</button>
+									</form>
+								</div>
+							</div>
 						<?php endif; ?>
 
 						<?php
@@ -708,6 +981,67 @@ include("./dbconnection/connection.php");
 
 		<!-- Theme js -->
 		<script type="text/javascript" src="js/theme.js"></script>
+
+		<!-- Pagination JavaScript -->
+		<script>
+		// Validate page input for quick jump
+		function validatePageInput(form) {
+			const input = form.querySelector('input[name="page"]');
+			const pageNum = parseInt(input.value);
+			const maxPage = parseInt(input.getAttribute('max'));
+			const minPage = parseInt(input.getAttribute('min'));
+			
+			if (isNaN(pageNum) || pageNum < minPage || pageNum > maxPage) {
+				alert('Please enter a valid page number between ' + minPage + ' and ' + maxPage);
+				input.focus();
+				return false;
+			}
+			
+			return true;
+		}
+
+		// Add smooth scrolling to pagination links
+		document.addEventListener('DOMContentLoaded', function() {
+			const paginationLinks = document.querySelectorAll('.pagination-link');
+			
+			paginationLinks.forEach(link => {
+				link.addEventListener('click', function(e) {
+					// Smooth scroll to top of page when navigating
+					if (this.href && this.href.includes('page=')) {
+						e.preventDefault();
+						const href = this.href;
+						
+						// Smooth scroll to top
+						window.scrollTo({
+							top: 0,
+							behavior: 'smooth'
+						});
+						
+						// Navigate after scroll animation
+						setTimeout(() => {
+							window.location.href = href;
+						}, 500);
+					}
+				});
+			});
+
+			// Add loading state to pagination buttons
+			paginationLinks.forEach(link => {
+				link.addEventListener('click', function() {
+					if (this.href && this.href.includes('page=')) {
+						this.style.pointerEvents = 'none';
+						this.style.opacity = '0.7';
+						
+						// Reset after navigation
+						setTimeout(() => {
+							this.style.pointerEvents = '';
+							this.style.opacity = '';
+						}, 1000);
+					}
+				});
+			});
+		});
+		</script>
 
 	</div> <!-- /.main-page-wrapper -->
 </body>
