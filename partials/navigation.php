@@ -1,5 +1,5 @@
 <?php
-include("./popup.php");
+// include("./popup.php"); // Disabled popup notification
 ?>
 
 <!-- Top Bar with Date and Social Icons -->

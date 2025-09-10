@@ -2,6 +2,31 @@
 session_start();
 include('./dbconnection/connection.php');
 include('./php/validateSession.php');
+
+// Handle starting a new conversation
+if (isset($_POST['startConvo']) && $_POST['startConvo'] === 'true') {
+    $userId = $_SESSION['userId'];
+    
+    // Check if user already has a conversation
+    $checkConvo = mysqli_query($conn, "SELECT `ConvId`, `UserId`, `AdminId`, `StartDate`, `StartTime`, `ConvStatus` FROM `Conversation` WHERE `UserId` = '$userId' LIMIT 1");
+    
+    if ($checkConvo->num_rows == 0) {
+        // Create new conversation with correct table structure
+        $insertConvo = mysqli_query($conn, "INSERT INTO `Conversation` (`UserId`, `AdminId`, `StartDate`, `StartTime`, `ConvStatus`) VALUES ('$userId', '0', CURDATE(), CURTIME(), '0')");
+        
+        if ($insertConvo) {
+            // Redirect to refresh the page and show the new conversation
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit();
+        } else {
+            echo "Error creating conversation: " . mysqli_error($conn);
+        }
+    } else {
+        // User already has a conversation, just redirect
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -80,7 +105,7 @@ include('./php/validateSession.php');
             <div class="chat-messages" id="chat-container">
                 <?php
                 $UserId = $_SESSION['userId'];
-                $CheckConvo = mysqli_query($conn, "SELECT * FROM Conversation WHERE UserId = '$UserId' LIMIT 1");
+                $CheckConvo = mysqli_query($conn, "SELECT `ConvId`, `UserId`, `AdminId`, `StartDate`, `StartTime`, `ConvStatus` FROM `Conversation` WHERE `UserId` = '$UserId' LIMIT 1");
                 if ($CheckConvo->num_rows == 1) {
                     $convoData = mysqli_fetch_assoc($CheckConvo);
                     $convoId = $convoData['ConvId'];
