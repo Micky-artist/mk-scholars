@@ -1,5 +1,6 @@
 <?php
-// include("./popup.php"); // Disabled popup notification
+// include("./popup.php"); // Disabled old popup
+include("./deutsch-popup.php"); // MK Deutsch Academy popup
 ?>
 
 <!-- Top Bar with Date and Social Icons -->
@@ -65,6 +66,9 @@
 				</li>
 				<li class="nav-item">
 					<a href="./driving-school" class="nav-link">Driving School</a>
+				</li>
+				<li class="nav-item">
+					<a href="./deutsch-academy" class="nav-link">Deutsch Academy</a>
 				</li>
 				<li class="nav-item dropdown">
 					<a href="#" class="nav-link dropdown-toggle">More</a>
@@ -132,6 +136,9 @@
 				</li>
 				<li class="mobile-nav-item">
 					<a href="./driving-school" class="mobile-nav-link">Driving School</a>
+				</li>
+				<li class="mobile-nav-item">
+					<a href="./deutsch-academy" class="mobile-nav-link">Deutsch Academy</a>
 				</li>
 				<li class="mobile-nav-item">
 					<a href="./about-us" class="mobile-nav-link">About Us</a>
