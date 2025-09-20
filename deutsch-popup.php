@@ -552,15 +552,14 @@
         </div>
 
         <p>
-          <strong>Registration is now open for August 2025 intake!</strong><br>
-          Start your German language journey with us today.
+          <strong>Registration is now open for October 2025 intake!</strong><br>
         </p>
       </div>
 
       <!-- Buttons -->
       <div class="popup-buttons">
         <button class="popup-button secondary" onclick="dismissPopup()">Maybe Later</button>
-        <a href="deutsch-academy" class="popup-button primary" onclick="continueAction()">Learn More!</a>
+        <a href="deutsch-academy" class="popup-button primary" onclick="continueAction()">Register Now!</a>
       </div>
     </div>
   </div>
@@ -568,13 +567,13 @@
   <script>
     // Deutsch Academy Popup Cookie Management
     const COOKIE_KEY = 'mk_deutsch_popup_2025';
-    const MAX_DISMISSALS = 3;
-    const COOKIE_EXPIRY_DAYS = 7; // Show more frequently for new academy
+    const MAX_DISMISSALS = 2; // Show only twice
+    const COOKIE_EXPIRY_HOURS = 24; // Show twice in 24 hours
     const popupOverlay = document.querySelector('.popup-overlay');
 
-    function setCookie(name, value, days) {
+    function setCookie(name, value, hours) {
       const expires = new Date();
-      expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+      expires.setTime(expires.getTime() + hours * 60 * 60 * 1000);
       document.cookie = name + '=' + value + ';expires=' + expires.toUTCString() + ';path=/;SameSite=Lax';
     }
 
@@ -604,12 +603,12 @@
 
     function dismissPopup() {
       let count = parseInt(getCookie(COOKIE_KEY) || '0');
-      setCookie(COOKIE_KEY, ++count, COOKIE_EXPIRY_DAYS);
+      setCookie(COOKIE_KEY, ++count, COOKIE_EXPIRY_HOURS);
       closePopup();
     }
 
     function continueAction() {
-      setCookie(COOKIE_KEY, '0', COOKIE_EXPIRY_DAYS);
+      setCookie(COOKIE_KEY, '999', COOKIE_EXPIRY_HOURS); // Set high value to prevent popup from showing again
       closePopup();
       // Let the link navigate naturally
     }

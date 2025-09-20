@@ -59,6 +59,9 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 					<a href="./applications" class="nav-link">All Applications</a>
 				</li>
 				<li class="nav-item">
+					<a href="./deutsch-academy" class="nav-link">Deutsch Academy</a>
+				</li>
+				<li class="nav-item">
 					<a href="./courses" class="nav-link">Courses</a>
 				</li>
 				<li class="nav-item">
@@ -66,9 +69,6 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 				</li>
 				<li class="nav-item">
 					<a href="./driving-school" class="nav-link">Driving School</a>
-				</li>
-				<li class="nav-item">
-					<a href="./deutsch-academy" class="nav-link">Deutsch Academy</a>
 				</li>
 				<li class="nav-item dropdown">
 					<a href="#" class="nav-link dropdown-toggle">More</a>
@@ -129,6 +129,9 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 					<a href="./applications" class="mobile-nav-link">All Applications</a>
 				</li>
 				<li class="mobile-nav-item">
+					<a href="./deutsch-academy" class="mobile-nav-link">Deutsch Academy</a>
+				</li>
+				<li class="mobile-nav-item">
 					<a href="./courses" class="mobile-nav-link">Courses</a>
 				</li>
 				<li class="mobile-nav-item">
@@ -136,9 +139,6 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 				</li>
 				<li class="mobile-nav-item">
 					<a href="./driving-school" class="mobile-nav-link">Driving School</a>
-				</li>
-				<li class="mobile-nav-item">
-					<a href="./deutsch-academy" class="mobile-nav-link">Deutsch Academy</a>
 				</li>
 				<li class="mobile-nav-item">
 					<a href="./about-us" class="mobile-nav-link">About Us</a>

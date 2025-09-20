@@ -279,6 +279,7 @@ session_start();
     <div class="status-tag">Open</div>
 </div>
 
+
         <div class="scholarship-card">
             <img src="./images/courses/codingcourse.jpeg" alt="Coding Course" class="card-image">
             <div class="card-content">
@@ -368,47 +369,7 @@ session_start();
         </div>
         
 
-        <!-- <div class="scholarship-card">
-            <img src="./images/courses/ucat.jpg" alt="UCAT" class="card-image">
-            <div class="card-content">
-                <div class="card-header">
-                    <h2 class="card-title">UCAT Online Coaching</h2>
-                    <p class="card-subtitle">For Future Medical Students</p>
-                    <div style="display: flex; flex-wrap: wrap;">
-                        <div class="price-tag">4,500 RWF Prepared notes and answers</div>
-                        <div class="price-tag" style="background: rgba(255, 193, 7, 0.15); color: #FFA000;">7,500 FRW Coaching with a teacher</div>
-
-                    </div>
-                </div>
-
-                <p class="card-description">
-                    Comprehensive online coaching for students preparing for the University Clinical Aptitude Test (UCAT). Includes expert guidance, practice tests, and strategies to improve scores. Morning and evening classes are available. <br>
-                </p>
-
-                <div class="card-details">
-                    <div class="detail-item">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span>Online Studying</span>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-users"></i>
-                        <span>3 Seats Available</span>
-                    </div>
-                </div>
-
-                <div class="action-section">
-                    <div class="deadline">
-                        <i class="fas fa-hourglass-half"></i>
-                        Registration Closes: April 24, 2025
-                    </div>
-                    <button onclick="window.location.href='./ucat'" class="apply-button">
-                        <i class="fas fa-arrow-circle-right"></i>
-                        Register now (Iyandikishe)
-                    </button>
-                </div>
-            </div>
-            <div class="status-tag">Open</div>
-        </div> -->
+        
 
         <!-- <div class="scholarship-card">
             <img src="./images/courses/lang.jpg" alt="Languages" class="card-image">

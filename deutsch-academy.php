@@ -20,7 +20,7 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Study Deutsch in MK Deutsch Academy - Learn German Language | MK Scholars</title>
-    <meta name="description" content="Study Deutsch in MK Deutsch Academy. Learn German language from A1 to B2 levels. Physical and online classes available. Registration open for August 2025 intake.">
+    <meta name="description" content="Study Deutsch in MK Deutsch Academy. Learn German language from A1 to B2 levels. Physical and online classes available. Registration open for October 2025 intake.">
     <meta name="keywords" content="German language, learn German, Deutsch Academy, German classes, Rwanda, Kigali, A1, B2, language learning">
     
     <!-- Favicon -->
@@ -91,6 +91,7 @@ try {
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
             letter-spacing: -1px;
+            color: white;
         }
 
         .academy-name {
@@ -169,6 +170,11 @@ try {
             font-weight: 600;
             display: inline-block;
             box-shadow: 0 8px 25px rgba(26, 54, 93, 0.3);
+        }
+
+        .registration-link {
+            text-decoration: none;
+            cursor: pointer;
         }
 
         /* Section Headers - Clean Design */
@@ -298,7 +304,7 @@ try {
         }
 
         .benefit-title {
-            font-size: 1.3rem;
+            font-size: 1.6rem;
             font-weight: 600;
             color: var(--dark-gray);
             margin-bottom: 15px;
@@ -321,6 +327,7 @@ try {
             font-size: 2.2rem;
             font-weight: 600;
             margin-bottom: 50px;
+            color: white;
         }
 
         .tuition-grid {
@@ -516,13 +523,14 @@ try {
     <section class="hero-section">
         <div class="container">
             <div class="hero-content">
-                <h1 class="main-title fade-in">Study Deutsch in MK</h1>
-                <div class="academy-name fade-in">Deutsch Academy</div>
-                <div class="kinyarwanda-text fade-in">IGA URURIMI RW' IKIDAGE</div>
+                <h1 class="main-title fade-in" STYLE>Study Deutsch in</h1>
+                <div class="academy-name fade-in">MK Deutsch Academy</div>
+                <div class="kinyarwanda-text fade-in">IGA URURIMI RW'IKIDAGE</div>
                 
                 <div class="intake-banner fade-in">
-                    <div class="intake-text">UPCOMING INTAKE</div>
-                    <div class="intake-date">AUGUST 2025</div>
+                    <div class="intake-text">OCTOBER INTAKE</div>
+                    <div class="intake-date">CLASSES START OCTOBER 1ST</div>
+                    <div style="font-size: 1.4rem; margin-top: 10px; font-weight: 600;">Registration open until September 30th</div>
                 </div>
                 
                 <div class="level-badge fade-in pulse">LEVEL A1 - B2</div>
@@ -534,39 +542,43 @@ try {
     <section class="registration-section">
         <div class="container">
             <h2 class="registration-title fade-in">Call For Registration</h2>
-            <div class="registration-subtitle fade-in">Registration is Open Right Now</div>
+            <a href="https://wa.me/250798611161?text=Hello%20I%20would%20like%20to%20register%20for%20MK%20Deutsch%20Academy" class="registration-subtitle fade-in registration-link" target="_blank">Registration is Open Right Now</a>
         </div>
     </section>
 
-    <!-- Schedule Section -->
+    <!-- Program Types Section -->
     <section class="schedule-section">
         <div class="container">
             <div class="section-header fade-in">
-                <h2 class="section-title">Program Schedule</h2>
-                <p class="section-subtitle">Choose the schedule that works best for you</p>
+                <h2 class="section-title">Program Options</h2>
+                <p class="section-subtitle">Choose the learning method that works best for you</p>
             </div>
             
             <div class="schedule-grid">
-                <!-- Weekday Schedule -->
+                <!-- Physical Classes -->
                 <div class="schedule-card fade-in">
-                    <div class="schedule-card-header">MONDAY - FRIDAY</div>
+                    <div class="schedule-card-header">PHYSICAL CLASSES</div>
                     <ul class="schedule-list">
-                        <li class="schedule-item">SHIFT 1: 08:00 - 11:00</li>
-                        <li class="schedule-item">SHIFT 2: 11:10 - 14:10</li>
-                        <li class="schedule-item">SHIFT 3: 14:20 - 17:20</li>
-                        <li class="schedule-item">SHIFT 4: 17:30 - 20:30</li>
+                        <li class="schedule-item">Location: Kigali City - Kiyovu</li>
+                        <li class="schedule-item">Class starts: October 1st</li>
+                        <li class="schedule-item">Registration: Until September 30th</li>
+                        <li class="schedule-item">Early registration: 5% discount</li>
+                        <li class="schedule-item">Books: Hard & soft copies provided</li>
+                        <li class="schedule-item">Levels: A1 to B2 (6 weeks each)</li>
                     </ul>
                 </div>
 
-                <!-- Weekend Schedule -->
+                <!-- Online Classes -->
                 <div class="schedule-card fade-in">
-                    <div class="schedule-card-header">WEEKEND COURSES</div>
-                    <div class="weekend-info">
-                        <div style="font-weight: 600; margin-bottom: 10px; font-size: 1.1rem;">(Saturday & Sunday)</div>
-                        <div style="font-weight: 600; margin-bottom: 15px; font-size: 1.2rem;">TIME: 08:30 - 15:30</div>
-                        <div style="margin-bottom: 15px;">START DATE:</div>
-                        <div class="start-date-badge">18th August</div>
-                    </div>
+                    <div class="schedule-card-header">ONLINE CLASSES</div>
+                    <ul class="schedule-list">
+                        <li class="schedule-item">Platform: MK Deutsch E-Learning</li>
+                        <li class="schedule-item">Start: When student registers</li>
+                        <li class="schedule-item">Registration: Always open</li>
+                        <li class="schedule-item">Materials: Soft copies & audio/video</li>
+                        <li class="schedule-item">Levels: A1 to B2 (6 weeks each)</li>
+                        <li class="schedule-item">Access: 24/7 learning platform</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -587,8 +599,8 @@ try {
                             <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
                         </svg>
                     </div>
-                    <h3 class="benefit-title">Certified Instructors</h3>
-                    <p class="benefit-description">Learn from experienced and certified German language instructors with proven track records.</p>
+                    <h3 class="benefit-title">Application Assistance</h3>
+                    <p class="benefit-description">We assist students with Aupair, Freiwillige (Volunteer), and Ausbildung applications with special discounts for Germany applications.</p>
                 </div>
                 
                 <div class="benefit-card fade-in">
@@ -597,8 +609,8 @@ try {
                             <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
                         </svg>
                     </div>
-                    <h3 class="benefit-title">Comprehensive Curriculum</h3>
-                    <p class="benefit-description">Structured learning path from A1 to B2 levels with modern teaching materials and methods.</p>
+                    <h3 class="benefit-title">Goethe Exam Preparation</h3>
+                    <p class="benefit-description">We prepare students for the GOETHE EXAM with sample questions and answers from previous exams.</p>
                 </div>
                 
                 <div class="benefit-card fade-in">
@@ -607,8 +619,8 @@ try {
                             <path d="M20 18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/>
                         </svg>
                     </div>
-                    <h3 class="benefit-title">Flexible Learning</h3>
-                    <p class="benefit-description">Choose between physical classes or online learning options that fit your schedule.</p>
+                    <h3 class="benefit-title">Complete Student Support</h3>
+                    <p class="benefit-description">We assist students from day 1 to the final day with continuous follow-up for each student's progress.</p>
                 </div>
                 
                 <div class="benefit-card fade-in">
@@ -617,8 +629,8 @@ try {
                             <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H16.5c-.8 0-1.54.5-1.85 1.26L12.5 14H10v8h2v-6h2.5l.5 6h3z"/>
                         </svg>
                     </div>
-                    <h3 class="benefit-title">Small Class Sizes</h3>
-                    <p class="benefit-description">Personalized attention with small class sizes ensuring better learning outcomes.</p>
+                    <h3 class="benefit-title">Comprehensive Learning Materials</h3>
+                    <p class="benefit-description">Students receive books (hard & soft copies), videos, and audio materials to support their learning journey.</p>
                 </div>
                 
                 <div class="benefit-card fade-in">
@@ -627,8 +639,8 @@ try {
                             <path d="M7 5h10v2h2V5c0-1.1-.9-2-2-2H7c-1.1 0-2 .9-2 2v2h2V5zm8 12v-5H9v5h6zm-8 2h10v2H7v-2z"/>
                         </svg>
                     </div>
-                    <h3 class="benefit-title">International Recognition</h3>
-                    <p class="benefit-description">German language skills recognized internationally for study, work, and immigration opportunities.</p>
+                    <h3 class="benefit-title">Structured Learning Path</h3>
+                    <p class="benefit-description">From A1 to B2 levels, each level takes 6 weeks to complete with comprehensive coverage of all studies.</p>
                 </div>
                 
                 <div class="benefit-card fade-in">
@@ -637,8 +649,8 @@ try {
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                         </svg>
                     </div>
-                    <h3 class="benefit-title">Supportive Community</h3>
-                    <p class="benefit-description">Join a supportive learning community of students from Rwanda and around the world.</p>
+                    <h3 class="benefit-title">Flexible Learning Options</h3>
+                    <p class="benefit-description">Choose between physical classes in Kigali or online learning through our e-learning platform.</p>
                 </div>
             </div>
         </div>
@@ -647,15 +659,66 @@ try {
     <!-- Tuition Section -->
     <section class="tuition-section">
         <div class="container">
-            <h2 class="tuition-title fade-in">Courses Start:</h2>
-            <div class="tuition-grid">
+            <h2 class="tuition-title fade-in">Tuition Fees (Per Level A1-B2)</h2>
+            <div class="tuition-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
                 <div class="tuition-card fade-in">
-                    <div class="tuition-type">PHYSICAL CLASS</div>
+                    <div class="tuition-type">PHYSICAL CLASSES</div>
                     <div class="tuition-price">200K Rwf</div>
+                    <div style="font-size: 1rem; margin-top: 15px; opacity: 0.9;">
+                        <div>1st Installment: 120K Rwf (at start)</div>
+                        <div>2nd Installment: 80K Rwf (after 3 weeks)</div>
+                        <div style="margin-top: 10px; font-weight: 600; color: var(--bright-yellow);">Early registration: 5% discount</div>
+                    </div>
                 </div>
                 <div class="tuition-card fade-in">
-                    <div class="tuition-type">ONLINE CLASS</div>
-                    <div class="tuition-price">100K Rwf Only</div>
+                    <div class="tuition-type">ONLINE CLASSES</div>
+                    <div class="tuition-price">100K Rwf</div>
+                    <div style="font-size: 1rem; margin-top: 15px; opacity: 0.9;">
+                        <div>1st Installment: 60K Rwf (at start)</div>
+                        <div>2nd Installment: 40K Rwf (after 3 weeks)</div>
+                        <div style="margin-top: 10px; font-weight: 600; color: var(--bright-yellow);">Registration always open</div>
+                    </div>
+                </div>
+                <div class="tuition-card fade-in">
+                    <div class="tuition-type">INTERNATIONAL STUDENTS</div>
+                    <div class="tuition-price">$100 USD</div>
+                    <div style="font-size: 1rem; margin-top: 15px; opacity: 0.9;">
+                        <div>1st Installment: $60 USD (at start)</div>
+                        <div>2nd Installment: $40 USD (after 3 weeks)</div>
+                        <div style="margin-top: 10px; font-weight: 600; color: var(--bright-yellow);">Same benefits as online classes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Payment Methods Section -->
+    <section class="benefits-section">
+        <div class="container">
+            <div class="section-header fade-in">
+                <h2 class="section-title">Payment Methods</h2>
+                <p class="section-subtitle">Choose your preferred payment option</p>
+            </div>
+            
+            <div class="benefits-grid">
+                <div class="benefit-card fade-in">
+                    <div class="benefit-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <h3 class="benefit-title">For Rwandans</h3>
+                    <p class="benefit-description">Mobile Money: 0798611161 (Paul SHYAKA)</p>
+                </div>
+                
+                <div class="benefit-card fade-in">
+                    <div class="benefit-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <h3 class="benefit-title">For International Students</h3>
+                    <p class="benefit-description">Flutterwave (M & S Innovation) or +250798611161 (Paul SHYAKA)</p>
                 </div>
             </div>
         </div>
@@ -664,7 +727,7 @@ try {
     <!-- Contact Section -->
     <section class="contact-section">
         <div class="container">
-            <h2 class="contact-title fade-in">Get In Touch</h2>
+            <h2 class="contact-title fade-in">Contact Us</h2>
             <a href="https://wa.me/250798611161" class="whatsapp-button fade-in" target="_blank">
                 <svg class="whatsapp-icon" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M13.601 2.326A7.85 7.85 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.9 7.9 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.9 7.9 0 0 0 13.6 2.326zM7.994 14.521a6.6 6.6 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.56 6.56 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592m3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.73.73 0 0 0-.529.247c-.182.198-.691.677-.691 1.654s.71 1.916.81 2.049c.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232"/>
@@ -672,7 +735,9 @@ try {
                 +250 798 611 161
             </a>
             <p class="contact-info">
-                Contact us on WhatsApp for more information and registration
+                Phone: 0798611161 (Paul)<br>
+                Email: mkscholars250@gmail.com<br>
+                Contact us for more information and registration
             </p>
         </div>
     </section>
