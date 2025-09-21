@@ -55,14 +55,61 @@ if (isset($_POST['selectedLogs'])) {
 }
 ?>
 
+<style>
+.pagination .page-link {
+    color: #007bff;
+    border: 1px solid #dee2e6;
+    padding: 0.375rem 0.75rem;
+    margin: 0 2px;
+    border-radius: 0.25rem;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+.pagination .page-link:hover {
+    color: #0056b3;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #6c757d;
+    background-color: #fff;
+    border-color: #dee2e6;
+}
+
+.log-item {
+    transition: all 0.3s ease;
+}
+
+.log-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.bg-warning {
+    background-color: #fff3cd !important;
+    border-left: 4px solid #ffc107 !important;
+}
+</style>
+
     <div class="container mt-4">
         <div class="card">
-            <div class="card-header bg-primary text-white">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">Activity Logs</h5>
+                <div class="text-light">
+                    <?php if (isset($totalRecords)): ?>
+                        <small>Total: <?php echo $totalRecords; ?> records | Page <?php echo $currentPage; ?> of <?php echo $totalPages; ?></small>
+                    <?php endif; ?>
+                </div>
             </div>
             <div class="card-body">
                 <!-- Bulk Action Buttons -->
-                <form method="POST" action="">
+                <form method="POST" action="?page=<?php echo $currentPage; ?>">
                     <div class="mb-3">
                         <?php if($_SESSION['adminId'] == 2){ ?> 
                         <button type="submit" name="deleteSelected" class="btn btn-danger btn-sm">
@@ -78,8 +125,19 @@ if (isset($_POST['selectedLogs'])) {
                     </div>
 
                     <?php
-                    // Fetch logs with user details
-                    $selectLogs = mysqli_query($conn, "SELECT l.*, u.userId, u.username FROM Logs l JOIN users u ON l.userId = u.userId ORDER BY logId DESC");
+                    // Pagination settings
+                    $recordsPerPage = 20;
+                    $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+                    $currentPage = max(1, $currentPage); // Ensure page is at least 1
+                    $offset = ($currentPage - 1) * $recordsPerPage;
+                    
+                    // Get total number of records
+                    $totalRecordsQuery = mysqli_query($conn, "SELECT COUNT(*) as total FROM Logs l JOIN users u ON l.userId = u.userId");
+                    $totalRecords = mysqli_fetch_assoc($totalRecordsQuery)['total'];
+                    $totalPages = ceil($totalRecords / $recordsPerPage);
+                    
+                    // Fetch logs with user details (paginated)
+                    $selectLogs = mysqli_query($conn, "SELECT l.*, u.userId, u.username FROM Logs l JOIN users u ON l.userId = u.userId ORDER BY logId DESC LIMIT $recordsPerPage OFFSET $offset");
                     if (mysqli_num_rows($selectLogs) > 0) {
                         while ($logData = mysqli_fetch_assoc($selectLogs)) {
                             // Determine background color based on logStatus and selection
@@ -119,7 +177,7 @@ if (isset($_POST['selectedLogs'])) {
                                     <div class="d-flex gap-2">
                                         <!-- Delete Button -->
                                         <?php if($_SESSION['adminId'] == 2){ ?> 
-                                        <button type="submit" name="deleteLog" value="<?php echo $logData['logId']; ?>" class="btn btn-danger btn-sm">
+                                        <button type="submit" name="deleteLog" value="<?php echo $logData['logId']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this log?')">
                                             <i class="fas fa-trash"></i> Delete
                                         </button>
                                         <?php } ?>
@@ -141,6 +199,84 @@ if (isset($_POST['selectedLogs'])) {
                     }
                     ?>
                 </form>
+                
+                <!-- Pagination -->
+                <?php if ($totalPages > 1): ?>
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div class="text-muted">
+                        Showing <?php echo $offset + 1; ?> to <?php echo min($offset + $recordsPerPage, $totalRecords); ?> of <?php echo $totalRecords; ?> records
+                    </div>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination pagination-sm mb-0">
+                            <!-- Previous Page -->
+                            <?php if ($currentPage > 1): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<?php echo $currentPage - 1; ?>" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            <?php else: ?>
+                                <li class="page-item disabled">
+                                    <span class="page-link" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </span>
+                                </li>
+                            <?php endif; ?>
+                            
+                            <!-- Page Numbers -->
+                            <?php
+                            $startPage = max(1, $currentPage - 2);
+                            $endPage = min($totalPages, $currentPage + 2);
+                            
+                            // Show first page if not in range
+                            if ($startPage > 1): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">1</a>
+                                </li>
+                                <?php if ($startPage > 2): ?>
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                            
+                            <!-- Page numbers in range -->
+                            <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
+                                <li class="page-item <?php echo ($i == $currentPage) ? 'active' : ''; ?>">
+                                    <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                                </li>
+                            <?php endfor; ?>
+                            
+                            <!-- Show last page if not in range -->
+                            <?php if ($endPage < $totalPages): ?>
+                                <?php if ($endPage < $totalPages - 1): ?>
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                <?php endif; ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<?php echo $totalPages; ?>"><?php echo $totalPages; ?></a>
+                                </li>
+                            <?php endif; ?>
+                            
+                            <!-- Next Page -->
+                            <?php if ($currentPage < $totalPages): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<?php echo $currentPage + 1; ?>" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            <?php else: ?>
+                                <li class="page-item disabled">
+                                    <span class="page-link" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </span>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </nav>
+                </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>

@@ -20,7 +20,7 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Study Deutsch in MK Deutsch Academy - Learn German Language | MK Scholars</title>
-    <meta name="description" content="Study Deutsch in MK Deutsch Academy. Learn German language from A1 to B2 levels. Physical and online classes available. Registration open for October 2025 intake.">
+    <meta name="description" content="Study Deutsch in MK Deutsch Academy. Learn German language from A1 to B2 levels. Physical and online classes available. Registration open for August 2025 intake.">
     <meta name="keywords" content="German language, learn German, Deutsch Academy, German classes, Rwanda, Kigali, A1, B2, language learning">
     
     <!-- Favicon -->
@@ -528,9 +528,9 @@ try {
                 <div class="kinyarwanda-text fade-in">IGA URURIMI RW'IKIDAGE</div>
                 
                 <div class="intake-banner fade-in">
-                    <div class="intake-text">OCTOBER INTAKE</div>
-                    <div class="intake-date">CLASSES START OCTOBER 1ST</div>
-                    <div style="font-size: 1.4rem; margin-top: 10px; font-weight: 600;">Registration open until September 30th</div>
+                    <div class="intake-text">UPCOMING INTAKE</div>
+                    <div class="intake-date">AUGUST 2025</div>
+                    <div style="font-size: 1.4rem; margin-top: 10px; font-weight: 600;">Registration is Open Right Now</div>
                 </div>
                 
                 <div class="level-badge fade-in pulse">LEVEL A1 - B2</div>
@@ -546,39 +546,87 @@ try {
         </div>
     </section>
 
-    <!-- Program Types Section -->
+    <!-- Program Schedule Section -->
     <section class="schedule-section">
+        <div class="container">
+            <div class="section-header fade-in">
+                <h2 class="section-title">Program Schedule</h2>
+                <p class="section-subtitle">Choose the time that works best for your schedule</p>
+            </div>
+            
+            <div class="schedule-grid">
+                <!-- Weekday Classes -->
+                <div class="schedule-card fade-in">
+                    <div class="schedule-card-header">MONDAY - FRIDAY</div>
+                    <ul class="schedule-list">
+                        <li class="schedule-item">SHIFT 1: 08:00 - 11:00</li>
+                        <li class="schedule-item">SHIFT 2: 11:10 - 14:10</li>
+                        <li class="schedule-item">SHIFT 3: 14:20 - 17:20</li>
+                        <li class="schedule-item">SHIFT 4: 17:30 - 20:30</li>
+                    </ul>
+                    <div class="weekend-info">
+                        <div style="font-weight: 600; color: var(--deep-blue); margin-bottom: 10px;">Physical Classes Available</div>
+                        <div style="color: #666;">Location: Kigali City - Kiyovu</div>
+                    </div>
+                </div>
+
+                <!-- Weekend Classes -->
+                <div class="schedule-card fade-in">
+                    <div class="schedule-card-header">WEEKEND COURSES</div>
+                    <div class="weekend-info">
+                        <div style="font-size: 1.3rem; font-weight: 600; color: var(--deep-blue); margin-bottom: 15px;">Saturday & Sunday</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: var(--dark-gray); margin-bottom: 20px;">TIME: 08:30 - 15:30</div>
+                        <div class="start-date-badge">START DATE: 18th August 2025</div>
+                    </div>
+                    <ul class="schedule-list" style="margin-top: 20px;">
+                        <li class="schedule-item">Intensive weekend program</li>
+                        <li class="schedule-item">Same curriculum as weekday classes</li>
+                        <li class="schedule-item">Perfect for working professionals</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Program Types Section -->
+    <section class="benefits-section">
         <div class="container">
             <div class="section-header fade-in">
                 <h2 class="section-title">Program Options</h2>
                 <p class="section-subtitle">Choose the learning method that works best for you</p>
             </div>
             
-            <div class="schedule-grid">
+            <div class="benefits-grid">
                 <!-- Physical Classes -->
-                <div class="schedule-card fade-in">
-                    <div class="schedule-card-header">PHYSICAL CLASSES</div>
-                    <ul class="schedule-list">
-                        <li class="schedule-item">Location: Kigali City - Kiyovu</li>
-                        <li class="schedule-item">Class starts: October 1st</li>
-                        <li class="schedule-item">Registration: Until September 30th</li>
-                        <li class="schedule-item">Early registration: 5% discount</li>
-                        <li class="schedule-item">Books: Hard & soft copies provided</li>
-                        <li class="schedule-item">Levels: A1 to B2 (6 weeks each)</li>
-                    </ul>
+                <div class="benefit-card fade-in">
+                    <div class="benefit-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <h3 class="benefit-title">PHYSICAL CLASSES</h3>
+                    <p class="benefit-description">Location: Kigali City - Kiyovu<br>
+                    Class starts: August 18th, 2025<br>
+                    Registration: Open until August 17th<br>
+                    Early registration: 5% discount<br>
+                    Books: Hard & soft copies provided<br>
+                    Levels: A1 to B2 (6 weeks each)</p>
                 </div>
 
                 <!-- Online Classes -->
-                <div class="schedule-card fade-in">
-                    <div class="schedule-card-header">ONLINE CLASSES</div>
-                    <ul class="schedule-list">
-                        <li class="schedule-item">Platform: MK Deutsch E-Learning</li>
-                        <li class="schedule-item">Start: When student registers</li>
-                        <li class="schedule-item">Registration: Always open</li>
-                        <li class="schedule-item">Materials: Soft copies & audio/video</li>
-                        <li class="schedule-item">Levels: A1 to B2 (6 weeks each)</li>
-                        <li class="schedule-item">Access: 24/7 learning platform</li>
-                    </ul>
+                <div class="benefit-card fade-in">
+                    <div class="benefit-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/>
+                        </svg>
+                    </div>
+                    <h3 class="benefit-title">ONLINE CLASSES</h3>
+                    <p class="benefit-description">Platform: MK Deutsch E-Learning<br>
+                    Start: When student registers<br>
+                    Registration: Always open<br>
+                    Materials: Soft copies & audio/video<br>
+                    Levels: A1 to B2 (6 weeks each)<br>
+                    Access: 24/7 learning platform</p>
                 </div>
             </div>
         </div>
