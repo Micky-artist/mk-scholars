@@ -234,6 +234,49 @@ session_start();
 
     <!-- ==== Scholarship Cards ==== -->
     <div class="container">
+
+    <div class="scholarship-card">
+            <img src="./images/courses/ucat.jpg" alt="UCAT" class="card-image">
+            <div class="card-content">
+                <div class="card-header">
+                    <h2 class="card-title">UCAT Online Coaching</h2>
+                    <p class="card-subtitle">For Future Medical Students</p>
+                    <div style="display: flex; flex-wrap: wrap;">
+                        <div class="price-tag">7,500 RWF Prepared notes and answers</div>
+                        <div class="price-tag" style="background: rgba(255, 193, 7, 0.15); color: #FFA000;">15,000 FRW Coaching with a teacher</div>
+
+                    </div>
+                </div>
+
+                <p class="card-description">
+                    Comprehensive online coaching for students preparing for the University Clinical Aptitude Test (UCAT). Includes expert guidance, practice tests, and strategies to improve scores. Morning and evening classes are available. <br>
+                </p>
+
+                <div class="card-details">
+                    <div class="detail-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Online Studying</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-users"></i>
+                        <span>30 Seats Available</span>
+                    </div>
+                </div>
+
+                <div class="action-section">
+                    <div class="deadline">
+                        <i class="fas fa-hourglass-half"></i>
+                        Registration Closes: September 28, 2025
+                    </div>
+                    <button onclick="window.location.href='./ucat'" class="apply-button">
+                        <i class="fas fa-arrow-circle-right"></i>
+                        Register now (Iyandikishe)
+                    </button>
+                </div>
+            </div>
+            <div class="status-tag">Open</div>
+        </div>
+
         <div class="scholarship-card">
     <img src="./images/courses/alu.jpeg" alt="ALU English Proficiency Program" class="card-image">
     <div class="card-content">
@@ -242,7 +285,7 @@ session_start();
             <p class="card-subtitle">Boost Your English Skills for Academic & Career Success</p>
             <div style="display: flex; flex-wrap: wrap;">
                 <div class="price-tag">15,000 RWF – 10 Days Practice (20th–30th June) + Sample Questions</div>
-                <div class="price-tag">7,500 RWF – Sample Questions & Answers</div>
+                <div class="price-tag">15,000 RWF – Sample Questions & Answers</div>
             </div>
         </div>
 

@@ -20,7 +20,7 @@ if (empty($_SESSION['userId'])) {
 $userId = (int) $_SESSION['userId'];
 
 // 3) Validate subscription type
-$allowedTypes = ['notes','englishcourse', 'moroccoadmissions','codingcourse','aluprogramonlinetutor','aluprogramsamplequestions'];
+$allowedTypes = ['notes','instructor','englishcourse', 'moroccoadmissions','codingcourse','aluprogramonlinetutor','aluprogramsamplequestions', 'ucatonline','ucatcoach'];
 if (!isset($_GET['type']) || !in_array($_GET['type'], $allowedTypes, true)) {
     header('Location: ./failed');
     exit;
@@ -29,12 +29,15 @@ $subscriptionType = $_GET['type'];
 
 // 4) Map to server‑side amount
 $amountMap = [
-    'notes'      => 4000,
+    'notes'      => 7500,
+    'instructor'      => 15000,
     'englishcourse' => 15000,
     'moroccoadmissions' => 2600,
     'codingcourse' => 25000,
     'aluprogramonlinetutor' => 15000,
     'aluprogramsamplequestions' => 7500,
+    'ucatonline' => 7500,
+    'ucatcoach' => 15000,
 ];
 $finalAmount = $amountMap[$subscriptionType];
 

@@ -19,13 +19,15 @@ header("X-Content-Type-Options: nosniff");
 
 // --- 3) WHITELIST & SERVER-SIDE PLAN LOOKUP ---
 $plans = [
-  'notes' => 4500,
-  'instructor'  => 7500,
+  'notes' => 7500,
+  'instructor'  => 15000,
   'moroccoadmissions' => 2600,
   'codingcourse' => 25000,
   'englishcourse' => 15000,
   'aluprogramonlinetutor' => 15000,
   'aluprogramsamplequestions' => 7500,
+  'ucatonline' => 7500,
+  'ucatcoach' => 15000,
 ];
 if (!isset($_GET['subscription']) || !isset($plans[$_GET['subscription']])) {
   http_response_code(400);

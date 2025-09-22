@@ -344,6 +344,31 @@ if (isset($_POST['checkout'])) {
             font-size: 1.5rem;
             cursor: pointer;
         }
+
+        /* Validation Error Styles */
+        #validation-error {
+            border-left: 4px solid #dc3545;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .course-card.required-highlight {
+            border-color: #dc3545 !important;
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%) !important;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -442,6 +467,12 @@ if (isset($_POST['checkout'])) {
             </ul>
           </div>
 
+          <!-- Validation Error Message -->
+          <div id="validation-error" class="alert alert-danger d-none" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Please select either "Prepared Notes and Answers" or "Online Coaching with a Teacher" to continue.
+          </div>
+
           <div class="form-check mb-4">
             <!-- <input class="form-check-input" type="checkbox" name="terms" id="terms"
                    <?= $formData['terms'] ? 'checked' : '' ?>> -->
@@ -473,8 +504,11 @@ if (isset($_POST['checkout'])) {
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     let selectedSet      = new Set(["UCAT Online Coaching Course"]);
+    let hasSelectedOption = false; // Track if notes or instructor is selected
     const nameInput      = document.getElementById("subscription-input"),
-          amtInput       = document.getElementById("amount-input");
+          amtInput       = document.getElementById("amount-input"),
+          validationError = document.getElementById("validation-error"),
+          registerBtn    = document.querySelector('button[name="checkout"]');
 
     function updateList(){
       const ul = document.getElementById("selected-courses-list");
@@ -484,11 +518,43 @@ if (isset($_POST['checkout'])) {
       });
     }
 
+    function validateSelection() {
+      // Check if either notes or instructor is selected
+      hasSelectedOption = selectedSet.has("notes") || selectedSet.has("instructor");
+      
+      if (hasSelectedOption) {
+        validationError.classList.add('d-none');
+        registerBtn.disabled = false;
+        registerBtn.classList.remove('btn-secondary');
+        registerBtn.classList.add('btn-info');
+        
+        // Remove highlight from course cards
+        document.querySelectorAll('.course-card').forEach(card => {
+          card.classList.remove('required-highlight');
+        });
+      } else {
+        validationError.classList.remove('d-none');
+        registerBtn.disabled = true;
+        registerBtn.classList.remove('btn-info');
+        registerBtn.classList.add('btn-secondary');
+        
+        // Highlight the course cards that need selection
+        document.querySelectorAll('.course-card[data-course-name="notes"], .course-card[data-course-name="instructor"]').forEach(card => {
+          card.classList.add('required-highlight');
+        });
+      }
+    }
+
+    function hideValidationError() {
+      validationError.classList.add('d-none');
+    }
+
     // keep UCAT expanded
     document.querySelectorAll('.course-card[data-course-id="1"] .course-details')
       .forEach(d=>d.style.maxHeight="500px");
 
     updateList();
+    validateSelection(); // Initial validation
 
     document.querySelectorAll('.choose-course').forEach(btn=>{
       btn.addEventListener('click', e=>{
@@ -514,7 +580,33 @@ if (isset($_POST['checkout'])) {
         });
         e.target.textContent="Selected";
         e.target.classList.replace("btn-dark","btn-success");
+        
+        // Validate selection after change
+        validateSelection();
       });
+    });
+
+    // Form submission validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+      if (!hasSelectedOption) {
+        e.preventDefault();
+        validationError.classList.remove('d-none');
+        
+        // Scroll to validation error
+        validationError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Highlight the course cards that need selection
+        document.querySelectorAll('.course-card[data-course-name="notes"], .course-card[data-course-name="instructor"]').forEach(card => {
+          card.classList.add('required-highlight');
+        });
+        
+        return false;
+      }
+    });
+
+    // Hide validation error when user starts selecting
+    document.querySelectorAll('.choose-course').forEach(btn => {
+      btn.addEventListener('click', hideValidationError);
     });
   </script>
 </body>
