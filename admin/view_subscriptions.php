@@ -1,5 +1,5 @@
 <?php
-session_start();
+// Don't start session here as it's already started in subscriptions.php
 include("./dbconnections/connection.php");
 
 // Pagination settings
@@ -38,6 +38,7 @@ $totalQ = mysqli_query(
       {$filter_condition}
       {$search_condition}"
 );
+
 $totalRows  = mysqli_fetch_assoc($totalQ)['total'];
 $totalPages = ceil($totalRows / $limit);
 
@@ -63,11 +64,7 @@ $sql = "
 ";
 $result = $conn->query($sql);
 ?>
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
- <style>
+<style>
         :root {
             --primary-color: #4361ee;
             --secondary-color: #3f37c9;
@@ -281,9 +278,7 @@ $result = $conn->query($sql);
             letter-spacing: 0.5px;
         }
     </style>
-</head>
 
-<body>
     <div class="container py-4">
         <div class="card mb-4">
             <div class="card-header text-white">
@@ -482,30 +477,27 @@ $result = $conn->query($sql);
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Add some interactive elements
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add animation to cards when they come into view
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.opacity = 1;
-                        entry.target.style.transform = 'translateY(0)';
-                    }
-                });
-            }, {
-                threshold: 0.1
-            });
 
-            document.querySelectorAll('.subscription-card').forEach(card => {
-                card.style.opacity = 0;
-                card.style.transform = 'translateY(20px)';
-                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                observer.observe(card);
+<script>
+    // Add some interactive elements
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add animation to cards when they come into view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
             });
+        }, {
+            threshold: 0.1
         });
-    </script>
-</body>
 
-</html>
+        document.querySelectorAll('.subscription-card').forEach(card => {
+            card.style.opacity = 0;
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(card);
+        });
+    });
+</script>

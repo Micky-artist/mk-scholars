@@ -12,9 +12,14 @@ include("./dbconnection/connection.php");
 <link rel="shortcut icon" href="./images/logo/logoRound.png" type="image/x-icon">
 
 </head>
-<?php
-include("./php/CreateUser.php");
-?>
+
+<body>
+    <!-- Universal Navigation -->
+    <?php include("./partials/navigation.php"); ?>
+
+    <?php
+    include("./php/CreateUser.php");
+    ?>
 <style>
 	* {
 		margin: 0;
@@ -42,6 +47,19 @@ include("./php/CreateUser.php");
 		justify-content: center;
 		background: #f5f5f5;
 		width: 100%;
+		padding-top: 120px; /* Account for fixed navigation */
+	}
+
+	@media (max-width: 768px) {
+		body {
+			padding-top: 100px; /* Reduced padding for mobile */
+		}
+	}
+
+	@media (max-width: 480px) {
+		body {
+			padding-top: 90px; /* Further reduced padding for small mobile */
+		}
 	}
 
 	.auth-container {
@@ -187,7 +205,7 @@ include("./php/CreateUser.php");
 			<form class="auth-form" method="post" id="login-form">
 				<div class="input-group">
 					<input type="text" name="NoUsername" id="login-email" value="<?php echo $NoUsername?>" placeholder=" ">
-					<label for="login-email">Username</label>
+					<label for="login-email">Full Names</label>
 				</div>
 				<div class="input-group">
 					<input type="email" name="NoEmail" id="login-email" value="<?php echo $NoEmail?>" placeholder=" ">

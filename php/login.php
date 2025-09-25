@@ -109,7 +109,7 @@ if (isset($_POST['login']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
                         // $logStmt->close();
                         
                         // Redirect user
-                        header("location: ./dashboard");
+                        header("location: ./e-learning");
                         exit;
                     } else {
                         // Log failed attempt

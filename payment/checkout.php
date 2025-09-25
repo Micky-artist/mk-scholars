@@ -8,12 +8,16 @@ if (!isset($_SESSION['userId'])) {
   exit;
 }
 // --- 0) SECURITY HEADERS & HTTPS REDIRECT ---
-if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off') {
+// Only redirect to HTTPS in production/online; support reverse proxy headers
+$isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+  || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
+  || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
+if (function_exists('isOnline') && isOnline() && !$isHttps) {
   header('Location: https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
   exit;
 }
 header("Strict-Transport-Security: max-age=31536000; includeSubDomains");
-header("Content-Security-Policy: default-src 'self' https://checkout.flutterwave.com; script-src 'self' https://checkout.flutterwave.com; frame-ancestors 'none';");
+header("Content-Security-Policy: default-src 'self' https://checkout.flutterwave.com; script-src 'self' https://checkout.flutterwave.com; form-action 'self' https://checkout.flutterwave.com; frame-ancestors 'none';");
 header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");
 
@@ -40,8 +44,7 @@ $finalAmount      = $plans[$subscriptionName];
 include('../dbconnection/connection.php');
 $stmt = $conn->prepare("SELECT NoUsername, NoEmail, NoPhone
     FROM normUsers
-    WHERE NoUserId = ?
-");
+    WHERE NoUserId = ?");
 $stmt->bind_param('i', $_SESSION['userId']);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -67,18 +70,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['applyCoupon'])) {
   // -- validate coupon against DB or list --
   $code = preg_replace('/[^A-Za-z0-9\-]/', '', $_POST['couponName']);
   // dummy example: 10% off code = SAVE10
-  if ($code === 'SAVE10') {
-    $finalAmount = intval($finalAmount * 0.9);
-    $couponMsg = 'Coupon applied: 10% off';
-  } else {
-    $couponMsg = 'Invalid or expired coupon.';
-  }
+  // if ($code === 'SAVE10') {
+  //   $finalAmount = intval($finalAmount * 0.9);
+  //   $couponMsg = 'Coupon applied: 10% off';
+  // } else {
+  //   $couponMsg = 'Invalid or expired coupon.';
+  // }
 }
 
 // --- 6) FLUTTERWAVE VARIABLES ---
 $customer_email = htmlspecialchars($user['NoEmail'], ENT_QUOTES, 'UTF-8');
 $customer_name  = htmlspecialchars($user['NoUsername'], ENT_QUOTES, 'UTF-8');
 $transaction_id = bin2hex(random_bytes(8)) . '_' . time();
+$userId = isset($_SESSION['userId']) ? (int)$_SESSION['userId'] : 0;
 
 ?>
 <!DOCTYPE html>
@@ -90,15 +94,11 @@ $transaction_id = bin2hex(random_bytes(8)) . '_' . time();
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="./checkout.css">
   <link rel="shortcut icon" href="https://mkscholars.com/images/logo/logoRound.png" type="image/x-icon">
-  <script>
-    // block right-click & copy
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('copy', e => e.preventDefault());
-  </script>
+  
 </head>
 
 <body>
-  <div class="checkout‑wrapper">
+  <div class="checkout-wrapper">
     <div class="panel purchase">
       <header>
         <button class="back" onclick="history.back()">←</button>
@@ -141,7 +141,7 @@ $transaction_id = bin2hex(random_bytes(8)) . '_' . time();
         <input type="hidden" name="amount" value="<?= htmlspecialchars($finalAmount) ?>">
         <input type="hidden" name="subType" value="<?= htmlspecialchars($subscriptionName) ?>">
         <input type="hidden" name="currency" value="RWF">
-        <input type="hidden" name="redirect_url" value="https://mkscholars.com/payment/TransactionCompleted?type=<?= urlencode($subscriptionName) ?>&userId=<?= urlencode($userId) ?>">
+        <input type="hidden" name="redirect_url" value="https://mkscholars.com/payment/TransactionCompleted.php?type=<?= urlencode($subscriptionName) ?>&userId=<?= urlencode($userId) ?>">
         <!-- <input type="hidden" name="redirect_url" value="https://mkscholars.com/payment/TransactionCompleted?status=successful&userId=<?= urlencode($userId) ?>&type=<?= urlencode($subscriptionName) ?>"> -->
         <button type="submit" class="btn pay-now">Pay Now</button>
       </form>

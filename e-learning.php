@@ -40,6 +40,7 @@ include('./php/validateSession.php');
             color: var(--text-primary);
             transition: all 0.3s ease;
             min-height: 100vh;
+            padding-top: 120px; /* Account for fixed navigation */
         }
 
         .glass-panel {
@@ -50,34 +51,25 @@ include('./php/validateSession.php');
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
 
-        .sidebar {
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            border-right: 1px solid var(--glass-border);
-            position: fixed;
-            height: 100vh;
-            z-index: 1000;
-            width: 250px;
-        }
-
         .main-content {
-            margin-left: 250px;
-            transition: margin-left 0.3s;
             padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
+            body {
+                padding-top: 100px; /* Reduced padding for mobile */
             }
-
-            .sidebar.active {
-                transform: translateX(0);
-            }
-
+            
             .main-content {
-                margin-left: 0;
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding-top: 90px; /* Further reduced padding for small mobile */
             }
         }
 
@@ -124,20 +116,32 @@ include('./php/validateSession.php');
         <i class="fas fa-moon"></i>
     </button>
 
-    <!-- Sidebar Include -->
-    <?php include("./partials/dashboardNavigation.php"); ?>
+    <!-- Universal Navigation -->
+    <?php include("./partials/navigation.php"); ?>
 
     <!-- Main Content -->
     <main class="main-content">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <button class="btn btn-light d-md-none glass-panel sidebar-toggle" type="button">
-                <i class="fas fa-bars"></i>
-            </button>
-            <h3 class="mb-0">Courses</h3>
+            <h3 class="mb-0">E-Learning Courses</h3>
         </div>
 
         <div class="row g-4">
-        <div class="col-sm-6 col-lg-4 mb-4">
+            <!-- Study Deutsch Course Card -->
+            <div class="col-sm-6 col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="position-relative">
+                        <img src="./images/courses/deutsch-academy.jpg" class="card-img-top rounded-top" alt="Study Deutsch in MK Deutsch Academy">
+                        <span class="badge bg-success position-absolute top-0 start-0 m-2">Language</span>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-semibold">Study Deutsch in MK Deutsch Academy</h5>
+                        <p class="card-text text-muted flex-grow-1">Master German language for academic & career success. A1 to B2 levels with certified instructors.</p>
+                        <a href="deutsch-academy" class="btn btn-outline-success w-100 mt-2">Register Now</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-4 mb-4">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="position-relative">
                         <img src="https://mkscholars.com/images/courses/ucat.jpg" class="card-img-top rounded-top" alt="UCAT">
@@ -235,26 +239,6 @@ include('./php/validateSession.php');
                 icon.className = body.getAttribute('data-theme') === 'light' ? 'fas fa-moon' : 'fas fa-sun';
             }
 
-            const sidebar = document.querySelector('.sidebar');
-            const sidebarToggle = document.querySelector('.sidebar-toggle');
-
-            if (sidebar && sidebarToggle) {
-                sidebarToggle.addEventListener('click', () => {
-                    sidebar.classList.toggle('active');
-                });
-            }
-
-            // Hide sidebar when clicking outside on small screens
-            document.addEventListener('click', function(event) {
-                if (
-                    window.innerWidth < 768 &&
-                    sidebar &&
-                    !sidebar.contains(event.target) &&
-                    !sidebarToggle.contains(event.target)
-                ) {
-                    sidebar.classList.remove('active');
-                }
-            });
         });
     </script>
 

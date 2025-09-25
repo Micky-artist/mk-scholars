@@ -412,9 +412,9 @@ if (isset($_POST['checkout'])) {
           <div class="course-card"
                data-course-id="4"
                data-course-name="notes"
-               data-course-amount="4500">
+               data-course-amount="7500">
             <div class="d-flex align-items-center justify-content-between">
-              <div><h4 class="mb-0">Prepared Notes and Answers (4 500 RWF)</h4></div>
+              <div><h4 class="mb-0">Prepared Notes and Answers 7,500 RWF)</h4></div>
               <button type="button" class="btn btn-dark btn-sm choose-course">Select</button>
             </div>
           </div>
@@ -422,9 +422,9 @@ if (isset($_POST['checkout'])) {
           <div class="course-card"
                data-course-id="2"
                data-course-name="instructor"
-               data-course-amount="7500">
+               data-course-amount="15000">
             <div class="d-flex align-items-center justify-content-between">
-              <div><h4 class="mb-0">Online Coching with a Teacher (7500 RWF)</h4></div>
+              <div><h4 class="mb-0">Online Coching with a Teacher (15,000 RWF)</h4></div>
               <button type="button" class="btn btn-dark btn-sm choose-course">Select</button>
             </div>
           </div>
