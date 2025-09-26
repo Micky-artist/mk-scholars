@@ -664,9 +664,13 @@ if (isset($_SESSION["userId"])) {
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
     :root {
-      --accent: #4bc2c5;
+      --accent: #0E77C2;
       --bg: #fff;
       --fg: #333;
+      --primary-blue: #0E77C2;
+      --dark-blue: #083352;
+      --orange: #FF6B35;
+      --gold: #FFD700;
     }
 
     html,
@@ -675,10 +679,12 @@ if (isset($_SESSION["userId"])) {
       min-height: 100vh;
       margin: 0;
       padding: 0;
-      overflow: auto;
+      overflow-x: hidden;
+      overflow-y: auto;
       user-select: none;
       background: #f4f4f4;
       color: var(--fg);
+      width: 100%;
     }
 
     .tabs {
@@ -697,9 +703,9 @@ if (isset($_SESSION["userId"])) {
 
     .tab.active {
       background: var(--bg);
-      border-top: 2px solid var(--accent);
-      border-left: 2px solid var(--accent);
-      border-right: 2px solid var(--accent);
+      border-top: 2px solid #0E77C2;
+      border-left: 2px solid #0E77C2;
+      border-right: 2px solid #0E77C2;
       font-weight: bold;
     }
 
@@ -716,6 +722,105 @@ if (isset($_SESSION["userId"])) {
       max-width: 100%;
     }
 
+    /* Mobile Responsive Design */
+    @media (max-width: 768px) {
+      html, body {
+        min-height: 100vh;
+        height: auto;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      .container-fluid {
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        max-width: 100%;
+      }
+      
+      .row {
+        margin: 0;
+        width: 100%;
+      }
+      
+      main {
+        padding: 1rem !important;
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .top-navbar {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
+      
+      .tabs {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      
+      .tab {
+        flex: 1;
+        min-width: 120px;
+        text-align: center;
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+      }
+      
+      .note-section {
+        padding: 1rem;
+        margin: 0;
+        width: 100%;
+        max-width: 100%;
+      }
+      
+      .section-title {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      
+      .sub-title {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+      }
+      
+      pre {
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container-fluid {
+        padding: 0;
+      }
+      
+      main {
+        padding: 0.5rem !important;
+      }
+      
+      .tab {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+      }
+      
+      .section-title {
+        font-size: 1.3rem;
+      }
+      
+      .sub-title {
+        font-size: 1.1rem;
+      }
+      
+      .note-section {
+        padding: 0.5rem;
+      }
+    }
+
     .note-section {
       background: #fff;
       padding: 1.5rem;
@@ -725,15 +830,15 @@ if (isset($_SESSION["userId"])) {
     }
 
     .section-title {
-      color: var(--accent);
+      color: #0E77C2;
       font-size: 1.75rem;
       margin-bottom: .75rem;
-      border-bottom: 3px solid var(--accent);
+      border-bottom: 3px solid #0E77C2;
       padding-bottom: .5rem;
     }
 
     .sub-title {
-      color: #ff7a7a;
+      color: #FF6B35;
       font-size: 1.25rem;
       margin-top: 1rem;
     }
@@ -748,13 +853,13 @@ if (isset($_SESSION["userId"])) {
     .example {
       background: #e9f9f9;
       padding: 1rem;
-      border-left: 5px solid var(--accent);
+      border-left: 5px solid #0E77C2;
       border-radius: 4px;
       margin-top: 1rem;
     }
 
     .example-title {
-      color: var(--accent);
+      color: #0E77C2;
       font-size: 1.25rem;
     }
 
@@ -795,7 +900,7 @@ if (isset($_SESSION["userId"])) {
       display: block;
       text-align: center;
       padding: .75rem;
-      background: var(--accent);
+      background: #0E77C2;
       color: #fff;
       text-decoration: none;
       border-radius: 5px;
@@ -805,22 +910,169 @@ if (isset($_SESSION["userId"])) {
     }
 
     .subscribe-btn:hover {
-      background: #369ea8;
+      background: #083352;
+    }
+
+    /* Navigation Styles - MK Brand Colors */
+    .top-navbar {
+      background: linear-gradient(135deg, #0E77C2 0%, #083352 100%);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar-brand {
+      color: white !important;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .navbar-brand:hover {
+      color: #e0e7ff !important;
+    }
+
+    .nav-link {
+      color: rgba(255, 255, 255, 0.9) !important;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: white !important;
+    }
+
+    .mobile-menu-btn {
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 0.5rem;
+      border-radius: 0.375rem;
+      transition: all 0.3s ease;
+    }
+
+    .mobile-menu-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* Mobile Sidebar */
+    .mobile-sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1050;
+      display: none;
+    }
+
+    .mobile-sidebar-overlay.show {
+      display: block;
+    }
+
+    .mobile-sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 280px;
+      height: 100%;
+      background: white;
+      z-index: 1051;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      overflow-y: auto;
+    }
+
+    .mobile-sidebar-overlay.show .mobile-sidebar {
+      transform: translateX(0);
+    }
+
+    .mobile-sidebar-header {
+      padding: 1rem;
+      border-bottom: 1px solid #dee2e6;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, #0E77C2 0%, #083352 100%);
+      color: white;
+    }
+
+    .mobile-sidebar-content {
+      padding: 1rem;
+    }
+
+    .close-sidebar {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: white;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .close-sidebar:hover {
+      color: #FFD700;
+    }
+
+    /* Adjust main content for navbar */
+    .main-content-wrapper {
+      margin-top: 0;
     }
   </style>
 </head>
 
 <body>
-  <div class="container-fluid">
+  <!-- Top Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark top-navbar">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="./e-learning">
+        <img src="./images/logo/logoRound.png" alt="MK Scholars" width="30" height="30" class="me-2">
+        MK Scholars
+      </a>
+      
+      <!-- Mobile menu button (only on mobile) -->
+      <button class="mobile-menu-btn d-md-none" type="button" id="mobileMenuBtn">
+        <i class="fas fa-bars"></i>
+      </button>
+      
+      <!-- Mobile Navigation Links (only when sidebar is hidden) -->
+      <div class="navbar-nav ms-auto d-flex d-md-none">
+        <a class="nav-link" href="./e-learning">E-Learning</a>
+        <a class="nav-link" href="./courses">Courses</a>
+        <a class="nav-link" href="./dashboard">Dashboard</a>
+        <a class="nav-link" href="./php/logout.php">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Sidebar Overlay -->
+  <div class="mobile-sidebar-overlay" id="mobileSidebarOverlay">
+    <div class="mobile-sidebar">
+      <div class="mobile-sidebar-header">
+        <h5 class="mb-0">Navigation</h5>
+        <button class="close-sidebar" id="closeSidebar">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="mobile-sidebar-content">
+        <?php include './partials/dashboardNavigation.php'; ?>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid main-content-wrapper">
     <div class="row">
       <!-- Sidebar -->
-      <div class="col-md-3 col-lg-2 bg-white border-end vh-100 overflow-auto p-0">
+      <div class="col-md-3 col-lg-2 bg-white border-end p-0 d-none d-md-block">
         <?php include './partials/dashboardNavigation.php'; ?>
 
       </div>
 
       <!-- Main Content -->
-      <main class="col-md-9 col-lg-10 p-4 vh-100 overflow-auto">
+      <main class="col-12 col-md-9 col-lg-10 p-4">
         <h2 class="mb-4">UCAT Full Notes</h2>
         <div class="tabs">
           <?php $i = 0;
@@ -884,6 +1136,45 @@ if (isset($_SESSION["userId"])) {
         document.querySelector(`.panel[data-index="${idx}"]`).classList.add('active');
       })
     );
+
+    // Mobile Sidebar functionality
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileSidebarOverlay = document.getElementById('mobileSidebarOverlay');
+    const closeSidebar = document.getElementById('closeSidebar');
+
+    // Open mobile sidebar
+    if (mobileMenuBtn) {
+      mobileMenuBtn.addEventListener('click', function() {
+        mobileSidebarOverlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+      });
+    }
+
+    // Close mobile sidebar
+    if (closeSidebar) {
+      closeSidebar.addEventListener('click', function() {
+        mobileSidebarOverlay.classList.remove('show');
+        document.body.style.overflow = '';
+      });
+    }
+
+    // Close sidebar when clicking overlay
+    if (mobileSidebarOverlay) {
+      mobileSidebarOverlay.addEventListener('click', function(e) {
+        if (e.target === mobileSidebarOverlay) {
+          mobileSidebarOverlay.classList.remove('show');
+          document.body.style.overflow = '';
+        }
+      });
+    }
+
+    // Close sidebar on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && mobileSidebarOverlay.classList.contains('show')) {
+        mobileSidebarOverlay.classList.remove('show');
+        document.body.style.overflow = '';
+      }
+    });
   </script>
 </body>
 

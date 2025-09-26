@@ -394,9 +394,16 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 	transition: all 0.3s ease;
 	list-style: none;
 	margin: 0;
+	z-index: 1000;
 }
 
 .dropdown:hover .dropdown-menu {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0);
+}
+
+.dropdown-menu.active {
 	opacity: 1;
 	visibility: visible;
 	transform: translateY(0);
@@ -413,6 +420,15 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 .dropdown-link:hover {
 	background: linear-gradient(135deg, rgba(14, 119, 194, 0.1) 0%, rgba(8, 51, 82, 0.05) 100%);
 	color: #0E77C2;
+}
+
+/* Dropdown toggle active state */
+.dropdown-toggle.active {
+	color: #0E77C2;
+}
+
+.dropdown-toggle.active::after {
+	width: 100%;
 }
 
 /* Right Side Styles */
@@ -657,6 +673,48 @@ document.addEventListener('DOMContentLoaded', function() {
 	const hamburgerMenu = document.getElementById('hamburger-menu');
 	const mobileNavOverlay = document.getElementById('mobile-nav-overlay');
 	const mobileClose = document.getElementById('mobile-close');
+	
+	// Desktop Dropdown Toggle
+	const dropdownToggle = document.querySelector('.dropdown-toggle');
+	const dropdownMenu = document.querySelector('.dropdown-menu');
+	
+	if (dropdownToggle && dropdownMenu) {
+		console.log('Dropdown elements found:', dropdownToggle, dropdownMenu);
+		
+		// Toggle dropdown on click
+		dropdownToggle.addEventListener('click', function(e) {
+			e.preventDefault();
+			e.stopPropagation();
+			console.log('Dropdown clicked, toggling...');
+			dropdownMenu.classList.toggle('active');
+		});
+		
+		// Prevent dropdown from closing when clicking inside it
+		dropdownMenu.addEventListener('click', function(e) {
+			e.stopPropagation();
+		});
+		
+		// Close dropdown when clicking outside
+		document.addEventListener('click', function(e) {
+			if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+				dropdownMenu.classList.remove('active');
+			}
+		});
+		
+		// Close dropdown on escape key
+		document.addEventListener('keydown', function(e) {
+			if (e.key === 'Escape') {
+				dropdownMenu.classList.remove('active');
+			}
+		});
+		
+		// Close dropdown when window is resized
+		window.addEventListener('resize', function() {
+			dropdownMenu.classList.remove('active');
+		});
+	} else {
+		console.log('Dropdown elements not found:', dropdownToggle, dropdownMenu);
+	}
 	
 	// Open mobile menu
 	hamburgerMenu.addEventListener('click', function() {

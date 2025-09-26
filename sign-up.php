@@ -188,7 +188,6 @@ include("./dbconnection/connection.php");
 
 
 <body>
-	<?php include("./partials/coursesNav.php") ?>
 	<div class="container">
 		<div class="auth-container" id="login-container">
 			<div class="logo"><a href="index"><img src="images/logo/logoRound.png" width="100" height="100" alt=""></a></div>

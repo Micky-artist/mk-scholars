@@ -109,8 +109,44 @@ if (isset($_POST['login']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
                         // $logStmt->close();
                         
                         // Redirect user
-                        header("location: ./e-learning");
-                        exit;
+                        // Clear any output buffer
+                        if (ob_get_level()) {
+                            ob_end_clean();
+                        }
+                        
+                        // Debug: Log successful login
+                        error_log("Login successful for user: " . $account['NoUsername'] . " (ID: " . $account['NoUserId'] . ")");
+                        
+                        // Set redirect header
+                        $redirectUrl = "./e-learning";
+                        
+                        // Check if e-learning page exists and is accessible
+                        if (file_exists("../e-learning.php")) {
+                            // Clear any output buffer before redirect
+                            if (ob_get_level()) {
+                                ob_end_clean();
+                            }
+                            
+                            header("Location: " . $redirectUrl);
+                            header("Cache-Control: no-cache, no-store, must-revalidate");
+                            header("Pragma: no-cache");
+                            header("Expires: 0");
+                            exit();
+                        } else {
+                            // Fallback to dashboard if e-learning doesn't exist
+                            $redirectUrl = "./dashboard";
+                            
+                            // Clear any output buffer before redirect
+                            if (ob_get_level()) {
+                                ob_end_clean();
+                            }
+                            
+                            header("Location: " . $redirectUrl);
+                            header("Cache-Control: no-cache, no-store, must-revalidate");
+                            header("Pragma: no-cache");
+                            header("Expires: 0");
+                            exit();
+                        }
                     } else {
                         // Log failed attempt
                         // $ipAddress = $_SERVER['REMOTE_ADDR'];

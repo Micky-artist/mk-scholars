@@ -5,12 +5,12 @@ include('./php/validateSession.php');
 ?>
 
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>Courses | MK Scholars</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Learning | MK Scholars</title>
     <link rel="shortcut icon" href="./images/logo/logoRound.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -40,7 +40,6 @@ include('./php/validateSession.php');
             color: var(--text-primary);
             transition: all 0.3s ease;
             min-height: 100vh;
-            padding-top: 120px; /* Account for fixed navigation */
         }
 
         .glass-panel {
@@ -57,19 +56,67 @@ include('./php/validateSession.php');
             margin: 0 auto;
         }
 
+        .sidebar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--neumorphic-shadow);
+            min-height: 100vh;
+        }
+
+        .neumorphic-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--neumorphic-shadow);
+        }
+
+        .nav-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--neumorphic-shadow);
+        }
+
+        .sidebar-toggle {
+            display: none;
+        }
+
         @media (max-width: 768px) {
-            body {
-                padding-top: 100px; /* Reduced padding for mobile */
-            }
-            
             .main-content {
                 padding: 1rem;
             }
-        }
 
-        @media (max-width: 480px) {
-            body {
-                padding-top: 90px; /* Further reduced padding for small mobile */
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 280px;
+                height: 100vh;
+                z-index: 1050;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.show {
+                left: 0;
+            }
+
+            .sidebar-toggle {
+                display: block;
             }
         }
 
@@ -106,26 +153,48 @@ include('./php/validateSession.php');
         .card-text {
             color: var(--text-secondary);
         }
+
+        .card-img-top {
+            height: 150px;
+            object-fit: cover;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .card-img-top {
+                height: 120px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card-img-top {
+                height: 100px;
+            }
+        }
     </style>
 </head>
 
-<body>
-
+<body data-theme="light">
     <!-- Theme Toggle Button -->
-    <button class="btn btn-secondary theme-toggle glass-panel" style="color: orange;">
+    <button style="color: orange;" class="btn btn-secondary theme-toggle glass-panel">
         <i class="fas fa-moon"></i>
     </button>
 
-    <!-- Universal Navigation -->
-    <?php include("./partials/navigation.php"); ?>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <?php include("./partials/dashboardNavigation.php"); ?>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="mb-0">E-Learning Courses</h3>
-        </div>
+            <!-- Main Content -->
+            <main class="col-md-9 col-lg-10 main-content p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <button class="btn btn-light d-md-none glass-panel sidebar-toggle" type="button">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h3 class="mb-0">E-Learning Courses</h3>
+                </div>
 
-        <div class="row g-4">
+                <div class="row g-4">
             <!-- Study Deutsch Course Card -->
             <div class="col-sm-6 col-lg-4 mb-4">
                 <div class="card border-0 shadow-sm h-100">
@@ -214,8 +283,10 @@ include('./php/validateSession.php');
 
            
 
+                </div>
+            </main>
         </div>
-    </main>
+    </div>
 
     <!-- Scripts -->
     <script>
@@ -237,6 +308,16 @@ include('./php/validateSession.php');
             function updateToggleIcon() {
                 const icon = themeToggle.querySelector('i');
                 icon.className = body.getAttribute('data-theme') === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+            }
+
+            // Sidebar toggle functionality
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            
+            if (sidebarToggle && sidebar) {
+                sidebarToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('show');
+                });
             }
 
         });
