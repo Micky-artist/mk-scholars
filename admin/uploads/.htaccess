@@ -1,0 +1,49 @@
+# Protect uploads directory
+Options -Indexes
+
+# Prevent execution of PHP files in uploads directory
+<Files "*.php">
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+# Prevent execution of other script files
+<FilesMatch "\.(php|php3|php4|php5|phtml|pl|py|jsp|asp|sh|cgi)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# Allow only specific file types
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|mp4|avi|mov|wmv|flv|webm|mp3|wav|ogg|m4a|aac|pdf|doc|docx|txt|rtf)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+# Set proper MIME types
+<IfModule mod_mime.c>
+    AddType image/jpeg .jpg .jpeg
+    AddType image/png .png
+    AddType image/gif .gif
+    AddType image/webp .webp
+    AddType video/mp4 .mp4
+    AddType video/avi .avi
+    AddType video/quicktime .mov
+    AddType audio/mpeg .mp3
+    AddType audio/wav .wav
+    AddType application/pdf .pdf
+    AddType application/msword .doc
+    AddType application/vnd.openxmlformats-officedocument.wordprocessingml.document .docx
+    AddType text/plain .txt
+</IfModule>
+
+# Set cache headers for better performance
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType video/mp4 "access plus 1 month"
+    ExpiresByType audio/mpeg "access plus 1 month"
+    ExpiresByType application/pdf "access plus 1 week"
+</IfModule>

@@ -1,11 +1,21 @@
 <?php
 if(!(isset($_SESSION['AdminName'])) || !(isset($_SESSION['adminId'])) || !isset($_SESSION['accountstatus']) || $_SESSION['accountstatus']==0){
     session_destroy();
-    echo('
-    <script type="text/javascript">
-    window.location.href="authentication-login";
-    </script>
-    ');
+    
+    // Check if this is an AJAX request
+    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+        // Return JSON for AJAX requests
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Session expired. Please login again.']);
+        exit;
+    } else {
+        // Return HTML for regular requests
+        echo('
+        <script type="text/javascript">
+        window.location.href="authentication-login";
+        </script>
+        ');
+    }
 }
 ?>
 <?php

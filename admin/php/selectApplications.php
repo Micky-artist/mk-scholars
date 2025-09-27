@@ -73,7 +73,7 @@ $selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships $filter_co
                             <div class="card card-horizontal">
                                 <div class="row g-0">
                                     <div class="col-md-3">
-                                        <img src="./uploads/posts/<?= $getScholarships['scholarshipImage'] ?>"
+                                        <img src="<?= getImageUrl('uploads/posts/' . $getScholarships['scholarshipImage']) ?>"
                                             class="img-fluid rounded-start"
                                             alt="<?= htmlspecialchars($getScholarships['scholarshipTitle']) ?>">
                                     </div>

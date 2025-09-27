@@ -200,6 +200,33 @@ if (!$conn) {
     $conn = null; // Set to null instead of crashing
 }
 
+// Function to get the correct base URL based on environment
+function getBaseUrl() {
+    if (isOnline()) {
+        return 'https://admin.mkscholars.com/';
+    } else {
+        return './';
+    }
+}
+
+// Function to get the correct asset URL based on environment
+function getAssetUrl($path = '') {
+    if (isOnline()) {
+        return 'https://admin.mkscholars.com/' . ltrim($path, './');
+    } else {
+        return './' . ltrim($path, './');
+    }
+}
+
+// Function to get the correct image URL based on environment
+function getImageUrl($path = '') {
+    if (isOnline()) {
+        return 'https://admin.mkscholars.com/' . ltrim($path, './');
+    } else {
+        return './' . ltrim($path, './');
+    }
+}
+
 // Debug information (remove in production)
 if (isset($_GET['debug']) && $_GET['debug'] == 'db') {
     echo "<div style='background: #f0f0f0; padding: 10px; margin: 10px; border: 1px solid #ccc;'>";
