@@ -1,9 +1,14 @@
+<?php
+// Start session and include dependencies BEFORE any output
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+include("./dbconnection/connection.php");
+// Include handler early to process POST and set $msg/$class/field values
+include("./php/forgetPassword.php");
+?>
 <!DOCTYPE html>
 <html lang="en">
-<?php
-session_start();
-include("./dbconnection/connection.php");
-?>
 
 <head>
     <meta charset="UTF-8">
@@ -13,9 +18,6 @@ include("./dbconnection/connection.php");
     <link rel="shortcut icon" href="./images/logo/logoRound.png" type="image/x-icon">
 
 </head>
-<?php
-include("./php/forgetPassword.php");
-?>
 <style>
     * {
         margin: 0;
@@ -185,28 +187,67 @@ include("./php/forgetPassword.php");
                 <h1>Reset Account Password</h1>
                 <p>Can't log in you account. Worry no more!</p>
             </div>
-            <div class="<?php echo $class ?>">
+            <?php if (!empty($msg)): ?>
+            <div class="<?php echo $class ?>" id="global-alert">
                 <?php echo $msg ?>
             </div>
+            <?php endif; ?>
             <form class="auth-form" method="post" id="login-form">
+                <input type="hidden" name="csrf_token" value="<?php echo isset($_SESSION['csrf_token']) ? htmlspecialchars($_SESSION['csrf_token']) : '' ?>">
                 <div class="input-group">
-                    <input type="email" name="email" id="login-email" value="<?php echo $email ?>" placeholder=" ">
+                    <input type="email" name="email" id="login-email" value="<?php echo isset($email) ? htmlspecialchars($email) : '' ?>" placeholder=" ">
                     <label for="login-email">Email Address</label>
+                    <?php if (!empty($errors['email'])): ?>
+                    <div class="password-rules" style="color:#c41f10; margin-top:6px;">
+                        <i class="fa fa-exclamation-circle"></i> <?php echo htmlspecialchars($errors['email']); ?>
+                    </div>
+                    <?php endif; ?>
                 </div>
                 <div class="input-group">
-                    <input type="text" name="phone" id="login-phone" value="<?php echo $phone ?>" placeholder=" ">
+                    <input type="text" name="phone" id="login-phone" value="<?php echo isset($phone) ? htmlspecialchars($phone) : '' ?>" placeholder=" ">
                     <label for="login-phone">Phone Number</label>
+                    <?php if (!empty($errors['phone'])): ?>
+                    <div class="password-rules" style="color:#c41f10; margin-top:6px;">
+                        <i class="fa fa-exclamation-circle"></i> <?php echo htmlspecialchars($errors['phone']); ?>
+                    </div>
+                    <?php endif; ?>
                 </div>
                 <div class="input-group">
-                    <input type="password" name="newPassword" id="new-password" value="<?php echo $newPassword ?>" placeholder=" ">
+                    <input type="password" name="newPassword" id="new-password" value="<?php echo isset($newPassword) ? htmlspecialchars($newPassword) : '' ?>" placeholder=" ">
                     <label for="new-password">New Password</label>
+                    <?php if (!empty($errors['newPassword'])): ?>
+                    <div class="password-rules" style="color:#c41f10; margin-top:6px;">
+                        <i class="fa fa-exclamation-circle"></i> <?php echo htmlspecialchars($errors['newPassword']); ?>
+                    </div>
+                    <?php else: ?>
+                    <div class="password-rules">
+                        At least 8 characters, including uppercase, lowercase, and a number.
+                    </div>
+                    <?php endif; ?>
                 </div>
                 <div class="input-group">
-                    <input type="password" name="coNewPassword" id="co-new-password" value="<?php echo $coNewPassword ?>" placeholder=" ">
+                    <input type="password" name="coNewPassword" id="co-new-password" value="<?php echo isset($coNewPassword) ? htmlspecialchars($coNewPassword) : '' ?>" placeholder=" ">
                     <label for="co-new-password">Confirm New Password</label>
+                    <?php if (!empty($errors['coNewPassword'])): ?>
+                    <div class="password-rules" style="color:#c41f10; margin-top:6px;">
+                        <i class="fa fa-exclamation-circle"></i> <?php echo htmlspecialchars($errors['coNewPassword']); ?>
+                    </div>
+                    <?php endif; ?>
                 </div>
                 <button type="submit" name="reset_password" class="submit-btn">Reset Password</button>
             </form>
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var alertBox = document.getElementById('global-alert');
+                if (alertBox) {
+                    setTimeout(function(){
+                        alertBox.style.transition = 'opacity 0.4s ease';
+                        alertBox.style.opacity = '0';
+                        setTimeout(function(){ alertBox.style.display = 'none'; }, 400);
+                    }, 6000);
+                }
+            });
+            </script>
 
             <div class="switch-form">
                 Need an account? <a href="./sign-up">Sign Up</a><br>

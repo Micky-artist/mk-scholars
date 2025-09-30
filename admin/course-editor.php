@@ -95,6 +95,7 @@ if (!$courseData) {
         margin-bottom: 0.75rem;
         cursor: move;
         transition: all 0.3s ease;
+        user-select: none;
     }
 
     .section-item:hover {
@@ -112,6 +113,19 @@ if (!$courseData) {
         justify-content: space-between;
         align-items: center;
         margin-bottom: 0.5rem;
+    }
+
+    .section-order-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin-right: 0.75rem;
+    }
+
+    .section-order-controls .btn {
+        padding: 0.25rem 0.375rem;
+        font-size: 0.7rem;
+        line-height: 1;
     }
 
     .section-title {
@@ -885,18 +899,33 @@ if (!$courseData) {
                 
                 sectionDiv.innerHTML = `
                     <div class="section-controls">
+                        <div class="section-order-controls">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="moveSection(${index}, 'up')" ${index === 0 ? 'disabled' : ''} title="Move Up">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="moveSection(${index}, 'down')" ${index === courseData.sections.length - 1 ? 'disabled' : ''} title="Move Down">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
                         <h6 class="section-title">${section.title}</h6>
                         <div class="section-actions">
-                            <button class="btn btn-sm btn-outline-primary" onclick="editSection(${index})">
+                            <button class="btn btn-sm btn-outline-primary" onclick="editSection(${index})" title="Edit Section">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteSection(${index})">
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteSection(${index})" title="Delete Section">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
                     <small class="text-muted">${section.type.charAt(0).toUpperCase() + section.type.slice(1)}</small>
                 `;
+                
+                // Add drag and drop functionality
+                sectionDiv.draggable = true;
+                sectionDiv.addEventListener('dragstart', handleDragStart);
+                sectionDiv.addEventListener('dragover', handleDragOver);
+                sectionDiv.addEventListener('drop', handleDrop);
+                sectionDiv.addEventListener('dragend', handleDragEnd);
                 
                 list.appendChild(sectionDiv);
             });
@@ -995,12 +1024,108 @@ if (!$courseData) {
 
         // Delete section
         function deleteSection(index) {
-            if (confirm('Are you sure you want to delete this section?')) {
+            if (confirm('Are you sure you want to delete this section? This will also delete all associated files.')) {
+                const section = courseData.sections[index];
+                
+                // Delete associated files if any
+                if (section.files && section.files.length > 0) {
+                    section.files.forEach(file => {
+                        if (file.fileId) {
+                            // Delete file from server and database
+                            fetch('php/delete-course-file.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                body: JSON.stringify({
+                                    fileId: file.fileId
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (!data.success) {
+                                    console.error('Error deleting file:', data.message);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error deleting file:', error);
+                            });
+                        }
+                    });
+                }
+                
+                // Remove section from course data
                 courseData.sections.splice(index, 1);
                 renderCoursePreview();
                 renderSectionsList();
-                showNotification('Section deleted successfully!', 'success');
+                showNotification('Section and associated files deleted successfully!', 'success');
             }
+        }
+
+        // Move section up or down
+        function moveSection(index, direction) {
+            if (direction === 'up' && index > 0) {
+                // Move up
+                const temp = courseData.sections[index];
+                courseData.sections[index] = courseData.sections[index - 1];
+                courseData.sections[index - 1] = temp;
+            } else if (direction === 'down' && index < courseData.sections.length - 1) {
+                // Move down
+                const temp = courseData.sections[index];
+                courseData.sections[index] = courseData.sections[index + 1];
+                courseData.sections[index + 1] = temp;
+            }
+            
+            renderCoursePreview();
+            renderSectionsList();
+            showNotification('Section order updated!', 'success');
+        }
+
+        // Drag and drop functionality
+        let draggedElement = null;
+
+        function handleDragStart(e) {
+            draggedElement = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', this.outerHTML);
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        function handleDrop(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+
+            if (draggedElement !== this) {
+                const draggedIndex = parseInt(draggedElement.dataset.index);
+                const targetIndex = parseInt(this.dataset.index);
+                
+                // Move the section in the array
+                const draggedSection = courseData.sections[draggedIndex];
+                courseData.sections.splice(draggedIndex, 1);
+                courseData.sections.splice(targetIndex, 0, draggedSection);
+                
+                // Re-render the sections
+                renderCoursePreview();
+                renderSectionsList();
+                showNotification('Section order updated!', 'success');
+            }
+
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            draggedElement = null;
         }
 
         // Format text
@@ -1030,11 +1155,30 @@ if (!$courseData) {
             if (linkText !== null) {
                 const linkHtml = `<a href="${linkUrl}" target="_blank" rel="noopener noreferrer">${linkText || linkUrl}</a>`;
                 
+                // Focus on the content editor first
+                contentEditor.focus();
+                
                 // Insert at cursor position or append
-                if (window.getSelection().rangeCount > 0) {
-                    document.execCommand('insertHTML', false, linkHtml);
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0) {
+                    // Check if cursor is inside the content editor
+                    const range = selection.getRangeAt(0);
+                    if (contentEditor.contains(range.commonAncestorContainer)) {
+                        // Insert at cursor position
+                        range.deleteContents();
+                        const linkNode = document.createElement('div');
+                        linkNode.innerHTML = linkHtml;
+                        range.insertNode(linkNode.firstChild);
+                        range.collapse(false);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    } else {
+                        // Cursor not in editor, append to end
+                        const separator = contentEditor.innerHTML ? '<br><br>' : '';
+                        contentEditor.innerHTML += separator + linkHtml;
+                    }
                 } else {
-                    // Add some spacing if content already exists
+                    // No selection, append to end
                     const separator = contentEditor.innerHTML ? '<br><br>' : '';
                     contentEditor.innerHTML += separator + linkHtml;
                 }
@@ -1434,7 +1578,7 @@ if (!$courseData) {
                                 <small class="text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB - Uploaded</small>
                             </div>
                         </div>
-                        <button class="btn btn-sm btn-outline-danger" onclick="removeFile(${index})">
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteUploadedFile(${data.fileId}, '${file.name}')" title="Delete File">
                             <i class="fas fa-times"></i>
                         </button>
                     `;
@@ -1512,13 +1656,72 @@ if (!$courseData) {
                                     <small class="text-muted">${(file.fileSize / 1024 / 1024).toFixed(2)} MB - Uploaded</small>
                                 </div>
                             </div>
-                            <button class="btn btn-sm btn-outline-danger" onclick="removeFile(${idx})">
+                            <button class="btn btn-sm btn-outline-danger" onclick="removeFile(${idx})" title="Delete File">
                                 <i class="fas fa-times"></i>
                             </button>
                         `;
                         filesContainer.appendChild(fileItem);
                     });
                 }
+            }
+        }
+
+        // Delete uploaded file from server and database
+        function deleteUploadedFile(fileId, fileName) {
+            if (confirm(`Are you sure you want to delete "${fileName}"? This action cannot be undone.`)) {
+                // Send AJAX request to delete file
+                fetch('php/delete-course-file.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        fileId: fileId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove from uploaded files array
+                        if (window.uploadedFiles) {
+                            window.uploadedFiles = window.uploadedFiles.filter(file => file.fileId !== fileId);
+                        }
+                        
+                        // Re-render file list
+                        const filesContainer = document.getElementById('uploadedFilesContainer');
+                        if (filesContainer) {
+                            filesContainer.innerHTML = '';
+                            if (window.uploadedFiles && window.uploadedFiles.length > 0) {
+                                window.uploadedFiles.forEach((file, idx) => {
+                                    const fileItem = document.createElement('div');
+                                    fileItem.className = 'file-item';
+                                    fileItem.innerHTML = `
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-check-circle text-success me-2"></i>
+                                            <div>
+                                                <div class="fw-bold">${file.fileName}</div>
+                                                <small class="text-muted">${(file.fileSize / 1024 / 1024).toFixed(2)} MB - Uploaded</small>
+                                            </div>
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteUploadedFile(${file.fileId}, '${file.fileName}')" title="Delete File">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    `;
+                                    filesContainer.appendChild(fileItem);
+                                });
+                            }
+                        }
+                        
+                        showNotification('File deleted successfully!', 'success');
+                    } else {
+                        showNotification('Error deleting file: ' + data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Error deleting file', 'error');
+                });
             }
         }
 

@@ -1,109 +1,282 @@
 <?php
-// TransactionCompleted.php
-session_start();
+/**
+ * Flutterwave Payment Success Handler
+ * 
+ * This page handles successful payments from Flutterwave v4 API
+ */
+
 include('../dbconnection/connection.php');
+include('./config.php');
 
-// 1) Must be GET + status=successful
-if ($_SERVER['REQUEST_METHOD'] !== 'GET'
-    || !isset($_GET['status'])
-    || $_GET['status'] !== 'successful'
-) {
-    header('Location: ./failed');
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['userId'])) {
+    header("Location: ../login");
     exit;
 }
 
-// 2) Must have logged‑in user
-if (empty($_SESSION['userId'])) {
-    header('Location: ./failed');
-    exit;
+// Get parameters from Flutterwave callback
+$courseId = $_GET['courseId'] ?? '';
+$type = $_GET['type'] ?? '';
+$userId = $_GET['userId'] ?? $_SESSION['userId'];
+$tx_ref = $_GET['tx_ref'] ?? '';
+$transaction_id = $_GET['transaction_id'] ?? '';
+
+// If we have transaction_id, verify the payment
+if (!empty($transaction_id)) {
+    $secretKey = "54cadf5f-a20f-4af5-8825-36e0121da065";
+    
+    // Build the verify endpoint for v4
+    $verifyUrl = "https://api.flutterwave.com/v4/transactions/{$transaction_id}/verify";
+    
+    $ch = curl_init($verifyUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => [
+            "Authorization: Bearer {$secretKey}",
+            "Content-Type: application/json"
+        ]
+    ]);
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode === 200) {
+        $result = json_decode($response, true);
+        
+        if (isset($result['status']) && $result['status'] === "success" && $result['data']['status'] === "successful") {
+            $paymentData = $result['data'];
+            
+            // Payment successful - process enrollment
+            if ($courseId) {
+                // Insert enrollment record
+                $enrollmentQuery = "INSERT INTO CourseEnrollments (userId, courseId, enrollmentDate, paymentAmount, paymentCurrency, paymentStatus, transactionReference) 
+                                   VALUES (?, ?, NOW(), ?, ?, 'completed', ?) 
+                                   ON DUPLICATE KEY UPDATE 
+                                   enrollmentDate = NOW(), 
+                                   paymentAmount = VALUES(paymentAmount),
+                                   paymentCurrency = VALUES(paymentCurrency),
+                                   paymentStatus = 'completed',
+                                   transactionReference = VALUES(transactionReference)";
+                
+                $stmt = $conn->prepare($enrollmentQuery);
+                $stmt->bind_param('iisss', $userId, $courseId, $paymentData['amount'], $paymentData['currency'], $tx_ref);
+                
+                if ($stmt->execute()) {
+                    $enrollmentSuccess = true;
+                } else {
+                    $enrollmentError = "Database error: " . $stmt->error;
+                }
+            }
+        } else {
+            $paymentError = "Payment verification failed";
+        }
+    } else {
+        $paymentError = "Failed to verify payment";
+    }
 }
-$userId = (int) $_SESSION['userId'];
 
-// 3) Validate subscription type
-$allowedTypes = ['notes','instructor','englishcourse', 'moroccoadmissions','codingcourse','aluprogramonlinetutor','aluprogramsamplequestions', 'ucatonline','ucatcoach'];
-if (!isset($_GET['type']) || !in_array($_GET['type'], $allowedTypes, true)) {
-    header('Location: ./failed');
-    exit;
+// Get course information for display
+$courseName = "Course";
+$courseDescription = "";
+if ($courseId) {
+    $courseQuery = "SELECT courseName, courseDescription FROM Courses WHERE courseId = ?";
+    $stmt = $conn->prepare($courseQuery);
+    $stmt->bind_param("i", $courseId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($course = $result->fetch_assoc()) {
+        $courseName = $course['courseName'];
+        $courseDescription = $course['courseDescription'];
+    }
 }
-$subscriptionType = $_GET['type'];
+?>
 
-// 4) Map to server‑side amount
-$amountMap = [
-    'notes'      => 7500,
-    'instructor'      => 15000,
-    'englishcourse' => 15000,
-    'moroccoadmissions' => 2600,
-    'codingcourse' => 25000,
-    'aluprogramonlinetutor' => 15000,
-    'aluprogramsamplequestions' => 7500,
-    'ucatonline' => 7500,
-    'ucatcoach' => 15000,
-];
-$finalAmount = $amountMap[$subscriptionType];
-
-// 5) Verify user exists in normUsers
-$stmt = $conn->prepare("SELECT NoUserId FROM normUsers WHERE NoUserId = ?");
-$stmt->bind_param('i', $userId);
-$stmt->execute();
-$userResult = $stmt->get_result();
-$stmt->close();
-
-if ($userResult->num_rows === 0) {
-    header('Location: ./failed');
-    exit;
-}
-
-// 6) Check for existing active subscription
-$today = date('Y-m-d');
-$stmt = $conn->prepare("SELECT 1
-    FROM subscription
-    WHERE UserId = ?
-      AND SubscriptionStatus = 1
-      AND expirationDate > ?
-    LIMIT 1
-");
-$stmt->bind_param('is', $userId, $today);
-$stmt->execute();
-$activeResult = $stmt->get_result();
-$stmt->close();
-
-// If already active, just go to success
-if ($activeResult->num_rows > 0) {
-    header('Location: ./success');
-    exit;
-}
-
-// 7) Insert new subscription
-$statusFlag       = 1;
-$subscriptionCode = 'SUB_' . random_int(100, 999) . '_' . date('Ymd_His');
-$subscriptionDate = $today;
-$expirationDate   = date('Y-m-d', strtotime('+1 month'));
-
-$stmt = $conn->prepare("INSERT INTO subscription (
-      SubscriptionStatus,
-      item,
-      UserId,
-      SubscriptionCode,
-      subscriptionDate,
-      expirationDate
-    ) VALUES (?, ?, ?, ?, ?, ?)
-");
-$stmt->bind_param(
-    'isisss',
-    $statusFlag,
-    $subscriptionType,
-    $userId,
-    $subscriptionCode,
-    $subscriptionDate,
-    $expirationDate
-);
-
-if ($stmt->execute()) {
-    $stmt->close();
-    header('Location: ./success');
-    exit;
-} else {
-    $stmt->close();
-    header('Location: ./failed');
-    exit;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - <?= COMPANY_NAME ?></title>
+    <link rel="shortcut icon" href="<?= COMPANY_LOGO ?>" type="image/x-icon">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .payment-container {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+        
+        .success-icon {
+            font-size: 4rem;
+            color: #27ae60;
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        
+        .success-message {
+            color: #7f8c8d;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .course-info {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+        
+        .course-info h3 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .transaction-details {
+            background: #ecf0f1;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            font-family: monospace;
+            color: #6c757d;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            margin: 10px;
+            background: #27ae60;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .btn:hover {
+            background: #229954;
+            transform: translateY(-2px);
+        }
+        
+        .btn.secondary {
+            background: #3498db;
+        }
+        
+        .btn.secondary:hover {
+            background: #2980b9;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            background: #fdf2f2;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .support-info {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #ecf0f1;
+            border-radius: 10px;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <?php if (isset($enrollmentSuccess) && $enrollmentSuccess): ?>
+            <div class="success-icon">✅</div>
+            <h1>Payment Successful!</h1>
+            <p class="success-message">
+                Thank you for your payment! You have been successfully enrolled in the course.
+            </p>
+            
+            <div class="course-info">
+                <h3><?= htmlspecialchars($courseName) ?></h3>
+                <p><?= htmlspecialchars($courseDescription) ?></p>
+            </div>
+            
+            <?php if ($tx_ref): ?>
+                <div class="transaction-details">
+                    Transaction Reference: <?= htmlspecialchars($tx_ref) ?><br>
+                    <?php if (isset($paymentData)): ?>
+                        Amount: <?= number_format($paymentData['amount']) ?> <?= htmlspecialchars($paymentData['currency']) ?><br>
+                        Payment Status: <?= htmlspecialchars($paymentData['status']) ?>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+            
+            <div>
+                <a href="../e-learning" class="btn">Go to E-Learning</a>
+                <a href="../courses" class="btn secondary">Browse More Courses</a>
+            </div>
+            
+        <?php elseif (isset($paymentError)): ?>
+            <div class="success-icon">❌</div>
+            <h1>Payment Verification Failed</h1>
+            <div class="error-message">
+                <?= htmlspecialchars($paymentError) ?>
+            </div>
+            <div>
+                <a href="../subscription?course=<?= $courseId ?>" class="btn">Try Again</a>
+                <a href="../courses" class="btn secondary">Browse Courses</a>
+            </div>
+            
+        <?php elseif (isset($enrollmentError)): ?>
+            <div class="success-icon">⚠️</div>
+            <h1>Payment Successful - Enrollment Issue</h1>
+            <p class="success-message">
+                Your payment was successful, but there was an issue enrolling you in the course.
+            </p>
+            <div class="error-message">
+                <?= htmlspecialchars($enrollmentError) ?>
+            </div>
+            <div>
+                <a href="../e-learning" class="btn">Check E-Learning</a>
+                <a href="../courses" class="btn secondary">Browse Courses</a>
+            </div>
+            
+        <?php else: ?>
+            <div class="success-icon">✅</div>
+            <h1>Payment Processed</h1>
+            <p class="success-message">
+                Your payment has been processed. Please check your email for confirmation.
+            </p>
+            <div>
+                <a href="../e-learning" class="btn">Go to E-Learning</a>
+                <a href="../courses" class="btn secondary">Browse Courses</a>
+            </div>
+        <?php endif; ?>
+        
+        <div class="support-info">
+            <p><strong>Need Help?</strong></p>
+            <p>Contact us at <?= SUPPORT_PHONE ?></p>
+            <p>Or email us at support@mkscholars.com</p>
+        </div>
+    </div>
+</body>
+</html>

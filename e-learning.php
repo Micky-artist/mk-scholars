@@ -2,6 +2,127 @@
 session_start();
 include('./dbconnection/connection.php');
 include('./php/validateSession.php');
+
+// Check if user is logged in
+$isLoggedIn = isset($_SESSION['userId']);
+$userId = $isLoggedIn ? $_SESSION['userId'] : null;
+
+// Get filter parameter
+$filter = $_GET['filter'] ?? 'all'; // all, enrolled, not_enrolled
+
+// Fetch courses from database with enrollment status
+$courses = [];
+$enrolledCourses = [];
+
+if ($conn) {
+    // First, get user's enrolled courses if logged in
+    if ($isLoggedIn) {
+        $enrollmentQuery = "SELECT courseId FROM CourseEnrollments WHERE userId = ? AND enrollmentStatus = 1";
+        $stmt = $conn->prepare($enrollmentQuery);
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $enrollmentResult = $stmt->get_result();
+        
+        while ($enrollment = $enrollmentResult->fetch_assoc()) {
+            $enrolledCourses[] = $enrollment['courseId'];
+        }
+        $stmt->close();
+    }
+    
+    // Build the main courses query
+    $coursesQuery = "SELECT c.*, cp.amount, cp.currency, cp.pricingDescription, curr.currencySymbol 
+                     FROM Courses c 
+                     LEFT JOIN CoursePricing cp ON c.courseId = cp.courseId 
+                     LEFT JOIN Currencies curr ON cp.currency = curr.currencyCode 
+                     WHERE c.courseDisplayStatus = 1";
+    
+    // Add filter conditions
+    if ($filter === 'enrolled' && $isLoggedIn && !empty($enrolledCourses)) {
+        $courseIds = implode(',', array_map('intval', $enrolledCourses));
+        $coursesQuery .= " AND c.courseId IN ($courseIds)";
+    } elseif ($filter === 'not_enrolled' && $isLoggedIn && !empty($enrolledCourses)) {
+        $courseIds = implode(',', array_map('intval', $enrolledCourses));
+        $coursesQuery .= " AND c.courseId NOT IN ($courseIds)";
+    } elseif ($filter === 'not_enrolled' && (!$isLoggedIn || empty($enrolledCourses))) {
+        // If not logged in or no enrollments, show all courses
+    }
+    
+    $coursesQuery .= " ORDER BY c.courseCreatedDate DESC";
+    
+    $coursesResult = mysqli_query($conn, $coursesQuery);
+    
+    if ($coursesResult && mysqli_num_rows($coursesResult) > 0) {
+        while ($course = mysqli_fetch_assoc($coursesResult)) {
+            // Add enrollment status to each course
+            $course['isEnrolled'] = $isLoggedIn && in_array($course['courseId'], $enrolledCourses);
+            $courses[] = $course;
+        }
+    }
+}
+
+// Helper function to get button info based on enrollment status
+function getButtonInfo($course, $isLoggedIn) {
+    if (!$isLoggedIn) {
+        return [
+            'text' => 'Register to View',
+            'class' => 'btn-outline-primary',
+            'action' => 'login',
+            'icon' => 'fas fa-user-plus'
+        ];
+    }
+    
+    if ($course['isEnrolled']) {
+        return [
+            'text' => 'Open Course',
+            'class' => 'btn-outline-success',
+            'action' => 'open',
+            'icon' => 'fas fa-play'
+        ];
+    } else {
+        return [
+            'text' => 'Register Now',
+            'class' => 'btn-outline-primary',
+            'action' => 'register',
+            'icon' => 'fas fa-user-plus'
+        ];
+    }
+}
+
+// Helper function to get image URL
+function getImageUrl($path = '') {
+    if (isOnline()) {
+        return 'https://admin.mkscholars.com/' . ltrim($path, './');
+    } else {
+        return './' . ltrim($path, './');
+    }
+}
+
+// Helper function to get status text
+function getStatusText($status) {
+    switch($status) {
+        case 1: return 'Open';
+        case 2: return 'Closed';
+        default: return 'Inactive';
+    }
+}
+
+// Helper function to get status class
+function getStatusClass($status) {
+    switch($status) {
+        case 1: return 'bg-success';
+        case 2: return 'bg-warning';
+        default: return 'bg-secondary';
+    }
+}
+
+// Helper function to format price
+function formatPrice($amount, $currencySymbol, $currency) {
+    if ($amount && $amount > 0) {
+        $symbol = $currencySymbol ?: $currency;
+        return $symbol . ' ' . number_format($amount, 0);
+    }
+    return 'Free';
+}
 ?>
 
 <!DOCTYPE html>
@@ -133,17 +254,268 @@ include('./php/validateSession.php');
             justify-content: center;
         }
 
-        .card {
-            border: none;
-            border-radius: 0.75rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            transition: transform 0.2s ease;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
+        /* ==== Course Grid ==== */
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin: 1rem 0;
         }
 
-        .card:hover {
+        .course-card {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 300px;
+            overflow: hidden;
+        }
+
+        .course-card:hover {
             transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .course-left-panel {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            color: white;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-width: 200px;
+            width: 35%;
+        }
+
+        .course-brand {
+            margin-bottom: 2rem;
+        }
+
+        .course-brand-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            line-height: 1.1;
+        }
+
+        .course-brand-subtitle {
+            font-size: 0.75rem;
+            font-weight: 500;
+            opacity: 0.9;
+            margin-bottom: 0.25rem;
+        }
+
+        .course-brand-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .course-contact {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .course-right-panel {
+            background: white;
+            padding: 2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .course-pricing-tags {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .price-tag {
+            background: #dcfce7;
+            color: #166534;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: 1px solid #bbf7d0;
+        }
+
+        .price-tag.secondary {
+            background: #fed7aa;
+            color: #c2410c;
+            border-color: #fdba74;
+        }
+
+        .course-features {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-box {
+            background: var(--gray-50);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--gray-700);
+            flex: 1;
+        }
+
+        .feature-icon {
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        .course-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .course-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .course-subtitle {
+            font-size: 1rem;
+            color: var(--gray-600);
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .course-badge {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: var(--success);
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .enrollment-badge {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            background: var(--success);
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .course-description {
+            font-size: 0.9rem;
+            color: var(--gray-700);
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .course-deadline {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            margin-bottom: 1.5rem;
+        }
+
+        .course-actions {
+            margin-top: auto;
+        }
+
+        .enroll-button {
+            background: #3b82f6;
+            color: var(--white);
+            border: none;
+            padding: 0.875rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .enroll-button:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .courses-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .course-card {
+                flex-direction: column;
+                min-height: auto;
+            }
+
+            .course-left-panel {
+                width: 100%;
+                min-width: auto;
+                padding: 1.5rem;
+            }
+
+            .course-right-panel {
+                padding: 1.5rem;
+            }
+
+            .course-features {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .course-pricing-tags {
+                gap: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .course-left-panel {
+                padding: 1rem;
+            }
+
+            .course-right-panel {
+                padding: 1rem;
+            }
+
+            .course-brand-title {
+                font-size: 1.5rem;
+            }
+
+            .course-title {
+                font-size: 1.25rem;
+            }
+
+            .course-features {
+                flex-direction: column;
+            }
         }
 
         .card-title {
@@ -194,95 +566,135 @@ include('./php/validateSession.php');
                     <h3 class="mb-0">E-Learning Courses</h3>
                 </div>
 
-                <div class="row g-4">
-            <!-- Study Deutsch Course Card -->
-            <div class="col-sm-6 col-lg-4 mb-4">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="position-relative">
-                        <img src="./images/courses/deutsch-academy.jpg" class="card-img-top rounded-top" alt="Study Deutsch in MK Deutsch Academy">
-                        <span class="badge bg-success position-absolute top-0 start-0 m-2">Language</span>
+                <!-- Filter Section -->
+                <div class="glass-panel p-3 mb-4">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                        <h5 class="mb-3 mb-md-0">Filter Courses</h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="?filter=all" class="btn btn-sm <?php echo $filter === 'all' ? 'btn-primary' : 'btn-outline-primary'; ?>">
+                                <i class="fas fa-list me-1"></i> All Courses
+                            </a>
+                            <?php if ($isLoggedIn): ?>
+                                <a href="?filter=enrolled" class="btn btn-sm <?php echo $filter === 'enrolled' ? 'btn-success' : 'btn-outline-success'; ?>">
+                                    <i class="fas fa-check-circle me-1"></i> My Courses
+                                </a>
+                                <a href="?filter=not_enrolled" class="btn btn-sm <?php echo $filter === 'not_enrolled' ? 'btn-warning' : 'btn-outline-warning'; ?>">
+                                    <i class="fas fa-plus-circle me-1"></i> Available Courses
+                                </a>
+                            <?php endif; ?>
+                        </div>
                     </div>
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title fw-semibold">Study Deutsch in MK Deutsch Academy</h5>
-                        <p class="card-text text-muted flex-grow-1">Master German language for academic & career success. A1 to B2 levels with certified instructors.</p>
-                        <a href="deutsch-academy" class="btn btn-outline-success w-100 mt-2">Register Now</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-sm-6 col-lg-4 mb-4">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="position-relative">
-                        <img src="https://mkscholars.com/images/courses/ucat.jpg" class="card-img-top rounded-top" alt="UCAT">
-                        <span class="badge bg-info text-dark position-absolute top-0 start-0 m-2">Medical</span>
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title fw-semibold">UCAT Coaching</h5>
-                        <p class="card-text text-muted flex-grow-1">Prepare for the UCAT with expert-led sessions, strategies, and full mock tests.</p>
-                        <a href="ucat-course" class="btn btn-outline-info w-100 mt-2">View Course</a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-sm-6 col-lg-4 mb-4">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="position-relative">
-                        <img src="./images/courses/alu.jpeg" class="card-img-top rounded-top" alt="ALU English Proficiency Program">
-                        <span class="badge bg-primary position-absolute top-0 start-0 m-2">Language</span>
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title fw-semibold">ALU English Proficiency Program</h5>
-                        <p class="card-text text-muted flex-grow-1">Boost your English for ALU English Proficency Test (EPT). 10 days online training in speaking, reading & writing.</p>
-                        <a href="alu-english-program" class="btn btn-outline-primary w-100 mt-2">Register Now</a>
+                    <div class="mt-3 pt-3 border-top">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                            <span class="text-muted"><?php echo count($courses); ?> course(s) found</span>
+                            <?php if ($isLoggedIn): ?>
+                                <span class="text-success">
+                                    <i class="fas fa-user-check me-1"></i>
+                                    <?php echo count($enrolledCourses); ?> enrolled
+                                </span>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-sm-6 col-lg-4 mb-4">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="position-relative">
-                        <img src="./images/courses/codingcourse.jpeg" class="card-img-top rounded-top" alt="Coding Bootcamp">
-                        <span class="badge bg-success position-absolute top-0 start-0 m-2">Tech</span>
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title fw-semibold">30-Day Coding Bootcamp</h5>
-                        <p class="card-text text-muted flex-grow-1">Learn HTML, CSS, JS, React & backend. Evening sessions. Certificate on completion.</p>
-                        <a href="coding-course" class="btn btn-outline-success w-100 mt-2">Register Now</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-4 mb-4">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="position-relative">
-                        <img src="./images/courses/englishcourse.jpeg" class="card-img-top rounded-top" alt="English Course">
-                        <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">Language</span>
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title fw-semibold">English Communication Course</h5>
-                        <p class="card-text text-muted flex-grow-1">Boost your English speaking, writing & listening. 2-month program with certificate.</p>
-                        <a href="english-course" class="btn btn-outline-warning w-100 mt-2">Join Now</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-4 mb-4">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="position-relative">
-                        <img src="./images/courses/morocco.jpeg" class="card-img-top rounded-top" alt="Morocco Admissions">
-                        <span class="badge bg-primary position-absolute top-0 start-0 m-2">Admissions</span>
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title fw-semibold">Morocco Admissions</h5>
-                        <p class="card-text text-muted flex-grow-1">Practice interviews, tourism knowledge, and logic tests.</p>
-                        <a href="morocco-admissions" class="btn btn-outline-primary w-100 mt-2">View Course</a>
-                    </div>
-                </div>
-            </div>
-
-
-
-
-           
-
+                <div class="courses-grid">
+                    <!-- Dynamic Courses from Database -->
+                    <?php if (!empty($courses)): ?>
+                        <?php foreach ($courses as $course): ?>
+                            <div class="course-card">
+                                <!-- Left Panel - Brand Section -->
+                                <div class="course-left-panel">
+                                    <div class="course-brand">
+                                        <div class="course-brand-title"><?php echo strtoupper(substr($course['courseName'], 0, 5)); ?></div>
+                                        <div class="course-brand-subtitle">COACHING WITH</div>
+                                        <div class="course-brand-name">MK SCHOLARS</div>
+                                    </div>
+                                    <div class="course-contact">0798611161</div>
+                                </div>
+                                
+                                <!-- Right Panel - Course Details -->
+                                <div class="course-right-panel">
+                                    <div class="course-badge <?php echo getStatusClass($course['courseDisplayStatus']); ?>">
+                                        <?php echo getStatusText($course['courseDisplayStatus']); ?>
+                                    </div>
+                                    
+                                    <?php if ($course['isEnrolled']): ?>
+                                        <div class="enrollment-badge">
+                                            <i class="fas fa-check-circle"></i>
+                                            Enrolled
+                                        </div>
+                                    <?php endif; ?>
+                                    
+                                    <div class="course-header">
+                                        <h2 class="course-title"><?php echo htmlspecialchars($course['courseName']); ?></h2>
+                                        <p class="course-subtitle"><?php echo htmlspecialchars($course['courseDescription']); ?></p>
+                                    </div>
+                                    
+                                    <div class="course-pricing-tags">
+                                        <div class="price-tag">
+                                            <?php echo formatPrice($course['amount'], $course['currencySymbol'], $course['currency']); ?> - Complete Package
+                                        </div>
+                                        <?php if ($course['pricingDescription']): ?>
+                                            <div class="price-tag secondary">
+                                                <?php echo htmlspecialchars($course['pricingDescription']); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                    
+                                    <div class="course-description">
+                                        Comprehensive online coaching designed to help students achieve their academic goals. Includes expert guidance, practice materials, and personalized support.
+                                    </div>
+                                    
+                                    <div class="course-features">
+                                        <div class="feature-box">
+                                            <i class="fas fa-graduation-cap feature-icon"></i>
+                                            <span>Online Learning</span>
+                                        </div>
+                                        <div class="feature-box">
+                                            <i class="fas fa-users feature-icon"></i>
+                                            <span>30 Seats Available</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="course-deadline">
+                                        <i class="fas fa-hourglass-half"></i>
+                                        <span>Registration Ends: <?php echo date('F j, Y', strtotime($course['courseRegEndDate'])); ?></span>
+                                    </div>
+                                    
+                                    <div class="course-actions">
+                                        <?php 
+                                        $buttonInfo = getButtonInfo($course, $isLoggedIn);
+                                        $buttonUrl = '';
+                                        
+                                        switch($buttonInfo['action']) {
+                                            case 'login':
+                                                $buttonUrl = './login';
+                                                break;
+                                            case 'open':
+                                                $buttonUrl = './course-details?id=' . $course['courseId'];
+                                                break;
+                                            case 'register':
+                                                $buttonUrl = './subscription?course=' . $course['courseId'];
+                                                break;
+                                        }
+                                        ?>
+                                        <button onclick="window.location.href='<?php echo $buttonUrl; ?>'" class="enroll-button">
+                                            <i class="fas fa-arrow-right"></i>
+                                            <?php echo $buttonInfo['text']; ?> (Iyandikishe)
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="col-12">
+                            <div class="text-center py-5">
+                                <i class="fas fa-graduation-cap fa-3x text-muted mb-3"></i>
+                                <h4 class="text-muted">No courses available</h4>
+                                <p class="text-muted">Check back later for new courses!</p>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </main>
         </div>

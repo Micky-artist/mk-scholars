@@ -3,9 +3,14 @@ session_start();
 include("./dbconnections/connection.php");
 include("./php/validateAdminSession.php");
 
-if (!hasPermission('ViewApplications')) {
-  header("Location: ./index");
-  exit;
+// Check if admin is logged in
+$isAdminLoggedIn = isset($_SESSION['AdminName']) && isset($_SESSION['adminId']) && isset($_SESSION['accountstatus']) && $_SESSION['accountstatus'] == 1;
+
+if (!$isAdminLoggedIn) {
+  // Show login required message instead of redirecting
+  $showLoginMessage = true;
+} elseif (!hasPermission('ViewApplications')) {
+  $showPermissionMessage = true;
 }
 ?>
 
@@ -30,9 +35,43 @@ include("./partials/head.php");
         
         <div class="row">
           <!-- column -->
-
-                <?php include("./view_subscriptions.php"); ?>
-
+          <?php if (isset($showLoginMessage)): ?>
+            <div class="col-12">
+              <div class="card">
+                <div class="card-body text-center py-5">
+                  <div class="mb-4">
+                    <i class="fas fa-lock fa-3x text-muted"></i>
+                  </div>
+                  <h3 class="card-title">Admin Login Required</h3>
+                  <p class="card-text text-muted mb-4">
+                    You need to be logged in as an administrator to access the subscriptions page.
+                  </p>
+                  <a href="./authentication-login" class="btn btn-primary btn-lg">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login to Admin Panel
+                  </a>
+                </div>
+              </div>
+            </div>
+          <?php elseif (isset($showPermissionMessage)): ?>
+            <div class="col-12">
+              <div class="card">
+                <div class="card-body text-center py-5">
+                  <div class="mb-4">
+                    <i class="fas fa-exclamation-triangle fa-3x text-warning"></i>
+                  </div>
+                  <h3 class="card-title">Access Denied</h3>
+                  <p class="card-text text-muted mb-4">
+                    You don't have permission to view subscriptions. Please contact your administrator.
+                  </p>
+                  <a href="./index" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                  </a>
+                </div>
+              </div>
+            </div>
+          <?php else: ?>
+            <?php include("./view_subscriptions.php"); ?>
+          <?php endif; ?>
           <!-- column -->
         </div>
       </div>

@@ -70,28 +70,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (mysqli_query($conn, $insertQuery)) {
             $courseId = mysqli_insert_id($conn);
             
-            // Insert pricing
-            $amount = (float)$_POST['amount'];
-            $pricingDescription = mysqli_real_escape_string($conn, $_POST['pricingDescription']);
-            $currency = $_POST['currency'];
-            $discountAmount = (float)$_POST['discountAmount'];
-            $discountStartDate = $_POST['discountStartDate'] ?: null;
-            $discountEndDate = $_POST['discountEndDate'] ?: null;
-            $isFree = isset($_POST['isFree']) ? 1 : 0;
-            
-            $pricingQuery = "INSERT INTO CoursePricing (courseId, amount, pricingDescription, currency, discountAmount, discountStartDate, discountEndDate, isFree) VALUES ($courseId, $amount, '$pricingDescription', '$currency', $discountAmount, " . ($discountStartDate ? "'$discountStartDate'" : 'NULL') . ", " . ($discountEndDate ? "'$discountEndDate'" : 'NULL') . ", $isFree)";
-            
-            if (mysqli_query($conn, $pricingQuery)) {
-                $message = 'Course created successfully!';
-                $messageType = 'success';
-                
-                // Redirect to course editor
-                header("Location: course-editor.php?id=$courseId");
-                exit;
-            } else {
-                $message = 'Course created but pricing failed: ' . mysqli_error($conn);
-                $messageType = 'error';
+            // Insert course tags
+            if (isset($_POST['tags']) && is_array($_POST['tags'])) {
+                foreach ($_POST['tags'] as $tag) {
+                    $tagDescription = mysqli_real_escape_string($conn, $tag['description']);
+                    $tagIcon = mysqli_real_escape_string($conn, $tag['icon']);
+                    $tagColor = mysqli_real_escape_string($conn, $tag['color']);
+                    
+                    $tagQuery = "INSERT INTO CourseTags (courseId, tagDescription, courseTagIcon, tagColor) VALUES ($courseId, '$tagDescription', '$tagIcon', '$tagColor')";
+                    mysqli_query($conn, $tagQuery);
+                }
             }
+            
+            // Insert pricing options
+            if (isset($_POST['pricing_options']) && is_array($_POST['pricing_options'])) {
+                foreach ($_POST['pricing_options'] as $pricing) {
+                    $amount = (float)$pricing['amount'];
+                    $pricingDescription = mysqli_real_escape_string($conn, $pricing['description']);
+                    $currency = mysqli_real_escape_string($conn, $pricing['currency']);
+                    $discountAmount = (float)$pricing['discountAmount'];
+                    $discountStartDate = $pricing['discountStartDate'] ?: null;
+                    $discountEndDate = $pricing['discountEndDate'] ?: null;
+                    $isFree = isset($pricing['isFree']) ? 1 : 0;
+                    
+                    $pricingQuery = "INSERT INTO CoursePricing (courseId, amount, pricingDescription, currency, discountAmount, discountStartDate, discountEndDate, isFree) VALUES ($courseId, $amount, '$pricingDescription', '$currency', $discountAmount, " . ($discountStartDate ? "'$discountStartDate'" : 'NULL') . ", " . ($discountEndDate ? "'$discountEndDate'" : 'NULL') . ", $isFree)";
+                    mysqli_query($conn, $pricingQuery);
+                }
+            } else {
+                // Insert default pricing if no pricing options provided
+                $amount = (float)$_POST['amount'];
+                $pricingDescription = mysqli_real_escape_string($conn, $_POST['pricingDescription']);
+                $currency = $_POST['currency'];
+                $discountAmount = (float)$_POST['discountAmount'];
+                $discountStartDate = $_POST['discountStartDate'] ?: null;
+                $discountEndDate = $_POST['discountEndDate'] ?: null;
+                $isFree = isset($_POST['isFree']) ? 1 : 0;
+                
+                $pricingQuery = "INSERT INTO CoursePricing (courseId, amount, pricingDescription, currency, discountAmount, discountStartDate, discountEndDate, isFree) VALUES ($courseId, $amount, '$pricingDescription', '$currency', $discountAmount, " . ($discountStartDate ? "'$discountStartDate'" : 'NULL') . ", " . ($discountEndDate ? "'$discountEndDate'" : 'NULL') . ", $isFree)";
+                mysqli_query($conn, $pricingQuery);
+            }
+            
+            $message = 'Course created successfully!';
+            $messageType = 'success';
+            
+            // Redirect to course editor
+            header("Location: course-editor.php?id=$courseId");
+            exit;
         } else {
             $message = 'Error creating course: ' . mysqli_error($conn);
             $messageType = 'error';
@@ -203,6 +227,124 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     .status-open { background: #d4edda; color: #155724; }
     .status-closed { background: #f8d7da; color: #721c24; }
     .status-inactive { background: #e2e3e5; color: #383d41; }
+
+    /* Tag Icon Selector */
+    .tag-icon-preview {
+        display: inline-block;
+        margin-left: 0.5rem;
+        font-size: 1.2rem;
+        color: #0E77C2;
+    }
+
+    .tag-icon-selector {
+        position: relative;
+    }
+
+    .tag-icon-selector select {
+        padding-right: 2.5rem;
+    }
+
+    .tag-icon-selector::after {
+        content: '\f078';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: #6c757d;
+    }
+
+    /* Course Tags Styles */
+    .tag-item {
+        display: inline-flex;
+        align-items: center;
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 20px;
+        padding: 0.375rem 0.75rem;
+        margin: 0.25rem;
+        font-size: 0.875rem;
+    }
+
+    .tag-item .tag-icon {
+        margin-right: 0.5rem;
+    }
+
+    .tag-item .tag-remove {
+        margin-left: 0.5rem;
+        cursor: pointer;
+        color: #dc3545;
+    }
+
+    .tag-item .tag-remove:hover {
+        color: #a71e2a;
+    }
+
+    /* Pricing Options Styles */
+    .pricing-option {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        position: relative;
+    }
+
+    .pricing-option-header {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .pricing-option-title {
+        font-weight: 600;
+        color: #495057;
+        margin: 0;
+    }
+
+    .pricing-option-remove {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: none;
+        border: none;
+        color: #dc3545;
+        cursor: pointer;
+        font-size: 1.2rem;
+    }
+
+    .pricing-option-remove:hover {
+        color: #a71e2a;
+    }
+
+    .price-input-group {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .currency-display {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .currency-symbol {
+        font-weight: 600;
+        color: #495057;
+        min-width: 3rem;
+    }
+
+    .currency-select {
+        min-width: 120px;
+    }
+
+    .amount-input {
+        flex: 1;
+    }
 </style>
 
 <body>
@@ -316,6 +458,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                             </div>
 
+                            <!-- Course Tags -->
+                            <div class="form-card">
+                                <h5 class="section-title">Course Tags</h5>
+                                <p class="text-muted">Add tags to help categorize and organize your course.</p>
+                                
+                                <div class="mb-3">
+                                    <label for="tagDescription" class="form-label">Tag Description</label>
+                                    <input type="text" class="form-control" id="tagDescription" placeholder="e.g., Programming, Beginner, Online">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="tagIcon" class="form-label">Tag Icon</label>
+                                    <div class="tag-icon-selector">
+                                        <select class="form-control" id="tagIcon" onchange="updateTagIconPreview()">
+                                            <option value="fas fa-tag">General Tag</option>
+                                            <option value="fas fa-code">Programming</option>
+                                            <option value="fas fa-graduation-cap">Education</option>
+                                            <option value="fas fa-book">Study</option>
+                                            <option value="fas fa-laptop">Online</option>
+                                            <option value="fas fa-users">Group</option>
+                                            <option value="fas fa-clock">Time</option>
+                                            <option value="fas fa-star">Featured</option>
+                                            <option value="fas fa-trophy">Achievement</option>
+                                            <option value="fas fa-certificate">Certificate</option>
+                                            <option value="fas fa-chart-line">Analytics</option>
+                                            <option value="fas fa-lightbulb">Idea</option>
+                                            <option value="fas fa-rocket">Launch</option>
+                                            <option value="fas fa-fire">Popular</option>
+                                            <option value="fas fa-heart">Favorite</option>
+                                            <option value="fas fa-gem">Premium</option>
+                                            <option value="fas fa-shield-alt">Security</option>
+                                            <option value="fas fa-mobile-alt">Mobile</option>
+                                            <option value="fas fa-globe">Global</option>
+                                            <option value="fas fa-puzzle-piece">Puzzle</option>
+                                            <option value="fas fa-cogs">Technical</option>
+                                            <option value="fas fa-paint-brush">Creative</option>
+                                            <option value="fas fa-brain">Intelligence</option>
+                                            <option value="fas fa-handshake">Partnership</option>
+                                            <option value="fas fa-leaf">Eco-friendly</option>
+                                        </select>
+                                        <span id="tagIconPreview" class="tag-icon-preview">
+                                            <i class="fas fa-tag"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="tagColor" class="form-label">Tag Color</label>
+                                    <input type="color" class="form-control" id="tagColor" value="#007bff">
+                                </div>
+                                
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="addTag()">
+                                    <i class="fas fa-plus me-1"></i>Add Tag
+                                </button>
+                                
+                                <div id="tagsList" class="mt-3">
+                                    <!-- Tags will be added here dynamically -->
+                                </div>
+                            </div>
+
                             <!-- Course Content -->
                             <div class="form-card">
                                 <h5 class="section-title">Course Content</h5>
@@ -343,7 +545,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                             <!-- Pricing Information -->
                             <div class="form-card">
-                                <h5 class="section-title">Pricing</h5>
+                                <h5 class="section-title">Pricing Options</h5>
+                                <p class="text-muted">Add multiple pricing tiers for your course.</p>
                                 
                                 <div class="mb-3">
                                     <div class="form-check">
@@ -356,53 +559,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                 <div id="pricingFields">
                                     <div class="mb-3">
-                                        <label for="amount" class="form-label">Price *</label>
-                                            <div class="price-input-group">
-                                            <div class="currency-display">
-                                                <span class="currency-symbol" id="currencySymbol">RWF</span>
-                                                <select class="form-control currency-select" id="currency" name="currency">
-                                                    <?php if ($currenciesResult && mysqli_num_rows($currenciesResult) > 0): ?>
-                                                        <?php while ($currency = mysqli_fetch_assoc($currenciesResult)): ?>
-                                                            <option value="<?php echo $currency['currencyCode']; ?>" 
-                                                                    data-symbol="<?php echo htmlspecialchars($currency['currencySymbol']); ?>"
-                                                                    <?php echo $currency['currencyCode'] === 'RWF' ? 'selected' : ''; ?>>
-                                                                <?php echo $currency['currencyCode'] . ' - ' . $currency['currencyName']; ?>
-                                                            </option>
-                                                        <?php endwhile; ?>
-                                                    <?php else: ?>
-                                                        <option value="RWF">RWF - Rwandan Franc</option>
-                                                        <option value="USD">USD - US Dollar</option>
-                                                        <option value="EUR">EUR - Euro</option>
-                                                    <?php endif; ?>
-                                                </select>
-                                            </div>
-                                            <input type="number" class="form-control amount-input" id="amount" name="amount" step="0.01" min="0" value="0">
-                                        </div>
+                                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addPricingOption()">
+                                            <i class="fas fa-plus me-1"></i>Add Pricing Option
+                                        </button>
                                     </div>
-
-                                    <div class="mb-3">
-                                        <label for="pricingDescription" class="form-label">Pricing Description</label>
-                                        <textarea class="form-control" id="pricingDescription" name="pricingDescription" rows="3" placeholder="Additional pricing information"></textarea>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <div class="mb-3">
-                                                <label for="discountAmount" class="form-label">Discount Amount</label>
-                                                <input type="number" class="form-control" id="discountAmount" name="discountAmount" step="0.01" min="0" value="0">
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="mb-3">
-                                                <label for="discountStartDate" class="form-label">Discount Start</label>
-                                                <input type="date" class="form-control" id="discountStartDate" name="discountStartDate">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="discountEndDate" class="form-label">Discount End</label>
-                                        <input type="date" class="form-control" id="discountEndDate" name="discountEndDate">
+                                    
+                                    <div id="pricingOptionsList">
+                                        <!-- Pricing options will be added here dynamically -->
                                     </div>
                                 </div>
                             </div>
@@ -437,32 +600,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script>
         // Image upload functionality
-        const imageUploadArea = document.getElementById('imageUploadArea');
-        const coursePhoto = document.getElementById('coursePhoto');
-        const imagePreview = document.getElementById('imagePreview');
-        const previewImg = document.getElementById('previewImg');
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageUploadArea = document.getElementById('imageUploadArea');
+            const coursePhoto = document.getElementById('coursePhoto');
+            const imagePreview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
 
-        imageUploadArea.addEventListener('click', () => coursePhoto.click());
-        imageUploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            imageUploadArea.classList.add('dragover');
-        });
-        imageUploadArea.addEventListener('dragleave', () => {
-            imageUploadArea.classList.remove('dragover');
-        });
-        imageUploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            imageUploadArea.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                coursePhoto.files = files;
-                handleImagePreview(files[0]);
-            }
-        });
+            if (imageUploadArea && coursePhoto) {
+                imageUploadArea.addEventListener('click', () => coursePhoto.click());
+                imageUploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    imageUploadArea.classList.add('dragover');
+                });
+                imageUploadArea.addEventListener('dragleave', () => {
+                    imageUploadArea.classList.remove('dragover');
+                });
+                imageUploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    imageUploadArea.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        coursePhoto.files = files;
+                        handleImagePreview(files[0]);
+                    }
+                });
 
-        coursePhoto.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                handleImagePreview(e.target.files[0]);
+                coursePhoto.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        handleImagePreview(e.target.files[0]);
+                    }
+                });
             }
         });
 
@@ -470,83 +637,359 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (file && file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    previewImg.src = e.target.result;
-                    imageUploadArea.style.display = 'none';
-                    imagePreview.style.display = 'block';
+                    const previewImg = document.getElementById('previewImg');
+                    const imageUploadArea = document.getElementById('imageUploadArea');
+                    const imagePreview = document.getElementById('imagePreview');
+                    
+                    if (previewImg) previewImg.src = e.target.result;
+                    if (imageUploadArea) imageUploadArea.style.display = 'none';
+                    if (imagePreview) imagePreview.style.display = 'block';
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        function removeImage() {
-            coursePhoto.value = '';
-            imageUploadArea.style.display = 'block';
-            imagePreview.style.display = 'none';
+        window.removeImage = function() {
+            const coursePhoto = document.getElementById('coursePhoto');
+            const imageUploadArea = document.getElementById('imageUploadArea');
+            const imagePreview = document.getElementById('imagePreview');
+            
+            if (coursePhoto) coursePhoto.value = '';
+            if (imageUploadArea) imageUploadArea.style.display = 'block';
+            if (imagePreview) imagePreview.style.display = 'none';
         }
 
         // Free course toggle
-        const isFreeCheckbox = document.getElementById('isFree');
-        const pricingFields = document.getElementById('pricingFields');
+        document.addEventListener('DOMContentLoaded', function() {
+            const isFreeCheckbox = document.getElementById('isFree');
+            const pricingFields = document.getElementById('pricingFields');
 
-        isFreeCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                pricingFields.style.display = 'none';
-                document.getElementById('amount').value = '0';
-            } else {
-                pricingFields.style.display = 'block';
+            if (isFreeCheckbox && pricingFields) {
+                isFreeCheckbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        pricingFields.style.display = 'none';
+                        const amountField = document.getElementById('amount');
+                        if (amountField) amountField.value = '0';
+                    } else {
+                        pricingFields.style.display = 'block';
+                    }
+                });
             }
         });
 
         // Form validation
-        document.getElementById('courseForm').addEventListener('submit', function(e) {
-            const startDate = new Date(document.getElementById('courseStartDate').value);
-            const regEndDate = new Date(document.getElementById('courseRegEndDate').value);
-            const endDate = new Date(document.getElementById('courseEndDate').value);
+        document.addEventListener('DOMContentLoaded', function() {
+            const courseForm = document.getElementById('courseForm');
+            if (courseForm) {
+                courseForm.addEventListener('submit', function(e) {
+                    const startDate = new Date(document.getElementById('courseStartDate').value);
+                    const regEndDate = new Date(document.getElementById('courseRegEndDate').value);
+                    const endDate = new Date(document.getElementById('courseEndDate').value);
+                    const isFreeCheckbox = document.getElementById('isFree');
 
-            if (regEndDate >= startDate) {
-                alert('Registration end date must be before course start date');
-                e.preventDefault();
-                return;
-            }
+                    if (regEndDate >= startDate) {
+                        alert('Registration end date must be before course start date');
+                        e.preventDefault();
+                        return;
+                    }
 
-            if (endDate <= startDate) {
-                alert('Course end date must be after course start date');
-                e.preventDefault();
-                return;
-            }
+                    if (endDate <= startDate) {
+                        alert('Course end date must be after course start date');
+                        e.preventDefault();
+                        return;
+                    }
 
-            if (!isFreeCheckbox.checked && parseFloat(document.getElementById('amount').value) < 0) {
-                alert('Price cannot be negative');
-                e.preventDefault();
-                return;
+                    if (!isFreeCheckbox.checked && parseFloat(document.getElementById('amount').value) < 0) {
+                        alert('Price cannot be negative');
+                        e.preventDefault();
+                        return;
+                    }
+                });
             }
         });
 
         // Auto-hide alerts
-        setTimeout(function() {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(function(alert) {
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            });
-        }, 5000);
-
-        // Handle currency selection
-        document.getElementById('currency').addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            const symbol = selectedOption.getAttribute('data-symbol');
-            document.getElementById('currencySymbol').textContent = symbol || selectedOption.value;
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
         });
 
-        // Initialize currency symbol on page load
+        // Handle currency selection
         document.addEventListener('DOMContentLoaded', function() {
             const currencySelect = document.getElementById('currency');
             if (currencySelect) {
+                currencySelect.addEventListener('change', function() {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const symbol = selectedOption.getAttribute('data-symbol');
+                    const currencySymbol = document.getElementById('currencySymbol');
+                    if (currencySymbol) {
+                        currencySymbol.textContent = symbol || selectedOption.value;
+                    }
+                });
+
+                // Initialize currency symbol on page load
                 const selectedOption = currencySelect.options[currencySelect.selectedIndex];
                 const symbol = selectedOption.getAttribute('data-symbol');
-                document.getElementById('currencySymbol').textContent = symbol || selectedOption.value;
+                const currencySymbol = document.getElementById('currencySymbol');
+                if (currencySymbol) {
+                    currencySymbol.textContent = symbol || selectedOption.value;
+                }
             }
         });
+
+        // Course Tags functionality
+        let tags = [];
+        let pricingOptions = [];
+
+        // Update tag icon preview
+        function updateTagIconPreview() {
+            const select = document.getElementById('tagIcon');
+            const preview = document.getElementById('tagIconPreview');
+            if (select && preview) {
+                const selectedIcon = select.value;
+                preview.innerHTML = `<i class="${selectedIcon}"></i>`;
+            }
+        }
+
+        // Multiple Pricing Options functionality - Define functions globally
+        window.addPricingOption = function() {
+            console.log('addPricingOption called');
+            const pricingOption = {
+                description: '',
+                amount: 0,
+                currency: 'RWF',
+                discountAmount: 0,
+                discountStartDate: '',
+                discountEndDate: '',
+                isFree: false
+            };
+
+            pricingOptions.push(pricingOption);
+            console.log('pricingOptions after push:', pricingOptions);
+            renderPricingOptions();
+        }
+
+        window.removePricingOption = function(index) {
+            pricingOptions.splice(index, 1);
+            renderPricingOptions();
+        }
+
+        function renderPricingOptions() {
+            console.log('renderPricingOptions called with pricingOptions:', pricingOptions);
+            const pricingList = document.getElementById('pricingOptionsList');
+            if (!pricingList) {
+                console.error('pricingOptionsList element not found');
+                return;
+            }
+            pricingList.innerHTML = '';
+
+            pricingOptions.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'pricing-option';
+                optionElement.innerHTML = `
+                    <button type="button" class="pricing-option-remove" onclick="removePricingOption(${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <h6 class="pricing-option-title">Pricing Option ${index + 1}</h6>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <input type="text" class="form-control pricing-description" 
+                               value="${option.description}" placeholder="e.g., Basic Plan, Premium Plan"
+                               onchange="updatePricingOption(${index}, 'description', this.value)">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" 
+                                   ${option.isFree ? 'checked' : ''} onchange="togglePricingFields(${index}); updatePricingOption(${index}, 'isFree', this.checked)">
+                            <label class="form-check-label">Free Option</label>
+                        </div>
+                    </div>
+                    
+                    <div class="pricing-fields-${index}" style="${option.isFree ? 'display: none;' : ''}">
+                        <div class="mb-3">
+                            <label class="form-label">Price</label>
+                            <div class="price-input-group">
+                                <div class="currency-display">
+                                    <span class="currency-symbol" id="currencySymbol${index}">RWF</span>
+                                    <select class="form-control currency-select" 
+                                            onchange="updateCurrencySymbol(${index}, this.value); updatePricingOption(${index}, 'currency', this.value)">
+                                        <option value="RWF" data-symbol="RWF" ${option.currency === 'RWF' ? 'selected' : ''}>RWF - Rwandan Franc</option>
+                                        <option value="USD" data-symbol="$" ${option.currency === 'USD' ? 'selected' : ''}>USD - US Dollar</option>
+                                        <option value="EUR" data-symbol="€" ${option.currency === 'EUR' ? 'selected' : ''}>EUR - Euro</option>
+                                    </select>
+                                </div>
+                                <input type="number" class="form-control amount-input" 
+                                       value="${option.amount}" step="0.01" min="0"
+                                       onchange="updatePricingOption(${index}, 'amount', this.value)">
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Discount Amount</label>
+                                    <input type="number" class="form-control" 
+                                           value="${option.discountAmount}" step="0.01" min="0"
+                                           onchange="updatePricingOption(${index}, 'discountAmount', this.value)">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Discount Start</label>
+                                    <input type="date" class="form-control" 
+                                           value="${option.discountStartDate}"
+                                           onchange="updatePricingOption(${index}, 'discountStartDate', this.value)">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Discount End</label>
+                            <input type="date" class="form-control" 
+                                   value="${option.discountEndDate}"
+                                   onchange="updatePricingOption(${index}, 'discountEndDate', this.value)">
+                        </div>
+                    </div>
+                `;
+                pricingList.appendChild(optionElement);
+                
+                // Initialize currency symbol
+                updateCurrencySymbol(index, option.currency);
+            });
+        }
+
+        // Update pricing option data
+        window.updatePricingOption = function(index, field, value) {
+            if (pricingOptions[index]) {
+                if (field === 'isFree') {
+                    pricingOptions[index][field] = value;
+                } else {
+                    pricingOptions[index][field] = value;
+                }
+            }
+        }
+
+        window.togglePricingFields = function(index) {
+            const fields = document.querySelector(`.pricing-fields-${index}`);
+            const checkbox = document.querySelector(`input[onchange*="togglePricingFields(${index})"]`);
+            
+            if (checkbox && checkbox.checked) {
+                if (fields) fields.style.display = 'none';
+                const amountInput = document.querySelector(`.pricing-fields-${index} .amount-input`);
+                if (amountInput) amountInput.value = '0';
+            } else {
+                if (fields) fields.style.display = 'block';
+            }
+        }
+
+        window.updateCurrencySymbol = function(index, currency) {
+            const select = document.querySelector(`.pricing-fields-${index} .currency-select`);
+            if (select) {
+                const selectedOption = select.options[select.selectedIndex];
+                const symbol = selectedOption.getAttribute('data-symbol');
+                const symbolElement = document.getElementById(`currencySymbol${index}`);
+                if (symbolElement) {
+                    symbolElement.textContent = symbol || currency;
+                }
+            }
+        }
+
+        function addTag() {
+            const description = document.getElementById('tagDescription').value.trim();
+            const icon = document.getElementById('tagIcon').value.trim();
+            const color = document.getElementById('tagColor').value;
+
+            if (!description) {
+                alert('Please enter a tag description');
+                return;
+            }
+
+            const tag = {
+                description: description,
+                icon: icon || 'fas fa-tag',
+                color: color
+            };
+
+            tags.push(tag);
+            renderTags();
+            
+            // Clear inputs
+            document.getElementById('tagDescription').value = '';
+            document.getElementById('tagIcon').value = '';
+            document.getElementById('tagColor').value = '#007bff';
+        }
+
+        function removeTag(index) {
+            tags.splice(index, 1);
+            renderTags();
+        }
+
+        function renderTags() {
+            const tagsList = document.getElementById('tagsList');
+            tagsList.innerHTML = '';
+
+            tags.forEach((tag, index) => {
+                const tagElement = document.createElement('div');
+                tagElement.className = 'tag-item';
+                tagElement.style.borderColor = tag.color;
+                tagElement.innerHTML = `
+                    <i class="${tag.icon} tag-icon" style="color: ${tag.color}"></i>
+                    <span>${tag.description}</span>
+                    <i class="fas fa-times tag-remove" onclick="removeTag(${index})"></i>
+                `;
+                tagsList.appendChild(tagElement);
+            });
+        }
+
+
+        // Form submission - add hidden inputs for tags and pricing options
+        document.addEventListener('DOMContentLoaded', function() {
+            const courseForm = document.getElementById('courseForm');
+            if (courseForm) {
+                courseForm.addEventListener('submit', function(e) {
+                    // Add hidden inputs for tags
+                    tags.forEach((tag, index) => {
+                        const hiddenInputs = `
+                            <input type="hidden" name="tags[${index}][description]" value="${tag.description}">
+                            <input type="hidden" name="tags[${index}][icon]" value="${tag.icon}">
+                            <input type="hidden" name="tags[${index}][color]" value="${tag.color}">
+                        `;
+                        this.insertAdjacentHTML('beforeend', hiddenInputs);
+                    });
+                    
+                    // Add hidden inputs for pricing options
+                    pricingOptions.forEach((option, index) => {
+                        const hiddenInputs = `
+                            <input type="hidden" name="pricing_options[${index}][description]" value="${option.description}">
+                            <input type="hidden" name="pricing_options[${index}][amount]" value="${option.amount}">
+                            <input type="hidden" name="pricing_options[${index}][currency]" value="${option.currency}">
+                            <input type="hidden" name="pricing_options[${index}][discountAmount]" value="${option.discountAmount}">
+                            <input type="hidden" name="pricing_options[${index}][discountStartDate]" value="${option.discountStartDate}">
+                            <input type="hidden" name="pricing_options[${index}][discountEndDate]" value="${option.discountEndDate}">
+                            <input type="hidden" name="pricing_options[${index}][isFree]" value="${option.isFree ? '1' : '0'}">
+                        `;
+                        this.insertAdjacentHTML('beforeend', hiddenInputs);
+                    });
+                });
+            }
+        });
+
+        // Initialize page on load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing pricing options...');
+            console.log('pricingOptions array:', pricingOptions);
+            console.log('addPricingOption function:', typeof addPricingOption);
+            addPricingOption();
+            updateTagIconPreview();
+        });
+
     </script>
 </body>
 </html>
