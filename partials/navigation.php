@@ -295,7 +295,7 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 	top: 48px; /* Below top bar */
 	left: 0;
 	right: 0;
-	z-index: 999;
+	z-index: 1500; /* above top bar to ensure dropdown visibility */
 }
 
 .nav-container {
@@ -394,7 +394,7 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 	transition: all 0.3s ease;
 	list-style: none;
 	margin: 0;
-	z-index: 1000;
+	z-index: 1600; /* ensure above other elements */
 }
 
 .dropdown:hover .dropdown-menu {
@@ -673,75 +673,57 @@ document.addEventListener('DOMContentLoaded', function() {
 	const hamburgerMenu = document.getElementById('hamburger-menu');
 	const mobileNavOverlay = document.getElementById('mobile-nav-overlay');
 	const mobileClose = document.getElementById('mobile-close');
+
+	// Support multiple dropdown toggles/menus if present
+	const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+	const dropdownMenus = document.querySelectorAll('.dropdown-menu');
 	
-	// Desktop Dropdown Toggle
-	const dropdownToggle = document.querySelector('.dropdown-toggle');
-	const dropdownMenu = document.querySelector('.dropdown-menu');
-	
-	if (dropdownToggle && dropdownMenu) {
-		console.log('Dropdown elements found:', dropdownToggle, dropdownMenu);
+	dropdownToggles.forEach(function(tgl) {
+		const menu = tgl.parentElement.querySelector('.dropdown-menu');
+		if (!menu) return;
 		
-		// Toggle dropdown on click
-		dropdownToggle.addEventListener('click', function(e) {
+		tgl.addEventListener('click', function(e) {
 			e.preventDefault();
 			e.stopPropagation();
-			console.log('Dropdown clicked, toggling...');
-			dropdownMenu.classList.toggle('active');
+			menu.classList.toggle('active');
 		});
-		
-		// Prevent dropdown from closing when clicking inside it
-		dropdownMenu.addEventListener('click', function(e) {
-			e.stopPropagation();
-		});
-		
-		// Close dropdown when clicking outside
-		document.addEventListener('click', function(e) {
-			if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
-				dropdownMenu.classList.remove('active');
-			}
-		});
-		
-		// Close dropdown on escape key
-		document.addEventListener('keydown', function(e) {
-			if (e.key === 'Escape') {
-				dropdownMenu.classList.remove('active');
-			}
-		});
-		
-		// Close dropdown when window is resized
-		window.addEventListener('resize', function() {
-			dropdownMenu.classList.remove('active');
-		});
-	} else {
-		console.log('Dropdown elements not found:', dropdownToggle, dropdownMenu);
-	}
-	
-	// Open mobile menu
-	hamburgerMenu.addEventListener('click', function() {
-		mobileNavOverlay.classList.add('active');
-		document.body.style.overflow = 'hidden';
 	});
-	
-	// Close mobile menu
-	mobileClose.addEventListener('click', function() {
-		mobileNavOverlay.classList.remove('active');
-		document.body.style.overflow = '';
+
+	// Close when clicking outside
+	document.addEventListener('click', function(e) {
+		dropdownMenus.forEach(function(menu) { menu.classList.remove('active'); });
 	});
-	
-	// Close mobile menu when clicking outside
-	mobileNavOverlay.addEventListener('click', function(e) {
-		if (e.target === mobileNavOverlay) {
-			mobileNavOverlay.classList.remove('active');
-			document.body.style.overflow = '';
-		}
-	});
-	
-	// Close mobile menu when pressing Escape key
+
+	// Close on escape and resize
 	document.addEventListener('keydown', function(e) {
-		if (e.key === 'Escape' && mobileNavOverlay.classList.contains('active')) {
+		if (e.key === 'Escape') dropdownMenus.forEach(function(menu){ menu.classList.remove('active'); });
+	});
+	window.addEventListener('resize', function(){ dropdownMenus.forEach(function(menu){ menu.classList.remove('active'); }); });
+
+	// Open mobile menu
+	if (hamburgerMenu) {
+		hamburgerMenu.addEventListener('click', function() {
+			mobileNavOverlay.classList.add('active');
+			document.body.style.overflow = 'hidden';
+		});
+	}
+
+	// Close mobile menu
+	if (mobileClose) {
+		mobileClose.addEventListener('click', function() {
 			mobileNavOverlay.classList.remove('active');
 			document.body.style.overflow = '';
-		}
-	});
+		});
+	}
+
+	// Close mobile menu when clicking outside
+	if (mobileNavOverlay) {
+		mobileNavOverlay.addEventListener('click', function(e) {
+			if (e.target === mobileNavOverlay) {
+				mobileNavOverlay.classList.remove('active');
+				document.body.style.overflow = '';
+			}
+		});
+	}
 });
 </script>

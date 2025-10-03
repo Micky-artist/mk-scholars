@@ -5,7 +5,15 @@ include('./config.php');
 session_start();
 
 if (!isset($_SESSION['userId'])) {
-  header("Location: ../login");
+  $currentUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+  $next = urlencode('/mkscholars/courses');
+  if (!empty($_SERVER['HTTP_REFERER'])) {
+    $ref = $_SERVER['HTTP_REFERER'];
+    if (stripos($ref, '/courses') !== false) {
+      $next = urlencode(parse_url($ref, PHP_URL_PATH) . (parse_url($ref, PHP_URL_QUERY) ? ('?' . parse_url($ref, PHP_URL_QUERY)) : ''));
+    }
+  }
+  header("Location: ../login?next=" . $next);
   exit;
 }
 // --- 0) SECURITY HEADERS & HTTPS REDIRECT ---
@@ -60,7 +68,6 @@ $courseName = $pricingData['courseName'];
 $courseDescription = $pricingData['pricingDescription'] ?: $pricingData['courseDescription'];
 
 // --- 4) FETCH USER SECURELY (PREPARED) ---
-include('../dbconnection/connection.php');
 $stmt = $conn->prepare("SELECT NoUsername, NoEmail, NoPhone
     FROM normUsers
     WHERE NoUserId = ?");
@@ -104,7 +111,11 @@ $transaction_id = 'TX-' . time() . '-' . $courseId;
 $userId = isset($_SESSION['userId']) ? (int)$_SESSION['userId'] : 0;
 
 // --- 7) FLUTTERWAVE V4 API PAYMENT CREATION ---
-$secretKey = "54cadf5f-a20f-4af5-8825-36e0121da065";
+$secretKey = defined('FLUTTERWAVE_SECRET_KEY') ? FLUTTERWAVE_SECRET_KEY : "";
+if (empty($secretKey) || $secretKey === 'YOUR_SECRET_KEY') {
+    // Fallback to previously working key if config isn't set
+    $secretKey = "54cadf5f-a20f-4af5-8825-36e0121da065";
+}
 $baseUrl = "https://api.flutterwave.com"; // v4 base (live)
 
 // Payment request payload for v4 API

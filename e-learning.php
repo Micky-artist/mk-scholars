@@ -668,7 +668,8 @@ function formatPrice($amount, $currencySymbol, $currency) {
                                         
                                         switch($buttonInfo['action']) {
                                             case 'login':
-                                                $buttonUrl = './login';
+                                                $next = urlencode('/mkscholars/e-learning');
+                                                $buttonUrl = './login?next=' . $next;
                                                 break;
                                             case 'open':
                                                 $buttonUrl = './course-details?id=' . $course['courseId'];
@@ -681,6 +682,10 @@ function formatPrice($amount, $currencySymbol, $currency) {
                                         <button onclick="window.location.href='<?php echo $buttonUrl; ?>'" class="enroll-button">
                                             <i class="fas fa-arrow-right"></i>
                                             <?php echo $buttonInfo['text']; ?> (Iyandikishe)
+                                        </button>
+                                        <button onclick="window.location.href='./request-help?course=<?php echo $course['courseId']; ?>'" class="enroll-button" style="background:#6b7280">
+                                            <i class="fas fa-life-ring"></i>
+                                            Ask for help
                                         </button>
                                     </div>
                                 </div>

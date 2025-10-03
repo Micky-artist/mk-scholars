@@ -1,4 +1,5 @@
 <?php
+session_start();
 include("./dbconnection/connection.php");
 
 // Fetch courses from database only
@@ -103,6 +104,7 @@ function getStatusClass($status) {
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             color: var(--gray-800);
             line-height: 1.6;
+            padding-top: 140px; /* account for fixed top bar + nav */
         }
 
         /* ==== Main Container ==== */
@@ -410,6 +412,7 @@ function getStatusClass($status) {
 
         /* ==== Responsive Design ==== */
         @media (max-width: 768px) {
+            body { padding-top: 110px; }
             .main-container {
                 padding: 0.5rem 1rem;
             }
@@ -458,6 +461,7 @@ function getStatusClass($status) {
         }
 
         @media (max-width: 480px) {
+            body { padding-top: 100px; }
             .courses-grid {
                 gap: 0.75rem;
             }
@@ -621,9 +625,17 @@ function getStatusClass($status) {
                             </div>
                             
                             <div class="course-actions">
-                                <button onclick="window.location.href='./subscription?course=<?php echo $course['courseId']; ?>'" class="enroll-button">
+                                <?php
+                                    $isLoggedIn = isset($_SESSION) && isset($_SESSION['userId']);
+                                    $next = urlencode('/mkscholars/courses');
+                                ?>
+                                <button onclick="window.location.href='<?php echo $isLoggedIn ? ('./subscription?course=' . $course['courseId']) : ('./login?next=' . $next); ?>'" class="enroll-button">
                                     <i class="fas fa-arrow-right"></i>
                                     Register Now (Iyandikishe)
+                                </button>
+                                <button onclick="window.location.href='./request-help?course=<?php echo $course['courseId']; ?>'" class="enroll-button" style="background:#6b7280">
+                                    <i class="fas fa-life-ring"></i>
+                                    Ask for help
                                 </button>
                             </div>
                         </div>
