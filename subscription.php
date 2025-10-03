@@ -193,6 +193,7 @@ if (isset($_POST['checkout'])) {
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding-top: 120px; /* Account for fixed navigation */
         }
 
         .hero-title {
@@ -384,104 +385,6 @@ if (isset($_POST['checkout'])) {
             margin-top: 5px;
         }
 
-        .navbar {
-            margin-bottom: 1cm;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(15px);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-            padding: .2rem 2rem;
-            top: 0 !important;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .navbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            text-decoration: none;
-        }
-
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.2rem;
-        }
-
-        .brand-text {
-            font-size: 1.4rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .navbar-nav {
-            display: flex !important;
-            flex-direction: row;
-            gap: 2rem;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-
-        .nav-link {
-            color: #4a4a4a;
-            text-decoration: none;
-            font-weight: 500;
-            position: relative;
-            padding: 0.5rem 0;
-        }
-
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary);
-            transition: width 0.3s ease;
-        }
-
-        .nav-link:hover::after {
-            width: 100%;
-        }
-
-        .nav-button {
-            background: #2196F3;
-            color: white;
-            border: none;
-            padding: 0.8rem 1.8rem;
-            border-radius: 30px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .nav-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
-        }
-
-        .menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            color: var(--primary);
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
 
         /* Validation Error Styles */
         #validation-error {
@@ -534,7 +437,7 @@ if (isset($_POST['checkout'])) {
     </style>
 </head>
 <body>
-  <?php include("./partials/coursesNav.php"); ?>
+  <?php include("./partials/navigation.php"); ?>
 
   <div class="container">
     <form method="POST" class="form-section mb-4">

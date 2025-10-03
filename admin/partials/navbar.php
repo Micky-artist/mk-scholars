@@ -47,7 +47,7 @@
 
         <?php if (hasPermission('PublishApplication')): ?>
         <li class="sidebar-item">
-          <a class="sidebar-link waves-effect waves-dark sidebar-link <?php echo isActive('upload-scholarship', $currentPage) ? 'active' : ''; ?>" href="upload-scholarship" aria-expanded="false"><i class="mdi mdi-file-plus"></i><span class="hide-menu">Upload Scholarship</span></a>
+          <a class="sidebar-link waves-effect waves-dark sidebar-link <?php echo isActive('upload-scholarship', $currentPage) ? 'active' : ''; ?>" href="upload-scholarship" aria-expanded="false"><i class="bi bi-upload"></i><span class="hide-menu">Upload Scholarship</span></a>
         </li>
         <?php endif; ?>
 
@@ -136,6 +136,12 @@
         <?php if (hasPermission('ManageRights')): ?>
         <li class="sidebar-item">
           <a class="sidebar-link waves-effect waves-dark sidebar-link <?php echo isActive('subscriptions', $currentPage) ? 'active' : ''; ?>" href="subscriptions" aria-expanded="false"><i class="mdi mdi-credit-card"></i><span class="hide-menu">Subscriptions</span></a>
+        </li>
+        <?php endif; ?>
+
+        <?php if (hasPermission('ManageRights')): ?>
+        <li class="sidebar-item">
+          <a class="sidebar-link waves-effect waves-dark sidebar-link <?php echo isActive('coupons', $currentPage) ? 'active' : ''; ?>" href="coupons" aria-expanded="false"><i class="mdi mdi-ticket-percent"></i><span class="hide-menu">Coupons</span></a>
         </li>
         <?php endif; ?>
 

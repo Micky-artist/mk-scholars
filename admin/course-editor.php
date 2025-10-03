@@ -7,8 +7,10 @@ $courseId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $message = '';
 $messageType = '';
 
-// Get course data
-$courseQuery = "SELECT * FROM Courses WHERE courseId = $courseId";
+// Get course data with optimized query
+$courseQuery = "SELECT courseId, courseName, courseContent, courseDisplayStatus, 
+                       courseStartDate, courseEndDate, courseRegEndDate 
+                FROM Courses WHERE courseId = $courseId";
 $courseResult = mysqli_query($conn, $courseQuery);
 $course = mysqli_fetch_assoc($courseResult);
 
@@ -54,8 +56,12 @@ if (!$courseData) {
         'settings' => [
             'allowComments' => true,
             'showProgress' => true,
-            'enableDownloads' => true
-        ]
+            'enableDownloads' => true,
+            'publishDate' => null,
+            'unpublishDate' => null,
+            'visibilityMode' => 'immediate' // immediate, scheduled, hidden
+        ],
+        'links' => []
     ];
 }
 ?>
@@ -419,6 +425,63 @@ if (!$courseData) {
                             </button>
                         </div>
 
+                        <!-- Visibility Controls -->
+                        <div class="editor-sidebar">
+                            <h5 class="mb-3">Content Visibility</h5>
+                            <div class="theme-controls">
+                                <div class="mb-3">
+                                    <label class="form-label">Visibility Mode</label>
+                                    <select class="form-control" id="visibilityMode">
+                                        <option value="immediate" <?php echo $courseData['settings']['visibilityMode'] === 'immediate' ? 'selected' : ''; ?>>Immediate</option>
+                                        <option value="scheduled" <?php echo $courseData['settings']['visibilityMode'] === 'scheduled' ? 'selected' : ''; ?>>Scheduled</option>
+                                        <option value="hidden" <?php echo $courseData['settings']['visibilityMode'] === 'hidden' ? 'selected' : ''; ?>>Hidden</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3" id="publishDateContainer" style="display: none;">
+                                    <label class="form-label">Publish Date</label>
+                                    <input type="datetime-local" class="form-control" id="publishDate" 
+                                           value="<?php echo $courseData['settings']['publishDate'] ? date('Y-m-d\TH:i', strtotime($courseData['settings']['publishDate'])) : ''; ?>">
+                                </div>
+                                <div class="mb-3" id="unpublishDateContainer" style="display: none;">
+                                    <label class="form-label">Unpublish Date</label>
+                                    <input type="datetime-local" class="form-control" id="unpublishDate" 
+                                           value="<?php echo $courseData['settings']['unpublishDate'] ? date('Y-m-d\TH:i', strtotime($courseData['settings']['unpublishDate'])) : ''; ?>">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Links Management -->
+                        <div class="editor-sidebar">
+                            <h5 class="mb-3">Course Links</h5>
+                            <div class="theme-controls">
+                                <div class="mb-3">
+                                    <button class="btn btn-primary btn-sm w-100" onclick="showAddLinkModal()">
+                                        <i class="fas fa-plus me-2"></i>Add Link
+                                    </button>
+                                </div>
+                                <div id="linksList">
+                                    <?php foreach ($courseData['links'] as $index => $link): ?>
+                                        <div class="link-item mb-2 p-2 border rounded">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <strong><?php echo htmlspecialchars($link['title']); ?></strong>
+                                                    <br><small class="text-muted"><?php echo htmlspecialchars($link['url']); ?></small>
+                                                </div>
+                                                <div>
+                                                    <button class="btn btn-sm btn-outline-primary" onclick="editLink(<?php echo $index; ?>)">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteLink(<?php echo $index; ?>)">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Theme Controls -->
                         <div class="editor-sidebar">
                             <h5 class="mb-3">Theme Settings</h5>
@@ -460,9 +523,14 @@ if (!$courseData) {
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <h4>Course Content Editor</h4>
                                 <div>
-                                    <button class="btn btn-outline-primary me-2" onclick="previewCourse()">
-                                        <i class="fas fa-eye me-2"></i>Preview
-                                    </button>
+                                    <div class="btn-group me-2" role="group">
+                                        <button class="btn btn-outline-primary" onclick="previewCourse('student')">
+                                            <i class="fas fa-user me-2"></i>Student View
+                                        </button>
+                                        <button class="btn btn-outline-info" onclick="previewCourse('admin')">
+                                            <i class="fas fa-cog me-2"></i>Admin View
+                                        </button>
+                                    </div>
                                     <button class="btn btn-primary" onclick="saveCourse()">
                                         <i class="fas fa-save me-2"></i>Save Course
                                     </button>
@@ -483,6 +551,41 @@ if (!$courseData) {
         <!-- ============================================================== -->
         <!-- End Page wrapper  -->
         <!-- ============================================================== -->
+    </div>
+
+    <!-- Add Link Modal -->
+    <div class="modal fade" id="addLinkModal" tabindex="-1" aria-labelledby="addLinkModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addLinkModalLabel">Add Course Link</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="linkTitle" class="form-label">Link Title *</label>
+                        <input type="text" class="form-control" id="linkTitle" placeholder="Enter link title">
+                    </div>
+                    <div class="mb-3">
+                        <label for="linkUrl" class="form-label">URL *</label>
+                        <input type="url" class="form-control" id="linkUrl" placeholder="https://example.com">
+                    </div>
+                    <div class="mb-3">
+                        <label for="linkDescription" class="form-label">Description (Optional)</label>
+                        <textarea class="form-control" id="linkDescription" rows="3" placeholder="Brief description of the link"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="linkIcon" class="form-label">Icon Class (Optional)</label>
+                        <input type="text" class="form-control" id="linkIcon" placeholder="fas fa-external-link-alt">
+                        <small class="text-muted">FontAwesome icon class (e.g., fas fa-external-link-alt)</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="addLink()">Add Link</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Add Section Modal -->
@@ -565,6 +668,26 @@ if (!$courseData) {
                             <p class="text-muted">Supports videos, audio, images, and documents</p>
                             <input type="file" id="fileInput" multiple style="display: none;" accept="">
                         </div>
+                        
+                        <!-- Section Scheduling Controls -->
+                        <div class="mb-3">
+                            <label class="form-label">Section Visibility</label>
+                            <select class="form-control" id="sectionVisibilityMode">
+                                <option value="immediate">Immediate</option>
+                                <option value="scheduled">Scheduled</option>
+                                <option value="hidden">Hidden</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3" id="sectionPublishDateContainer" style="display: none;">
+                            <label class="form-label">Publish Date</label>
+                            <input type="datetime-local" class="form-control" id="sectionPublishDate">
+                        </div>
+                        
+                        <div class="mb-3" id="sectionUnpublishDateContainer" style="display: none;">
+                            <label class="form-label">Unpublish Date (Optional)</label>
+                            <input type="datetime-local" class="form-control" id="sectionUnpublishDate">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -595,9 +718,10 @@ if (!$courseData) {
         let courseData = <?php echo json_encode($courseData); ?>;
         let selectedSectionType = '';
         let editingSectionIndex = -1;
+        let editingLinkIndex = -1;
 
         // Initialize course preview
-        function renderCoursePreview() {
+        function renderCoursePreview(viewMode = 'admin') {
             const preview = document.getElementById('course-preview');
             preview.innerHTML = '';
             
@@ -611,8 +735,71 @@ if (!$courseData) {
                 `;
                 return;
             }
+
+            // Check visibility for student view
+            if (viewMode === 'student') {
+                const now = new Date();
+                const publishDate = courseData.settings.publishDate ? new Date(courseData.settings.publishDate) : null;
+                const unpublishDate = courseData.settings.unpublishDate ? new Date(courseData.settings.unpublishDate) : null;
+                
+                if (courseData.settings.visibilityMode === 'hidden') {
+                    preview.innerHTML = `
+                        <div class="text-center py-5">
+                            <i class="fas fa-eye-slash fa-5x text-muted mb-4"></i>
+                            <h4 class="text-muted">Content Hidden</h4>
+                            <p class="text-muted">This content is currently hidden from students.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                if (courseData.settings.visibilityMode === 'scheduled') {
+                    if (publishDate && now < publishDate) {
+                        preview.innerHTML = `
+                            <div class="text-center py-5">
+                                <i class="fas fa-clock fa-5x text-muted mb-4"></i>
+                                <h4 class="text-muted">Content Not Yet Available</h4>
+                                <p class="text-muted">This content will be available on ${publishDate.toLocaleDateString()}.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    if (unpublishDate && now > unpublishDate) {
+                        preview.innerHTML = `
+                            <div class="text-center py-5">
+                                <i class="fas fa-calendar-times fa-5x text-muted mb-4"></i>
+                                <h4 class="text-muted">Content No Longer Available</h4>
+                                <p class="text-muted">This content is no longer available.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                }
+            }
             
             courseData.sections.forEach((section, index) => {
+                // Check section visibility for student view
+                if (viewMode === 'student') {
+                    const now = new Date();
+                    const sectionPublishDate = section.publishDate ? new Date(section.publishDate) : null;
+                    const sectionUnpublishDate = section.unpublishDate ? new Date(section.unpublishDate) : null;
+                    
+                    if (section.visibilityMode === 'hidden') {
+                        return; // Skip hidden sections
+                    }
+                    
+                    if (section.visibilityMode === 'scheduled') {
+                        if (sectionPublishDate && now < sectionPublishDate) {
+                            return; // Skip sections not yet published
+                        }
+                        
+                        if (sectionUnpublishDate && now > sectionUnpublishDate) {
+                            return; // Skip sections that have been unpublished
+                        }
+                    }
+                }
+                
                 const sectionDiv = document.createElement('div');
                 sectionDiv.className = 'section-preview mb-4';
                 sectionDiv.style.border = '2px solid #e9ecef';
@@ -825,6 +1012,27 @@ if (!$courseData) {
                 default:
                     fileInput.accept = '';
             }
+            
+            // Setup section visibility controls
+            setupSectionVisibilityControls();
+        }
+        
+        function setupSectionVisibilityControls() {
+            const visibilityMode = document.getElementById('sectionVisibilityMode');
+            const publishContainer = document.getElementById('sectionPublishDateContainer');
+            const unpublishContainer = document.getElementById('sectionUnpublishDateContainer');
+            
+            if (visibilityMode) {
+                visibilityMode.addEventListener('change', function() {
+                    if (this.value === 'scheduled') {
+                        publishContainer.style.display = 'block';
+                        unpublishContainer.style.display = 'block';
+                    } else {
+                        publishContainer.style.display = 'none';
+                        unpublishContainer.style.display = 'none';
+                    }
+                });
+            }
         }
 
         // Add section
@@ -848,12 +1056,19 @@ if (!$courseData) {
                 return;
             }
             
+            const visibilityMode = document.getElementById('sectionVisibilityMode').value;
+            const publishDate = document.getElementById('sectionPublishDate').value || null;
+            const unpublishDate = document.getElementById('sectionUnpublishDate').value || null;
+            
             const section = {
                 type: selectedSectionType,
                 title: title,
                 content: content,
                 order: courseData.sections.length,
-                files: window.uploadedFiles || []
+                files: window.uploadedFiles || [],
+                publishDate: publishDate,
+                unpublishDate: unpublishDate,
+                visibilityMode: visibilityMode
             };
             
             console.log('Creating section:', section);
@@ -897,6 +1112,26 @@ if (!$courseData) {
                 sectionDiv.className = 'section-item';
                 sectionDiv.dataset.index = index;
                 
+                // Get scheduling status
+                let schedulingStatus = '';
+                if (section.visibilityMode === 'hidden') {
+                    schedulingStatus = '<span class="badge bg-secondary">Hidden</span>';
+                } else if (section.visibilityMode === 'scheduled') {
+                    const now = new Date();
+                    const publishDate = section.publishDate ? new Date(section.publishDate) : null;
+                    const unpublishDate = section.unpublishDate ? new Date(section.unpublishDate) : null;
+                    
+                    if (publishDate && now < publishDate) {
+                        schedulingStatus = `<span class="badge bg-warning">Scheduled (${publishDate.toLocaleDateString()})</span>`;
+                    } else if (unpublishDate && now > unpublishDate) {
+                        schedulingStatus = '<span class="badge bg-danger">Expired</span>';
+                    } else {
+                        schedulingStatus = '<span class="badge bg-success">Published</span>';
+                    }
+                } else {
+                    schedulingStatus = '<span class="badge bg-primary">Immediate</span>';
+                }
+                
                 sectionDiv.innerHTML = `
                     <div class="section-controls">
                         <div class="section-order-controls">
@@ -917,7 +1152,10 @@ if (!$courseData) {
                             </button>
                         </div>
                     </div>
-                    <small class="text-muted">${section.type.charAt(0).toUpperCase() + section.type.slice(1)}</small>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">${section.type.charAt(0).toUpperCase() + section.type.slice(1)}</small>
+                        ${schedulingStatus}
+                    </div>
                 `;
                 
                 // Add drag and drop functionality
@@ -938,6 +1176,22 @@ if (!$courseData) {
             
             document.getElementById('sectionTitle').value = section.title;
             document.getElementById('sectionContent').innerHTML = section.content;
+            
+            // Populate scheduling fields
+            document.getElementById('sectionVisibilityMode').value = section.visibilityMode || 'immediate';
+            document.getElementById('sectionPublishDate').value = section.publishDate || '';
+            document.getElementById('sectionUnpublishDate').value = section.unpublishDate || '';
+            
+            // Show/hide scheduling containers based on visibility mode
+            const publishContainer = document.getElementById('sectionPublishDateContainer');
+            const unpublishContainer = document.getElementById('sectionUnpublishDateContainer');
+            if (section.visibilityMode === 'scheduled') {
+                publishContainer.style.display = 'block';
+                unpublishContainer.style.display = 'block';
+            } else {
+                publishContainer.style.display = 'none';
+                unpublishContainer.style.display = 'none';
+            }
             
             // Show existing files for image/video/audio/file sections
             if (section.files && section.files.length > 0) {
@@ -1231,6 +1485,11 @@ if (!$courseData) {
             saveButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
             saveButton.disabled = true;
             
+            // Update settings with current form values
+            courseData.settings.visibilityMode = document.getElementById('visibilityMode').value;
+            courseData.settings.publishDate = document.getElementById('publishDate').value || null;
+            courseData.settings.unpublishDate = document.getElementById('unpublishDate').value || null;
+            
             // Update the hidden input with current course data
             document.getElementById('courseContentInput').value = JSON.stringify(courseData);
             
@@ -1247,13 +1506,167 @@ if (!$courseData) {
             }, 2000);
         }
 
+        // Link management functions
+        function showAddLinkModal() {
+            console.log('showAddLinkModal called');
+            editingLinkIndex = -1;
+            document.getElementById('linkTitle').value = '';
+            document.getElementById('linkUrl').value = '';
+            document.getElementById('linkDescription').value = '';
+            document.getElementById('linkIcon').value = '';
+            
+            const modalElement = document.getElementById('addLinkModal');
+            if (modalElement) {
+                // Remove any existing modal instances
+                const existingModal = bootstrap.Modal.getInstance(modalElement);
+                if (existingModal) {
+                    existingModal.dispose();
+                }
+                
+                const modal = new bootstrap.Modal(modalElement, {
+                    backdrop: true,
+                    keyboard: true,
+                    focus: true
+                });
+                modal.show();
+                console.log('Link modal should be showing now');
+            } else {
+                console.error('Link modal element not found');
+            }
+        }
+
+        function addLink() {
+            const title = document.getElementById('linkTitle').value.trim();
+            const url = document.getElementById('linkUrl').value.trim();
+            const description = document.getElementById('linkDescription').value.trim();
+            const icon = document.getElementById('linkIcon').value.trim();
+
+            if (!title || !url) {
+                alert('Please fill in title and URL');
+                return;
+            }
+
+            const link = {
+                title: title,
+                url: url,
+                description: description,
+                icon: icon || 'fas fa-external-link-alt'
+            };
+
+            if (editingLinkIndex >= 0) {
+                courseData.links[editingLinkIndex] = link;
+            } else {
+                courseData.links.push(link);
+            }
+
+            renderLinksList();
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addLinkModal'));
+            modal.hide();
+            
+            showNotification('Link added successfully!', 'success');
+        }
+
+        function editLink(index) {
+            editingLinkIndex = index;
+            const link = courseData.links[index];
+            
+            document.getElementById('linkTitle').value = link.title;
+            document.getElementById('linkUrl').value = link.url;
+            document.getElementById('linkDescription').value = link.description || '';
+            document.getElementById('linkIcon').value = link.icon || '';
+            
+            const modal = new bootstrap.Modal(document.getElementById('addLinkModal'));
+            modal.show();
+        }
+
+        function deleteLink(index) {
+            if (confirm('Are you sure you want to delete this link?')) {
+                courseData.links.splice(index, 1);
+                renderLinksList();
+                showNotification('Link deleted successfully!', 'success');
+            }
+        }
+
+        function renderLinksList() {
+            const container = document.getElementById('linksList');
+            container.innerHTML = '';
+            
+            courseData.links.forEach((link, index) => {
+                const linkDiv = document.createElement('div');
+                linkDiv.className = 'link-item mb-2 p-2 border rounded';
+                linkDiv.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${link.title}</strong>
+                            <br><small class="text-muted">${link.url}</small>
+                            ${link.description ? `<br><small class="text-muted">${link.description}</small>` : ''}
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary" onclick="editLink(${index})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteLink(${index})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(linkDiv);
+            });
+        }
+
+        // Visibility controls
+        document.getElementById('visibilityMode').addEventListener('change', function() {
+            const publishContainer = document.getElementById('publishDateContainer');
+            const unpublishContainer = document.getElementById('unpublishDateContainer');
+            
+            if (this.value === 'scheduled') {
+                publishContainer.style.display = 'block';
+                unpublishContainer.style.display = 'block';
+            } else {
+                publishContainer.style.display = 'none';
+                unpublishContainer.style.display = 'none';
+            }
+        });
+
+        // Initialize visibility controls
+        document.addEventListener('DOMContentLoaded', function() {
+            const visibilityMode = document.getElementById('visibilityMode');
+            if (visibilityMode.value === 'scheduled') {
+                document.getElementById('publishDateContainer').style.display = 'block';
+                document.getElementById('unpublishDateContainer').style.display = 'block';
+            }
+        });
+
         // Preview course
-        function previewCourse() {
+        function previewCourse(viewMode = 'admin') {
             // Open preview in new window
             const previewWindow = window.open('', '_blank');
             
             // Generate content for each section with file support
             const sectionsHtml = courseData.sections.map(section => {
+                // Check section visibility for student view
+                if (viewMode === 'student') {
+                    const now = new Date();
+                    const sectionPublishDate = section.publishDate ? new Date(section.publishDate) : null;
+                    const sectionUnpublishDate = section.unpublishDate ? new Date(section.unpublishDate) : null;
+                    
+                    if (section.visibilityMode === 'hidden') {
+                        return ''; // Skip hidden sections
+                    }
+                    
+                    if (section.visibilityMode === 'scheduled') {
+                        if (sectionPublishDate && now < sectionPublishDate) {
+                            return ''; // Skip sections not yet published
+                        }
+                        
+                        if (sectionUnpublishDate && now > sectionUnpublishDate) {
+                            return ''; // Skip sections that have been unpublished
+                        }
+                    }
+                }
+                
                 let contentHtml = '';
                 
                 if (section.type === 'image' && section.files && section.files.length > 0) {
@@ -1808,6 +2221,7 @@ if (!$courseData) {
         // Initialize
         renderCoursePreview();
         renderSectionsList();
+        renderLinksList();
 
         // Add event listener to Add Section button
         document.getElementById('addSectionBtn').addEventListener('click', function(e) {

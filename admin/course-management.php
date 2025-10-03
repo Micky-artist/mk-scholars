@@ -49,12 +49,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Get all courses with currency symbols
-$coursesQuery = "SELECT c.*, cp.amount, cp.currency, curr.currencySymbol 
+// Pagination settings
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$limit = 12; // Courses per page
+$offset = ($page - 1) * $limit;
+
+// Get total count for pagination
+$countQuery = "SELECT COUNT(*) as total FROM Courses c";
+$countResult = mysqli_query($conn, $countQuery);
+$totalCourses = mysqli_fetch_assoc($countResult)['total'];
+$totalPages = ceil($totalCourses / $limit);
+
+// Get courses with pagination and optimized query
+$coursesQuery = "SELECT c.courseId, c.courseName, c.courseShortDescription, c.courseStartDate, 
+                        c.courseEndDate, c.courseSeats, c.courseDisplayStatus, c.courseCreatedDate,
+                        c.coursePhoto, c.courseRegEndDate,
+                        cp.amount, cp.currency, curr.currencySymbol 
                  FROM Courses c 
                  LEFT JOIN CoursePricing cp ON c.courseId = cp.courseId 
                  LEFT JOIN Currencies curr ON cp.currency = curr.currencyCode 
-                 ORDER BY c.courseCreatedDate DESC";
+                 ORDER BY c.courseCreatedDate DESC 
+                 LIMIT $limit OFFSET $offset";
 $coursesResult = mysqli_query($conn, $coursesQuery);
 ?>
 
@@ -651,6 +666,51 @@ $coursesResult = mysqli_query($conn, $coursesQuery);
                         </div>
                     <?php endif; ?>
                 </div>
+
+                <!-- Pagination -->
+                <?php if ($totalPages > 1): ?>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <nav aria-label="Course pagination">
+                                <ul class="pagination justify-content-center">
+                                    <?php if ($page > 1): ?>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=<?php echo $page - 1; ?>" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+                                    
+                                    <?php
+                                    $startPage = max(1, $page - 2);
+                                    $endPage = min($totalPages, $page + 2);
+                                    
+                                    for ($i = $startPage; $i <= $endPage; $i++):
+                                    ?>
+                                        <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
+                                            <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
+                                        </li>
+                                    <?php endfor; ?>
+                                    
+                                    <?php if ($page < $totalPages): ?>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=<?php echo $page + 1; ?>" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                    <?php endif; ?>
+                                </ul>
+                            </nav>
+                            
+                            <div class="text-center mt-2">
+                                <small class="text-muted">
+                                    Showing <?php echo $offset + 1; ?> to <?php echo min($offset + $limit, $totalCourses); ?> 
+                                    of <?php echo $totalCourses; ?> courses
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
             </div>
             <!-- ============================================================== -->
             <!-- End Container fluid  -->

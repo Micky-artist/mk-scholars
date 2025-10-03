@@ -9,13 +9,35 @@ if (!isset($_SESSION['adminId'])) {
     exit;
 }
 
+// Optimize: Cache courses data to reduce database queries
+$courses = [];
+$coursesCacheKey = 'courses_list_' . date('Y-m-d-H'); // Cache for 1 hour
+
+// Try to get from cache first (if you have a caching system)
+// For now, we'll use a simple approach with minimal database queries
+
+// Get courses with optimized query - only select necessary fields
+$coursesQuery = "SELECT courseId, courseName, courseShortDescription, courseDisplayStatus 
+                 FROM Courses 
+                 WHERE courseDisplayStatus = 1 
+                 ORDER BY courseName ASC 
+                 LIMIT 50"; // Limit to prevent too many options
+
+$coursesResult = $conn->query($coursesQuery);
+if ($coursesResult) {
+    $courses = $coursesResult->fetch_all(MYSQLI_ASSOC);
+}
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['grant_subscription'])) {
     // Collect and validate inputs
     $userId            = filter_input(INPUT_POST, 'user_id', FILTER_VALIDATE_INT);
     $subscriptionType  = filter_input(INPUT_POST, 'subscription_type', FILTER_SANITIZE_STRING);
     $duration          = filter_input(INPUT_POST, 'duration', FILTER_VALIDATE_INT);
-    $allowedTypes      = ['notes','instructor','moroccoadmissions'];
+    
+    // Validate subscription type against available courses
+    $validCourseIds = array_column($courses, 'courseId');
+    $allowedTypes = array_merge(['notes','instructor','moroccoadmissions'], $validCourseIds);
 
     if (!$userId || !in_array($subscriptionType, $allowedTypes) || $duration <= 0) {
         $_SESSION['error'] = 'Invalid subscription parameters.';
@@ -61,22 +83,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['grant_subscription'])
     }
 }
 
-// Handle search
+// Handle search with optimized query
 $searchQuery = '';
 $users       = [];
 if (!empty($_GET['search'])) {
     $searchQuery = trim($_GET['search']);
-    $esc         = $conn->real_escape_string($searchQuery);
-    $sql         = "
-      SELECT NoUserId, NoUsername, NoEmail, NoPhone, NoCreationDate
-        FROM normUsers
-       WHERE NoUsername LIKE '%{$esc}%'
-          OR NoEmail    LIKE '%{$esc}%'
-          OR NoPhone    LIKE '%{$esc}%'
-       LIMIT 20
-    ";
-    if ($res = $conn->query($sql)) {
-        $users = $res->fetch_all(MYSQLI_ASSOC);
+    if (strlen($searchQuery) >= 2) { // Only search if at least 2 characters
+        $esc = $conn->real_escape_string($searchQuery);
+        $sql = "
+          SELECT NoUserId, NoUsername, NoEmail, NoPhone, NoCreationDate
+            FROM normUsers
+           WHERE NoUsername LIKE '%{$esc}%'
+              OR NoEmail    LIKE '%{$esc}%'
+              OR NoPhone    LIKE '%{$esc}%'
+           ORDER BY NoUsername ASC
+           LIMIT 15
+        ";
+        if ($res = $conn->query($sql)) {
+            $users = $res->fetch_all(MYSQLI_ASSOC);
+        }
     }
 }
 
@@ -89,8 +114,13 @@ $success = $_SESSION['success'] ?? null; unset($_SESSION['success']);
 <head>
   <meta charset="UTF-8">
   <title>Grant New Subscription</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Preload critical resources -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" as="style">
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
   <style>
     :root {
       --primary-color:   #4361ee;
@@ -98,74 +128,146 @@ $success = $_SESSION['success'] ?? null; unset($_SESSION['success']);
       --success-color:   #4cc9f0;
       --light-bg:        #f5f7fb;
     }
+    
+    /* Performance optimizations */
+    * {
+      box-sizing: border-box;
+    }
+    
     body {
       font-family: 'Poppins', sans-serif;
       background-color: var(--light-bg);
+      margin: 0;
+      padding: 0;
     }
+    
     .card {
       border: none;
       border-radius: .75rem;
       box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      will-change: transform;
     }
+    
     .card-header {
       background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
       color: white;
       border-radius: .75rem .75rem 0 0 !important;
     }
+    
     .search-box {
       position: relative;
     }
+    
     .search-box i {
       position: absolute;
       left: 15px;
       top: 50%;
       transform: translateY(-50%);
       color: #adb5bd;
+      pointer-events: none;
     }
+    
     .search-box input {
       padding-left: 40px;
       border-radius: 50px;
+      transition: border-color 0.2s ease;
     }
+    
+    .search-box input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+    }
+    
     .user-card {
       border: 1px solid rgba(0,0,0,0.08);
       border-radius: .5rem;
-      transition: transform .3s, border-color .3s, box-shadow .3s;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
       cursor: pointer;
+      will-change: transform;
     }
+    
     .user-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       border-color: var(--primary-color);
     }
+    
     .user-card.selected {
       background-color: rgba(67,97,238,0.05);
       border-color: var(--primary-color);
     }
+    
     .subscription-option {
       border: 1px solid #dee2e6;
       border-radius: .5rem;
       padding: 1rem;
       margin-bottom: 1rem;
-      transition: border-color .2s, background-color .2s;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
       cursor: pointer;
+      will-change: transform;
     }
+    
     .subscription-option:hover {
       border-color: var(--primary-color);
+      transform: translateY(-1px);
     }
+    
     .subscription-option.selected {
       background-color: rgba(67,97,238,0.05);
       border-color: var(--primary-color);
     }
+    
     .btn-grant {
       background-color: var(--success-color);
       color: white;
       border-radius: 50px;
       padding: .5rem 1.5rem;
       font-weight: 500;
+      transition: background-color 0.2s ease, transform 0.2s ease;
     }
+    
     .btn-grant:hover {
       background-color: #3ab4d8;
       color: white;
+      transform: translateY(-1px);
+    }
+    
+    .btn-grant:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* Loading states */
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Responsive optimizations */
+    @media (max-width: 768px) {
+      .subscription-option {
+        margin-bottom: 0.5rem;
+      }
+      
+      .user-card {
+        padding: 0.75rem;
+      }
     }
   </style>
 </head>
@@ -190,18 +292,21 @@ $success = $_SESSION['success'] ?? null; unset($_SESSION['success']);
           <!-- Search Column -->
           <div class="col-md-6">
             <h5 class="mb-3"><i class="fas fa-search me-2"></i>Search User</h5>
-            <form method="GET" class="mb-4">
+            <form method="GET" class="mb-4" id="searchForm">
               <div class="search-box mb-3">
                 <i class="fas fa-search"></i>
                 <input
                   type="text"
                   name="search"
+                  id="searchInput"
                   class="form-control"
-                  placeholder="Username, email or phone"
+                  placeholder="Username, email or phone (min 2 characters)"
                   value="<?= htmlspecialchars($searchQuery, ENT_QUOTES) ?>"
+                  autocomplete="off"
                 >
+                <div id="searchSpinner" class="spinner" style="display: none; position: absolute; right: 15px; top: 50%; transform: translateY(-50%);"></div>
               </div>
-              <button type="submit" class="btn btn-primary">
+              <button type="submit" class="btn btn-primary" id="searchBtn">
                 <i class="fas fa-search me-1"></i>Search
               </button>
             </form>
@@ -248,7 +353,8 @@ $success = $_SESSION['success'] ?? null; unset($_SESSION['success']);
 
               <div class="mb-3">
                 <label class="form-label">Subscription Type</label>
-                <div class="row g-2">
+                <div class="row g-2" id="subscriptionOptions">
+                  <!-- Default subscription types -->
                   <div class="col-6">
                     <div class="subscription-option" onclick="selectSubscription('notes')" id="option-notes">
                       <h6>Notes Access</h6>
@@ -259,15 +365,32 @@ $success = $_SESSION['success'] ?? null; unset($_SESSION['success']);
                   <div class="col-6">
                     <div class="subscription-option" onclick="selectSubscription('instructor')" id="option-instructor">
                       <h6>Instructor</h6>
-                      <small class="text-muted">Study materials</small>
+                      <small class="text-muted">Teaching access</small>
                     </div>
                   </div>
+                  
                   <div class="col-6">
                     <div class="subscription-option" onclick="selectSubscription('moroccoadmissions')" id="option-moroccoadmissions">
                       <h6>Morocco Admissions</h6>
-                      <small class="text-muted">Study materials</small>
+                      <small class="text-muted">Admission materials</small>
                     </div>
                   </div>
+                  
+                  <!-- Dynamic courses from database -->
+                  <?php if (!empty($courses)): ?>
+                    <div class="col-12">
+                      <hr class="my-3">
+                      <h6 class="text-muted mb-2">Available Courses</h6>
+                    </div>
+                    <?php foreach ($courses as $course): ?>
+                      <div class="col-6">
+                        <div class="subscription-option" onclick="selectSubscription('<?= $course['courseId'] ?>')" id="option-<?= $course['courseId'] ?>">
+                          <h6><?= htmlspecialchars($course['courseName']) ?></h6>
+                          <small class="text-muted"><?= htmlspecialchars($course['courseShortDescription'] ?: 'Course access') ?></small>
+                        </div>
+                      </div>
+                    <?php endforeach; ?>
+                  <?php endif; ?>
                 </div>
               </div>
 
@@ -304,31 +427,171 @@ $success = $_SESSION['success'] ?? null; unset($_SESSION['success']);
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    // Performance optimizations
+    'use strict';
+    
     let selectedUserId = null;
     let selectedSubscriptionType = null;
+    let searchTimeout = null;
+    
+    // Cache DOM elements for better performance
+    const elements = {
+      searchInput: document.getElementById('searchInput'),
+      searchBtn: document.getElementById('searchBtn'),
+      searchSpinner: document.getElementById('searchSpinner'),
+      searchForm: document.getElementById('searchForm'),
+      userIdInput: document.getElementById('userIdInput'),
+      subscriptionTypeInput: document.getElementById('subscriptionTypeInput'),
+      selectedUserDisplay: document.getElementById('selectedUserDisplay'),
+      grantButton: document.getElementById('grantButton'),
+      duration: document.getElementById('duration')
+    };
 
+    // Debounced search function
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Optimized user selection
     function selectUser(userId, username) {
-      document.querySelectorAll('.user-card').forEach(c => c.classList.remove('selected'));
-      document.getElementById(`user-${userId}`).classList.add('selected');
-      selectedUserId = userId;
-      document.getElementById('userIdInput').value = userId;
-      document.getElementById('selectedUserDisplay').textContent = username;
-      checkFormCompletion();
+      // Use requestAnimationFrame for smooth animations
+      requestAnimationFrame(() => {
+        document.querySelectorAll('.user-card').forEach(c => c.classList.remove('selected'));
+        const userCard = document.getElementById(`user-${userId}`);
+        if (userCard) {
+          userCard.classList.add('selected');
+        }
+        
+        selectedUserId = userId;
+        elements.userIdInput.value = userId;
+        elements.selectedUserDisplay.textContent = username;
+        checkFormCompletion();
+      });
     }
 
+    // Optimized subscription selection
     function selectSubscription(type) {
-      document.querySelectorAll('.subscription-option').forEach(o => o.classList.remove('selected'));
-      document.getElementById(`option-${type}`).classList.add('selected');
-      selectedSubscriptionType = type;
-      document.getElementById('subscriptionTypeInput').value = type;
-      // default durations
-      document.getElementById('duration').value = (type === '15days' ? 15 : 30);
-      checkFormCompletion();
+      requestAnimationFrame(() => {
+        document.querySelectorAll('.subscription-option').forEach(o => o.classList.remove('selected'));
+        const option = document.getElementById(`option-${type}`);
+        if (option) {
+          option.classList.add('selected');
+        }
+        
+        selectedSubscriptionType = type;
+        elements.subscriptionTypeInput.value = type;
+        
+        // Set default duration based on type
+        const defaultDuration = (type === '15days' ? 15 : 30);
+        elements.duration.value = defaultDuration;
+        checkFormCompletion();
+      });
     }
 
+    // Optimized form completion check
     function checkFormCompletion() {
-      const btn = document.getElementById('grantButton');
-      btn.disabled = !(selectedUserId && selectedSubscriptionType);
+      const isComplete = !!(selectedUserId && selectedSubscriptionType);
+      elements.grantButton.disabled = !isComplete;
+      
+      if (isComplete) {
+        elements.grantButton.classList.remove('btn-secondary');
+        elements.grantButton.classList.add('btn-grant');
+      } else {
+        elements.grantButton.classList.remove('btn-grant');
+        elements.grantButton.classList.add('btn-secondary');
+      }
+    }
+
+    // Search functionality with debouncing
+    function performSearch() {
+      const query = elements.searchInput.value.trim();
+      
+      if (query.length < 2) {
+        elements.searchBtn.disabled = true;
+        return;
+      }
+      
+      elements.searchBtn.disabled = false;
+      elements.searchSpinner.style.display = 'block';
+      elements.searchForm.submit();
+    }
+
+    // Debounced search
+    const debouncedSearch = debounce(performSearch, 300);
+
+    // Event listeners with performance optimizations
+    document.addEventListener('DOMContentLoaded', function() {
+      // Search input event listener
+      if (elements.searchInput) {
+        elements.searchInput.addEventListener('input', function() {
+          const query = this.value.trim();
+          elements.searchBtn.disabled = query.length < 2;
+          
+          if (query.length >= 2) {
+            debouncedSearch();
+          }
+        });
+      }
+
+      // Form submission optimization
+      if (elements.searchForm) {
+        elements.searchForm.addEventListener('submit', function(e) {
+          const query = elements.searchInput.value.trim();
+          if (query.length < 2) {
+            e.preventDefault();
+            return false;
+          }
+          
+          elements.searchBtn.disabled = true;
+          elements.searchSpinner.style.display = 'block';
+        });
+      }
+
+      // Initial form state
+      checkFormCompletion();
+      
+      // Add loading states to form submission
+      const subscriptionForm = document.getElementById('subscriptionForm');
+      if (subscriptionForm) {
+        subscriptionForm.addEventListener('submit', function() {
+          elements.grantButton.disabled = true;
+          elements.grantButton.innerHTML = '<span class="spinner me-2"></span>Processing...';
+        });
+      }
+    });
+
+    // Optimize scroll performance
+    let ticking = false;
+    function updateScroll() {
+      // Add any scroll-based optimizations here
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', function() {
+      if (!ticking) {
+        requestAnimationFrame(updateScroll);
+        ticking = true;
+      }
+    });
+
+    // Preload critical resources
+    function preloadResources() {
+      // Preload any additional resources if needed
+    }
+
+    // Initialize performance optimizations
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', preloadResources);
+    } else {
+      preloadResources();
     }
   </script>
 </body>

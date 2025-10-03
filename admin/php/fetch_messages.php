@@ -17,16 +17,25 @@ if (empty($_GET['ConvId'])) {
 $convId = intval($_GET['ConvId']);
 $lastMessageId = isset($_GET['lastMessageId']) ? intval($_GET['lastMessageId']) : 0;
 
+
 // Build query based on whether we want all messages or only new ones
 if ($lastMessageId > 0) {
-    // Get only messages newer than lastMessageId
-    $stmt = $conn->prepare("SELECT MessageId, AdminId, MessageContent, SentDate, SentTime
-        FROM Message WHERE ConvId = ? AND MessageId > ? ORDER BY SentDate, SentTime");
+    // Get only messages newer than lastMessageId with admin names
+    $stmt = $conn->prepare("SELECT m.MessageId, m.AdminId, m.MessageContent, m.SentDate, m.SentTime,
+        COALESCE(a.username, 'Admin') as AdminName
+        FROM Message m
+        LEFT JOIN users a ON m.AdminId = a.userId
+        WHERE m.ConvId = ? AND m.MessageId > ? 
+        ORDER BY m.SentDate, m.SentTime");
     $stmt->bind_param('ii', $convId, $lastMessageId);
 } else {
-    // Get all messages
-    $stmt = $conn->prepare("SELECT MessageId, AdminId, MessageContent, SentDate, SentTime
-        FROM Message WHERE ConvId = ? ORDER BY SentDate, SentTime");
+    // Get all messages with admin names
+    $stmt = $conn->prepare("SELECT m.MessageId, m.AdminId, m.MessageContent, m.SentDate, m.SentTime,
+        COALESCE(a.username, 'Admin') as AdminName
+        FROM Message m
+        LEFT JOIN users a ON m.AdminId = a.userId
+        WHERE m.ConvId = ? 
+        ORDER BY m.SentDate, m.SentTime");
     $stmt->bind_param('i', $convId);
 }
 
@@ -34,6 +43,14 @@ $stmt->execute();
 $res = $stmt->get_result();
 $messages = $res->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
+
+// Add admin names (time conversion will be handled on client-side)
+foreach ($messages as &$message) {
+    // Ensure AdminName is set
+    if (empty($message['AdminName'])) {
+        $message['AdminName'] = 'Admin';
+    }
+}
 
 // Mark as read only if getting all messages (not polling)
 if ($lastMessageId == 0) {
