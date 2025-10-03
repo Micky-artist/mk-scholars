@@ -48,8 +48,14 @@ if (!empty($transaction_id)) {
         if (isset($result['status']) && $result['status'] === "success" && $result['data']['status'] === "successful") {
             $paymentData = $result['data'];
             
-            // Payment successful - process enrollment
-            if ($courseId) {
+            // Determine context
+            $contextType = $paymentData['meta']['contextType'] ?? null;
+            $courseId = $paymentData['meta']['courseId'] ?? $courseId;
+            $scholarshipId = $paymentData['meta']['scholarshipId'] ?? null;
+            $couponId = $paymentData['meta']['couponId'] ?? null;
+            $couponCode = $paymentData['meta']['couponCode'] ?? null;
+
+            if ($contextType === 'course' && $courseId) {
                 // Insert enrollment record
                 $enrollmentQuery = "INSERT INTO CourseEnrollments (userId, courseId, enrollmentDate, paymentAmount, paymentCurrency, paymentStatus, transactionReference) 
                                    VALUES (?, ?, NOW(), ?, ?, 'completed', ?) 
@@ -67,6 +73,35 @@ if (!empty($transaction_id)) {
                     $enrollmentSuccess = true;
                 } else {
                     $enrollmentError = "Database error: " . $stmt->error;
+                }
+            } elseif ($contextType === 'scholarship' && $scholarshipId) {
+                // Insert application request after successful payment
+                $requestDate = date('Y-m-d');
+                $requestTime = date('H:i:s');
+                $status = 0; // unseen
+                $comments = $_SESSION['pending_application_comments'] ?? '';
+                unset($_SESSION['pending_application_comments']);
+                $stmt = $conn->prepare("INSERT INTO ApplicationRequests (UserId, ApplicationId, RequestDate, RequestTime, Status, Comments) VALUES (?, ?, ?, ?, ?, ?)");
+                if ($stmt) {
+                    $stmt->bind_param('iissss', $userId, $scholarshipId, $requestDate, $requestTime, $status, $comments);
+                    if ($stmt->execute()) {
+                        $enrollmentSuccess = true;
+                    } else {
+                        $enrollmentError = "Application save error: " . $stmt->error;
+                    }
+                } else {
+                    $enrollmentError = "Application prepare failed: " . $conn->error;
+                }
+            }
+
+            // Log coupon redemption if any
+            if (isset($enrollmentSuccess) && $enrollmentSuccess && $couponId) {
+                $stmt = $conn->prepare("INSERT INTO CouponRedemptions (coupon_id, user_id, transaction_reference, amount_charged, currency, status, created_at) VALUES (?, ?, ?, ?, ?, 'success', NOW())");
+                if ($stmt) {
+                    $amountCharged = $paymentData['amount'];
+                    $currency = $paymentData['currency'];
+                    $stmt->bind_param('iisss', $couponId, $userId, $tx_ref, $amountCharged, $currency);
+                    $stmt->execute();
                 }
             }
         } else {

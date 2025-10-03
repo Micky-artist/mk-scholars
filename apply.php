@@ -118,29 +118,39 @@ if (isset($_POST['submit_application']) && $_SERVER['REQUEST_METHOD'] === 'POST'
         $class = "alert alert-danger";
     } else {
         $userId = $_SESSION['userId'];
-        $applicationId = $scholarshipData['scholarshipId'];
-        $requestDate = date('Y-m-d');
-        $requestTime = date('H:i:s');
-        $status = 0; // Default status is 0 (unseen)
+        $applicationId = (int)$scholarshipData['scholarshipId'];
         $comments = isset($_POST['comments']) ? trim($_POST['comments']) : '';
 
-        // Insert into ApplicationRequests table
-        $insertStmt = $conn->prepare("INSERT INTO ApplicationRequests (UserId, ApplicationId, RequestDate, RequestTime, Status, Comments) VALUES (?, ?, ?, ?, ?, ?)");
-        if (!$insertStmt) {
-            $msg = "System error. Please try again later.";
-            $class = "alert alert-danger";
-            error_log("Database error: " . $conn->error);
-        } else {
-            $insertStmt->bind_param("iissss", $userId, $applicationId, $requestDate, $requestTime, $status, $comments);
-            if ($insertStmt->execute()) {
-                $msg = "Application submitted successfully!";
-                $class = "alert alert-success";
-            } else {
-                $msg = "Submission failed. Please try again.";
+        $amountDue = isset($scholarshipData['amount']) ? floatval($scholarshipData['amount']) : 0;
+
+        if ($amountDue <= 0) {
+            // Free application: insert immediately
+            $requestDate = date('Y-m-d');
+            $requestTime = date('H:i:s');
+            $status = 0; // unseen
+            $insertStmt = $conn->prepare("INSERT INTO ApplicationRequests (UserId, ApplicationId, RequestDate, RequestTime, Status, Comments) VALUES (?, ?, ?, ?, ?, ?)");
+            if (!$insertStmt) {
+                $msg = "System error. Please try again later.";
                 $class = "alert alert-danger";
-                error_log("Insert error: " . $insertStmt->error);
+                error_log("Database error: " . $conn->error);
+            } else {
+                $insertStmt->bind_param("iissss", $userId, $applicationId, $requestDate, $requestTime, $status, $comments);
+                if ($insertStmt->execute()) {
+                    $msg = "Application submitted successfully!";
+                    $class = "alert alert-success";
+                } else {
+                    $msg = "Submission failed. Please try again.";
+                    $class = "alert alert-danger";
+                    error_log("Insert error: " . $insertStmt->error);
+                }
+                $insertStmt->close();
             }
-            $insertStmt->close();
+        } else {
+            // Paid application: redirect to checkout for scholarship payment
+            // Persist comments temporarily in session so we can save after successful payment
+            $_SESSION['pending_application_comments'] = $comments;
+            header("Location: ./payment/checkout.php?scholarshipId=" . urlencode($applicationId));
+            exit;
         }
     }
 }

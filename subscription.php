@@ -170,7 +170,7 @@ $errors = [];
 if (isset($_POST['checkout'])) {
     $sub = urlencode($_POST['subscription']);
     $courseId = $_GET['course'];
-    header("Location: ./payment/checkout?course={$courseId}&subscription={$sub}");
+    header("Location: ./payment/checkout.php?course={$courseId}&subscription={$sub}");
     exit;
 }
 ?>

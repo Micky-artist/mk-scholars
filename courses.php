@@ -633,10 +633,6 @@ function getStatusClass($status) {
                                     <i class="fas fa-arrow-right"></i>
                                     Register Now (Iyandikishe)
                                 </button>
-                                <button onclick="window.location.href='./request-help?course=<?php echo $course['courseId']; ?>'" class="enroll-button" style="background:#6b7280">
-                                    <i class="fas fa-life-ring"></i>
-                                    Ask for help
-                                </button>
                             </div>
                         </div>
                     </div>
