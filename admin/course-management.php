@@ -521,7 +521,6 @@ $coursesResult = mysqli_query($conn, $coursesQuery);
                 <div class="row mb-4">
                     <div class="col-12">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h2 class="page-title">Course Management</h2>
                             <div class="action-buttons">
                                 <a href="create-course.php" class="btn btn-primary">
                                     <i class="fas fa-plus me-2"></i>Create New Course

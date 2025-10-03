@@ -131,6 +131,31 @@ if (!hasPermission('ChatGround')) {
             font-weight: 600;
         }
 
+        .search-box {
+            position: relative;
+        }
+
+        .search-box .search-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-color);
+            font-size: 0.8rem;
+        }
+
+        .search-box input {
+            padding-right: 30px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
         .users-list {
             flex: 1;
             overflow-y: auto;
@@ -144,8 +169,9 @@ if (!hasPermission('ChatGround')) {
             margin-bottom: 0.5rem;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             border: 1px solid transparent;
+            position: relative;
         }
 
         .user-item:hover {
@@ -154,8 +180,55 @@ if (!hasPermission('ChatGround')) {
         }
 
         .user-item.active {
-            background: rgba(0, 123, 255, 0.1);
+            background: linear-gradient(135deg, rgba(0, 123, 255, 0.15), rgba(0, 123, 255, 0.05));
             border-color: var(--primary-color);
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+            transform: translateX(2px);
+        }
+
+        .user-item.active .user-avatar {
+            background: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+        }
+
+        .user-item.active .user-name {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .user-item.active .user-status {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .active-indicator {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--success-color);
+            color: white;
+            border-radius: 50%;
+            width: 8px;
+            height: 8px;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.3);
+        }
+
+        .user-item.active {
+            animation: slideInActive 0.3s ease;
+        }
+
+        @keyframes slideInActive {
+            0% {
+                transform: translateX(-10px);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateX(2px);
+                opacity: 1;
+            }
         }
 
         .user-avatar {
@@ -202,6 +275,29 @@ if (!hasPermission('ChatGround')) {
             justify-content: center;
             font-size: 0.7rem;
             font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .new-message-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--success-color);
+            color: white;
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            animation: pulse 1s infinite;
         }
 
         .chat-panel {
@@ -436,8 +532,8 @@ if (!hasPermission('ChatGround')) {
 </head>
 
 <body>
-    <div id="main-wrapper" data-layout="vertical" data-navbarbg="skin5" data-sidebartype="full"
-        data-sidebar-position="absolute" data-header-position="absolute" data-boxed-layout="full">
+  <div id="main-wrapper" data-layout="vertical" data-navbarbg="skin5" data-sidebartype="full"
+    data-sidebar-position="absolute" data-header-position="absolute" data-boxed-layout="full">
         
         <!-- Header -->
         <?php include("./partials/header.php"); ?>
@@ -448,11 +544,19 @@ if (!hasPermission('ChatGround')) {
         <!-- Main Content -->
         <div class="page-wrapper">
             <div class="container-fluid">
-                <div class="row">
+        <div class="row">
                     <div class="col-12">
                         <div class="chat-container">
                             <div class="chat-header">
-                                <h4><i class="fas fa-comments me-2"></i>Chat Ground</h4>
+                                <div class="d-flex align-items-center">
+                                    <h4><i class="fas fa-comments me-2"></i>Chat Ground</h4>
+                                    <div id="active-user-indicator" class="ms-3" style="display: none;">
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-user-circle me-1"></i>
+                                            <span id="active-username">User</span>
+                                        </span>
+                                    </div>
+                                </div>
                                 <div class="status-indicators">
                                     <span id="connection-status" class="status-badge connecting">
                                         <i class="fas fa-circle me-1"></i>Connecting...
@@ -468,6 +572,10 @@ if (!hasPermission('ChatGround')) {
                                 <div class="users-sidebar">
                                     <div class="users-header">
                                         <h5><i class="fas fa-users me-2"></i>Active Users</h5>
+                                        <div class="search-box mt-2">
+                                            <input type="text" id="user-search" class="form-control form-control-sm" placeholder="Search users..." autocomplete="off">
+                                            <i class="fas fa-search search-icon"></i>
+                                        </div>
                                     </div>
                                     <div class="users-list" id="users-list">
                                         <!-- Users will be loaded here -->
@@ -498,11 +606,11 @@ if (!hasPermission('ChatGround')) {
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
         </div>
-    </div>
-
+      </div>
+      </div>
+     </div>
+ 
     <!-- Image Preview Modal -->
     <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -525,13 +633,13 @@ if (!hasPermission('ChatGround')) {
     </div>
 
     <!-- Scripts -->
-    <script src="./assets/libs/jquery/dist/jquery.min.js"></script>
-    <script src="./assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="./assets/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js"></script>
-    <script src="./assets/extra-libs/sparkline/sparkline.js"></script>
-    <script src="./dist/js/waves.js"></script>
-    <script src="./dist/js/sidebarmenu.js"></script>
-    <script src="./dist/js/custom.min.js"></script>
+  <script src="./assets/libs/jquery/dist/jquery.min.js"></script>
+  <script src="./assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="./assets/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js"></script>
+  <script src="./assets/extra-libs/sparkline/sparkline.js"></script>
+  <script src="./dist/js/waves.js"></script>
+  <script src="./dist/js/sidebarmenu.js"></script>
+  <script src="./dist/js/custom.min.js"></script>
     
     <script>
         $(document).ready(function() {
@@ -540,46 +648,119 @@ if (!hasPermission('ChatGround')) {
             let currentUsername = null;
             let lastMessageId = 0;
             let pollInterval = null;
+            let globalPollInterval = null;
             let processedMessages = new Set();
             let pendingMessages = new Set();
+            let allConversations = [];
+            let filteredConversations = [];
+            let searchTimeout = null;
 
             // Load users list
             loadUsers();
+            
+            // Start global polling for all conversations
+            startGlobalPolling();
 
             // Load users from server
             function loadUsers() {
                 $.get('./php/fetch_conversations.php', function(data) {
-                    const usersList = $('#users-list');
-                    usersList.empty();
-                    
-                    if (data.length === 0) {
-                        usersList.html('<div class="text-center text-muted p-3">No active conversations</div>');
-                        return;
-                    }
-                    
-                    data.forEach(user => {
-                        const userItem = $(`
-                            <div class="user-item" data-conv-id="${user.ConvId}" data-user-id="${user.NoUserId}" data-username="${user.NoUsername}">
-                                <div class="user-avatar">
-                                    ${user.NoUsername.charAt(0).toUpperCase()}
-                                </div>
-                                <div class="user-info">
-                                    <h6 class="user-name">${user.NoUsername}</h6>
-                                    <p class="user-status">Last seen recently</p>
-                                </div>
-                                ${user.unreadCount > 0 ? `<div class="unread-badge">${user.unreadCount}</div>` : ''}
-                            </div>
-                        `);
-                        
-                        userItem.click(function() {
-                            selectUser(user.ConvId, user.NoUserId, user.NoUsername);
-                        });
-                        
-                        usersList.append(userItem);
-                    });
+                    allConversations = data;
+                    filteredConversations = [...data];
+                    renderUsersList();
                 }, 'json').fail(function() {
                     $('#users-list').html('<div class="text-center text-danger p-3">Failed to load users</div>');
                 });
+            }
+
+            // Render users list based on filtered conversations
+            function renderUsersList() {
+                const usersList = $('#users-list');
+                usersList.empty();
+                
+                if (filteredConversations.length === 0) {
+                    usersList.html('<div class="text-center text-muted p-3">No conversations found</div>');
+                    return;
+                }
+                
+                filteredConversations.forEach(user => {
+                    const isActive = user.ConvId == currentConvId;
+                    const activeClass = isActive ? 'active' : '';
+                    const activeIndicator = isActive ? '<div class="active-indicator"></div>' : '';
+                    
+                    const userItem = $(`
+                        <div class="user-item ${activeClass}" data-conv-id="${user.ConvId}" data-user-id="${user.NoUserId}" data-username="${user.NoUsername}">
+                            <div class="user-avatar">
+                                ${user.NoUsername.charAt(0).toUpperCase()}
+                            </div>
+                            <div class="user-info">
+                                <h6 class="user-name">${user.NoUsername}</h6>
+                                <p class="user-status">${isActive ? 'Currently chatting' : 'Last seen recently'}</p>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                ${user.unreadCount > 0 ? `<div class="unread-badge">${user.unreadCount}</div>` : ''}
+                                ${activeIndicator}
+                            </div>
+                        </div>
+                    `);
+                    
+                    userItem.click(function() {
+                        selectUser(user.ConvId, user.NoUserId, user.NoUsername);
+                    });
+                    
+                    usersList.append(userItem);
+                });
+            }
+
+            // Search users functionality
+            function setupUserSearch() {
+                $('#user-search').on('input', function() {
+                    const searchTerm = $(this).val().toLowerCase().trim();
+                    
+                    // Clear previous timeout
+                    if (searchTimeout) {
+                        clearTimeout(searchTimeout);
+                    }
+                    
+                    // Debounce search
+                    searchTimeout = setTimeout(() => {
+                        if (searchTerm === '') {
+                            filteredConversations = [...allConversations];
+                        } else {
+                            filteredConversations = allConversations.filter(user => 
+                                user.NoUsername.toLowerCase().includes(searchTerm)
+                            );
+                        }
+                        renderUsersList();
+                    }, 300);
+                });
+            }
+
+            // Initialize search
+            setupUserSearch();
+
+            // Clear active state
+            function clearActiveState() {
+                currentConvId = null;
+                currentUserId = null;
+                currentUsername = null;
+                
+                // Hide active user indicator
+                $('#active-user-indicator').hide();
+                
+                // Hide chat input
+                $('#chat-input').hide();
+                
+                // Clear all active states
+                $('.user-item').removeClass('active');
+                
+                // Show empty state
+                $('#chat-messages').html(`
+                    <div class="empty-state">
+                        <i class="fas fa-comment-dots"></i>
+                        <h5>Select a user to start chatting</h5>
+                        <p>Choose a user from the sidebar to begin your conversation</p>
+                    </div>
+                `);
             }
 
             // Select user and load conversation
@@ -600,6 +781,10 @@ if (!hasPermission('ChatGround')) {
                 $('#current-conv-id').val(convId);
                 $('#current-user-id').val(userId);
                 
+                // Show active user indicator
+                $('#active-username').text(username);
+                $('#active-user-indicator').show();
+                
                 // Show chat input
                 $('#chat-input').show();
                 
@@ -608,6 +793,9 @@ if (!hasPermission('ChatGround')) {
                 
                 // Start polling
                 startPolling();
+                
+                // Re-render users list to update active states
+                renderUsersList();
             }
 
             // Load messages for current conversation
@@ -735,17 +923,94 @@ if (!hasPermission('ChatGround')) {
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
 
-            // Start polling for new messages
+            // Start global polling for all conversations
+            function startGlobalPolling() {
+                if (globalPollInterval) {
+                    clearInterval(globalPollInterval);
+                }
+                
+                updateConnectionStatus('connected');
+                
+                // Poll every 2 seconds for all conversations
+                globalPollInterval = setInterval(() => {
+                    pollAllConversations();
+                }, 2000);
+            }
+
+            // Poll all conversations for new messages and unread counts
+            function pollAllConversations() {
+                $.get('./php/fetch_conversations.php', function(data) {
+                    // Check for new unread messages in other conversations
+                    const previousUnreadCounts = {};
+                    allConversations.forEach(conv => {
+                        previousUnreadCounts[conv.ConvId] = conv.unreadCount || 0;
+                    });
+                    
+                    // Update all conversations data
+                    allConversations = data;
+                    
+                    // Check for new messages in other conversations
+                    data.forEach(conv => {
+                        const prevCount = previousUnreadCounts[conv.ConvId] || 0;
+                        const currentCount = conv.unreadCount || 0;
+                        
+                        // If there are new unread messages and it's not the current conversation
+                        if (currentCount > prevCount && conv.ConvId !== currentConvId) {
+                            showNewMessageNotification(conv.NoUsername, currentCount - prevCount);
+                        }
+                    });
+                    
+                    // Update filtered conversations if search is active
+                    const searchTerm = $('#user-search').val().toLowerCase().trim();
+                    if (searchTerm === '') {
+                        filteredConversations = [...data];
+                    } else {
+                        filteredConversations = data.filter(user => 
+                            user.NoUsername.toLowerCase().includes(searchTerm)
+                        );
+                    }
+                    
+                    // Re-render users list to update unread counts
+                    renderUsersList();
+                    
+                    // If we're in a conversation, also fetch new messages for that conversation
+                    if (currentConvId) {
+                        fetchNewMessages();
+                    }
+                }, 'json').fail(function() {
+                    console.error('Failed to poll conversations');
+                });
+            }
+
+            // Show notification for new messages in other conversations
+            function showNewMessageNotification(username, count) {
+                // Create notification element
+                const notification = $(`
+                    <div class="alert alert-info alert-dismissible fade show position-fixed" 
+                         style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+                        <i class="fas fa-comment-dots me-2"></i>
+                        <strong>${username}</strong> sent ${count} new message${count > 1 ? 's' : ''}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `);
+                
+                // Add to page
+                $('body').append(notification);
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    notification.alert('close');
+                }, 5000);
+            }
+
+            // Start polling for new messages (for current conversation)
             function startPolling() {
                 if (pollInterval) {
                     clearInterval(pollInterval);
                 }
                 
-                updateConnectionStatus('connected');
-                
-                pollInterval = setInterval(() => {
-                    fetchNewMessages();
-                }, 3000);
+                // Current conversation polling is now handled by global polling
+                // This function is kept for compatibility but doesn't start its own interval
             }
 
             // Fetch new messages
@@ -857,6 +1122,12 @@ if (!hasPermission('ChatGround')) {
             $(window).on('beforeunload', function() {
                 if (pollInterval) {
                     clearInterval(pollInterval);
+                }
+                if (globalPollInterval) {
+                    clearInterval(globalPollInterval);
+                }
+                if (searchTimeout) {
+                    clearTimeout(searchTimeout);
                 }
                 processedMessages.clear();
                 pendingMessages.clear();
