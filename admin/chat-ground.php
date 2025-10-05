@@ -1095,7 +1095,7 @@ if (!hasPermission('ChatGround')) {
                     MessageId: Date.now(),
                     UserId: 0,
                     AdminId: <?= $_SESSION['adminId'] ?? 0 ?>,
-                    AdminName: '<?= $_SESSION['adminName'] ?? 'Admin' ?>',
+                    AdminName: '<?= $_SESSION['AdminName'] ?? 'Admin' ?>',
                     MessageContent: message,
                     SentDate: new Date().toISOString().split('T')[0],
                     SentTime: new Date().toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute: '2-digit'})

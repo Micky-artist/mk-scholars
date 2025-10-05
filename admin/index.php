@@ -1,3 +1,6 @@
-<script type="text/javascript">
-	window.location.href="home";
-</script>
+<?php
+// Ensure session exists for admin landing
+session_start();
+header("Location: home");
+exit;
+?>

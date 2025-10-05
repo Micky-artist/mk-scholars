@@ -2,6 +2,15 @@
 session_start();
 include("../dbconnections/connection.php");
 
+// Debug: Check if we're online and database connection
+$isOnline = isOnline();
+$dbConnected = $conn ? true : false;
+
+// Check database connection
+if (!$conn) {
+    die("Database connection failed: " . mysqli_connect_error());
+}
+
 // Pagination logic
 $limit = 20; // Number of posts per page
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1; // Current page number
@@ -32,10 +41,28 @@ $result = $conn->query($sql);
 $row = $result->fetch_assoc();
 $scholarship_count = $row['scholarship_count'];
 // Fetch scholarships with pagination, search, and filter
-$selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships $filter_condition $search_condition ORDER BY scholarshipUpdateDate DESC LIMIT $limit OFFSET $offset");
+$query = "SELECT * FROM scholarships $filter_condition $search_condition ORDER BY scholarshipUpdateDate DESC LIMIT $limit OFFSET $offset";
+$selectScholarships = mysqli_query($conn, $query);
+
+// Check for query errors
+if (!$selectScholarships) {
+    $error_message = "Database query failed: " . mysqli_error($conn);
+    $selectScholarships = false;
+}
 ?>
 
 <div class="container mt-4">
+    <!-- Debug Information (remove in production) -->
+    <?php if (isset($_GET['debug']) && $_GET['debug'] == '1'): ?>
+    <div class="alert alert-info mb-3">
+        <strong>Debug Information:</strong><br>
+        Environment: <?php echo $isOnline ? 'Online (Production)' : 'Local (Development)'; ?><br>
+        Database Connected: <?php echo $dbConnected ? 'Yes' : 'No'; ?><br>
+        Total Scholarships: <?php echo $scholarship_count; ?><br>
+        Query: <?php echo "SELECT * FROM scholarships $filter_condition $search_condition ORDER BY scholarshipUpdateDate DESC LIMIT $limit OFFSET $offset"; ?>
+    </div>
+    <?php endif; ?>
+    
     <div class="card">
         <div class="card-header bg-primary text-white">
             <h4 class="card-title mb-0">Applications(<?php echo $scholarship_count ?>)</h4>
@@ -66,16 +93,33 @@ $selectScholarships = mysqli_query($conn, "SELECT * FROM scholarships $filter_co
             <!-- Scholarships List -->
             <div class="row">
                 <?php
-                if ($selectScholarships->num_rows > 0) {
+                // Check for database errors
+                if (isset($error_message)) {
+                    echo '<div class="col-12">
+                            <div class="alert alert-danger">
+                                <strong>Database Error:</strong> ' . htmlspecialchars($error_message) . '
+                            </div>
+                          </div>';
+                } elseif ($selectScholarships && $selectScholarships->num_rows > 0) {
                     while ($getScholarships = mysqli_fetch_assoc($selectScholarships)) {
                 ?>
                 <div class="col-md-12 mb-4">
                     <div class="card card-horizontal">
                         <div class="row g-0">
                             <div class="col-md-3">
-                                <img src="<?= getImageUrl('uploads/posts/' . $getScholarships['scholarshipImage']) ?>" 
+                                <?php 
+                                $imagePath = 'uploads/posts/' . $getScholarships['scholarshipImage'];
+                                $imageUrl = getImageUrl($imagePath);
+                                
+                                // Fallback for image URL
+                                if (empty($imageUrl) || $imageUrl === './' . $imagePath) {
+                                    $imageUrl = $isOnline ? 'https://mkscholars.com/' . $imagePath : './' . $imagePath;
+                                }
+                                ?>
+                                <img src="<?= $imageUrl ?>" 
                                      class="img-fluid rounded-start" 
-                                     alt="<?= htmlspecialchars($getScholarships['scholarshipTitle']) ?>">
+                                     alt="<?= htmlspecialchars($getScholarships['scholarshipTitle']) ?>"
+                                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg=='">
                             </div>
                             <div class="col-md-9">
                                 <div class="card-body">

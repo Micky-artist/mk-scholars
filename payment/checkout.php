@@ -358,7 +358,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['continue_to_pay'])) {
   
   $redirectUrl = $baseUrl . '?' . http_build_query($params);
   header("Location: " . $redirectUrl);
-  exit;
+    exit;
 }
 
 // Determine whether to proceed to payment or show coupon form first

@@ -9,12 +9,9 @@ if(!(isset($_SESSION['AdminName'])) || !(isset($_SESSION['adminId'])) || !isset(
         echo json_encode(['success' => false, 'message' => 'Session expired. Please login again.']);
         exit;
     } else {
-        // Return HTML for regular requests
-        echo('
-        <script type="text/javascript">
-        window.location.href="authentication-login";
-        </script>
-        ');
+        // Standardize to PHP header redirect for non-AJAX requests
+        header("Location: authentication-login.php");
+        exit;
     }
 }
 ?>
@@ -58,14 +55,14 @@ if(isset($_SESSION['adminId']) && isset($_SESSION['AdminName']) && isset($_SESSI
         // Log deactivated account access attempt
         error_log("Deactivated account (Admin ID: {$_SESSION['adminId']}) attempted access");
         session_destroy();
-        header("Location: authentication-login?status=account_deactivated");
+            header("Location: authentication-login.php?status=account_deactivated");
         exit();
     }
 } else {
     // Log unauthorized access attempt
     error_log("Unauthorized access attempt from IP: " . $_SERVER['REMOTE_ADDR']);
     session_destroy();
-    header("Location: authentication-login?status=not_logged_in");
+    header("Location: authentication-login.php?status=not_logged_in");
     exit();
 }
 

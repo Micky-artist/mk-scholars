@@ -1,12 +1,13 @@
-<!DOCTYPE html>
-<html dir="ltr">
 <?php
+// Start session and handle login BEFORE any HTML output to avoid header issues in production
 session_start();
 include("./dbconnections/connection.php");
 include("./php/validateSignInSignUp.php");
-include("./partials/head.php");
 include("./php/login.php");
 ?>
+<!DOCTYPE html>
+<html dir="ltr">
+<?php include("./partials/head.php"); ?>
 
 <head>
   <meta charset="UTF-8">
@@ -148,6 +149,11 @@ include("./php/login.php");
         </div>
         <button class="btn-login" name="submit">Login</button>
       </form>
+    <?php if (!empty($msg)): ?>
+      <div style="margin-top:12px;padding:10px;border-radius:8px;background:#ffecec;color:#c00;font-weight:600;">
+        <?= htmlspecialchars($msg) ?>
+      </div>
+    <?php endif; ?>
     </div>
   </div>
 
