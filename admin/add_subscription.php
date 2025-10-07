@@ -30,54 +30,136 @@ if ($coursesResult) {
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['grant_subscription'])) {
-    // Collect and validate inputs
-    $userId            = filter_input(INPUT_POST, 'user_id', FILTER_VALIDATE_INT);
-    $subscriptionType  = filter_input(INPUT_POST, 'subscription_type', FILTER_SANITIZE_STRING);
-    $duration          = filter_input(INPUT_POST, 'duration', FILTER_VALIDATE_INT);
+    // Debug: Log all POST data
+    error_log("Subscription POST data: " . print_r($_POST, true));
     
-    // Validate subscription type against available courses
-    $validCourseIds = array_column($courses, 'courseId');
-    $allowedTypes = array_merge(['notes','instructor','moroccoadmissions'], $validCourseIds);
-
-    if (!$userId || !in_array($subscriptionType, $allowedTypes) || $duration <= 0) {
-        $_SESSION['error'] = 'Invalid subscription parameters.';
-        header('Location: add_subscription');
-        exit;
-    }
-
-    // Generate subscription code
     try {
-        $rand = bin2hex(random_bytes(4));
+        // Check database connection first
+        if (!$conn) {
+            throw new Exception('Database connection failed.');
+        }
+        
+        // Collect and validate inputs
+        $userId            = filter_input(INPUT_POST, 'user_id', FILTER_VALIDATE_INT);
+        $subscriptionType  = filter_input(INPUT_POST, 'subscription_type', FILTER_SANITIZE_STRING);
+        $duration          = filter_input(INPUT_POST, 'duration', FILTER_VALIDATE_INT);
+        
+        // Debug: Log input values
+        error_log("Parsed inputs - UserID: $userId, Type: $subscriptionType, Duration: $duration");
+        
+        // Validate inputs
+        if (!$userId || $userId <= 0) {
+            throw new Exception('Invalid user ID: ' . $userId);
+        }
+        
+        if (!$subscriptionType || empty(trim($subscriptionType))) {
+            throw new Exception('Please select a subscription type. Received: ' . $subscriptionType);
+        }
+        
+        if (!$duration || $duration <= 0) {
+            throw new Exception('Duration must be a positive number. Received: ' . $duration);
+        }
+        
+        // Validate subscription type against available courses
+        $validCourseIds = array_column($courses, 'courseId');
+        $allowedTypes = array_merge(['notes','instructor','moroccoadmissions'], $validCourseIds);
+        
+        error_log("Allowed types: " . print_r($allowedTypes, true));
+        error_log("Selected type: " . $subscriptionType);
+
+        if (!in_array($subscriptionType, $allowedTypes)) {
+            throw new Exception('Invalid subscription type selected: ' . $subscriptionType . '. Allowed: ' . implode(', ', $allowedTypes));
+        }
+
+        // Check if user exists
+        $userCheck = $conn->prepare("SELECT NoUserId, NoUsername FROM normUsers WHERE NoUserId = ?");
+        if (!$userCheck) {
+            throw new Exception('User check prepare failed: ' . $conn->error);
+        }
+        
+        $userCheck->bind_param('i', $userId);
+        if (!$userCheck->execute()) {
+            throw new Exception('User check execute failed: ' . $userCheck->error);
+        }
+        
+        $userResult = $userCheck->get_result();
+        
+        if ($userResult->num_rows === 0) {
+            throw new Exception('User not found with ID: ' . $userId);
+        }
+        
+        $userData = $userResult->fetch_assoc();
+        $userCheck->close();
+        
+        error_log("User found: " . print_r($userData, true));
+
+        // Check for existing active subscription
+        $existingCheck = $conn->prepare("SELECT SubId FROM subscription WHERE UserId = ? AND Item = ? AND SubscriptionStatus = 1 AND expirationDate > CURDATE()");
+        if (!$existingCheck) {
+            throw new Exception('Existing check prepare failed: ' . $conn->error);
+        }
+        
+        $existingCheck->bind_param('is', $userId, $subscriptionType);
+        if (!$existingCheck->execute()) {
+            throw new Exception('Existing check execute failed: ' . $existingCheck->error);
+        }
+        
+        $existingResult = $existingCheck->get_result();
+        
+        if ($existingResult->num_rows > 0) {
+            throw new Exception('User already has an active subscription for this item.');
+        }
+        $existingCheck->close();
+
+        // Generate subscription code
+        try {
+            $rand = bin2hex(random_bytes(4));
+        } catch (Exception $e) {
+            $rand = substr(md5(uniqid('', true)), 0, 8);
+        }
+        $subscriptionCode = 'ADM_' . strtoupper($rand) . '_' . date('Ymd');
+        $subscriptionDate = date('Y-m-d');
+        $expirationDate   = date('Y-m-d', strtotime("+{$duration} days"));
+        
+        error_log("Generated subscription code: $subscriptionCode");
+        error_log("Dates - Start: $subscriptionDate, End: $expirationDate");
+
+        // Insert into DB - using correct column names from database
+        $stmt = $conn->prepare("
+            INSERT INTO subscription 
+              (SubscriptionStatus, Item, UserId, adminId, SubscriptionCode, subscriptionDate, expirationDate)
+            VALUES 
+              (1, ?, ?, ?, ?, ?, ?)
+        ");
+        
+        if (!$stmt) {
+            throw new Exception('Database prepare failed: ' . $conn->error);
+        }
+        
+        $stmt->bind_param(
+            'siisss',
+            $subscriptionType,
+            $userId,
+            $_SESSION['adminId'],
+            $subscriptionCode,
+            $subscriptionDate,
+            $expirationDate
+        );
+
+        if ($stmt->execute()) {
+            $insertId = $conn->insert_id;
+            $stmt->close();
+            error_log("Subscription inserted successfully with ID: $insertId");
+            $_SESSION['success'] = "Subscription granted successfully to {$userData['NoUsername']} for {$subscriptionType} (expires {$expirationDate}).";
+            header('Location: add_subscription');
+            exit;
+        } else {
+            throw new Exception('Database insert failed: ' . $stmt->error);
+        }
+        
     } catch (Exception $e) {
-        $rand = substr(md5(uniqid('', true)), 0, 8);
-    }
-    $subscriptionCode = 'ADM_' . strtoupper($rand) . '_' . date('Ymd');
-    $subscriptionDate = date('Y-m-d');
-    $expirationDate   = date('Y-m-d', strtotime("+{$duration} days"));
-
-    // Insert into DB
-    $stmt = $conn->prepare("
-        INSERT INTO subscription 
-          (SubscriptionStatus, item, UserId, adminId, SubscriptionCode, subscriptionDate, expirationDate)
-        VALUES 
-          (1, ?, ?, ?, ?, ?, ?)
-    ");
-    $stmt->bind_param(
-        'siisss',
-        $subscriptionType,
-        $userId,
-        $_SESSION['adminId'],
-        $subscriptionCode,
-        $subscriptionDate,
-        $expirationDate
-    );
-
-    if ($stmt->execute()) {
-        $_SESSION['success'] = 'Subscription granted successfully.';
-        header('Location: subscriptions');
-        exit;
-    } else {
-        $_SESSION['error'] = 'Database error: ' . $stmt->error;
+        error_log("Subscription error: " . $e->getMessage());
+        $_SESSION['error'] = 'Error: ' . $e->getMessage();
         header('Location: add_subscription');
         exit;
     }
@@ -282,10 +364,30 @@ $success = $_SESSION['success'] ?? null; unset($_SESSION['success']);
       </div>
       <div class="card-body">
         <?php if ($error): ?>
-          <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+          <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Error:</strong> <?= htmlspecialchars($error) ?>
+          </div>
         <?php endif; ?>
         <?php if ($success): ?>
-          <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+          <div class="alert alert-success">
+            <i class="fas fa-check-circle me-2"></i>
+            <strong>Success:</strong> <?= htmlspecialchars($success) ?>
+          </div>
+        <?php endif; ?>
+        
+        <!-- Debug Information -->
+        <?php if (isset($_POST['grant_subscription'])): ?>
+          <div class="alert alert-info">
+            <h6><i class="fas fa-bug me-2"></i>Debug Information</h6>
+            <small>
+              <strong>POST Data:</strong> <?= htmlspecialchars(print_r($_POST, true)) ?><br>
+              <strong>User ID:</strong> <?= isset($_POST['user_id']) ? htmlspecialchars($_POST['user_id']) : 'Not set' ?><br>
+              <strong>Subscription Type:</strong> <?= isset($_POST['subscription_type']) ? htmlspecialchars($_POST['subscription_type']) : 'Not set' ?><br>
+              <strong>Duration:</strong> <?= isset($_POST['duration']) ? htmlspecialchars($_POST['duration']) : 'Not set' ?><br>
+              <strong>Admin ID:</strong> <?= isset($_SESSION['adminId']) ? $_SESSION['adminId'] : 'Not set' ?>
+            </small>
+          </div>
         <?php endif; ?>
 
         <div class="row">
@@ -343,6 +445,7 @@ $success = $_SESSION['success'] ?? null; unset($_SESSION['success']);
           <div class="col-md-6">
             <h5 class="mb-3"><i class="fas fa-gift me-2"></i>Subscription Details</h5>
             <form method="POST" id="subscriptionForm">
+              <input type="hidden" name="grant_subscription" value="1">
               <input type="hidden" name="user_id" id="userIdInput">
               <input type="hidden" name="subscription_type" id="subscriptionTypeInput">
 
@@ -386,7 +489,7 @@ $success = $_SESSION['success'] ?? null; unset($_SESSION['success']);
                       <div class="col-6">
                         <div class="subscription-option" onclick="selectSubscription('<?= $course['courseId'] ?>')" id="option-<?= $course['courseId'] ?>">
                           <h6><?= htmlspecialchars($course['courseName']) ?></h6>
-                          <small class="text-muted"><?= htmlspecialchars($course['courseShortDescription'] ?: 'Course access') ?></small>
+                          <small class="text-muted">Course access</small>
                         </div>
                       </div>
                     <?php endforeach; ?>
@@ -462,6 +565,7 @@ $success = $_SESSION['success'] ?? null; unset($_SESSION['success']);
 
     // Optimized user selection
     function selectUser(userId, username) {
+      console.log('selectUser called:', userId, username);
       // Use requestAnimationFrame for smooth animations
       requestAnimationFrame(() => {
         document.querySelectorAll('.user-card').forEach(c => c.classList.remove('selected'));
@@ -473,12 +577,14 @@ $success = $_SESSION['success'] ?? null; unset($_SESSION['success']);
         selectedUserId = userId;
         elements.userIdInput.value = userId;
         elements.selectedUserDisplay.textContent = username;
+        console.log('User selected - ID:', userId, 'Input value:', elements.userIdInput.value);
         checkFormCompletion();
       });
     }
 
     // Optimized subscription selection
     function selectSubscription(type) {
+      console.log('selectSubscription called:', type);
       requestAnimationFrame(() => {
         document.querySelectorAll('.subscription-option').forEach(o => o.classList.remove('selected'));
         const option = document.getElementById(`option-${type}`);
@@ -488,6 +594,7 @@ $success = $_SESSION['success'] ?? null; unset($_SESSION['success']);
         
         selectedSubscriptionType = type;
         elements.subscriptionTypeInput.value = type;
+        console.log('Subscription selected - Type:', type, 'Input value:', elements.subscriptionTypeInput.value);
         
         // Set default duration based on type
         const defaultDuration = (type === '15days' ? 15 : 30);
@@ -499,6 +606,7 @@ $success = $_SESSION['success'] ?? null; unset($_SESSION['success']);
     // Optimized form completion check
     function checkFormCompletion() {
       const isComplete = !!(selectedUserId && selectedSubscriptionType);
+      console.log('Form completion check - UserID:', selectedUserId, 'Type:', selectedSubscriptionType, 'Complete:', isComplete);
       elements.grantButton.disabled = !isComplete;
       
       if (isComplete) {
@@ -561,7 +669,28 @@ $success = $_SESSION['success'] ?? null; unset($_SESSION['success']);
       // Add loading states to form submission
       const subscriptionForm = document.getElementById('subscriptionForm');
       if (subscriptionForm) {
-        subscriptionForm.addEventListener('submit', function() {
+        subscriptionForm.addEventListener('submit', function(e) {
+          console.log('Form submission started');
+          console.log('Form data:', {
+            user_id: elements.userIdInput.value,
+            subscription_type: elements.subscriptionTypeInput.value,
+            duration: elements.duration.value,
+            grant_subscription: '1'
+          });
+          
+          // Validate form data before submission
+          if (!elements.userIdInput.value) {
+            e.preventDefault();
+            alert('Please select a user');
+            return false;
+          }
+          
+          if (!elements.subscriptionTypeInput.value) {
+            e.preventDefault();
+            alert('Please select a subscription type');
+            return false;
+          }
+          
           elements.grantButton.disabled = true;
           elements.grantButton.innerHTML = '<span class="spinner me-2"></span>Processing...';
         });
