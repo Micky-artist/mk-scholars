@@ -727,3 +727,5 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 });
 </script>
+
+<?php include("./partials/contactButton.php"); ?>

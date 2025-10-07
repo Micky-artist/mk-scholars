@@ -87,3 +87,5 @@
 		</div> <!-- /.row -->
 	</div> <!-- /.container -->
 </footer>
+
+<?php include("./partials/contactButton.php"); ?>
