@@ -18,6 +18,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $courseSeats = (int)$_POST['courseSeats'];
         $courseDisplayStatus = (int)$_POST['courseDisplayStatus'];
         $courseCreatedBy = $_SESSION['adminId'];
+
+        // Duplicate guard: prevent quick duplicate courses by name (last 24h)
+        $dupCheckSql = "SELECT courseId FROM Courses WHERE courseName = '$courseName' AND courseCreatedDate >= (NOW() - INTERVAL 1 DAY) LIMIT 1";
+        $dupRes = mysqli_query($conn, $dupCheckSql);
+        if ($dupRes && mysqli_num_rows($dupRes) > 0) {
+            $existing = mysqli_fetch_assoc($dupRes);
+            $message = 'A course with this name was recently created. Redirecting to edit.';
+            $messageType = 'warning';
+            header('Location: edit-course.php?id=' . (int)$existing['courseId']);
+            exit;
+        }
         
         // Create course content JSON structure
         $courseContent = json_encode([
@@ -61,16 +72,44 @@ $totalCourses = mysqli_fetch_assoc($countResult)['total'];
 $totalPages = ceil($totalCourses / $limit);
 
 // Get courses with pagination and optimized query
-$coursesQuery = "SELECT c.courseId, c.courseName, c.courseShortDescription, c.courseStartDate, 
-                        c.courseEndDate, c.courseSeats, c.courseDisplayStatus, c.courseCreatedDate,
-                        c.coursePhoto, c.courseRegEndDate,
-                        cp.amount, cp.currency, curr.currencySymbol 
-                 FROM Courses c 
-                 LEFT JOIN CoursePricing cp ON c.courseId = cp.courseId 
-                 LEFT JOIN Currencies curr ON cp.currency = curr.currencyCode 
-                 ORDER BY c.courseCreatedDate DESC 
-                 LIMIT $limit OFFSET $offset";
+      $coursesQuery = "SELECT c.courseId, c.courseName, c.courseShortDescription, c.courseStartDate, 
+                              c.courseEndDate, c.courseSeats, c.courseDisplayStatus, c.courseCreatedDate,
+                              c.coursePhoto, c.courseRegEndDate,
+                              ap.minAmount AS amount, ap.currency, curr.currencySymbol, ap.pricingCount
+                       FROM Courses c
+                       LEFT JOIN (
+                           SELECT courseId, MIN(amount) AS minAmount, MAX(currency) AS currency, COUNT(*) AS pricingCount
+                           FROM CoursePricing
+                           GROUP BY courseId
+                       ) ap ON ap.courseId = c.courseId
+                       LEFT JOIN Currencies curr ON ap.currency = curr.currencyCode
+                       ORDER BY c.courseCreatedDate DESC
+                       LIMIT $limit OFFSET $offset";
 $coursesResult = mysqli_query($conn, $coursesQuery);
+
+// Collect courses into array to enable bulk pricing fetch
+$courses = [];
+if ($coursesResult) {
+    while ($row = mysqli_fetch_assoc($coursesResult)) {
+        $courses[] = $row;
+    }
+}
+
+// Fetch all pricing options for the listed courses in one query
+$coursePricingsMap = [];
+if (!empty($courses)) {
+    $courseIds = array_map(function($c){ return (int)$c['courseId']; }, $courses);
+    $inClause = implode(',', $courseIds);
+    $pricingSql = "SELECT courseId, coursePricingId, pricingDescription, amount, currency, isFree FROM CoursePricing WHERE courseId IN ($inClause) ORDER BY courseId, coursePricingId";
+    $pricingRes = mysqli_query($conn, $pricingSql);
+    if ($pricingRes) {
+        while ($p = mysqli_fetch_assoc($pricingRes)) {
+            $cid = (int)$p['courseId'];
+            if (!isset($coursePricingsMap[$cid])) { $coursePricingsMap[$cid] = []; }
+            $coursePricingsMap[$cid][] = $p;
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -535,8 +574,8 @@ $coursesResult = mysqli_query($conn, $coursesQuery);
 
                 <!-- Courses Grid -->
                 <div class="row">
-                    <?php if ($coursesResult && mysqli_num_rows($coursesResult) > 0): ?>
-                        <?php while ($course = mysqli_fetch_assoc($coursesResult)): ?>
+                    <?php if (!empty($courses)): ?>
+                        <?php foreach ($courses as $course): ?>
                             <div class="col-lg-4 col-md-6">
                                 <div class="card course-card">
                                     <div class="course-header position-relative">
@@ -609,20 +648,7 @@ $coursesResult = mysqli_query($conn, $coursesQuery);
                                                 <div class="meta-label">Seats</div>
                                                 <div class="meta-value"><?php echo $course['courseSeats']; ?></div>
                                             </div>
-                                            <div class="meta-item">
-                                                <div class="meta-label">Price</div>
-                                                <div class="meta-value">
-                                                    <?php if ($course['amount'] && $course['amount'] > 0): ?>
-                                                        <?php 
-                                                        $currencySymbol = $course['currencySymbol'] ?: $course['currency'];
-                                                        $formattedAmount = number_format($course['amount'], 2);
-                                                        echo $currencySymbol . ' ' . $formattedAmount;
-                                                        ?>
-                                                    <?php else: ?>
-                                                        Free
-                                                    <?php endif; ?>
-                                                </div>
-                                            </div>
+                                            
                                         </div>
                                         
                                         <div class="d-flex justify-content-between align-items-center">
@@ -634,6 +660,28 @@ $coursesResult = mysqli_query($conn, $coursesQuery);
                                             </small>
                                         </div>
                                     </div>
+                                    <?php 
+                                        $cid = (int)$course['courseId'];
+                                        $pricings = $coursePricingsMap[$cid] ?? [];
+                                        if (!empty($pricings)):
+                                    ?>
+                                    <div class="px-3 pb-3">
+                                        <div class="mb-2" style="font-weight:600;color:var(--text-secondary);">Pricing Options</div>
+                                        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+                                            <?php foreach ($pricings as $p): ?>
+                                                <?php 
+                                                    $isFree = (int)$p['isFree'] === 1;
+                                                    $desc = trim($p['pricingDescription']);
+                                                    $label = $isFree ? 'Free' : (htmlspecialchars($p['currency']) . ' ' . number_format((float)$p['amount'], 2));
+                                                    $text = $desc ? ($label . ' — ' . htmlspecialchars($desc)) : $label;
+                                                ?>
+                                                <span class="badge" style="background:#eef2ff;color:#1e293b;border:1px solid #e2e8f0;border-radius:9999px;padding:0.4rem 0.6rem;font-weight:600;">
+                                                    <?php echo $text; ?>
+                                                </span>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                    <?php endif; ?>
                                     
                                     <div class="course-stats">
                                         <div class="stat-item">
@@ -651,7 +699,7 @@ $coursesResult = mysqli_query($conn, $coursesQuery);
                                     </div>
                                 </div>
                             </div>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     <?php else: ?>
                         <div class="col-12">
                             <div class="empty-state">
@@ -753,15 +801,15 @@ $coursesResult = mysqli_query($conn, $coursesQuery);
                         
                         <div class="row">
                             <div class="col-md-4 mb-3">
-                                <label for="courseStartDate" class="form-label">Start Date *</label>
-                                <input type="date" class="form-control" id="courseStartDate" name="courseStartDate" required>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="courseRegEndDate" class="form-label">Registration End Date *</label>
+                                <label for="courseRegEndDate" class="form-label">Registration End Date <span style="color:#dc3545">*</span></label>
                                 <input type="date" class="form-control" id="courseRegEndDate" name="courseRegEndDate" required>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label for="courseEndDate" class="form-label">End Date *</label>
+                                <label for="courseStartDate" class="form-label">Course Start Date <span style="color:#dc3545">*</span></label>
+                                <input type="date" class="form-control" id="courseStartDate" name="courseStartDate" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="courseEndDate" class="form-label">Course End Date <span style="color:#dc3545">*</span></label>
                                 <input type="date" class="form-control" id="courseEndDate" name="courseEndDate" required>
                             </div>
                         </div>

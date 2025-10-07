@@ -1,7 +1,7 @@
 <?php
 session_start();
 include("./dbconnections/connection.php");
-include("./php/accessRestriction.php");
+include("./php/validateAdminSession.php");
 
 // Debug: Check if tables exist
 $debugInfo = '';
@@ -240,7 +240,7 @@ if ($tablesExist) {
     <div id="main-wrapper" data-layout="vertical" data-navbarbg="skin5" data-sidebartype="full"
         data-sidebar-position="absolute" data-header-position="absolute" data-boxed-layout="full">
         <?php include("./partials/header.php"); ?>
-        <?php include("./partials/left-sidebar.php"); ?>
+        <?php include("./partials/navbar.php"); ?>
 
         <div class="page-wrapper">
             <div class="page-breadcrumb">

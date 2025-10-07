@@ -12,11 +12,18 @@ $currenciesQuery = "SELECT * FROM Currencies WHERE isActive = 1 ORDER BY display
 $currenciesResult = mysqli_query($conn, $currenciesQuery);
 
 // Get course data
-$courseQuery = "SELECT c.*, cp.* FROM Courses c 
-                LEFT JOIN CoursePricing cp ON c.courseId = cp.courseId 
-                WHERE c.courseId = $courseId";
+$courseQuery = "SELECT * FROM Courses WHERE courseId = $courseId";
 $courseResult = mysqli_query($conn, $courseQuery);
 $course = mysqli_fetch_assoc($courseResult);
+
+// Fetch all pricing options for this course
+$pricings = [];
+$pricingRes = mysqli_query($conn, "SELECT * FROM CoursePricing WHERE courseId = $courseId ORDER BY coursePricingId ASC");
+if ($pricingRes) {
+    while ($row = mysqli_fetch_assoc($pricingRes)) {
+        $pricings[] = $row;
+    }
+}
 
 if (!$course) {
     header("Location: course-management.php");
@@ -34,7 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $courseEndDate = $_POST['courseEndDate'];
         $courseSeats = (int)$_POST['courseSeats'];
         $courseDisplayStatus = (int)$_POST['courseDisplayStatus'];
-        $coursePaymentCodeName = mysqli_real_escape_string($conn, $_POST['coursePaymentCodeName']);
         
         // Handle course photo upload
         $coursePhoto = $course['coursePhoto']; // Keep existing photo
@@ -105,8 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         courseEndDate = '$courseEndDate',
                         courseSeats = $courseSeats,
                         coursePhoto = '$coursePhoto',
-                        courseDisplayStatus = $courseDisplayStatus,
-                        coursePaymentCodeName = '$coursePaymentCodeName'
+                        courseDisplayStatus = $courseDisplayStatus
                         WHERE courseId = $courseId";
         
         if (mysqli_query($conn, $updateQuery)) {
@@ -119,32 +124,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $discountEndDate = $_POST['discountEndDate'] ?: null;
             $isFree = isset($_POST['isFree']) ? 1 : 0;
             
-            if ($course['coursePricingId']) {
-                // Update existing pricing
-                $pricingQuery = "UPDATE CoursePricing SET 
-                                amount = $amount,
-                                pricingDescription = '$pricingDescription',
-                                currency = '$currency',
-                                discountAmount = $discountAmount,
-                                discountStartDate = " . ($discountStartDate ? "'$discountStartDate'" : 'NULL') . ",
-                                discountEndDate = " . ($discountEndDate ? "'$discountEndDate'" : 'NULL') . ",
-                                isFree = $isFree
-                                WHERE coursePricingId = " . $course['coursePricingId'];
-            } else {
-                // Insert new pricing
-                $pricingQuery = "INSERT INTO CoursePricing (courseId, amount, pricingDescription, currency, discountAmount, discountStartDate, discountEndDate, isFree) VALUES ($courseId, $amount, '$pricingDescription', '$currency', $discountAmount, " . ($discountStartDate ? "'$discountStartDate'" : 'NULL') . ", " . ($discountEndDate ? "'$discountEndDate'" : 'NULL') . ", $isFree)";
-            }
-            
-            if (mysqli_query($conn, $pricingQuery)) {
+            // Replace all pricing options with submitted options (supports multi-pricing)
+            if (isset($_POST['pricing_options']) && is_array($_POST['pricing_options'])) {
+                // Delete existing
+                mysqli_query($conn, "DELETE FROM CoursePricing WHERE courseId = $courseId");
+                foreach ($_POST['pricing_options'] as $pricing) {
+                    $amount = (float)($pricing['amount'] ?? 0);
+                    $pricingDescription = mysqli_real_escape_string($conn, $pricing['description'] ?? '');
+                    $currency = mysqli_real_escape_string($conn, $pricing['currency'] ?? 'RWF');
+                    $discountAmount = (float)($pricing['discountAmount'] ?? 0);
+                    $discountStartDate = !empty($pricing['discountStartDate']) ? $pricing['discountStartDate'] : null;
+                    $discountEndDate = !empty($pricing['discountEndDate']) ? $pricing['discountEndDate'] : null;
+                    $isFree = !empty($pricing['isFree']) ? 1 : 0;
+                    $baseCode = strtoupper(preg_replace('/[^A-Z0-9]+/','', substr($courseName,0,10)));
+                    $planCode = strtoupper(preg_replace('/[^A-Z0-9]+/','', substr($pricingDescription ?: 'PLAN',0,8)));
+                    $rand = substr(strtoupper(bin2hex(random_bytes(2))), 0, 4);
+                    $newCode = $baseCode . '-' . $planCode . '-' . $rand;
+                    $pricingQuery = "INSERT INTO CoursePricing (courseId, amount, pricingDescription, currency, discountAmount, discountStartDate, discountEndDate, isFree, coursePaymentCodeName) VALUES ($courseId, $amount, '$pricingDescription', '$currency', $discountAmount, " . ($discountStartDate ? "'$discountStartDate'" : 'NULL') . ", " . ($discountEndDate ? "'$discountEndDate'" : 'NULL') . ", $isFree, '" . $newCode . "')";
+                    mysqli_query($conn, $pricingQuery);
+                }
                 $message = 'Course updated successfully!';
                 $messageType = 'success';
-                
-                // Refresh course data
-                $courseResult = mysqli_query($conn, $courseQuery);
-                $course = mysqli_fetch_assoc($courseResult);
+                // Refresh pricing
+                $pricings = [];
+                $pricingRes = mysqli_query($conn, "SELECT * FROM CoursePricing WHERE courseId = $courseId ORDER BY coursePricingId ASC");
+                if ($pricingRes) { while ($row = mysqli_fetch_assoc($pricingRes)) { $pricings[] = $row; } }
             } else {
-                $message = 'Course updated but pricing failed: ' . mysqli_error($conn);
-                $messageType = 'error';
+                $message = 'Course updated, but no pricing options were submitted.';
+                $messageType = 'warning';
             }
         } else {
             $message = 'Error updating course: ' . mysqli_error($conn);
@@ -219,6 +226,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         border-color: #0056b3;
         transform: scale(1.02);
     }
+    .required-star { color: #dc3545; }
+    .invalid-feedback { display: none; }
+    .is-invalid + .invalid-feedback { display: block; }
 
     .price-input-group {
         display: flex;
@@ -361,19 +371,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="mb-3">
-                                            <label for="courseStartDate" class="form-label">Start Date *</label>
-                                            <input type="date" class="form-control" id="courseStartDate" name="courseStartDate" value="<?php echo $course['courseStartDate']; ?>" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
-                                            <label for="courseRegEndDate" class="form-label">Registration End Date *</label>
+                                            <label for="courseRegEndDate" class="form-label">Registration End Date <span class="required-star">*</span></label>
                                             <input type="date" class="form-control" id="courseRegEndDate" name="courseRegEndDate" value="<?php echo $course['courseRegEndDate']; ?>" required>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="mb-3">
-                                            <label for="courseEndDate" class="form-label">End Date *</label>
+                                            <label for="courseStartDate" class="form-label">Course Start Date <span class="required-star">*</span></label>
+                                            <input type="date" class="form-control" id="courseStartDate" name="courseStartDate" value="<?php echo $course['courseStartDate']; ?>" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="courseEndDate" class="form-label">Course End Date <span class="required-star">*</span></label>
                                             <input type="date" class="form-control" id="courseEndDate" name="courseEndDate" value="<?php echo $course['courseEndDate']; ?>" required>
                                         </div>
                                     </div>
@@ -386,12 +396,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <input type="number" class="form-control" id="courseSeats" name="courseSeats" min="1" value="<?php echo $course['courseSeats']; ?>" required>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="coursePaymentCodeName" class="form-label">Payment Code Name</label>
-                                            <input type="text" class="form-control" id="coursePaymentCodeName" name="coursePaymentCodeName" value="<?php echo htmlspecialchars($course['coursePaymentCodeName']); ?>" placeholder="e.g., COURSE2024">
-                                        </div>
-                                    </div>
+                                    <!-- Removed Payment Code Name field; codes handled per pricing option -->
                                 </div>
                             </div>
 
@@ -440,70 +445,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                             </div>
 
-                            <!-- Pricing Information -->
+                            <!-- Pricing Information (Multiple Options) -->
                             <div class="form-card">
-                                <h5 class="section-title">Pricing</h5>
-                                
-                                <div class="mb-3">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="isFree" name="isFree" <?php echo $course['isFree'] ? 'checked' : ''; ?>>
-                                        <label class="form-check-label" for="isFree">
-                                            Free Course
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div id="pricingFields">
-                                    <div class="mb-3">
-                                        <label for="amount" class="form-label">Price *</label>
-                                        <div class="price-input-group">
-                                            <div class="currency-display">
-                                                <span class="currency-symbol" id="currencySymbol"><?php echo $course['currency'] ?? 'RWF'; ?></span>
-                                                <select class="form-control currency-select" id="currency" name="currency">
-                                                    <?php if ($currenciesResult && mysqli_num_rows($currenciesResult) > 0): ?>
-                                                        <?php while ($currency = mysqli_fetch_assoc($currenciesResult)): ?>
-                                                            <option value="<?php echo $currency['currencyCode']; ?>" 
-                                                                    data-symbol="<?php echo htmlspecialchars($currency['currencySymbol']); ?>"
-                                                                    <?php echo $course['currency'] == $currency['currencyCode'] ? 'selected' : ''; ?>>
-                                                                <?php echo $currency['currencyCode'] . ' - ' . $currency['currencyName']; ?>
-                                                            </option>
-                                                        <?php endwhile; ?>
-                                                    <?php else: ?>
-                                                        <option value="RWF" <?php echo $course['currency'] == 'RWF' ? 'selected' : ''; ?>>RWF - Rwandan Franc</option>
-                                                        <option value="USD" <?php echo $course['currency'] == 'USD' ? 'selected' : ''; ?>>USD - US Dollar</option>
-                                                        <option value="EUR" <?php echo $course['currency'] == 'EUR' ? 'selected' : ''; ?>>EUR - Euro</option>
-                                                    <?php endif; ?>
-                                                </select>
-                                            </div>
-                                            <input type="number" class="form-control amount-input" id="amount" name="amount" step="0.01" min="0" value="<?php echo $course['amount'] ?? 0; ?>">
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="pricingDescription" class="form-label">Pricing Description</label>
-                                        <textarea class="form-control" id="pricingDescription" name="pricingDescription" rows="3"><?php echo htmlspecialchars($course['pricingDescription'] ?? ''); ?></textarea>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <div class="mb-3">
-                                                <label for="discountAmount" class="form-label">Discount Amount</label>
-                                                <input type="number" class="form-control" id="discountAmount" name="discountAmount" step="0.01" min="0" value="<?php echo $course['discountAmount'] ?? 0; ?>">
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="mb-3">
-                                                <label for="discountStartDate" class="form-label">Discount Start</label>
-                                                <input type="date" class="form-control" id="discountStartDate" name="discountStartDate" value="<?php echo $course['discountStartDate'] ?? ''; ?>">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="discountEndDate" class="form-label">Discount End</label>
-                                        <input type="date" class="form-control" id="discountEndDate" name="discountEndDate" value="<?php echo $course['discountEndDate'] ?? ''; ?>">
-                                    </div>
-                                </div>
+                                <h5 class="section-title">Pricing Options</h5>
+                                <p class="text-muted">Add, edit, or remove pricing tiers for this course.</p>
+                                <div id="pricingOptionsContainer"></div>
+                                <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="addPricingBtn"><i class="fas fa-plus me-1"></i>Add Pricing Option</button>
+                                <div class="mt-2 small text-muted">Codes are auto-generated (Course-Plan-XXXX).</div>
                             </div>
 
                             <!-- Actions -->
@@ -535,6 +483,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 
     <script>
+        // Wrap any '*' in labels with red asterisk for visibility
+        (function() {
+            const labels = document.querySelectorAll('label.form-label');
+            labels.forEach(label => {
+                if (label.textContent.includes('*') && !label.innerHTML.includes('required-star')) {
+                    label.innerHTML = label.textContent.replace('*', '<span class="required-star">*</span>');
+                }
+            });
+        })();
+
         // Image upload functionality
         const imageUploadArea = document.getElementById('imageUploadArea');
         const coursePhoto = document.getElementById('coursePhoto');
@@ -594,62 +552,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // Free course toggle
-        const isFreeCheckbox = document.getElementById('isFree');
-        const pricingFields = document.getElementById('pricingFields');
-
-        isFreeCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                pricingFields.style.display = 'none';
-                document.getElementById('amount').value = '0';
-            } else {
-                pricingFields.style.display = 'block';
+        // Inline validation helpers (non-intrusive)
+        function setInvalid(input, message) {
+            input.classList.add('is-invalid');
+            let fb = input.nextElementSibling;
+            if (!fb || !fb.classList.contains('invalid-feedback')) {
+                fb = document.createElement('div');
+                fb.className = 'invalid-feedback';
+                input.parentNode.appendChild(fb);
             }
-        });
-
-        // Initialize pricing fields visibility
-        if (isFreeCheckbox.checked) {
-            pricingFields.style.display = 'none';
+            fb.textContent = message;
+        }
+        function clearInvalid(input) {
+            input.classList.remove('is-invalid');
+            const fb = input.nextElementSibling;
+            if (fb && fb.classList.contains('invalid-feedback')) {
+                fb.remove();
+            }
         }
 
-        // Form validation
-        document.getElementById('courseForm').addEventListener('submit', function(e) {
-            console.log('Form submission started');
-            
-            // Check if file is selected
-            const fileInput = document.getElementById('coursePhoto');
-            if (fileInput && fileInput.files.length > 0) {
-                console.log('File selected for upload:', fileInput.files[0].name);
-                console.log('File size:', fileInput.files[0].size);
-                console.log('File type:', fileInput.files[0].type);
-            } else {
-                console.log('No file selected for upload');
-            }
-            
-            const startDate = new Date(document.getElementById('courseStartDate').value);
-            const regEndDate = new Date(document.getElementById('courseRegEndDate').value);
-            const endDate = new Date(document.getElementById('courseEndDate').value);
-
-            if (regEndDate >= startDate) {
-                alert('Registration end date must be before course start date');
-                e.preventDefault();
-                return;
-            }
-
-            if (endDate <= startDate) {
-                alert('Course end date must be after course start date');
-                e.preventDefault();
-                return;
-            }
-
-            if (!isFreeCheckbox.checked && parseFloat(document.getElementById('amount').value) < 0) {
-                alert('Price cannot be negative');
-                e.preventDefault();
-                return;
-            }
-            
-            console.log('Form validation passed, submitting...');
+        // Gentle real-time date validation
+        ['courseRegEndDate','courseStartDate','courseEndDate'].forEach(id => {
+            const el = document.getElementById(id);
+            el && el.addEventListener('change', validateDates);
         });
+        function validateDates() {
+            const regEnd = document.getElementById('courseRegEndDate');
+            const start = document.getElementById('courseStartDate');
+            const end = document.getElementById('courseEndDate');
+            if (!regEnd || !start || !end) return;
+            const dReg = new Date(regEnd.value), dStart = new Date(start.value), dEnd = new Date(end.value);
+            clearInvalid(regEnd); clearInvalid(start); clearInvalid(end);
+            if (regEnd.value && start.value && dReg >= dStart) {
+                setInvalid(regEnd, 'Registration End must be before Course Start');
+            }
+            if (start.value && end.value && dEnd <= dStart) {
+                setInvalid(end, 'Course End must be after Course Start');
+            }
+        }
 
         // Auto-hide alerts
         setTimeout(function() {
@@ -660,22 +600,123 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
         }, 5000);
 
-        // Handle currency selection
-        document.getElementById('currency').addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            const symbol = selectedOption.getAttribute('data-symbol');
-            document.getElementById('currencySymbol').textContent = symbol || selectedOption.value;
+        // Pricing options management (load existing, edit, add/remove)
+        const existingPricings = <?php echo json_encode($pricings ?: []); ?>;
+        const pricingContainer = document.getElementById('pricingOptionsContainer');
+        const addPricingBtn = document.getElementById('addPricingBtn');
+        let pricingOptions = existingPricings.map(p => ({
+            coursePricingId: p.coursePricingId,
+            description: p.pricingDescription || '',
+            amount: parseFloat(p.amount || 0),
+            currency: p.currency || 'RWF',
+            discountAmount: parseFloat(p.discountAmount || 0),
+            discountStartDate: p.discountStartDate || '',
+            discountEndDate: p.discountEndDate || '',
+            isFree: Number(p.isFree) === 1
+        }));
+
+        function renderPricingOptions() {
+            pricingContainer.innerHTML = '';
+            pricingOptions.forEach((opt, idx) => {
+                const wrap = document.createElement('div');
+                wrap.className = 'border rounded p-2 mb-2';
+                wrap.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong>Pricing Option ${idx + 1}</strong>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removePricing(${idx})"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Description</label>
+                        <input type="text" class="form-control" value="${opt.description.replace(/"/g,'&quot;')}" oninput="updatePricing(${idx}, 'description', this.value)">
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" ${opt.isFree ? 'checked' : ''} onchange="toggleFree(${idx}, this.checked)">
+                        <label class="form-check-label">Free Option</label>
+                    </div>
+                    <div class="row pricing-fields" style="${opt.isFree ? 'display:none' : ''}">
+                        <div class="col-6 mb-2">
+                            <label class="form-label">Currency</label>
+                            <select class="form-control" onchange="updatePricing(${idx}, 'currency', this.value)">
+                                <option value="RWF" ${opt.currency==='RWF'?'selected':''}>RWF</option>
+                                <option value="USD" ${opt.currency==='USD'?'selected':''}>USD</option>
+                                <option value="EUR" ${opt.currency==='EUR'?'selected':''}>EUR</option>
+                            </select>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <label class="form-label">Amount</label>
+                            <input type="number" min="0" step="0.01" class="form-control" value="${opt.amount}" oninput="updatePricing(${idx}, 'amount', this.value)">
+                        </div>
+                        <div class="col-6 mb-2">
+                            <label class="form-label">Discount Amount</label>
+                            <input type="number" min="0" step="0.01" class="form-control" value="${opt.discountAmount}" oninput="updatePricing(${idx}, 'discountAmount', this.value)">
+                        </div>
+                        <div class="col-6 mb-2">
+                            <label class="form-label">Discount Start</label>
+                            <input type="date" class="form-control" value="${opt.discountStartDate || ''}" onchange="updatePricing(${idx}, 'discountStartDate', this.value)">
+                        </div>
+                        <div class="col-6 mb-2">
+                            <label class="form-label">Discount End</label>
+                            <input type="date" class="form-control" value="${opt.discountEndDate || ''}" onchange="updatePricing(${idx}, 'discountEndDate', this.value)">
+                        </div>
+                    </div>
+                `;
+                pricingContainer.appendChild(wrap);
+            });
+        }
+
+        window.updatePricing = function(index, field, value) {
+            if (!pricingOptions[index]) return;
+            if (field === 'amount' || field === 'discountAmount') {
+                pricingOptions[index][field] = parseFloat(value || 0);
+            } else {
+                pricingOptions[index][field] = value;
+            }
+        }
+        window.toggleFree = function(index, checked) {
+            pricingOptions[index].isFree = !!checked;
+            renderPricingOptions();
+        }
+        window.removePricing = function(index) {
+            pricingOptions.splice(index, 1);
+            renderPricingOptions();
+        }
+        addPricingBtn.addEventListener('click', function() {
+            pricingOptions.push({ description: '', amount: 0, currency: 'RWF', discountAmount: 0, discountStartDate: '', discountEndDate: '', isFree: false });
+            renderPricingOptions();
         });
 
-        // Initialize currency symbol on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const currencySelect = document.getElementById('currency');
-            if (currencySelect) {
-                const selectedOption = currencySelect.options[currencySelect.selectedIndex];
-                const symbol = selectedOption.getAttribute('data-symbol');
-                document.getElementById('currencySymbol').textContent = symbol || selectedOption.value;
-            }
+        // Inject hidden inputs on submit
+        document.getElementById('courseForm').addEventListener('submit', function(e) {
+            validateDates();
+            const invalids = document.querySelectorAll('.is-invalid');
+            if (invalids.length) { e.preventDefault(); return; }
+            // Clear any previous injected inputs
+            const prev = this.querySelectorAll('input[name^="pricing_options["]');
+            prev.forEach(n => n.remove());
+            pricingOptions.forEach((opt, idx) => {
+                const fields = {
+                    description: opt.description,
+                    amount: opt.isFree ? 0 : (opt.amount || 0),
+                    currency: opt.currency,
+                    discountAmount: opt.isFree ? 0 : (opt.discountAmount || 0),
+                    discountStartDate: opt.discountStartDate || '',
+                    discountEndDate: opt.discountEndDate || '',
+                    isFree: opt.isFree ? '1' : '0'
+                };
+                Object.keys(fields).forEach(key => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = `pricing_options[${idx}][${key}]`;
+                    input.value = fields[key];
+                    this.appendChild(input);
+                });
+            });
         });
+
+        // Initial render
+        renderPricingOptions();
     </script>
 </body>
 </html>

@@ -64,8 +64,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         
-        // Insert course
-        $insertQuery = "INSERT INTO Courses (courseName, courseShortDescription, courseLongDescription, courseStartDate, courseRegEndDate, courseEndDate, courseSeats, coursePhoto, courseDisplayStatus, coursePaymentCodeName, courseCreatedBy) VALUES ('$courseName', '$courseShortDescription', '$courseLongDescription', '$courseStartDate', '$courseRegEndDate', '$courseEndDate', $courseSeats, '$coursePhoto', $courseDisplayStatus, '$coursePaymentCodeName', " . $_SESSION['adminId'] . ")";
+        // Duplicate guard: prevent quick duplicate courses by name (last 24h)
+        $dupCheckSql = "SELECT courseId FROM Courses WHERE courseName = '$courseName' AND courseCreatedDate >= (NOW() - INTERVAL 1 DAY) LIMIT 1";
+        $dupRes = mysqli_query($conn, $dupCheckSql);
+        if ($dupRes && mysqli_num_rows($dupRes) > 0) {
+            $existing = mysqli_fetch_assoc($dupRes);
+            $message = 'A course with this name was recently created. Redirecting to edit.';
+            $messageType = 'warning';
+            header('Location: edit-course.php?id=' . (int)$existing['courseId']);
+            exit;
+        }
+
+        // Insert course (coursePaymentCodeName belongs to CoursePricing, not Courses)
+        $insertQuery = "INSERT INTO Courses (courseName, courseShortDescription, courseLongDescription, courseStartDate, courseRegEndDate, courseEndDate, courseSeats, coursePhoto, courseDisplayStatus, courseCreatedBy) VALUES ('$courseName', '$courseShortDescription', '$courseLongDescription', '$courseStartDate', '$courseRegEndDate', '$courseEndDate', $courseSeats, '$coursePhoto', $courseDisplayStatus, " . $_SESSION['adminId'] . ")";
         
         if (mysqli_query($conn, $insertQuery)) {
             $courseId = mysqli_insert_id($conn);
@@ -92,8 +103,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $discountStartDate = $pricing['discountStartDate'] ?: null;
                     $discountEndDate = $pricing['discountEndDate'] ?: null;
                     $isFree = isset($pricing['isFree']) ? 1 : 0;
+                    // Generate meaningful payment code (COURSECODE-PLAN-XXXX)
+                    $baseCode = strtoupper(preg_replace('/[^A-Z0-9]+/','', substr($courseName,0,10)));
+                    $planCode = strtoupper(preg_replace('/[^A-Z0-9]+/','', substr($pricingDescription ?: 'PLAN',0,8)));
+                    $rand = substr(strtoupper(bin2hex(random_bytes(2))), 0, 4);
+                    $paymentCode = $baseCode . '-' . $planCode . '-' . $rand;
                     
-                    $pricingQuery = "INSERT INTO CoursePricing (courseId, amount, pricingDescription, currency, discountAmount, discountStartDate, discountEndDate, isFree) VALUES ($courseId, $amount, '$pricingDescription', '$currency', $discountAmount, " . ($discountStartDate ? "'$discountStartDate'" : 'NULL') . ", " . ($discountEndDate ? "'$discountEndDate'" : 'NULL') . ", $isFree)";
+                    $pricingQuery = "INSERT INTO CoursePricing (courseId, amount, pricingDescription, currency, discountAmount, discountStartDate, discountEndDate, isFree, coursePaymentCodeName) VALUES ($courseId, $amount, '$pricingDescription', '$currency', $discountAmount, " . ($discountStartDate ? "'$discountStartDate'" : 'NULL') . ", " . ($discountEndDate ? "'$discountEndDate'" : 'NULL') . ", $isFree, '" . $paymentCode . "')";
                     mysqli_query($conn, $pricingQuery);
                 }
             } else {
@@ -105,8 +121,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $discountStartDate = $_POST['discountStartDate'] ?: null;
                 $discountEndDate = $_POST['discountEndDate'] ?: null;
                 $isFree = isset($_POST['isFree']) ? 1 : 0;
-                
-                $pricingQuery = "INSERT INTO CoursePricing (courseId, amount, pricingDescription, currency, discountAmount, discountStartDate, discountEndDate, isFree) VALUES ($courseId, $amount, '$pricingDescription', '$currency', $discountAmount, " . ($discountStartDate ? "'$discountStartDate'" : 'NULL') . ", " . ($discountEndDate ? "'$discountEndDate'" : 'NULL') . ", $isFree)";
+                // Generate meaningful payment code
+                $baseCode = strtoupper(preg_replace('/[^A-Z0-9]+/','', substr($courseName,0,10)));
+                $planCode = strtoupper(preg_replace('/[^A-Z0-9]+/','', substr($pricingDescription ?: 'PLAN',0,8)));
+                $rand = substr(strtoupper(bin2hex(random_bytes(2))), 0, 4);
+                $paymentCode = $baseCode . '-' . $planCode . '-' . $rand;
+                $pricingQuery = "INSERT INTO CoursePricing (courseId, amount, pricingDescription, currency, discountAmount, discountStartDate, discountEndDate, isFree, coursePaymentCodeName) VALUES ($courseId, $amount, '$pricingDescription', '$currency', $discountAmount, " . ($discountStartDate ? "'$discountStartDate'" : 'NULL') . ", " . ($discountEndDate ? "'$discountEndDate'" : 'NULL') . ", $isFree, '" . $paymentCode . "')";
                 mysqli_query($conn, $pricingQuery);
             }
             
@@ -189,6 +209,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         border-color: #0056b3;
         transform: scale(1.02);
     }
+
+    .required-star { color: #dc3545; }
 
     .price-input-group {
         display: flex;
@@ -424,19 +446,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="mb-3">
-                                            <label for="courseStartDate" class="form-label">Start Date *</label>
-                                            <input type="date" class="form-control" id="courseStartDate" name="courseStartDate" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
-                                            <label for="courseRegEndDate" class="form-label">Registration End Date *</label>
+                                            <label for="courseRegEndDate" class="form-label">Registration End Date <span class="required-star">*</span></label>
                                             <input type="date" class="form-control" id="courseRegEndDate" name="courseRegEndDate" required>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="mb-3">
-                                            <label for="courseEndDate" class="form-label">End Date *</label>
+                                            <label for="courseStartDate" class="form-label">Course Start Date <span class="required-star">*</span></label>
+                                            <input type="date" class="form-control" id="courseStartDate" name="courseStartDate" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="courseEndDate" class="form-label">Course End Date <span class="required-star">*</span></label>
                                             <input type="date" class="form-control" id="courseEndDate" name="courseEndDate" required>
                                         </div>
                                     </div>
@@ -449,12 +471,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <input type="number" class="form-control" id="courseSeats" name="courseSeats" min="1" required>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="coursePaymentCodeName" class="form-label">Payment Code Name</label>
-                                            <input type="text" class="form-control" id="coursePaymentCodeName" name="coursePaymentCodeName" placeholder="e.g., COURSE2024">
-                                        </div>
-                                    </div>
+                                    <!-- Removed Payment Code Name field; codes are generated per pricing option -->
                                 </div>
                             </div>
 
