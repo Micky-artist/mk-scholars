@@ -1,6 +1,14 @@
 <?php
 // Universal Navigation Component
 // This file provides consistent navigation across all user pages
+
+// Get current page from URL or parameter
+$currentPage = $_GET['page'] ?? basename($_SERVER['PHP_SELF'], '.php');
+
+// Function to check if a nav item is active
+function isActive($page, $currentPage) {
+    return $page === $currentPage ? 'active' : '';
+}
 ?>
 
 <nav class="col-md-3 col-lg-2 sidebar p-4">
@@ -14,31 +22,31 @@
             <a href="./profile.php" class="btn btn-sm btn-outline-primary">View Profile</a>
         </div>
 
-        <div class="glass-panel p-2 mb-1">
+        <div class="glass-panel p-2 mb-1 <?php echo isActive('dashboard', $currentPage); ?>">
             <a class="nav-link d-flex align-items-center" href="./dashboard.php">
                 <i class="fas fa-tachometer-alt me-3 text-primary"></i>
                 <span>Dashboard</span>
             </a>
         </div>
-        <div class="glass-panel p-2 mb-1">
+        <div class="glass-panel p-2 mb-1 <?php echo isActive('e-learning', $currentPage); ?>">
             <a class="nav-link d-flex align-items-center" href="./e-learning.php">
                 <i class="fas fa-graduation-cap me-3 text-primary"></i>
                 <span>E-Learning</span>
             </a>
         </div>
-        <div class="glass-panel p-2 mb-1">
+        <div class="glass-panel p-2 mb-1 <?php echo isActive('conversations', $currentPage); ?>">
             <a class="nav-link d-flex align-items-center" href="./conversations.php">
                 <i class="fas fa-comments me-3 text-primary"></i>
                 <span>Conversations</span>
             </a>
         </div>
-        <div class="glass-panel p-2 mb-1">
+        <div class="glass-panel p-2 mb-1 <?php echo isActive('apply', $currentPage); ?>">
             <a class="nav-link d-flex align-items-center" href="./apply.php">
                 <i class="fas fa-hand-holding-heart me-3 text-primary"></i>
                 <span>Ask For Assistance</span>
             </a>
         </div>
-        <div class="glass-panel p-2 mb-1">
+        <div class="glass-panel p-2 mb-1 <?php echo isActive('profile', $currentPage); ?>">
             <a class="nav-link d-flex align-items-center" href="./profile.php">
                 <i class="fas fa-user-circle me-3 text-primary"></i>
                 <span>Profile</span>
@@ -150,6 +158,27 @@
     .nav-link i {
         width: 20px;
         text-align: center;
+    }
+
+    /* Active navigation item styles */
+    .glass-panel.active {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(29, 78, 216, 0.1));
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+    }
+
+    .glass-panel.active .nav-link {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    .glass-panel.active .nav-link i {
+        color: var(--primary-color);
+    }
+
+    .glass-panel.active:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 25px rgba(59, 130, 246, 0.25);
     }
 
     .theme-toggle {

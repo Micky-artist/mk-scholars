@@ -558,7 +558,11 @@ function generatePaginationLink($page_num)
     </button>
 
     <!-- Include your existing sidebar code here -->
-    <?php include("./partials/universalNavigation.php"); ?>
+    <?php 
+    // Set current page for navigation highlighting
+    $_GET['page'] = 'apply';
+    include("./partials/universalNavigation.php"); 
+    ?>
 
     <main class="col-md-9 col-lg-10 main-content p-4">
         <div class="d-flex justify-content-between align-items-center mb-4">

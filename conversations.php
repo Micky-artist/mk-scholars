@@ -43,7 +43,11 @@ if (isset($_POST['startConvo']) && $_POST['startConvo'] === 'true') {
 
 <body data-theme="light">
     <!-- Navigation -->
-    <?php include("./partials/universalNavigation.php"); ?>
+    <?php 
+    // Set current page for navigation highlighting
+    $_GET['page'] = 'conversations';
+    include("./partials/universalNavigation.php"); 
+    ?>
 
     <!-- Mobile Navigation Bar -->
     <div class="mobile-nav-bar">

@@ -27,7 +27,13 @@ $userPhone = $_SESSION['userPhone'] ?? '';
             <!-- Universal Navigation -->
             <?php 
             try {
-                include("./partials/universalNavigation.php"); 
+                // Set current page for navigation highlighting
+                $_GET['page'] = 'profile';
+                if (file_exists("./partials/universalNavigation.php")) {
+                    include("./partials/universalNavigation.php"); 
+                } else {
+                    echo "<!-- Navigation file not found -->";
+                }
             } catch (Exception $e) {
                 echo "<!-- Navigation error: " . $e->getMessage() . " -->";
             }
@@ -177,13 +183,12 @@ $userPhone = $_SESSION['userPhone'] ?? '';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        // Prevent multiple initializations
-        if (window.profilePageInitialized) {
-            return;
-        }
-        window.profilePageInitialized = true;
-
         $(document).ready(function() {
+            // Prevent multiple initializations
+            if (window.profilePageInitialized) {
+                return;
+            }
+            window.profilePageInitialized = true;
             // Theme toggle functionality
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.body.setAttribute('data-theme', savedTheme);
@@ -212,13 +217,24 @@ $userPhone = $_SESSION['userPhone'] ?? '';
                 saveBtn.prop('disabled', true);
                 
                 const formData = {
-                    userName: $('#userName').val(),
-                    userEmail: $('#userEmail').val(),
-                    userPhone: $('#userPhone').val(),
+                    userName: $('#userName').val().trim(),
+                    userEmail: $('#userEmail').val().trim(),
+                    userPhone: $('#userPhone').val().trim(),
                     currentPassword: $('#currentPassword').val(),
                     newPassword: $('#newPassword').val(),
                     confirmPassword: $('#confirmPassword').val()
                 };
+                
+                // Basic validation
+                if (!formData.userName || !formData.userEmail) {
+                    showAlert('Name and email are required fields', 'error');
+                    return;
+                }
+                
+                if (formData.newPassword && formData.newPassword !== formData.confirmPassword) {
+                    showAlert('New passwords do not match', 'error');
+                    return;
+                }
                 
                 $.ajax({
                     url: 'php/update_profile.php',
@@ -226,7 +242,8 @@ $userPhone = $_SESSION['userPhone'] ?? '';
                     data: formData,
                     dataType: 'json',
                     success: function(response) {
-                        if (response.success) {
+                        console.log('Profile update response:', response);
+                        if (response && response.success) {
                             showAlert('Profile updated successfully!', 'success');
                             // Clear password fields
                             $('#currentPassword, #newPassword, #confirmPassword').val('');
@@ -234,7 +251,8 @@ $userPhone = $_SESSION['userPhone'] ?? '';
                             showAlert(response.message || 'Failed to update profile', 'error');
                         }
                     },
-                    error: function() {
+                    error: function(xhr, status, error) {
+                        console.error('Profile update error:', status, error, xhr.responseText);
                         showAlert('An error occurred. Please try again.', 'error');
                     },
                     complete: function() {
@@ -244,33 +262,56 @@ $userPhone = $_SESSION['userPhone'] ?? '';
                 });
             });
 
-            // Load subscriptions on page load with error handling
-            try {
-                loadSubscriptions();
-            } catch (e) {
-                console.error('Error loading subscriptions on page load:', e);
-            }
+            // Load subscriptions on page load with error handling and delay
+            setTimeout(function() {
+                try {
+                    loadSubscriptions();
+                } catch (e) {
+                    console.error('Error loading subscriptions on page load:', e);
+                }
+            }, 500); // 500ms delay to ensure page is fully loaded
         });
 
         function toggleTheme() {
-            const currentTheme = document.body.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            document.body.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeIcon();
+            try {
+                const currentTheme = document.body.getAttribute('data-theme');
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                document.body.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateThemeIcon();
+            } catch (e) {
+                console.error('Error toggling theme:', e);
+            }
         }
 
         function updateThemeIcon() {
-            const currentTheme = document.body.getAttribute('data-theme');
-            const icon = currentTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
-            $('.theme-toggle i').attr('class', icon);
+            try {
+                const currentTheme = document.body.getAttribute('data-theme');
+                const icon = currentTheme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+                const themeToggle = document.querySelector('.theme-toggle i');
+                if (themeToggle) {
+                    themeToggle.className = icon;
+                }
+            } catch (e) {
+                console.error('Error updating theme icon:', e);
+            }
         }
 
+        // Prevent multiple simultaneous requests
+        let isLoadingSubscriptions = false;
+
         function loadSubscriptions() {
+            if (isLoadingSubscriptions) {
+                console.log('Subscription request already in progress, skipping...');
+                return;
+            }
+            
+            isLoadingSubscriptions = true;
             console.log('Loading subscriptions for userId:', <?php echo (int)$userId; ?>);
             const tbody = $('#subscriptionsTable tbody');
             if (tbody.length === 0) {
                 console.error('Subscription table not found');
+                isLoadingSubscriptions = false;
                 return;
             }
             tbody.html('<tr><td colspan="4" class="text-center py-4"><div class="loading"></div><span class="ms-2">Loading subscriptions...</span></td></tr>');
@@ -309,7 +350,7 @@ $userPhone = $_SESSION['userPhone'] ?? '';
                                 }
                                 
                                 rows += `
-                                    <tr class="fade-in">
+                                    <tr>
                                         <td><strong>${sub.Item || 'N/A'}</strong></td>
                                         <td><span class="badge ${statusClass}">${sub.SubscriptionStatus || 'Unknown'}</span></td>
                                         <td>${sub.subscriptionDate || 'N/A'}</td>
@@ -327,6 +368,8 @@ $userPhone = $_SESSION['userPhone'] ?? '';
                         console.error('Error processing subscription data:', e);
                         tbody.html('<tr><td colspan="4" class="text-center py-4 text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Error processing data</td></tr>');
                         $('#subsMsg').html('<i class="fas fa-exclamation-triangle me-2"></i>Error processing subscription data');
+                    } finally {
+                        isLoadingSubscriptions = false;
                     }
                 },
                 error: function(xhr, status, error) {
@@ -349,6 +392,7 @@ $userPhone = $_SESSION['userPhone'] ?? '';
                     
                     tbody.html('<tr><td colspan="4" class="text-center py-4 text-danger"><i class="fas fa-exclamation-triangle me-2"></i>' + errorMsg + '</td></tr>');
                     $('#subsMsg').html('<i class="fas fa-exclamation-triangle me-2"></i>' + errorMsg);
+                    isLoadingSubscriptions = false;
                 }
             });
         }
@@ -371,21 +415,141 @@ $userPhone = $_SESSION['userPhone'] ?? '';
     </script>
 
     <style>
+        /* CSS Variables - must be defined first */
+        :root {
+            --bg-primary: #f3f4f6;
+            --bg-secondary: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #4b5563;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --neumorphic-shadow: 5px 5px 10px #d1d5db, -5px -5px 10px #ffffff;
+            --primary-color: #3b82f6;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #111827;
+            --bg-secondary: #1f2937;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --glass-bg: rgba(31, 41, 55, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --neumorphic-shadow: 5px 5px 10px #0a0c10, -5px -5px 10px #283447;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Universal glass panel styles */
+        .glass-panel {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+
+        /* Page header styles */
+        .page-header {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            margin: 0.5rem 0 0 0;
+            font-size: 1rem;
+        }
+
+        /* Content container */
+        .content-container {
+            padding: 2rem;
+        }
+
+        /* Main content */
+        .main-content {
+            margin-left: 250px;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border-right: 1px solid var(--glass-border);
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            width: 250px;
+            overflow-y: auto;
+        }
+
+        /* Theme toggle */
+        .theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1100;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            box-shadow: var(--neumorphic-shadow);
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+
         /* Additional profile-specific styles */
         .profile-avatar {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            width: 100px;
+            height: 100px;
+            background: var(--primary-color);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
         }
 
         .profile-name {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 600;
             color: var(--text-primary);
             margin: 0.5rem 0 0.25rem 0;
@@ -431,11 +595,10 @@ $userPhone = $_SESSION['userPhone'] ?? '';
 
         .form-control {
             border: 1px solid var(--glass-border);
-            border-radius: 10px;
+            border-radius: 8px;
             padding: 0.75rem 1rem;
             background: var(--glass-bg);
             color: var(--text-primary);
-            transition: all 0.3s ease;
         }
 
         .form-control:focus {
@@ -445,43 +608,32 @@ $userPhone = $_SESSION['userPhone'] ?? '';
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+            background: var(--primary-color);
             border: none;
-            border-radius: 10px;
-            padding: 0.75rem 2rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
-        }
 
         .btn-outline-primary {
             border: 1px solid var(--primary-color);
             color: var(--primary-color);
-            border-radius: 10px;
+            border-radius: 8px;
             padding: 0.5rem 1rem;
             font-weight: 500;
-            transition: all 0.3s ease;
         }
 
-        .btn-outline-primary:hover {
-            background: var(--primary-color);
-            color: white;
-            transform: translateY(-1px);
-        }
 
         .table {
             background: var(--bg-secondary);
-            border-radius: 15px;
+            border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .table thead th {
-            background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+            background: var(--primary-color);
             color: white;
             border: none;
             padding: 1rem;
@@ -494,9 +646,6 @@ $userPhone = $_SESSION['userPhone'] ?? '';
             vertical-align: middle;
         }
 
-        .table tbody tr:hover {
-            background: rgba(59, 130, 246, 0.05);
-        }
 
         .badge {
             padding: 0.5rem 1rem;
@@ -506,17 +655,17 @@ $userPhone = $_SESSION['userPhone'] ?? '';
         }
 
         .status-active {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: #10b981;
             color: white;
         }
 
         .status-expired {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
+            background: #ef4444;
             color: white;
         }
 
         .status-pending {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
+            background: #f59e0b;
             color: white;
         }
 
@@ -534,29 +683,6 @@ $userPhone = $_SESSION['userPhone'] ?? '';
             to { transform: rotate(360deg); }
         }
 
-        .slide-in {
-            animation: slideIn 0.6s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
 
         /* Responsive adjustments */
         @media (max-width: 768px) {

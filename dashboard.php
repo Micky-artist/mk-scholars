@@ -54,7 +54,11 @@ include('./php/validateSession.php');
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <?php include("./partials/universalNavigation.php"); ?>
+            <?php 
+            // Set current page for navigation highlighting
+            $_GET['page'] = 'dashboard';
+            include("./partials/universalNavigation.php"); 
+            ?>
 
             <!-- Main Content -->
             <main class="col-md-9 col-lg-10 main-content p-4">

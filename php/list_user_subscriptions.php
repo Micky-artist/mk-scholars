@@ -2,10 +2,6 @@
 header('Content-Type: application/json');
 include('../dbconnection/connection.php');
 
-// Enable error reporting for debugging
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 if (!isset($_GET['userId'])) {
     echo json_encode(['error' => 'Missing userId']);
     exit;
@@ -13,24 +9,10 @@ if (!isset($_GET['userId'])) {
 
 $userId = intval($_GET['userId']);
 
-// Debug: Log the request
-error_log("Subscription request for userId: " . $userId);
-
 // Check if connection is valid
 if (!$conn) {
-    error_log("Database connection failed");
     echo json_encode(['error' => 'Database connection failed']);
     exit;
-}
-
-// First, let's check what columns actually exist in the subscription table
-$checkColumns = mysqli_query($conn, "SHOW COLUMNS FROM subscription");
-if ($checkColumns) {
-    $columns = [];
-    while ($row = mysqli_fetch_assoc($checkColumns)) {
-        $columns[] = $row['Field'];
-    }
-    error_log("Subscription table columns: " . implode(', ', $columns));
 }
 
 $stmt = $conn->prepare("SELECT s.Item, s.SubscriptionStatus, s.subscriptionDate, s.expirationDate, c.courseName 
@@ -48,9 +30,6 @@ if (!$stmt) {
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $result = $stmt->get_result();
-
-// Debug: Log query execution
-error_log("Query executed, rows found: " . $result->num_rows);
 
 $subscriptions = [];
 while ($row = $result->fetch_assoc()) {
@@ -85,9 +64,5 @@ while ($row = $result->fetch_assoc()) {
 
 $stmt->close();
 $conn->close();
-
-// Debug: Log final output
-error_log("Final subscriptions count: " . count($subscriptions));
-error_log("Final output: " . json_encode($subscriptions));
 
 echo json_encode($subscriptions); 
