@@ -1,58 +1,49 @@
 <?php
-header('Content-Type: application/json');
-include('../dbconnection/connection.php');
+session_start();
+include('./dbconnection/connection.php');
 
-// Enable error reporting for debugging
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-if (!isset($_GET['userId'])) {
-    echo json_encode(['error' => 'Missing userId']);
+if (!isset($_SESSION['userId'])) {
+    echo "User not logged in";
     exit;
 }
 
-$userId = intval($_GET['userId']);
+$userId = $_SESSION['userId'];
+echo "<h3>Testing Subscriptions for User ID: $userId</h3>";
 
-// Debug: Log the request
-error_log("Subscription request for userId: " . $userId);
-
-// Check if connection is valid
-if (!$conn) {
-    error_log("Database connection failed");
-    echo json_encode(['error' => 'Database connection failed']);
-    exit;
-}
-
-// First, let's check what columns actually exist in the subscription table
-$checkColumns = mysqli_query($conn, "SHOW COLUMNS FROM subscription");
-if ($checkColumns) {
-    $columns = [];
-    while ($row = mysqli_fetch_assoc($checkColumns)) {
-        $columns[] = $row['Field'];
-    }
-    error_log("Subscription table columns: " . implode(', ', $columns));
-}
-
+// Test the subscription query
 $stmt = $conn->prepare("SELECT s.Item, s.SubscriptionStatus, s.subscriptionDate, s.expirationDate, c.courseName 
                        FROM subscription s 
                        LEFT JOIN Courses c ON s.Item = c.courseId 
                        WHERE s.UserId = ? 
                        ORDER BY s.subscriptionDate DESC");
-
-if (!$stmt) {
-    error_log("Prepare failed: " . $conn->error);
-    echo json_encode(['error' => 'Prepare failed: ' . $conn->error]);
-    exit;
-}
-
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $result = $stmt->get_result();
 
-// Debug: Log query execution
-error_log("Query executed, rows found: " . $result->num_rows);
+echo "<h4>Raw Query Results:</h4>";
+echo "<table border='1'>";
+echo "<tr><th>Item</th><th>SubscriptionStatus</th><th>subscriptionDate</th><th>expirationDate</th><th>courseName</th></tr>";
 
+$count = 0;
+while ($row = $result->fetch_assoc()) {
+    $count++;
+    echo "<tr>";
+    echo "<td>" . htmlspecialchars($row['Item']) . "</td>";
+    echo "<td>" . htmlspecialchars($row['SubscriptionStatus']) . "</td>";
+    echo "<td>" . htmlspecialchars($row['subscriptionDate']) . "</td>";
+    echo "<td>" . htmlspecialchars($row['expirationDate']) . "</td>";
+    echo "<td>" . htmlspecialchars($row['courseName']) . "</td>";
+    echo "</tr>";
+}
+echo "</table>";
+
+echo "<p><strong>Total subscriptions found: $count</strong></p>";
+
+// Test the JSON output
+echo "<h4>JSON Output:</h4>";
 $subscriptions = [];
+$result->data_seek(0); // Reset result pointer
+
 while ($row = $result->fetch_assoc()) {
     // Convert status number to text
     $statusText = '';
@@ -83,11 +74,8 @@ while ($row = $result->fetch_assoc()) {
     ];
 }
 
+echo "<pre>" . json_encode($subscriptions, JSON_PRETTY_PRINT) . "</pre>";
+
 $stmt->close();
 $conn->close();
-
-// Debug: Log final output
-error_log("Final subscriptions count: " . count($subscriptions));
-error_log("Final output: " . json_encode($subscriptions));
-
-echo json_encode($subscriptions); 
+?>

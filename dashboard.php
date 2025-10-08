@@ -54,7 +54,7 @@ include('./php/validateSession.php');
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <?php include("./partials/dashboardNavigation.php"); ?>
+            <?php include("./partials/universalNavigation.php"); ?>
 
             <!-- Main Content -->
             <main class="col-md-9 col-lg-10 main-content p-4">

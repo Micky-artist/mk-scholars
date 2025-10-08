@@ -43,7 +43,7 @@ if (isset($_POST['startConvo']) && $_POST['startConvo'] === 'true') {
 
 <body data-theme="light">
     <!-- Navigation -->
-    <?php include("./partials/dashboardNavigation.php"); ?>
+    <?php include("./partials/universalNavigation.php"); ?>
 
     <!-- Mobile Navigation Bar -->
     <div class="mobile-nav-bar">
