@@ -1,35 +1,157 @@
 <?php
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // Hide errors from users
+ini_set('log_errors', 1);
+
 session_start();
-include("./dbconnection/connection.php");
 
-// Fetch courses from database only
+// Initialize variables
 $courses = [];
+$error = null;
+$hasError = false;
 
-if ($conn) {
-    $coursesQuery = "SELECT c.*, cp.amount, cp.currency, cp.pricingDescription, curr.currencySymbol 
-                     FROM Courses c 
-                     LEFT JOIN CoursePricing cp ON c.courseId = cp.courseId 
-                     LEFT JOIN Currencies curr ON cp.currency = curr.currencyCode 
-                     WHERE c.courseDisplayStatus = 1 
-                     ORDER BY c.courseCreatedDate DESC";
+try {
+    // Include database connection
+    if (!include("./dbconnection/connection.php")) {
+        throw new Exception("Database connection file not found");
+    }
+
+    // Check if database connection is available
+    if (!$conn) {
+        throw new Exception("Database connection failed");
+    }
+
+    // Debug mode - add ?debug=1 to URL to see debug info
+    $debugMode = isset($_GET['debug']) && $_GET['debug'] == '1';
+    
+    if ($debugMode) {
+        error_log("=== COURSES PAGE DEBUG ===");
+        error_log("Environment: " . (isOnline() ? 'PRODUCTION' : 'LOCAL'));
+        error_log("Database connection: " . ($conn ? 'SUCCESS' : 'FAILED'));
+        error_log("Server: " . ($_SERVER['HTTP_HOST'] ?? 'Unknown'));
+        error_log("Document Root: " . ($_SERVER['DOCUMENT_ROOT'] ?? 'Unknown'));
+        
+        // Check if Courses table exists
+        $tableCheck = mysqli_query($conn, "SHOW TABLES LIKE 'Courses'");
+        if ($tableCheck && mysqli_num_rows($tableCheck) > 0) {
+            error_log("Courses table: EXISTS");
+        } else {
+            error_log("Courses table: NOT FOUND");
+        }
+        
+        // Check table structure
+        $structureCheck = mysqli_query($conn, "DESCRIBE Courses");
+        if ($structureCheck) {
+            error_log("Courses table structure check: SUCCESS");
+        } else {
+            error_log("Courses table structure check: FAILED - " . mysqli_error($conn));
+        }
+    }
+
+    // First, get count of open courses only
+    $countQuery = "SELECT COUNT(*) as openCoursesCount FROM Courses WHERE courseDisplayStatus = 1";
+    $countResult = mysqli_query($conn, $countQuery);
+    $openCoursesCount = 0;
+    
+    if ($countResult) {
+        $countData = mysqli_fetch_assoc($countResult);
+        $openCoursesCount = (int)$countData['openCoursesCount'];
+        
+        if ($debugMode) {
+            error_log("Open courses count: " . $openCoursesCount);
+        }
+    } else {
+        $countError = mysqli_error($conn);
+        error_log("Count query failed: " . $countError);
+        
+        if ($debugMode) {
+            error_log("Count query: " . $countQuery);
+            error_log("Count error: " . $countError);
+        }
+    }
+
+    // First, fetch unique courses from database - only open courses
+    $coursesQuery = "SELECT * FROM Courses WHERE courseDisplayStatus = 1 ORDER BY courseCreatedDate DESC";
+    
+    if ($debugMode) {
+        error_log("Courses query: " . $coursesQuery);
+    }
     
     $coursesResult = mysqli_query($conn, $coursesQuery);
     
-    if ($coursesResult && mysqli_num_rows($coursesResult) > 0) {
+    if (!$coursesResult) {
+        $queryError = mysqli_error($conn);
+        error_log("Courses query failed: " . $queryError);
+        throw new Exception("Database query failed: " . $queryError);
+    }
+    
+    $coursesFound = mysqli_num_rows($coursesResult);
+    
+    if ($debugMode) {
+        error_log("Unique courses found: " . $coursesFound);
+    }
+    
+    if ($coursesFound > 0) {
         while ($course = mysqli_fetch_assoc($coursesResult)) {
+            // Validate course data
+            if (empty($course['courseName'])) {
+                error_log("Course with invalid name found: " . json_encode($course));
+                continue;
+            }
+            
+            // Fetch pricing options for this course
+            $pricingQuery = "SELECT cp.*, curr.currencySymbol 
+                           FROM CoursePricing cp 
+                           LEFT JOIN Currencies curr ON cp.currency = curr.currencyCode 
+                           WHERE cp.courseId = ? 
+                           ORDER BY cp.amount ASC";
+            
+            $pricingStmt = mysqli_prepare($conn, $pricingQuery);
+            if ($pricingStmt) {
+                mysqli_stmt_bind_param($pricingStmt, "i", $course['courseId']);
+                mysqli_stmt_execute($pricingStmt);
+                $pricingResult = mysqli_stmt_get_result($pricingStmt);
+                
+                $pricingOptions = [];
+                if ($pricingResult && mysqli_num_rows($pricingResult) > 0) {
+                    while ($pricing = mysqli_fetch_assoc($pricingResult)) {
+                        $pricingOptions[] = $pricing;
+                    }
+                }
+                mysqli_stmt_close($pricingStmt);
+                
+                // Add pricing options to course
+                $course['pricingOptions'] = $pricingOptions;
+                
+                // For backward compatibility, add the first pricing option to the main course object
+                if (!empty($pricingOptions)) {
+                    $firstPricing = $pricingOptions[0];
+                    $course['amount'] = $firstPricing['amount'];
+                    $course['currency'] = $firstPricing['currency'];
+                    $course['currencySymbol'] = $firstPricing['currencySymbol'];
+                    $course['pricingDescription'] = $firstPricing['pricingDescription'];
+                }
+            }
+            
             $courses[] = $course;
         }
+        
+        if ($debugMode) {
+            error_log("Courses with pricing processed: " . count($courses));
+            if (!empty($courses)) {
+                error_log("First course pricing options: " . count($courses[0]['pricingOptions'] ?? []));
+            }
+        }
     }
+
+} catch (Exception $e) {
+    $error = $e->getMessage();
+    $hasError = true;
+    error_log("Courses page error: " . $error);
 }
 
-// Helper function to get image URL
-function getImageUrl($path = '') {
-    if (isOnline()) {
-        return 'https://admin.mkscholars.com/' . ltrim($path, './');
-    } else {
-        return './' . ltrim($path, './');
-    }
-}
+// Helper function removed - no images needed
 
 // Helper function to format price
 function formatPrice($amount, $currencySymbol, $currency) {
@@ -65,32 +187,36 @@ function getStatusClass($status) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Courses | MK Scholars</title>
-    <link rel="shortcut icon" href="./images/logo/logoRound.png" type="image/x-icon">
+    <!-- Favicon removed for testing -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary: #4bc2c5;
-            --secondary: #ff7a7a;
+            --primary: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
             --white: #ffffff;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-400: #9ca3af;
-            --gray-500: #6b7280;
-            --gray-600: #4b5563;
-            --gray-700: #374151;
-            --gray-800: #1f2937;
-            --gray-900: #111827;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(255, 255, 255, 0.3);
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
         * {
@@ -100,138 +226,111 @@ function getStatusClass($status) {
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             color: var(--gray-800);
             line-height: 1.6;
-            padding-top: 140px; /* account for fixed top bar + nav */
+            padding-top: 120px;
+            min-height: 100vh;
         }
 
         /* ==== Main Container ==== */
         .main-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 1rem 2rem;
+            padding: 2rem;
+        }
+
+        /* ==== Page Header ==== */
+        .page-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            color: var(--gray-600);
+            font-size: 1.1rem;
+            margin: 0;
         }
 
         /* ==== Course Grid ==== */
         .courses-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 1.5rem;
-            margin: 1rem 0;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
         }
 
         /* ==== Modern Course Cards ==== */
         .course-card {
-            background: var(--white);
-            border-radius: 16px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
             padding: 0;
             margin: 0;
-            box-shadow: var(--shadow-md);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-lg);
             position: relative;
-            border: 1px solid var(--gray-200);
-            display: flex;
-            min-height: 300px;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 500px;
+            transition: all 0.3s ease;
         }
 
         .course-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
         }
 
-        .course-left-panel {
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-            color: white;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-width: 200px;
-            width: 35%;
-            position: relative;
-            overflow: hidden;
-        }
+        /* ==== Course Image Section Removed ==== */
 
-        .course-image-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            min-height: 300px;
-        }
+        /* Course brand removed with images */
 
-        .course-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center;
-        }
+        /* Course brand styles removed with images */
 
-        .course-image-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(30, 58, 138, 0.8) 0%, rgba(30, 64, 175, 0.8) 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 2rem 1.5rem;
-        }
-
-        .course-brand {
-            margin-bottom: 2rem;
-        }
-
-        .course-left-panel .course-brand {
-            margin-bottom: 2rem;
-        }
-
-        .course-left-panel .course-contact {
-            font-size: 0.875rem;
-            font-weight: 500;
-            padding: 0 1.5rem 2rem 1.5rem;
-        }
-
-        .course-brand-title {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            line-height: 1.1;
-        }
-
-        .course-brand-subtitle {
-            font-size: 0.75rem;
-            font-weight: 500;
-            opacity: 0.9;
-            margin-bottom: 0.25rem;
-        }
-
-        .course-brand-name {
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        .course-contact {
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .course-right-panel {
-            background: white;
+        /* ==== Course Content Section ==== */
+        .course-content {
             padding: 2rem;
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
         }
 
+        /* ==== Course Header ==== */
         .course-header {
             margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .course-badge {
+            position: absolute;
+            top: -1rem;
+            right: 0;
+            background: var(--success);
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-md);
         }
 
         .course-title {
@@ -249,42 +348,78 @@ function getStatusClass($status) {
             font-weight: 500;
         }
 
-        .course-badge {
-            position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-            background: var(--success);
-            color: var(--white);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            box-shadow: var(--shadow-md);
-        }
-
-        .course-pricing-tags {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
+        /* ==== Course Pricing ==== */
+        .course-pricing {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 1rem;
             margin-bottom: 1.5rem;
         }
 
-        .price-tag {
-            background: #dcfce7;
-            color: #166534;
-            padding: 0.75rem 1rem;
-            border-radius: 12px;
+        .price-main {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .price-description {
             font-size: 0.875rem;
+            color: var(--gray-600);
+            margin: 0;
+        }
+
+        /* ==== Multiple Pricing Options ==== */
+        .pricing-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .pricing-option {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .pricing-option.featured {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .pricing-option:hover {
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+        }
+
+        .price-amount {
+            font-size: 1.1rem;
             font-weight: 600;
-            border: 1px solid #bbf7d0;
+            color: var(--primary);
         }
 
-        .price-tag.secondary {
-            background: #fed7aa;
-            color: #c2410c;
-            border-color: #fdba74;
+        .pricing-option.featured .price-amount {
+            color: white;
         }
 
+        .price-desc {
+            font-size: 0.8rem;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        .pricing-option.featured .price-desc {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* ==== Course Description ==== */
         .course-description {
             font-size: 0.9rem;
             color: var(--gray-600);
@@ -292,22 +427,20 @@ function getStatusClass($status) {
             line-height: 1.6;
         }
 
+        /* ==== Course Features ==== */
         .course-features {
-            display: flex;
-            gap: 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
             margin-bottom: 1.5rem;
         }
 
-        .feature-box {
-            background: var(--gray-50);
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
+        .feature-item {
             display: flex;
             align-items: center;
             gap: 0.5rem;
             font-size: 0.875rem;
             color: var(--gray-700);
-            flex: 1;
         }
 
         .feature-icon {
@@ -315,6 +448,7 @@ function getStatusClass($status) {
             font-size: 1rem;
         }
 
+        /* ==== Course Deadline ==== */
         .course-deadline {
             display: flex;
             align-items: center;
@@ -322,207 +456,106 @@ function getStatusClass($status) {
             font-size: 0.875rem;
             color: var(--gray-500);
             margin-bottom: 1.5rem;
+            padding: 0.75rem;
+            background: var(--gray-50);
+            border-radius: 8px;
         }
 
+        /* ==== Course Actions ==== */
         .course-actions {
             margin-top: auto;
         }
 
-        .course-header {
-            margin-bottom: 1rem;
-        }
-
-        .course-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--gray-900);
-            margin-bottom: 0.5rem;
-            line-height: 1.3;
-        }
-
-        .course-subtitle {
-            font-size: 0.875rem;
-            color: var(--gray-600);
-            margin-bottom: 0.75rem;
-        }
-
-        .course-pricing {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .price-tag {
-            background: var(--primary);
-            color: var(--white);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-
-        .course-description {
-            font-size: 0.9rem;
-            color: var(--gray-600);
-            margin-bottom: 1rem;
-            line-height: 1.5;
-        }
-
-        .course-deadline {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            color: var(--gray-500);
-            margin-bottom: 1rem;
-        }
-
-        .course-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
         .enroll-button {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: var(--white);
             border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
+            padding: 1rem 2rem;
+            border-radius: 12px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 1rem;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            width: 100%;
+            box-shadow: var(--shadow-md);
         }
 
         .enroll-button:hover {
-            background: #3aa9ac;
             transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-lg);
         }
 
         .enroll-button:active {
             transform: translateY(0);
         }
 
-        /* ==== Responsive Design ==== */
-        @media (max-width: 768px) {
-            body { padding-top: 110px; }
-            .main-container {
-                padding: 0.5rem 1rem;
-            }
-
-            .courses-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-                margin: 0.5rem 0;
-            }
-
-            .course-card {
-                flex-direction: column;
-                min-height: auto;
-            }
-
-            .course-left-panel {
-                width: 100%;
-                min-width: auto;
-                padding: 0;
-            }
-
-            .course-image-container {
-                min-height: 200px;
-            }
-
-            .course-image-overlay {
-                padding: 1.5rem;
-            }
-
-            .course-left-panel .course-contact {
-                padding: 0 1.5rem 1.5rem 1.5rem;
-            }
-
-            .course-right-panel {
-                padding: 1.5rem;
-            }
-
-            .course-features {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-
-            .course-pricing-tags {
-                gap: 0.5rem;
-            }
+        .enroll-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
-        @media (max-width: 480px) {
-            body { padding-top: 100px; }
-            .courses-grid {
-                gap: 0.75rem;
-            }
-
-            .course-left-panel {
-                padding: 1rem;
-            }
-
-            .course-right-panel {
-                padding: 1rem;
-            }
-
-            .course-brand-title {
-                font-size: 1.5rem;
-            }
-
-            .course-title {
-                font-size: 1.25rem;
-            }
-
-            .course-features {
-                flex-direction: column;
-            }
+        /* ==== Error Handling Styles ==== */
+        .error-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 2rem 0;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
         }
 
-        .course-card {
-            animation: fadeInUp 0.6s ease-out;
+        .error-icon {
+            font-size: 4rem;
+            color: var(--danger);
+            margin-bottom: 1rem;
         }
 
-        .course-card:nth-child(1) { animation-delay: 0.1s; }
-        .course-card:nth-child(2) { animation-delay: 0.2s; }
-        .course-card:nth-child(3) { animation-delay: 0.3s; }
-        .course-card:nth-child(4) { animation-delay: 0.4s; }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .error-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
         }
 
-        /* ==== Loading States ==== */
-        .course-card.loading {
-            opacity: 0.7;
-            pointer-events: none;
+        .error-message {
+            color: var(--gray-600);
+            margin-bottom: 1.5rem;
         }
 
-        .course-card.loading::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
+        .retry-button {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .retry-button:hover {
+            background: var(--primary-dark);
+        }
+
+        .loading-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+        }
+
+        .loading-spinner {
             width: 40px;
             height: 40px;
-            margin: -20px 0 0 -20px;
-            border: 3px solid var(--gray-200);
-            border-top: 3px solid var(--primary);
+            border: 4px solid var(--gray-200);
+            border-top: 4px solid var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -530,6 +563,74 @@ function getStatusClass($status) {
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        /* ==== Responsive Design ==== */
+        @media (max-width: 768px) {
+            body { 
+                padding-top: 100px; 
+            }
+            
+            .main-container {
+                padding: 1rem;
+            }
+
+            .page-header {
+                padding: 1.5rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .courses-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .course-card {
+                min-height: auto;
+            }
+
+            .course-content {
+                padding: 1.5rem;
+            }
+
+            .course-features {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body { 
+                padding-top: 90px; 
+            }
+            
+            .main-container {
+                padding: 0.5rem;
+            }
+
+            .page-header {
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 1.75rem;
+            }
+
+            .course-content {
+                padding: 1rem;
+            }
+
+            .course-title {
+                font-size: 1.25rem;
+            }
+
+            .enroll-button {
+                padding: 0.875rem 1.5rem;
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
@@ -540,83 +641,154 @@ function getStatusClass($status) {
 
     <!-- ==== Courses Section ==== -->
     <div class="main-container">
-        <div class="course-count-section mb-4">
-            <h3 class="mb-0">Available Courses</h3>
-            <p class="text-muted"><?php echo count($courses); ?> course(s) available</p>
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Available Courses</h1>
+            <p class="page-subtitle">
+                <?php if ($hasError): ?>
+                    Unable to load course count
+                <?php else: ?>
+                    <?php echo $openCoursesCount; ?> open course(s) available for enrollment
+                <?php endif; ?>
+            </p>
+            
+            <!-- Debug Information (only show if debug=1 in URL) -->
+            <?php if (isset($debugMode) && $debugMode): ?>
+                <div style="background: #f0f0f0; padding: 15px; margin-top: 20px; border-radius: 8px; font-family: monospace; font-size: 12px;">
+                    <h4>Debug Information:</h4>
+                    <p><strong>Environment:</strong> <?php echo isOnline() ? 'PRODUCTION' : 'LOCAL'; ?></p>
+                    <p><strong>Database Connection:</strong> <?php echo $conn ? 'SUCCESS' : 'FAILED'; ?></p>
+                    <p><strong>Open Courses Count:</strong> <?php echo $openCoursesCount; ?></p>
+                    <p><strong>Courses Found:</strong> <?php echo count($courses); ?></p>
+                    <p><strong>Server:</strong> <?php echo $_SERVER['HTTP_HOST'] ?? 'Unknown'; ?></p>
+                    <p><strong>Error:</strong> <?php echo $error ? htmlspecialchars($error) : 'None'; ?></p>
+                    <?php if ($conn): ?>
+                        <p><strong>Database:</strong> <?php echo mysqli_get_server_info($conn); ?></p>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
         </div>
 
-        <div class="courses-grid">
+        <!-- Error Handling Container -->
+        <div id="errorContainer" style="display: none;">
+            <div class="error-container">
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h2 class="error-title">Something went wrong</h2>
+                <p class="error-message" id="errorMessage">We're having trouble loading the courses. Please try again.</p>
+                <button class="retry-button" onclick="retryLoadCourses()">
+                    <i class="fas fa-refresh me-2"></i>Try Again
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading Container -->
+        <div id="loadingContainer" style="display: none;">
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+
+        <!-- PHP Error Display -->
+        <?php if ($hasError): ?>
+            <div class="error-container">
+                <div class="error-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h2 class="error-title">Unable to Load Courses</h2>
+                <p class="error-message">
+                    <?php echo htmlspecialchars($error); ?>
+                </p>
+                <button class="retry-button" onclick="location.reload()">
+                    <i class="fas fa-refresh me-2"></i>Refresh Page
+                </button>
+            </div>
+        <?php endif; ?>
+
+        <!-- Courses Grid -->
+        <div class="courses-grid" id="coursesGrid" <?php echo $hasError ? 'style="display: none;"' : ''; ?>>
             <!-- Dynamic Courses from Database Only -->
-            <?php if (!empty($courses)): ?>
+            <?php if (!$hasError && !empty($courses)): ?>
                 <?php foreach ($courses as $course): ?>
                     <div class="course-card">
-                        <!-- Left Panel - Course Image -->
-                        <div class="course-left-panel">
-                            <?php if (!empty($course['coursePhoto'])): ?>
-                                <div class="course-image-container">
-                                    <img src="<?php echo getImageUrl($course['coursePhoto']); ?>" 
-                                         alt="<?php echo htmlspecialchars($course['courseName']); ?>" 
-                                         class="course-image">
-                                    <div class="course-image-overlay">
-                                        <div class="course-brand">
-                                            <div class="course-brand-title"><?php echo strtoupper(substr($course['courseName'], 0, 5)); ?></div>
-                                            <div class="course-brand-subtitle">COACHING WITH</div>
-                                            <div class="course-brand-name">MK SCHOLARS</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            <?php else: ?>
-                                <div class="course-image-container">
-                                    <img src="<?php echo getImageUrl('images/courses/placeholder.jpg'); ?>" 
-                                         alt="<?php echo htmlspecialchars($course['courseName']); ?>" 
-                                         class="course-image">
-                                    <div class="course-image-overlay">
-                                        <div class="course-brand">
-                                            <div class="course-brand-title"><?php echo strtoupper(substr($course['courseName'], 0, 5)); ?></div>
-                                            <div class="course-brand-subtitle">COACHING WITH</div>
-                                            <div class="course-brand-name">MK SCHOLARS</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
-                            <div class="course-contact">0798611161</div>
-                        </div>
+                        <!-- Course Image Section Removed for Testing -->
                         
-                        <!-- Right Panel - Course Details -->
-                        <div class="course-right-panel">
-                            <div class="course-badge <?php echo getStatusClass($course['courseDisplayStatus']); ?>">
-                                <?php echo getStatusText($course['courseDisplayStatus']); ?>
-                            </div>
-                            
+                        <!-- Course Content -->
+                        <div class="course-content">
                             <div class="course-header">
+                                <div class="course-badge <?php echo getStatusClass($course['courseDisplayStatus']); ?>">
+                                    <?php echo getStatusText($course['courseDisplayStatus']); ?>
+                                </div>
                                 <h2 class="course-title"><?php echo htmlspecialchars($course['courseName']); ?></h2>
                                 <p class="course-subtitle"><?php echo htmlspecialchars($course['courseDescription']); ?></p>
                             </div>
                             
-                            <div class="course-pricing-tags">
-                                <div class="price-tag">
-                                    <?php echo formatPrice($course['amount'], $course['currencySymbol'], $course['currency']); ?> - Complete Package
-                                </div>
-                                <?php if ($course['pricingDescription']): ?>
-                                    <div class="price-tag secondary">
-                                        <?php echo htmlspecialchars($course['pricingDescription']); ?>
-                                    </div>
+                            <div class="course-pricing">
+                                <?php if (!empty($course['pricingOptions'])): ?>
+                                    <?php if (count($course['pricingOptions']) == 1): ?>
+                                        <!-- Single pricing option -->
+                                        <div class="price-main">
+                                            <?php echo formatPrice($course['pricingOptions'][0]['amount'], $course['pricingOptions'][0]['currencySymbol'], $course['pricingOptions'][0]['currency']); ?>
+                                        </div>
+                                        <p class="price-description">
+                                            <?php echo htmlspecialchars($course['pricingOptions'][0]['pricingDescription'] ?? 'Complete Package'); ?>
+                                        </p>
+                                    <?php else: ?>
+                                        <!-- Multiple pricing options -->
+                                        <div class="pricing-options">
+                                            <?php foreach ($course['pricingOptions'] as $index => $pricing): ?>
+                                                <div class="pricing-option <?php echo $index === 0 ? 'featured' : ''; ?>">
+                                                    <div class="price-amount">
+                                                        <?php echo formatPrice($pricing['amount'], $pricing['currencySymbol'], $pricing['currency']); ?>
+                                                    </div>
+                                                    <div class="price-desc">
+                                                        <?php echo htmlspecialchars($pricing['pricingDescription'] ?? 'Package'); ?>
+                                                    </div>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                <?php else: ?>
+                                    <!-- No pricing available -->
+                                    <div class="price-main">Contact for Pricing</div>
                                 <?php endif; ?>
                             </div>
                             
                             <div class="course-description">
-                                Comprehensive online coaching designed to help students achieve their academic goals. Includes expert guidance, practice materials, and personalized support.
+                                <?php echo htmlspecialchars($course['courseShortDescription'] ?? 'Course description not available'); ?>
                             </div>
                             
                             <div class="course-features">
-                                <div class="feature-box">
-                                    <i class="fas fa-graduation-cap feature-icon"></i>
-                                    <span>Online Learning</span>
+                                <?php 
+                                // Parse course features from database
+                                $features = [];
+                                if (!empty($course['courseFeatures'])) {
+                                    $features = json_decode($course['courseFeatures'], true);
+                                }
+                                
+                                // Default features if none in database
+                                if (empty($features) || !is_array($features)) {
+                                    $features = ['Online Learning', 'Expert Support', 'Certificate'];
+                                }
+                                
+                                $featureIcons = [
+                                    'Online Learning' => 'fas fa-graduation-cap',
+                                    'Expert Support' => 'fas fa-user-tie', 
+                                    'Certificate' => 'fas fa-certificate',
+                                    '24/7 Support' => 'fas fa-headset',
+                                    'Practice Materials' => 'fas fa-book',
+                                    'Personalized Support' => 'fas fa-user-friends'
+                                ];
+                                
+                                foreach ($features as $feature): 
+                                    $icon = $featureIcons[$feature] ?? 'fas fa-check';
+                                ?>
+                                <div class="feature-item">
+                                    <i class="<?php echo $icon; ?> feature-icon"></i>
+                                    <span><?php echo htmlspecialchars($feature); ?></span>
                                 </div>
-                                <div class="feature-box">
-                                    <i class="fas fa-users feature-icon"></i>
-                                    <span>30 Seats Available</span>
-                                </div>
+                                <?php endforeach; ?>
                             </div>
                             
                             <div class="course-deadline">
@@ -629,7 +801,9 @@ function getStatusClass($status) {
                                     $isLoggedIn = isset($_SESSION) && isset($_SESSION['userId']);
                                     $next = urlencode('/mkscholars/courses');
                                 ?>
-                                <button onclick="window.location.href='<?php echo $isLoggedIn ? ('./subscription?course=' . $course['courseId']) : ('./login?next=' . $next); ?>'" class="enroll-button">
+                                <button onclick="enrollCourse(<?php echo $course['courseId']; ?>, <?php echo $isLoggedIn ? 'true' : 'false'; ?>)" 
+                                        class="enroll-button" 
+                                        data-course-id="<?php echo $course['courseId']; ?>">
                                     <i class="fas fa-arrow-right"></i>
                                     Register Now (Iyandikishe)
                                 </button>
@@ -637,68 +811,172 @@ function getStatusClass($status) {
                         </div>
                     </div>
                 <?php endforeach; ?>
-            <?php else: ?>
-                <div class="col-12">
-                    <div class="text-center py-5">
-                        <i class="fas fa-graduation-cap fa-3x text-muted mb-3"></i>
-                        <h4 class="text-muted">No courses available</h4>
-                        <p class="text-muted">Check back later for new courses!</p>
+            <?php elseif (!$hasError): ?>
+                <div class="error-container">
+                    <div class="error-icon">
+                        <i class="fas fa-graduation-cap"></i>
                     </div>
+                    <h2 class="error-title">No courses available</h2>
+                    <p class="error-message">Check back later for new courses!</p>
                 </div>
             <?php endif; ?>
         </div>
     </div>
 
-    <!-- ==== Enhanced JavaScript ==== -->
+    <!-- ==== Enhanced JavaScript with Error Handling ==== -->
     <script>
-        // Enhanced course card interactions
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add loading states to buttons
-            const enrollButtons = document.querySelectorAll('.enroll-button');
+        // Global error handling
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+            showError('An unexpected error occurred. Please refresh the page.');
+        });
+
+        // Unhandled promise rejection handling
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled promise rejection:', e.reason);
+            showError('A network error occurred. Please check your connection.');
+        });
+
+        // Error display function
+        function showError(message) {
+            const errorContainer = document.getElementById('errorContainer');
+            const errorMessage = document.getElementById('errorMessage');
+            const coursesGrid = document.getElementById('coursesGrid');
             
-            enrollButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    const card = this.closest('.course-card');
-                    const originalText = this.innerHTML;
-                    
-                    // Add loading state
-                    card.classList.add('loading');
-                    this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
-                    this.disabled = true;
-                    
-                    // Simulate loading delay (remove in production)
-                    setTimeout(() => {
-                        // Remove loading state
-                        card.classList.remove('loading');
-                        this.innerHTML = originalText;
-                        this.disabled = false;
-                    }, 2000);
+            if (errorContainer && errorMessage) {
+                errorMessage.textContent = message;
+                errorContainer.style.display = 'block';
+                if (coursesGrid) coursesGrid.style.display = 'none';
+            }
+        }
+
+        // Hide error function
+        function hideError() {
+            const errorContainer = document.getElementById('errorContainer');
+            const coursesGrid = document.getElementById('coursesGrid');
+            
+            if (errorContainer) errorContainer.style.display = 'none';
+            if (coursesGrid) coursesGrid.style.display = 'grid';
+        }
+
+        // Show loading function
+        function showLoading() {
+            const loadingContainer = document.getElementById('loadingContainer');
+            const coursesGrid = document.getElementById('coursesGrid');
+            
+            if (loadingContainer) loadingContainer.style.display = 'block';
+            if (coursesGrid) coursesGrid.style.display = 'none';
+        }
+
+        // Hide loading function
+        function hideLoading() {
+            const loadingContainer = document.getElementById('loadingContainer');
+            const coursesGrid = document.getElementById('coursesGrid');
+            
+            if (loadingContainer) loadingContainer.style.display = 'none';
+            if (coursesGrid) coursesGrid.style.display = 'grid';
+        }
+
+        // Retry function
+        function retryLoadCourses() {
+            hideError();
+            showLoading();
+            
+            // Simulate retry (in real implementation, this would reload data)
+            setTimeout(() => {
+                hideLoading();
+                location.reload();
+            }, 1000);
+        }
+
+        // Enhanced course enrollment function
+        function enrollCourse(courseId, isLoggedIn) {
+            try {
+                if (!courseId) {
+                    throw new Error('Invalid course ID');
+                }
+
+                const button = document.querySelector(`[data-course-id="${courseId}"]`);
+                if (!button) {
+                    throw new Error('Course button not found');
+                }
+
+                const originalText = button.innerHTML;
+                
+                // Add loading state
+                button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+                button.disabled = true;
+
+                // Simulate processing delay
+                setTimeout(() => {
+                    try {
+                        if (isLoggedIn) {
+                            // Redirect to subscription page
+                            window.location.href = `./subscription?course=${courseId}`;
+                        } else {
+                            // Redirect to login page
+                            const next = encodeURIComponent('/mkscholars/courses');
+                            window.location.href = `./login?next=${next}`;
+                        }
+                    } catch (error) {
+                        console.error('Navigation error:', error);
+                        showError('Unable to navigate to the enrollment page. Please try again.');
+                        
+                        // Restore button state
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                    }
+                }, 1000);
+
+            } catch (error) {
+                console.error('Enrollment error:', error);
+                showError('Unable to process enrollment. Please try again.');
+            }
+        }
+
+        // Image error handling removed - no images
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                // Image error handling removed - no images
+
+                // Add click handlers to enroll buttons
+                const enrollButtons = document.querySelectorAll('.enroll-button');
+                enrollButtons.forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const courseId = this.getAttribute('data-course-id');
+                        const isLoggedIn = this.onclick.toString().includes('true');
+                        enrollCourse(parseInt(courseId), isLoggedIn);
+                    });
                 });
-            });
 
-            // Intersection Observer for scroll animations
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
+                // Add smooth scroll behavior
+                document.documentElement.style.scrollBehavior = 'smooth';
 
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
+                // Add keyboard navigation support
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        hideError();
                     }
                 });
-            }, observerOptions);
 
-            // Observe all course cards
-            const courseCards = document.querySelectorAll('.course-card');
-            courseCards.forEach(card => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(30px)';
-                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-                observer.observe(card);
-            });
+                console.log('Courses page initialized successfully');
+
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showError('Page initialization failed. Please refresh the page.');
+            }
+        });
+
+        // Network status monitoring
+        window.addEventListener('online', function() {
+            console.log('Network connection restored');
+        });
+
+        window.addEventListener('offline', function() {
+            showError('You are currently offline. Please check your internet connection.');
         });
     </script>
 
