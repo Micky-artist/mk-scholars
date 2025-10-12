@@ -4,7 +4,8 @@ error_reporting(E_ALL);
 ini_set('display_errors', 0); // Hide errors from users
 ini_set('log_errors', 1);
 
-session_start();
+// Include session configuration for persistent sessions
+include("./config/session.php");
 
 // Initialize variables
 $courses = [];
@@ -717,9 +718,9 @@ function getStatusClass($status) {
                         <!-- Course Content -->
                         <div class="course-content">
                             <div class="course-header">
-                                <div class="course-badge <?php echo getStatusClass($course['courseDisplayStatus']); ?>">
-                                    <?php echo getStatusText($course['courseDisplayStatus']); ?>
-                                </div>
+                            <div class="course-badge <?php echo getStatusClass($course['courseDisplayStatus']); ?>">
+                                <?php echo getStatusText($course['courseDisplayStatus']); ?>
+                            </div>
                                 <h2 class="course-title"><?php echo htmlspecialchars($course['courseName']); ?></h2>
                                 <p class="course-subtitle"><?php echo htmlspecialchars($course['courseDescription']); ?></p>
                             </div>
@@ -745,9 +746,9 @@ function getStatusClass($status) {
                                                     <div class="price-desc">
                                                         <?php echo htmlspecialchars($pricing['pricingDescription'] ?? 'Package'); ?>
                                                     </div>
-                                                </div>
+                                </div>
                                             <?php endforeach; ?>
-                                        </div>
+                                    </div>
                                     <?php endif; ?>
                                 <?php else: ?>
                                     <!-- No pricing available -->
@@ -942,9 +943,9 @@ function getStatusClass($status) {
                 // Image error handling removed - no images
 
                 // Add click handlers to enroll buttons
-                const enrollButtons = document.querySelectorAll('.enroll-button');
-                enrollButtons.forEach(button => {
-                    button.addEventListener('click', function(e) {
+            const enrollButtons = document.querySelectorAll('.enroll-button');
+            enrollButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
                         e.preventDefault();
                         const courseId = this.getAttribute('data-course-id');
                         const isLoggedIn = this.onclick.toString().includes('true');

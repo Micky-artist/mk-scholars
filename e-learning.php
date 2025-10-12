@@ -1,5 +1,6 @@
 <?php
-session_start();
+// Include session configuration for persistent sessions
+include("./config/session.php");
 include('./dbconnection/connection.php');
 include('./php/validateSession.php');
 
@@ -345,7 +346,7 @@ function formatFileSize($bytes) {
     
     <style>
         :root {
-            --bg-primary: #f3f4f6;
+            --bg-primary: #f8f9fa;
             --bg-secondary: #ffffff;
             --text-primary: #1f2937;
             --text-secondary: #4b5563;
@@ -355,13 +356,13 @@ function formatFileSize($bytes) {
         }
 
         [data-theme="dark"] {
-            --bg-primary: #111827;
-            --bg-secondary: #1f2937;
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
             --text-primary: #f9fafb;
             --text-secondary: #9ca3af;
-            --glass-bg: rgba(31, 41, 55, 0.9);
+            --glass-bg: rgba(45, 45, 45, 0.9);
             --glass-border: rgba(255, 255, 255, 0.1);
-            --neumorphic-shadow: 5px 5px 10px #0a0c10, -5px -5px 10px #283447;
+            --neumorphic-shadow: 5px 5px 10px #0a0c10, -5px -5px 10px #404040;
         }
 
         body {
@@ -809,6 +810,7 @@ function formatFileSize($bytes) {
             margin-bottom: 1.5rem;
         }
 
+
         /* Responsive */
         @media (max-width: 768px) {
             .courses-grid {
@@ -839,8 +841,9 @@ function formatFileSize($bytes) {
 </head>
 
 <body data-theme="light">
-    <!-- Theme Toggle Button -->
-    <button style="color: orange;" class="btn btn-secondary theme-toggle glass-panel">
+
+    <!-- Theme Toggle Button (Legacy - Hidden) -->
+    <button style="color: orange; display: none;" class="btn btn-secondary theme-toggle glass-panel">
         <i class="fas fa-moon"></i>
     </button>
 
@@ -1067,6 +1070,7 @@ function formatFileSize($bytes) {
                 '<i class="fas fa-sun"></i>';
         }
 
+
         // Notifications
         const notificationBtn = document.querySelector('.notification-btn');
         const notificationBox = document.querySelector('.notification-box');
@@ -1120,6 +1124,9 @@ function formatFileSize($bytes) {
                 alert('Please allow popups to view course content');
                 return;
             }
+
+            // Store window reference
+            window.previewWindow = previewWindow;
             
             // Parse the JSON data
             let courseNotes;
@@ -1241,39 +1248,56 @@ function formatFileSize($bytes) {
                     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
                     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
                     <style>
+                        :root {
+                            --bg-primary: #f8f9fa;
+                            --bg-secondary: #ffffff;
+                            --text-primary: #1f2937;
+                            --text-secondary: #4b5563;
+                            --glass-bg: rgba(255, 255, 255, 0.9);
+                            --glass-border: rgba(255, 255, 255, 0.3);
+                        }
+
+                        [data-theme="dark"] {
+                            --bg-primary: #1a1a1a;
+                            --bg-secondary: #2d2d2d;
+                            --text-primary: #f9fafb;
+                            --text-secondary: #9ca3af;
+                            --glass-bg: rgba(45, 45, 45, 0.9);
+                            --glass-border: rgba(255, 255, 255, 0.1);
+                        }
+
                         body { 
                             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            background: var(--bg-primary);
+                            color: var(--text-primary);
                             padding: 1rem;
                             font-size: 0.9rem;
                             min-height: 100vh;
+                            transition: background 0.3s, color 0.3s;
                         }
                         .container {
-                            background: rgba(255, 255, 255, 0.95);
+                            background: var(--glass-bg);
                             border-radius: 15px;
                             padding: 2rem;
                             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
                             backdrop-filter: blur(10px);
-                            border: 1px solid rgba(255, 255, 255, 0.2);
+                            border: 1px solid var(--glass-border);
                         }
                         h1, h2, h3 { 
-                            color: #667eea; 
+                            color: var(--text-primary); 
                             font-weight: 600;
                         }
                         h1 { 
                             font-size: 2rem; 
                             margin-bottom: 1.5rem; 
                             text-align: center;
-                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                            -webkit-background-clip: text;
-                            -webkit-text-fill-color: transparent;
-                            background-clip: text;
+                            color: var(--text-primary);
                         }
                         h2 { 
                             font-size: 1.3rem; 
                             margin-bottom: 1rem; 
-                            color: #667eea;
-                            border-bottom: 2px solid #e9ecef;
+                            color: var(--text-primary);
+                            border-bottom: 2px solid var(--glass-border);
                             padding-bottom: 0.5rem;
                         }
                         .section { 
@@ -1339,11 +1363,116 @@ function formatFileSize($bytes) {
                             margin-bottom: 1rem;
                             opacity: 0.5;
                         }
+
+                        /* Fixed Floating Navbar */
+                        .floating-navbar {
+                            position: fixed;
+                            top: 20px;
+                            right: 20px;
+                            z-index: 1050;
+                            background: var(--glass-bg);
+                            backdrop-filter: blur(10px);
+                            border: 1px solid var(--glass-border);
+                            border-radius: 15px;
+                            padding: 10px 15px;
+                            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                            transition: all 0.3s ease;
+                        }
+
+                        .floating-navbar:hover {
+                            transform: translateY(-2px);
+                            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+                        }
+
+                        .floating-navbar .nav-btn {
+                            background: transparent;
+                            border: none;
+                            color: var(--text-primary);
+                            padding: 8px 12px;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            display: flex;
+                            align-items: center;
+                            gap: 5px;
+                            font-size: 0.9rem;
+                            font-weight: 500;
+                        }
+
+                        .floating-navbar .nav-btn:hover {
+                            background: var(--bg-secondary);
+                            color: var(--text-primary);
+                            transform: scale(1.05);
+                        }
+
+                        .floating-navbar .nav-btn.active {
+                            background: var(--text-primary);
+                            color: var(--bg-primary);
+                        }
+
+                        .floating-navbar .theme-toggle {
+                            position: relative;
+                        }
+
+                        .floating-navbar .theme-toggle .theme-icon {
+                            transition: transform 0.3s ease;
+                        }
+
+                        .floating-navbar .theme-toggle:hover .theme-icon {
+                            transform: rotate(180deg);
+                        }
+
+                        /* Responsive navbar */
+                        @media (max-width: 768px) {
+                            .floating-navbar {
+                                top: 10px;
+                                right: 10px;
+                                padding: 8px 12px;
+                                gap: 8px;
+                            }
+
+                            .floating-navbar .nav-btn {
+                                padding: 6px 10px;
+                                font-size: 0.8rem;
+                            }
+
+                            .floating-navbar .nav-btn span {
+                                display: none;
+                            }
+                        }
+
+                        @media (max-width: 480px) {
+                            .floating-navbar {
+                                flex-direction: column;
+                                gap: 5px;
+                                padding: 8px;
+                            }
+
+                            .floating-navbar .nav-btn {
+                                width: 100%;
+                                justify-content: center;
+                            }
+                        }
                     </style>
                 </head>
-                <body>
+                <body data-theme="light">
+                    <!-- Fixed Floating Navbar -->
+                    <div class="floating-navbar">
+                        <button class="nav-btn theme-toggle" onclick="togglePreviewTheme()">
+                            <i class="fas fa-moon theme-icon"></i>
+                            <span>Theme</span>
+                        </button>
+                        <button class="nav-btn" onclick="window.close()">
+                            <i class="fas fa-times"></i>
+                            <span>Close</span>
+                        </button>
+                    </div>
+
                     <div class="container">
-                        <h1><i class="fas fa-graduation-cap me-2"></i>${courseName}</h1>
+                        <h1 class="text-center mb-4"><i class="fas fa-graduation-cap me-2"></i>${courseName}</h1>
                         ${visibleNotes.length > 0 ? sectionsHtml : '<div class="no-content"><i class="fas fa-book-open"></i><h3>No course materials available</h3><p>Course content will be added soon.</p></div>'}
                     </div>
 </body>
@@ -1353,6 +1482,34 @@ function formatFileSize($bytes) {
             // Write the content to the preview window
             previewWindow.document.write(previewHtml);
             previewWindow.document.close();
+            
+            // Add theme toggle functionality to preview window
+            previewWindow.addEventListener('load', function() {
+                const previewBody = previewWindow.document.body;
+                const previewThemeIcon = previewWindow.document.querySelector('.floating-navbar .theme-icon');
+                
+                // Load saved theme from main window
+                const savedTheme = localStorage.getItem('theme') || 'light';
+                previewBody.setAttribute('data-theme', savedTheme);
+                updatePreviewThemeIcon();
+                
+                // Add theme toggle function to preview window
+                previewWindow.togglePreviewTheme = function() {
+                    const currentTheme = previewBody.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                    previewBody.setAttribute('data-theme', newTheme);
+                    // Sync with main window theme
+                    localStorage.setItem('theme', newTheme);
+                    updatePreviewThemeIcon();
+                };
+                
+                function updatePreviewThemeIcon() {
+                    const currentTheme = previewBody.getAttribute('data-theme');
+                    if (previewThemeIcon) {
+                        previewThemeIcon.className = currentTheme === 'light' ? 'fas fa-moon theme-icon' : 'fas fa-sun theme-icon';
+                    }
+                }
+            });
             
             // Focus the preview window
             previewWindow.focus();

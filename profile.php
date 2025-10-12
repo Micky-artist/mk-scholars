@@ -1,5 +1,6 @@
 <?php
-session_start();
+// Include session configuration for persistent sessions
+include("./config/session.php");
 if (!isset($_SESSION['userId'])) {
     header('Location: login.php');
     exit;

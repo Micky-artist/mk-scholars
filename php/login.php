@@ -1,37 +1,6 @@
 <?php
-
-
-
-// Start session if not already started
-if (session_status() === PHP_SESSION_NONE) {
-    // Configure secure session settings
-    ini_set('session.use_only_cookies', 1);
-    ini_set('session.use_strict_mode', 1);
-    
-    // Set secure cookie parameters
-    $cookieParams = session_get_cookie_params();
-    session_set_cookie_params([
-        'lifetime' => $cookieParams['lifetime'],
-        'path' => $cookieParams['path'],
-        'domain' => $cookieParams['domain'],
-        'secure' => true,  // Only transmit over HTTPS
-        'httponly' => true, // Not accessible via JavaScript
-        'samesite' => 'Lax' // Protects against CSRF attacks
-    ]);
-    
-    session_name('SECURESSID');
-    session_start();
-    
-    // Regenerate session ID to prevent session fixation
-    if (!isset($_SESSION['last_regeneration'])) {
-        session_regenerate_id(true);
-        $_SESSION['last_regeneration'] = time();
-    } else if (time() - $_SESSION['last_regeneration'] > 1800) {
-        // Regenerate session ID every 30 minutes
-        session_regenerate_id(true);
-        $_SESSION['last_regeneration'] = time();
-    }
-}
+// Include session configuration for persistent sessions
+include("../config/session.php");
 
 // Initialize variables
 $msg = '';

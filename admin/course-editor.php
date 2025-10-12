@@ -341,6 +341,123 @@ if (!$courseData) {
     .modal:not(.show) .modal-dialog {
         transform: translate(0, -50px);
     }
+
+    /* Pagination Controls */
+    .pagination-controls {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+
+    .pagination-controls .pagination-info {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .pagination-controls .pagination-buttons {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .pagination-controls .page-numbers {
+        display: flex;
+        gap: 0.25rem;
+    }
+
+    .pagination-controls .btn {
+        min-width: 40px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .sections-pagination {
+        border-top: 1px solid #e9ecef;
+        padding-top: 1rem;
+        margin-top: 1rem;
+    }
+
+    .sections-pagination .pagination-info {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+
+    .sections-pagination .pagination-buttons {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .sections-pagination .page-numbers {
+        display: flex;
+        gap: 0.25rem;
+    }
+
+    .sections-pagination .btn {
+        min-width: 35px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+    }
+
+    /* Break Section Styling */
+    .break-section {
+        background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%) !important;
+        border: 2px dashed #007bff !important;
+        border-radius: 10px !important;
+        position: relative;
+    }
+
+    .break-section::before {
+        content: "PAGE BREAK";
+        position: absolute;
+        top: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #007bff;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        z-index: 1;
+    }
+
+    .break-section .section-title {
+        color: #007bff !important;
+        font-weight: bold !important;
+    }
+
+    .break-section .section-actions {
+        opacity: 0.7;
+    }
+
+    /* Responsive pagination */
+    @media (max-width: 768px) {
+        .pagination-controls .d-flex {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .pagination-controls .pagination-buttons {
+            justify-content: center;
+        }
+        
+        .sections-pagination .d-flex {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .sections-pagination .pagination-buttons {
+            justify-content: center;
+        }
+    }
 </style>
 
 <body>
@@ -514,6 +631,29 @@ if (!$courseData) {
                                     <small class="text-muted"><?php echo $courseData['theme']['bodyFontSize']; ?></small>
                                 </div>
                             </div>
+                            
+                            <!-- Pagination Settings -->
+                            <h5 class="mb-3 mt-4">Pagination Settings</h5>
+                            <div class="pagination-controls">
+                                <div class="mb-3">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        <strong>Break Course Sections</strong><br>
+                                        <small>Add "Break Course Section" to control pagination. Content after each break will appear on the next page.</small>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Sections per page (List)</label>
+                                    <select class="form-control" id="sectionsPerPageListSelect">
+                                        <option value="3">3 sections</option>
+                                        <option value="5" selected>5 sections</option>
+                                        <option value="10">10 sections</option>
+                                        <option value="15">15 sections</option>
+                                        <option value="20">20 sections</option>
+                                    </select>
+                                    <small class="text-muted">Number of sections shown per page in sections list (for management only)</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -526,7 +666,7 @@ if (!$courseData) {
                                     <div class="btn-group me-2" role="group">
                                         <button class="btn btn-outline-primary" onclick="previewCourse('student')">
                                             <i class="fas fa-user me-2"></i>Student View
-                                        </button>
+                                    </button>
                                         <button class="btn btn-outline-info" onclick="previewCourse('admin')">
                                             <i class="fas fa-cog me-2"></i>Admin View
                                         </button>
@@ -628,6 +768,11 @@ if (!$courseData) {
                             <h6>File Section</h6>
                             <small>Downloadable files</small>
                         </div>
+                        <div class="section-type-card" data-type="break">
+                            <div class="section-type-icon"><i class="fas fa-page-break"></i></div>
+                            <h6>Break Course Section</h6>
+                            <small>Page break for pagination</small>
+                        </div>
                     </div>
 
                     <div id="section-form" style="display: none;">
@@ -719,9 +864,33 @@ if (!$courseData) {
         let selectedSectionType = '';
         let editingSectionIndex = -1;
         let editingLinkIndex = -1;
+        
+        // Pagination variables
+        let currentPage = 1;
+        let sectionsPerPage = 3; // Number of sections per page
+        let currentSectionsPage = 1;
+        let sectionsPerPageList = 5; // Number of sections per page in the list
+
+        // Change page function
+        function changePage(page) {
+            if (page < 1) return;
+            
+            // Get current view mode from the active tab
+            const activeTab = document.querySelector('.nav-link.active');
+            const viewMode = activeTab ? activeTab.getAttribute('data-view-mode') : 'admin';
+            
+            renderCoursePreview(viewMode, page);
+        }
+
+        // Change sections list page function
+        function changeSectionsPage(page) {
+            if (page < 1) return;
+            currentSectionsPage = page;
+            renderSectionsList();
+        }
 
         // Initialize course preview
-        function renderCoursePreview(viewMode = 'admin') {
+        function renderCoursePreview(viewMode = 'admin', page = 1) {
             const preview = document.getElementById('course-preview');
             preview.innerHTML = '';
             
@@ -735,6 +904,56 @@ if (!$courseData) {
                 `;
                 return;
             }
+            
+            // Filter sections based on visibility for student view
+            let visibleSections = courseData.sections;
+            if (viewMode === 'student') {
+                const now = new Date();
+                visibleSections = courseData.sections.filter(section => {
+                    const sectionPublishDate = section.publishDate ? new Date(section.publishDate) : null;
+                    const sectionUnpublishDate = section.unpublishDate ? new Date(section.unpublishDate) : null;
+                    
+                    if (section.visibilityMode === 'hidden') {
+                        return false;
+                    }
+                    
+                    if (section.visibilityMode === 'scheduled') {
+                        if (sectionPublishDate && now < sectionPublishDate) {
+                            return false;
+                        }
+                        if (sectionUnpublishDate && now > sectionUnpublishDate) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+            }
+
+            // Calculate pagination based on break sections
+            const breakSections = visibleSections.filter(section => section.type === 'break');
+            const totalPages = breakSections.length + 1; // +1 for content before first break
+            
+            let sectionsToShow = [];
+            if (page === 1) {
+                // First page: show sections from start until first break
+                const firstBreakIndex = visibleSections.findIndex(section => section.type === 'break');
+                sectionsToShow = firstBreakIndex === -1 ? visibleSections : visibleSections.slice(0, firstBreakIndex);
+            } else {
+                // Subsequent pages: show sections between breaks
+                const breakIndices = visibleSections.map((section, index) => section.type === 'break' ? index : -1).filter(index => index !== -1);
+                const startBreakIndex = breakIndices[page - 2]; // Previous break
+                const endBreakIndex = breakIndices[page - 1]; // Current break
+                
+                if (startBreakIndex !== undefined && endBreakIndex !== undefined) {
+                    sectionsToShow = visibleSections.slice(startBreakIndex + 1, endBreakIndex);
+                } else if (startBreakIndex !== undefined) {
+                    // Last page: from last break to end
+                    sectionsToShow = visibleSections.slice(startBreakIndex + 1);
+                }
+            }
+
+            // Update current page
+            currentPage = page;
 
             // Check visibility for student view
             if (viewMode === 'student') {
@@ -778,27 +997,10 @@ if (!$courseData) {
                 }
             }
             
-            courseData.sections.forEach((section, index) => {
-                // Check section visibility for student view
-                if (viewMode === 'student') {
-                    const now = new Date();
-                    const sectionPublishDate = section.publishDate ? new Date(section.publishDate) : null;
-                    const sectionUnpublishDate = section.unpublishDate ? new Date(section.unpublishDate) : null;
-                    
-                    if (section.visibilityMode === 'hidden') {
-                        return; // Skip hidden sections
-                    }
-                    
-                    if (section.visibilityMode === 'scheduled') {
-                        if (sectionPublishDate && now < sectionPublishDate) {
-                            return; // Skip sections not yet published
-                        }
-                        
-                        if (sectionUnpublishDate && now > sectionUnpublishDate) {
-                            return; // Skip sections that have been unpublished
-                        }
-                    }
-                }
+            // Render only the sections for the current page
+            sectionsToShow.forEach((section, pageIndex) => {
+                // Find the original index in the full sections array
+                const originalIndex = courseData.sections.findIndex(s => s === section);
                 
                 const sectionDiv = document.createElement('div');
                 sectionDiv.className = 'section-preview mb-4';
@@ -830,6 +1032,7 @@ if (!$courseData) {
                     case 'image': sectionIcon = '<i class="fas fa-image"></i>'; break;
                     case 'quiz': sectionIcon = '<i class="fas fa-question-circle"></i>'; break;
                     case 'file': sectionIcon = '<i class="fas fa-file"></i>'; break;
+                    case 'break': sectionIcon = '<i class="fas fa-page-break"></i>'; break;
                     default: sectionIcon = '<i class="fas fa-file-alt"></i>';
                 }
                 
@@ -895,6 +1098,24 @@ if (!$courseData) {
                         `;
                     });
                     contentHtml += '</div>';
+                } else if (section.type === 'break') {
+                    // Display break section with special styling
+                    contentHtml = `
+                        <div class="page-break-display" style="
+                            text-align: center; 
+                            padding: 2rem; 
+                            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                            border: 2px dashed #007bff;
+                            border-radius: 10px;
+                            margin: 1rem 0;
+                            font-family: ${courseData.theme.fontFamily};
+                            font-size: ${courseData.theme.bodyFontSize};
+                        ">
+                            <i class="fas fa-page-break" style="font-size: 2rem; color: #007bff; margin-bottom: 0.5rem;"></i>
+                            <div style="font-weight: bold; color: #007bff; margin-bottom: 0.5rem;">${section.title}</div>
+                            <div style="color: #6c757d; font-size: 0.9rem;">Content after this break will appear on the next page</div>
+                        </div>
+                    `;
                 } else {
                     // Display text content
                     contentHtml = `<div style="font-family: ${courseData.theme.fontFamily}; font-size: ${courseData.theme.bodyFontSize}; line-height: 1.6;">${section.content}</div>`;
@@ -915,6 +1136,42 @@ if (!$courseData) {
                 
                 preview.appendChild(sectionDiv);
             });
+
+            // Add pagination controls if there are multiple pages
+            if (totalPages > 1) {
+                const paginationDiv = document.createElement('div');
+                paginationDiv.className = 'pagination-controls mt-4';
+                paginationDiv.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="pagination-info">
+                            <span class="text-muted">
+                                Page ${page} of ${totalPages} (${sectionsToShow.length} sections on this page)
+                            </span>
+                        </div>
+                        <div class="pagination-buttons">
+                            <button class="btn btn-outline-primary btn-sm me-2" 
+                                    onclick="changePage(${page - 1})" 
+                                    ${page === 1 ? 'disabled' : ''}>
+                                <i class="fas fa-chevron-left me-1"></i>Previous
+                            </button>
+                            <span class="page-numbers">
+                                ${Array.from({length: totalPages}, (_, i) => {
+                                    const pageNum = i + 1;
+                                    const isActive = pageNum === page;
+                                    return `<button class="btn btn-sm me-1 ${isActive ? 'btn-primary' : 'btn-outline-primary'}" 
+                                                   onclick="changePage(${pageNum})">${pageNum}</button>`;
+                                }).join('')}
+                            </span>
+                            <button class="btn btn-outline-primary btn-sm ms-2" 
+                                    onclick="changePage(${page + 1})" 
+                                    ${page === totalPages ? 'disabled' : ''}>
+                                Next<i class="fas fa-chevron-right ms-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                preview.appendChild(paginationDiv);
+            }
         }
 
         // Show add section modal
@@ -1046,14 +1303,22 @@ if (!$courseData) {
             console.log('Title:', title);
             console.log('Content:', content);
             
-            if (!title || !content) {
-                alert('Please fill in all required fields');
-                return;
-            }
-            
             if (!selectedSectionType) {
                 alert('Please select a section type');
                 return;
+            }
+            
+            // For break sections, only title is required
+            if (selectedSectionType === 'break') {
+                if (!title) {
+                    alert('Please enter a title for the break section');
+                return;
+                }
+            } else {
+                if (!title || !content) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
             }
             
             const visibilityMode = document.getElementById('sectionVisibilityMode').value;
@@ -1063,9 +1328,9 @@ if (!$courseData) {
             const section = {
                 type: selectedSectionType,
                 title: title,
-                content: content,
+                content: selectedSectionType === 'break' ? '<div class="page-break-section"><i class="fas fa-page-break"></i> Page Break</div>' : content,
                 order: courseData.sections.length,
-                files: window.uploadedFiles || [],
+                files: selectedSectionType === 'break' ? [] : (window.uploadedFiles || []),
                 publishDate: publishDate,
                 unpublishDate: unpublishDate,
                 visibilityMode: visibilityMode
@@ -1107,10 +1372,34 @@ if (!$courseData) {
             const list = document.getElementById('sections-list');
             list.innerHTML = '';
             
-            courseData.sections.forEach((section, index) => {
+            // Calculate pagination for sections list based on break sections
+            const breakSections = courseData.sections.filter(section => section.type === 'break');
+            const totalPages = breakSections.length + 1; // +1 for content before first break
+            
+            let sectionsToShow = [];
+            if (currentSectionsPage === 1) {
+                // First page: show sections from start until first break
+                const firstBreakIndex = courseData.sections.findIndex(section => section.type === 'break');
+                sectionsToShow = firstBreakIndex === -1 ? courseData.sections : courseData.sections.slice(0, firstBreakIndex);
+            } else {
+                // Subsequent pages: show sections between breaks
+                const breakIndices = courseData.sections.map((section, index) => section.type === 'break' ? index : -1).filter(index => index !== -1);
+                const startBreakIndex = breakIndices[currentSectionsPage - 2]; // Previous break
+                const endBreakIndex = breakIndices[currentSectionsPage - 1]; // Current break
+                
+                if (startBreakIndex !== undefined && endBreakIndex !== undefined) {
+                    sectionsToShow = courseData.sections.slice(startBreakIndex + 1, endBreakIndex);
+                } else if (startBreakIndex !== undefined) {
+                    // Last page: from last break to end
+                    sectionsToShow = courseData.sections.slice(startBreakIndex + 1);
+                }
+            }
+            
+            sectionsToShow.forEach((section, pageIndex) => {
+                const originalIndex = courseData.sections.findIndex(s => s === section);
                 const sectionDiv = document.createElement('div');
-                sectionDiv.className = 'section-item';
-                sectionDiv.dataset.index = index;
+                sectionDiv.className = section.type === 'break' ? 'section-item break-section' : 'section-item';
+                sectionDiv.dataset.index = originalIndex;
                 
                 // Get scheduling status
                 let schedulingStatus = '';
@@ -1135,25 +1424,25 @@ if (!$courseData) {
                 sectionDiv.innerHTML = `
                     <div class="section-controls">
                         <div class="section-order-controls">
-                            <button class="btn btn-sm btn-outline-secondary" onclick="moveSection(${index}, 'up')" ${index === 0 ? 'disabled' : ''} title="Move Up">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="moveSection(${originalIndex}, 'up')" ${originalIndex === 0 ? 'disabled' : ''} title="Move Up">
                                 <i class="fas fa-chevron-up"></i>
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="moveSection(${index}, 'down')" ${index === courseData.sections.length - 1 ? 'disabled' : ''} title="Move Down">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="moveSection(${originalIndex}, 'down')" ${originalIndex === courseData.sections.length - 1 ? 'disabled' : ''} title="Move Down">
                                 <i class="fas fa-chevron-down"></i>
                             </button>
                         </div>
                         <h6 class="section-title">${section.title}</h6>
                         <div class="section-actions">
-                            <button class="btn btn-sm btn-outline-primary" onclick="editSection(${index})" title="Edit Section">
+                            <button class="btn btn-sm btn-outline-primary" onclick="editSection(${originalIndex})" title="Edit Section">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteSection(${index})" title="Delete Section">
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteSection(${originalIndex})" title="Delete Section">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
-                        <small class="text-muted">${section.type.charAt(0).toUpperCase() + section.type.slice(1)}</small>
+                    <small class="text-muted">${section.type.charAt(0).toUpperCase() + section.type.slice(1)}</small>
                         ${schedulingStatus}
                     </div>
                 `;
@@ -1167,6 +1456,42 @@ if (!$courseData) {
                 
                 list.appendChild(sectionDiv);
             });
+
+            // Add pagination controls for sections list if there are multiple pages
+            if (totalPages > 1) {
+                const paginationDiv = document.createElement('div');
+                paginationDiv.className = 'sections-pagination mt-3';
+                paginationDiv.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="pagination-info">
+                            <span class="text-muted small">
+                                Page ${currentSectionsPage} of ${totalPages} (${sectionsToShow.length} sections on this page)
+                            </span>
+                        </div>
+                        <div class="pagination-buttons">
+                            <button class="btn btn-outline-primary btn-sm me-2" 
+                                    onclick="changeSectionsPage(${currentSectionsPage - 1})" 
+                                    ${currentSectionsPage === 1 ? 'disabled' : ''}>
+                                <i class="fas fa-chevron-left me-1"></i>Previous
+                            </button>
+                            <span class="page-numbers">
+                                ${Array.from({length: totalPages}, (_, i) => {
+                                    const pageNum = i + 1;
+                                    const isActive = pageNum === currentSectionsPage;
+                                    return `<button class="btn btn-sm me-1 ${isActive ? 'btn-primary' : 'btn-outline-primary'}" 
+                                                   onclick="changeSectionsPage(${pageNum})">${pageNum}</button>`;
+                                }).join('')}
+                            </span>
+                            <button class="btn btn-outline-primary btn-sm ms-2" 
+                                    onclick="changeSectionsPage(${currentSectionsPage + 1})" 
+                                    ${currentSectionsPage === totalPages ? 'disabled' : ''}>
+                                Next<i class="fas fa-chevron-right ms-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(paginationDiv);
+            }
         }
 
         // Edit section
@@ -1729,6 +2054,24 @@ if (!$courseData) {
                         `;
                     });
                     contentHtml += '</div>';
+                } else if (section.type === 'break') {
+                    // Display break section with special styling
+                    contentHtml = `
+                        <div class="page-break-display" style="
+                            text-align: center; 
+                            padding: 2rem; 
+                            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                            border: 2px dashed #007bff;
+                            border-radius: 10px;
+                            margin: 1rem 0;
+                            font-family: ${courseData.theme.fontFamily};
+                            font-size: ${courseData.theme.bodyFontSize};
+                        ">
+                            <i class="fas fa-page-break" style="font-size: 2rem; color: #007bff; margin-bottom: 0.5rem;"></i>
+                            <div style="font-weight: bold; color: #007bff; margin-bottom: 0.5rem;">${section.title}</div>
+                            <div style="color: #6c757d; font-size: 0.9rem;">Content after this break will appear on the next page</div>
+                        </div>
+                    `;
                 } else {
                     // Display text content
                     contentHtml = `<div style="font-family: ${courseData.theme.fontFamily}; font-size: ${courseData.theme.bodyFontSize}; line-height: 1.6;">${section.content}</div>`;
@@ -1831,6 +2174,13 @@ if (!$courseData) {
             courseData.theme.bodyFontSize = this.value + 'rem';
             document.querySelectorAll('small')[1].textContent = this.value + 'rem';
             renderCoursePreview();
+        });
+
+        // Pagination controls
+        document.getElementById('sectionsPerPageListSelect').addEventListener('change', function() {
+            sectionsPerPageList = parseInt(this.value);
+            currentSectionsPage = 1; // Reset to first page
+            renderSectionsList();
         });
 
         // File upload functionality

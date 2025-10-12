@@ -1,4 +1,7 @@
 <?php
+// Include session configuration for persistent sessions
+include("./config/session.php");
+
 // Error handling for database connection
 error_reporting(E_ALL);
 ini_set('display_errors', 1);

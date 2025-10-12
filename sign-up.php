@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
-session_start();
+// Include session configuration for persistent sessions
+include("./config/session.php");
 include("./dbconnection/connection.php");
 ?>
 <head>

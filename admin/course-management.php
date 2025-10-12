@@ -196,6 +196,36 @@ if (!empty($courses)) {
         border-radius: var(--radius-sm);
     }
 
+    /* Pricing badge specific styles for text wrapping */
+    .pricing-badge {
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        word-break: break-word !important;
+        max-width: 200px !important;
+        display: inline-block !important;
+        line-height: 1.3 !important;
+        border-radius: 0.5rem !important;
+        margin-bottom: 0.25rem !important;
+        vertical-align: top !important;
+    }
+
+    /* Responsive adjustments for pricing badges */
+    @media (max-width: 768px) {
+        .pricing-badge {
+            max-width: 150px !important;
+            font-size: 0.7rem !important;
+            padding: 0.3rem 0.5rem !important;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .pricing-badge {
+            max-width: 120px !important;
+            font-size: 0.65rem !important;
+            padding: 0.25rem 0.4rem !important;
+        }
+    }
+
     .course-title {
         font-size: 1.25rem;
         font-weight: 600;
@@ -675,7 +705,7 @@ if (!empty($courses)) {
                                                     $label = $isFree ? 'Free' : (htmlspecialchars($p['currency']) . ' ' . number_format((float)$p['amount'], 2));
                                                     $text = $desc ? ($label . ' — ' . htmlspecialchars($desc)) : $label;
                                                 ?>
-                                                <span class="badge" style="background:#eef2ff;color:#1e293b;border:1px solid #e2e8f0;border-radius:9999px;padding:0.4rem 0.6rem;font-weight:600;">
+                                                <span class="badge pricing-badge" style="background:#eef2ff;color:#1e293b;border:1px solid #e2e8f0;border-radius:0.5rem;padding:0.4rem 0.6rem;font-weight:600;white-space:normal;word-wrap:break-word;max-width:200px;display:inline-block;line-height:1.3;">
                                                     <?php echo $text; ?>
                                                 </span>
                                             <?php endforeach; ?>

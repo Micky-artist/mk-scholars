@@ -1,4 +1,7 @@
 <?php
+// Include session configuration for persistent sessions
+include("./config/session.php");
+
 // Check if there are any critical errors
 $hasError = false;
 
@@ -8,10 +11,9 @@ try {
     
     // Check if connection is working
     if ($conn && mysqli_ping($conn)) {
-        // Database is working, redirect to home
-        echo '<script type="text/javascript">
-            window.location.href="home";
-        </script>';
+        // Database is working, redirect to home using PHP header
+        header("Location: home");
+        exit();
     } else {
         $hasError = true;
     }

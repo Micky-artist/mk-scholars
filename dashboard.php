@@ -1,5 +1,6 @@
 <?php
-session_start();
+// Include session configuration for persistent sessions
+include("./config/session.php");
 include('./dbconnection/connection.php');
 include('./php/validateSession.php');
 // include('./php/sendMessage.php');

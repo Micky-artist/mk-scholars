@@ -1,4 +1,7 @@
 <?php
+// Include session configuration for persistent sessions
+include("./config/session.php");
+
 // Fallback index file that works without database
 ?>
 <!DOCTYPE html>
