@@ -71,42 +71,66 @@ if (!$courseData) {
 <?php include("./partials/head.php"); ?>
 
 <style>
+    :root {
+        --bg-primary: #f8f9fa;
+        --bg-secondary: #ffffff;
+        --text-primary: #1f2937;
+        --text-secondary: #4b5563;
+        --glass-bg: rgba(255, 255, 255, 0.9);
+        --glass-border: rgba(255, 255, 255, 0.3);
+    }
+
+    [data-theme="dark"] {
+        --bg-primary: #1a1a1a;
+        --bg-secondary: #2d2d2d;
+        --text-primary: #f9fafb;
+        --text-secondary: #9ca3af;
+        --glass-bg: rgba(45, 45, 45, 0.9);
+        --glass-border: rgba(255, 255, 255, 0.1);
+    }
+
     .editor-container {
-        background: #f8f9fa;
+        background: var(--bg-primary);
         min-height: 100vh;
         padding: 2rem 0;
     }
 
     .editor-sidebar {
-        background: white;
+        background: var(--glass-bg);
         border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
         padding: 1.5rem;
         margin-bottom: 2rem;
     }
 
     .editor-main {
-        background: white;
+        background: var(--glass-bg);
         border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
         padding: 2rem;
         margin-bottom: 2rem;
     }
 
     .section-item {
-        background: #f8f9fa;
-        border: 1px solid #e9ecef;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
         border-radius: 8px;
         padding: 0.75rem;
         margin-bottom: 0.75rem;
         cursor: move;
         transition: all 0.3s ease;
         user-select: none;
+        backdrop-filter: blur(10px);
     }
 
     .section-item:hover {
-        background: #e9ecef;
+        background: var(--bg-secondary);
         transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
     .section-item.dragging {
@@ -894,12 +918,24 @@ if (!$courseData) {
             const preview = document.getElementById('course-preview');
             preview.innerHTML = '';
             
+            // Add modern styling to preview container
+            preview.style.cssText = `
+                background: var(--bg-primary, #f8f9fa);
+                border-radius: 15px;
+                padding: 2rem;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+                backdrop-filter: blur(10px);
+                border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.3));
+                min-height: 400px;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            `;
+            
             if (courseData.sections.length === 0) {
                 preview.innerHTML = `
-                    <div class="text-center py-5">
-                        <i class="fas fa-file-alt fa-5x text-muted mb-4"></i>
-                        <h4 class="text-muted">No Sections Added Yet</h4>
-                        <p class="text-muted">Click "Add Section" to start building your course content.</p>
+                    <div class="text-center py-5" style="color: var(--text-secondary, #6c757d);">
+                        <i class="fas fa-file-alt fa-5x mb-4" style="opacity: 0.5;"></i>
+                        <h4 style="color: var(--text-secondary, #6c757d);">No Sections Added Yet</h4>
+                        <p style="color: var(--text-secondary, #6c757d);">Click "Add Section" to start building your course content.</p>
                     </div>
                 `;
                 return;
@@ -1004,23 +1040,26 @@ if (!$courseData) {
                 
                 const sectionDiv = document.createElement('div');
                 sectionDiv.className = 'section-preview mb-4';
-                sectionDiv.style.border = '2px solid #e9ecef';
-                sectionDiv.style.borderRadius = '10px';
-                sectionDiv.style.padding = '1rem';
-                sectionDiv.style.backgroundColor = 'white';
-                sectionDiv.style.transition = 'all 0.3s ease';
+                sectionDiv.style.cssText = `
+                    margin-bottom: 2rem;
+                    padding: 1.5rem;
+                    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.3));
+                    border-radius: 12px;
+                    background: var(--glass-bg, rgba(255, 255, 255, 0.9));
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+                    transition: transform 0.2s ease, box-shadow 0.2s ease;
+                    backdrop-filter: blur(10px);
+                `;
                 
                 // Add hover effect
                 sectionDiv.addEventListener('mouseenter', function() {
-                    this.style.borderColor = courseData.theme.primaryColor;
                     this.style.transform = 'translateY(-2px)';
-                    this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+                    this.style.boxShadow = '0 4px 16px rgba(0,0,0,0.1)';
                 });
                 
                 sectionDiv.addEventListener('mouseleave', function() {
-                    this.style.borderColor = '#e9ecef';
                     this.style.transform = 'translateY(0)';
-                    this.style.boxShadow = 'none';
+                    this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
                 });
                 
                 // Get appropriate icon for section type
@@ -1044,9 +1083,9 @@ if (!$courseData) {
                     section.files.forEach(file => {
                         const imageUrl = `<?php echo getImageUrl(''); ?>${file.filePath}`;
                         contentHtml += `
-                            <div class="image-item mb-3">
-                                <img src="${imageUrl}" alt="${file.fileName}" class="img-fluid rounded" style="max-width: 300px; height: auto;">
-                                <div class="text-muted small mt-1">${file.fileName}</div>
+                            <div class="image-item mb-3" style="text-align: center;">
+                                <img src="${imageUrl}" alt="${file.fileName}" class="img-fluid rounded" style="max-width: 250px; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                <div class="small mt-1" style="color: var(--text-secondary, #4b5563);">${file.fileName}</div>
                             </div>
                         `;
                     });
@@ -1057,12 +1096,12 @@ if (!$courseData) {
                     section.files.forEach(file => {
                         const videoUrl = `<?php echo getImageUrl(''); ?>${file.filePath}`;
                         contentHtml += `
-                            <div class="video-item mb-3">
-                                <video controls class="img-fluid rounded" style="max-height: 300px; width: 100%;">
+                            <div class="video-item mb-3" style="text-align: center;">
+                                <video controls class="img-fluid rounded" style="max-width: 300px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                                     <source src="${videoUrl}" type="video/mp4">
                                     Your browser does not support the video tag.
                                 </video>
-                                <div class="text-muted small mt-1">${file.fileName}</div>
+                                <div class="small mt-1" style="color: var(--text-secondary, #4b5563);">${file.fileName}</div>
                             </div>
                         `;
                     });
@@ -1089,11 +1128,11 @@ if (!$courseData) {
                     section.files.forEach(file => {
                         const fileUrl = `<?php echo getImageUrl(''); ?>${file.filePath}`;
                         contentHtml += `
-                            <div class="file-item mb-2">
-                                <a href="${fileUrl}" target="_blank" class="btn btn-outline-primary btn-sm">
+                            <div class="file-item mb-2" style="display: inline-block; margin-right: 1rem; margin-bottom: 0.75rem;">
+                                <a href="${fileUrl}" target="_blank" class="btn btn-outline-primary btn-sm" style="font-size: 0.8rem; padding: 0.4rem 0.8rem; border-radius: 6px; transition: all 0.2s ease;">
                                     <i class="fas fa-download me-2"></i>${file.fileName}
                                 </a>
-                                <span class="text-muted small ms-2">(${(file.fileSize / 1024 / 1024).toFixed(2)} MB)</span>
+                                <span class="small ms-2" style="color: var(--text-secondary, #4b5563);">(${(file.fileSize / 1024 / 1024).toFixed(2)} MB)</span>
                             </div>
                         `;
                     });
@@ -1117,19 +1156,29 @@ if (!$courseData) {
                         </div>
                     `;
                 } else {
-                    // Display text content
-                    contentHtml = `<div style="font-family: ${courseData.theme.fontFamily}; font-size: ${courseData.theme.bodyFontSize}; line-height: 1.6;">${section.content}</div>`;
+                    // Display text content with modern styling
+                    contentHtml = `
+                        <div class="text-content" style="
+                            line-height: 1.6;
+                            color: var(--text-primary, #1f2937);
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                        ">
+                            <div style="color: var(--text-secondary, #4b5563);">${section.content}</div>
+                        </div>
+                    `;
                 }
 
                 sectionDiv.innerHTML = `
                     <div class="d-flex align-items-center mb-3">
-                        <div class="me-3" style="color: ${courseData.theme.primaryColor}; font-size: 1.5rem;">
+                        <div class="me-3" style="color: var(--text-primary, #1f2937); font-size: 1.5rem;">
                             ${sectionIcon}
                         </div>
-                        <h3 style="color: ${courseData.theme.primaryColor}; font-family: ${courseData.theme.fontFamily}; font-size: ${courseData.theme.headerFontSize}; margin: 0;">
+                        <h3 style="color: var(--text-primary, #1f2937); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 1.3rem; margin: 0; font-weight: 600;">
                             ${section.title}
                         </h3>
-                        <span class="badge bg-secondary ms-auto">${section.type.charAt(0).toUpperCase() + section.type.slice(1)}</span>
+                        <span class="badge ms-auto" style="background: var(--text-primary, #1f2937); color: var(--bg-primary, #f8f9fa); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem;">
+                            ${section.type.charAt(0).toUpperCase() + section.type.slice(1)}
+                        </span>
                     </div>
                     ${contentHtml}
                 `;
@@ -1141,17 +1190,26 @@ if (!$courseData) {
             if (totalPages > 1) {
                 const paginationDiv = document.createElement('div');
                 paginationDiv.className = 'pagination-controls mt-4';
+                paginationDiv.style.cssText = `
+                    background: var(--glass-bg, rgba(255, 255, 255, 0.9));
+                    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.3));
+                    border-radius: 12px;
+                    padding: 1rem;
+                    backdrop-filter: blur(10px);
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+                `;
                 paginationDiv.innerHTML = `
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="pagination-info">
-                            <span class="text-muted">
+                            <span style="color: var(--text-secondary, #4b5563);">
                                 Page ${page} of ${totalPages} (${sectionsToShow.length} sections on this page)
                             </span>
                         </div>
                         <div class="pagination-buttons">
                             <button class="btn btn-outline-primary btn-sm me-2" 
                                     onclick="changePage(${page - 1})" 
-                                    ${page === 1 ? 'disabled' : ''}>
+                                    ${page === 1 ? 'disabled' : ''}
+                                    style="border-radius: 8px; transition: all 0.2s ease;">
                                 <i class="fas fa-chevron-left me-1"></i>Previous
                             </button>
                             <span class="page-numbers">
@@ -1159,12 +1217,14 @@ if (!$courseData) {
                                     const pageNum = i + 1;
                                     const isActive = pageNum === page;
                                     return `<button class="btn btn-sm me-1 ${isActive ? 'btn-primary' : 'btn-outline-primary'}" 
-                                                   onclick="changePage(${pageNum})">${pageNum}</button>`;
+                                                   onclick="changePage(${pageNum})"
+                                                   style="border-radius: 8px; transition: all 0.2s ease;">${pageNum}</button>`;
                                 }).join('')}
                             </span>
                             <button class="btn btn-outline-primary btn-sm ms-2" 
                                     onclick="changePage(${page + 1})" 
-                                    ${page === totalPages ? 'disabled' : ''}>
+                                    ${page === totalPages ? 'disabled' : ''}
+                                    style="border-radius: 8px; transition: all 0.2s ease;">
                                 Next<i class="fas fa-chevron-right ms-1"></i>
                             </button>
                         </div>
@@ -1969,122 +2029,133 @@ if (!$courseData) {
             // Open preview in new window
             const previewWindow = window.open('', '_blank');
             
-            // Generate content for each section with file support
-            const sectionsHtml = courseData.sections.map(section => {
-                // Check section visibility for student view
-                if (viewMode === 'student') {
-                    const now = new Date();
-                    const sectionPublishDate = section.publishDate ? new Date(section.publishDate) : null;
-                    const sectionUnpublishDate = section.unpublishDate ? new Date(section.unpublishDate) : null;
-                    
-                    if (section.visibilityMode === 'hidden') {
-                        return ''; // Skip hidden sections
-                    }
-                    
-                    if (section.visibilityMode === 'scheduled') {
-                        if (sectionPublishDate && now < sectionPublishDate) {
-                            return ''; // Skip sections not yet published
-                        }
-                        
-                        if (sectionUnpublishDate && now > sectionUnpublishDate) {
-                            return ''; // Skip sections that have been unpublished
-                        }
-                    }
+            // Build filtered sections (keep breaks as page boundaries)
+            const filteredSectionsForPreview = courseData.sections.filter(section => {
+                if (viewMode !== 'student') return true;
+                const now = new Date();
+                const sectionPublishDate = section.publishDate ? new Date(section.publishDate) : null;
+                const sectionUnpublishDate = section.unpublishDate ? new Date(section.unpublishDate) : null;
+                if (section.visibilityMode === 'hidden') return false;
+                if (section.visibilityMode === 'scheduled') {
+                    if (sectionPublishDate && now < sectionPublishDate) return false;
+                    if (sectionUnpublishDate && now > sectionUnpublishDate) return false;
                 }
-                
-                let contentHtml = '';
-                
-                if (section.type === 'image' && section.files && section.files.length > 0) {
-                    // Display uploaded images
-                    contentHtml = '<div class="image-gallery">';
-                    section.files.forEach(file => {
-                        const imageUrl = `<?php echo getImageUrl(''); ?>${file.filePath}`;
-                        contentHtml += `
-                            <div class="image-item mb-3">
-                                <img src="${imageUrl}" alt="${file.fileName}" class="img-fluid rounded" style="max-width: 300px; height: auto;">
-                                <div class="text-muted small mt-1">${file.fileName}</div>
-                            </div>
-                        `;
-                    });
-                    contentHtml += '</div>';
-                } else if (section.type === 'video' && section.files && section.files.length > 0) {
-                    // Display uploaded videos
-                    contentHtml = '<div class="video-gallery">';
-                    section.files.forEach(file => {
-                        const videoUrl = `<?php echo getImageUrl(''); ?>${file.filePath}`;
-                        contentHtml += `
-                            <div class="video-item mb-3">
-                                <video controls class="img-fluid rounded" style="max-height: 300px; width: 100%;">
-                                    <source src="${videoUrl}" type="video/mp4">
-                                    Your browser does not support the video tag.
-                                </video>
-                                <div class="text-muted small mt-1">${file.fileName}</div>
-                            </div>
-                        `;
-                    });
-                    contentHtml += '</div>';
-                } else if (section.type === 'audio' && section.files && section.files.length > 0) {
-                    // Display uploaded audio
-                    contentHtml = '<div class="audio-gallery">';
-                    section.files.forEach(file => {
-                        const audioUrl = `<?php echo getImageUrl(''); ?>${file.filePath}`;
-                        contentHtml += `
-                            <div class="audio-item mb-3">
-                                <audio controls class="w-100">
-                                    <source src="${audioUrl}" type="audio/mpeg">
-                                    Your browser does not support the audio tag.
-                                </audio>
-                                <div class="text-muted small mt-1">${file.fileName}</div>
-                            </div>
-                        `;
-                    });
-                    contentHtml += '</div>';
-                } else if (section.type === 'file' && section.files && section.files.length > 0) {
-                    // Display uploaded files
-                    contentHtml = '<div class="file-gallery">';
-                    section.files.forEach(file => {
-                        const fileUrl = `<?php echo getImageUrl(''); ?>${file.filePath}`;
-                        contentHtml += `
-                            <div class="file-item mb-2">
-                                <a href="${fileUrl}" target="_blank" class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-download me-2"></i>${file.fileName}
-                                </a>
-                                <span class="text-muted small ms-2">(${(file.fileSize / 1024 / 1024).toFixed(2)} MB)</span>
-                            </div>
-                        `;
-                    });
-                    contentHtml += '</div>';
-                } else if (section.type === 'break') {
-                    // Display break section with special styling
-                    contentHtml = `
-                        <div class="page-break-display" style="
-                            text-align: center; 
-                            padding: 2rem; 
-                            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-                            border: 2px dashed #007bff;
-                            border-radius: 10px;
-                            margin: 1rem 0;
-                            font-family: ${courseData.theme.fontFamily};
-                            font-size: ${courseData.theme.bodyFontSize};
-                        ">
-                            <i class="fas fa-page-break" style="font-size: 2rem; color: #007bff; margin-bottom: 0.5rem;"></i>
-                            <div style="font-weight: bold; color: #007bff; margin-bottom: 0.5rem;">${section.title}</div>
-                            <div style="color: #6c757d; font-size: 0.9rem;">Content after this break will appear on the next page</div>
+                return true;
+            });
+            const totalPages = filteredSectionsForPreview.filter(s => s.type === 'break').length + 1;
+            
+            // Helper to render a specific page based on break sections
+            function renderPreviewPage(pageNumber) {
+                // Determine slice by break boundaries
+                const original = filteredSectionsForPreview;
+                const breakIndices = original
+                    .map((s, i) => (s.type === 'break' ? i : -1))
+                    .filter(i => i !== -1);
+
+                let startIdx = 0;
+                let endIdx = original.length;
+                if (pageNumber === 1) {
+                    endIdx = breakIndices.length > 0 ? breakIndices[0] : original.length;
+                } else {
+                    const prevBreak = breakIndices[pageNumber - 2];
+                    const nextBreak = breakIndices[pageNumber - 1];
+                    startIdx = prevBreak + 1;
+                    endIdx = nextBreak !== undefined ? nextBreak : original.length;
+                }
+
+                const pageSections = original.slice(startIdx, endIdx).filter(s => s.type !== 'break');
+
+                // Build sections HTML for this page
+                const sectionsHtml = pageSections.map(section => {
+                    let contentHtml = '';
+                    if (section.type === 'image' && section.files && section.files.length > 0) {
+                        contentHtml = '<div class="image-gallery">';
+                        section.files.forEach(file => {
+                            const imageUrl = `<?php echo getImageUrl(''); ?>${file.filePath}`;
+                            contentHtml += `
+                                <div class="image-item mb-3">
+                                    <img src="${imageUrl}" alt="${file.fileName}" class="img-fluid rounded" style="max-width: 300px; height: auto;">
+                                    <div class="text-muted small mt-1">${file.fileName}</div>
+                                </div>
+                            `;
+                        });
+                        contentHtml += '</div>';
+                    } else if (section.type === 'video' && section.files && section.files.length > 0) {
+                        contentHtml = '<div class="video-gallery">';
+                        section.files.forEach(file => {
+                            const videoUrl = `<?php echo getImageUrl(''); ?>${file.filePath}`;
+                            contentHtml += `
+                                <div class="video-item mb-3" style="text-align: center;">
+                                    <video controls class="img-fluid rounded" style="max-width: 300px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                        <source src="${videoUrl}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="small mt-1" style="color: var(--text-secondary, #4b5563);">${file.fileName}</div>
+                                </div>
+                            `;
+                        });
+                        contentHtml += '</div>';
+                    } else if (section.type === 'audio' && section.files && section.files.length > 0) {
+                        contentHtml = '<div class="audio-gallery">';
+                        section.files.forEach(file => {
+                            const audioUrl = `<?php echo getImageUrl(''); ?>${file.filePath}`;
+                            contentHtml += `
+                                <div class="audio-item mb-3">
+                                    <audio controls class="w-100">
+                                        <source src="${audioUrl}" type="audio/mpeg">
+                                        Your browser does not support the audio tag.
+                                    </audio>
+                                    <div class="text-muted small mt-1">${file.fileName}</div>
+                                </div>
+                            `;
+                        });
+                        contentHtml += '</div>';
+                    } else if (section.type === 'file' && section.files && section.files.length > 0) {
+                        contentHtml = '<div class="file-gallery">';
+                        section.files.forEach(file => {
+                            const fileUrl = `<?php echo getImageUrl(''); ?>${file.filePath}`;
+                            contentHtml += `
+                                <div class="file-item mb-2" style="display: inline-block; margin-right: 1rem; margin-bottom: 0.75rem;">
+                                    <a href="${fileUrl}" target="_blank" class="btn btn-outline-primary btn-sm" style="font-size: 0.8rem; padding: 0.4rem 0.8rem; border-radius: 6px; transition: all 0.2s ease;">
+                                        <i class="fas fa-download me-2"></i>${file.fileName}
+                                    </a>
+                                    <span class="small ms-2" style="color: var(--text-secondary, #4b5563);">(${(file.fileSize / 1024 / 1024).toFixed(2)} MB)</span>
+                                </div>
+                            `;
+                        });
+                        contentHtml += '</div>';
+                    } else {
+                        contentHtml = `<div style="font-family: ${courseData.theme.fontFamily}; font-size: ${courseData.theme.bodyFontSize}; line-height: 1.6;">${section.content}</div>`;
+                    }
+
+                    return `
+                        <div class="section">
+                            <h2 style="color: ${courseData.theme.primaryColor}; font-family: ${courseData.theme.fontFamily}; font-size: ${courseData.theme.headerFontSize};">${section.title}</h2>
+                            ${contentHtml}
                         </div>
                     `;
-                } else {
-                    // Display text content
-                    contentHtml = `<div style="font-family: ${courseData.theme.fontFamily}; font-size: ${courseData.theme.bodyFontSize}; line-height: 1.6;">${section.content}</div>`;
-                }
-                
-                return `
-                    <div class="section">
-                        <h2 style="color: ${courseData.theme.primaryColor}; font-family: ${courseData.theme.fontFamily}; font-size: ${courseData.theme.headerFontSize};">${section.title}</h2>
-                        ${contentHtml}
-                    </div>
-                `;
-            }).join('');
-            
+                }).join('');
+
+                const contentRoot = previewWindow.document.getElementById('courseContent');
+                if (contentRoot) contentRoot.innerHTML = sectionsHtml;
+
+                // Update pagination UI
+                const currEl = previewWindow.document.getElementById('currentPage');
+                const totalEl = previewWindow.document.getElementById('totalPages');
+                const prevBtn = previewWindow.document.getElementById('prevBtn');
+                const nextBtn = previewWindow.document.getElementById('nextBtn');
+                if (currEl) currEl.textContent = String(pageNumber);
+                if (totalEl) totalEl.textContent = String(totalPages);
+                if (prevBtn) prevBtn.disabled = pageNumber <= 1;
+                if (nextBtn) nextBtn.disabled = pageNumber >= totalPages;
+                // Update page buttons active state
+                const pageBtns = previewWindow.document.querySelectorAll('[data-page-btn]');
+                pageBtns.forEach(btn => {
+                    const p = parseInt(btn.getAttribute('data-page-btn'));
+                    btn.className = `btn btn-sm me-1 ${p === pageNumber ? 'btn-primary' : 'btn-outline-primary'}`;
+                });
+            }
+
             previewWindow.document.write(`
                 <!DOCTYPE html>
                 <html>
@@ -2141,11 +2212,59 @@ if (!$courseData) {
                 <body>
                     <div class="container">
                         <h1 class="text-center mb-4">${courseData.sections.length > 0 ? courseData.sections[0].title : 'Course Preview'}</h1>
-                        ${sectionsHtml}
+                        <div id="courseContent"></div>
+
+                        ${totalPages > 1 ? `
+                        <div class="pagination-controls mt-4" style="
+                            background: rgba(255,255,255,0.9);
+                            border: 1px solid rgba(255,255,255,0.3);
+                            border-radius: 12px;
+                            padding: 1rem;
+                            backdrop-filter: blur(10px);
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+                        ">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="pagination-info">
+                                    <span style="color: #4b5563;">
+                                        Page <span id="currentPage">1</span> of <span id="totalPages">${totalPages}</span>
+                                    </span>
+                                </div>
+                                <div class="pagination-buttons">
+                                    <button id="prevBtn" class="btn btn-outline-primary btn-sm me-2">\n                                        <i class="fas fa-chevron-left me-1"></i>Previous\n                                    </button>
+                                    <span class="page-numbers">
+                                        ${Array.from({length: totalPages}, (_, i) => {
+                                            const pageNum = i + 1;
+                                            return `<button class="btn btn-sm me-1 ${pageNum === 1 ? 'btn-primary' : 'btn-outline-primary'}" data-page-btn="${pageNum}">${pageNum}</button>`;
+                                        }).join('')}
+                                    </span>
+                                    <button id="nextBtn" class="btn btn-outline-primary btn-sm ms-2">\n                                        Next<i class="fas fa-chevron-right ms-1"></i>\n                                    </button>
+                                </div>
+                            </div>
+                        </div>` : ''}
                     </div>
                 </body>
                 </html>
             `);
+
+            // Wire up pagination handlers inside the preview window
+            previewWindow.document.close();
+            previewWindow.addEventListener('load', function() {
+                let current = 1;
+                const goTo = (p) => {
+                    if (p < 1 || p > totalPages) return;
+                    current = p;
+                    renderPreviewPage(current);
+                };
+                const prevBtn = previewWindow.document.getElementById('prevBtn');
+                const nextBtn = previewWindow.document.getElementById('nextBtn');
+                if (prevBtn) prevBtn.onclick = () => goTo(current - 1);
+                if (nextBtn) nextBtn.onclick = () => goTo(current + 1);
+                const pageBtns = previewWindow.document.querySelectorAll('[data-page-btn]');
+                pageBtns.forEach(btn => btn.addEventListener('click', () => goTo(parseInt(btn.getAttribute('data-page-btn')))));
+
+                // Initial render
+                renderPreviewPage(current);
+            });
         }
 
         // Theme controls

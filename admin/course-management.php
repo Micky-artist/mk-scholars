@@ -51,6 +51,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if (mysqli_query($conn, $insertQuery)) {
             $courseId = mysqli_insert_id($conn);
+            
+            // Create discussion board for the course
+            $discussionQuery = "INSERT INTO DiscussionBoard (courseId, userId, messageTitle, messageBody, messageDate, messageTime, isPinned, parentDiscussionId, isApproved) VALUES (?, ?, ?, ?, CURDATE(), CURTIME(), 1, NULL, 1)";
+            $discussionStmt = $conn->prepare($discussionQuery);
+            $welcomeTitle = "Welcome to " . $courseName . " Discussion Board";
+            $welcomeBody = "This is the discussion board for " . $courseName . ". Feel free to ask questions, share ideas, and engage with other students and instructors.";
+            $discussionStmt->bind_param("iis", $courseId, $courseCreatedBy, $welcomeTitle, $welcomeBody);
+            $discussionStmt->execute();
+            $discussionStmt->close();
+            
             $message = 'Course created successfully! Course ID: ' . $courseId;
             $messageType = 'success';
         } else {
@@ -652,6 +662,9 @@ if (!empty($courses)) {
                                                     <li><a class="dropdown-item" href="course-enrollments.php?id=<?php echo $course['courseId']; ?>">
                                                         <i class="fas fa-users me-2"></i>View Enrollments
                                                     </a></li>
+                                                    <li><a class="dropdown-item" href="course-discussion.php?id=<?php echo $course['courseId']; ?>">
+                                                        <i class="fas fa-comments me-2"></i>Discussion Board
+                                                    </a></li>
                                                     <li><hr class="dropdown-divider"></li>
                                                     <li><a class="dropdown-item text-danger" href="#" onclick="deleteCourse(<?php echo $course['courseId']; ?>)">
                                                         <i class="fas fa-trash me-2"></i>Delete Course
@@ -888,9 +901,28 @@ if (!empty($courses)) {
         });
 
         function deleteCourse(courseId) {
-            if (confirm('Are you sure you want to delete this course? This action cannot be undone.')) {
-                // Add delete functionality here
-                console.log('Delete course:', courseId);
+            if (confirm('Are you sure you want to delete this course? This action cannot be undone. This will also delete the discussion board and all messages.')) {
+                // Delete course and related data
+                fetch('php/delete-course.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'courseId=' + courseId
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Course deleted successfully!');
+                        location.reload();
+                    } else {
+                        alert('Error deleting course: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error deleting course');
+                });
             }
         }
 

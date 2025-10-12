@@ -130,7 +130,7 @@ if ($conn) {
             
             if ($courseContent && isset($courseContent['sections']) && is_array($courseContent['sections'])) {
                 foreach ($courseContent['sections'] as $section) {
-                    if (isset($section['type']) && in_array($section['type'], ['text', 'file', 'image', 'video', 'audio'])) {
+                    if (isset($section['type']) && in_array($section['type'], ['text', 'file', 'image', 'video', 'audio', 'break'])) {
                         $course['hasNotes'] = true;
                         $course['courseNotes'][] = $section;
                     }
@@ -408,6 +408,154 @@ function formatFileSize($bytes) {
             display: flex;
             align-items: center;
             justify-content: center;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+            background: var(--bg-secondary);
+        }
+
+        /* Discussion Modal Styling */
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .modal-title {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .modal-body {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .discussion-item {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .discussion-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .discussion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .discussion-author {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .author-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .author-avatar.admin {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+        }
+
+        .author-info h6 {
+            margin: 0;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .author-info small {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+
+        .discussion-time {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+
+        .discussion-content {
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin-bottom: 0.75rem;
+        }
+
+        .discussion-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .discussion-actions button {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .discussion-actions button:hover {
+            color: var(--text-primary);
+        }
+
+        .real-time-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 1060;
+            display: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .real-time-indicator.active {
+            display: block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
         .notification-box {
@@ -842,10 +990,47 @@ function formatFileSize($bytes) {
 
 <body data-theme="light">
 
-    <!-- Theme Toggle Button (Legacy - Hidden) -->
-    <button style="color: orange; display: none;" class="btn btn-secondary theme-toggle glass-panel">
+    <!-- Theme Toggle Button -->
+    <button class="btn btn-secondary theme-toggle glass-panel">
         <i class="fas fa-moon"></i>
     </button>
+
+    <!-- Real-time Indicator -->
+    <div class="real-time-indicator" id="realTimeIndicator">
+        <i class="fas fa-circle me-1"></i>
+        New messages available
+    </div>
+
+    <!-- Discussion Board Popup Modal -->
+    <div class="modal fade" id="discussionModal" tabindex="-1" aria-labelledby="discussionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content glass-panel">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="discussionModalLabel">
+                        <i class="fas fa-comments me-2"></i>
+                        Course Discussion
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="discussionContent">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Loading discussion...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="refreshDiscussion()">
+                        <i class="fas fa-sync-alt me-1"></i>Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Notification Box -->
     <div class="glass-panel notification-box p-3">
@@ -931,7 +1116,7 @@ function formatFileSize($bytes) {
                 <div class="courses-grid">
                     <?php if (!empty($courses)): ?>
                         <?php foreach ($courses as $course): ?>
-                            <div class="course-card">
+                            <div class="course-card" data-course-id="<?php echo $course['courseId']; ?>" data-enrolled="<?php echo ($course['isEnrolled'] || $course['isPaid']) ? 'true' : 'false'; ?>">
                         <div class="course-header">
                             <div class="course-badge <?php echo $course['courseDisplayStatus'] == 1 ? 'open' : 'closed'; ?>">
                                 <?php echo $course['courseDisplayStatus'] == 1 ? 'Open' : 'Closed'; ?>
@@ -1024,6 +1209,14 @@ function formatFileSize($bytes) {
                                     <i class="<?php echo $buttonInfo['icon']; ?>"></i>
                                     <?php echo $buttonInfo['text']; ?>
                                 </a>
+                                
+                                <?php if ($isLoggedIn && ($course['isEnrolled'] || $course['isPaid'])): ?>
+                                    <a href="course-discussion.php?id=<?php echo $course['courseId']; ?>" 
+                                       class="btn-secondary-custom w-100 mt-2">
+                                        <i class="fas fa-comments"></i>
+                                        Discussion Board
+                                    </a>
+                                <?php endif; ?>
                                     </div>
                                 </div>
                         
@@ -1161,8 +1354,29 @@ function formatFileSize($bytes) {
                 return true;
             });
             
-            // Generate content for each section
-            const sectionsHtml = visibleNotes.map(section => {
+            // Build pagination based on break sections
+            const breakIndices = visibleNotes
+                .map((s, i) => (s.type === 'break' ? i : -1))
+                .filter(i => i !== -1);
+            const totalPages = breakIndices.length + 1;
+
+            function getPageSlice(pageNumber) {
+                let startIdx = 0;
+                let endIdx = visibleNotes.length;
+                if (pageNumber === 1) {
+                    endIdx = breakIndices.length > 0 ? breakIndices[0] : visibleNotes.length;
+                } else {
+                    const prevBreak = breakIndices[pageNumber - 2];
+                    const nextBreak = breakIndices[pageNumber - 1];
+                    startIdx = prevBreak + 1;
+                    endIdx = nextBreak !== undefined ? nextBreak : visibleNotes.length;
+                }
+                return visibleNotes.slice(startIdx, endIdx).filter(s => s.type !== 'break');
+            }
+
+            function buildSectionsHtml(pageNumber) {
+                const pageSections = getPageSlice(pageNumber);
+                return pageSections.map(section => {
                 let contentHtml = '';
                 
                 if (section.type === 'image' && section.files && section.files.length > 0) {
@@ -1238,6 +1452,7 @@ function formatFileSize($bytes) {
                     </div>
                 `;
             }).join('');
+            }
             
             // Generate the preview HTML
             const previewHtml = `
@@ -1303,15 +1518,22 @@ function formatFileSize($bytes) {
                         .section { 
                             margin-bottom: 2rem; 
                             padding: 1.5rem; 
-                            border: 1px solid #e9ecef; 
+                            border: 1px solid var(--glass-border); 
                             border-radius: 12px; 
-                            background: white;
+                            background: var(--glass-bg);
                             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
                             transition: transform 0.2s ease, box-shadow 0.2s ease;
+                            backdrop-filter: blur(10px);
                         }
                         .section:hover {
                             transform: translateY(-2px);
                             box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+                        }
+                        .section h2 {
+                            color: var(--text-primary);
+                            font-size: 1.3rem;
+                            margin-bottom: 1rem;
+                            font-weight: 600;
                         }
                         .image-gallery .image-item {
                             text-align: center;
@@ -1351,12 +1573,32 @@ function formatFileSize($bytes) {
                         }
                         .text-content {
                             line-height: 1.6;
-                            color: #333;
+                            color: var(--text-primary);
+                        }
+                        .text-content p {
+                            color: var(--text-secondary);
+                            margin-bottom: 1rem;
+                        }
+                        .text-content h1, .text-content h2, .text-content h3, .text-content h4, .text-content h5, .text-content h6 {
+                            color: var(--text-primary);
+                            margin-top: 1.5rem;
+                            margin-bottom: 0.5rem;
+                        }
+                        .text-content h1:first-child, .text-content h2:first-child, .text-content h3:first-child {
+                            margin-top: 0;
+                        }
+                        .text-content ul, .text-content ol {
+                            color: var(--text-secondary);
+                            margin-bottom: 1rem;
+                            padding-left: 1.5rem;
+                        }
+                        .text-content li {
+                            margin-bottom: 0.5rem;
                         }
                         .no-content {
                             text-align: center;
                             padding: 3rem;
-                            color: #6c757d;
+                            color: var(--text-secondary);
                         }
                         .no-content i {
                             font-size: 3rem;
@@ -1367,50 +1609,71 @@ function formatFileSize($bytes) {
                         /* Fixed Floating Navbar */
                         .floating-navbar {
                             position: fixed;
-                            top: 20px;
-                            right: 20px;
+                            bottom: 20px;
+                            left: 50%;
+                            transform: translateX(-50%);
                             z-index: 1050;
                             background: var(--glass-bg);
-                            backdrop-filter: blur(10px);
-                            border: 1px solid var(--glass-border);
-                            border-radius: 15px;
-                            padding: 10px 15px;
-                            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+                            backdrop-filter: blur(15px);
+                            border: 2px solid var(--glass-border);
+                            border-radius: 25px;
+                            padding: 12px 20px;
+                            box-shadow: 
+                                0 8px 32px rgba(0, 0, 0, 0.15),
+                                0 4px 16px rgba(0, 0, 0, 0.1),
+                                0 0 0 1px rgba(255, 255, 255, 0.1),
+                                inset 0 1px 0 rgba(255, 255, 255, 0.2);
                             display: flex;
                             align-items: center;
-                            gap: 10px;
+                            gap: 15px;
                             transition: all 0.3s ease;
                         }
 
                         .floating-navbar:hover {
-                            transform: translateY(-2px);
-                            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+                            transform: translateX(-50%) translateY(-3px);
+                            box-shadow: 
+                                0 12px 40px rgba(0, 0, 0, 0.2),
+                                0 6px 20px rgba(0, 0, 0, 0.15),
+                                0 0 0 1px rgba(255, 255, 255, 0.15),
+                                inset 0 1px 0 rgba(255, 255, 255, 0.3);
                         }
 
                         .floating-navbar .nav-btn {
-                            background: transparent;
-                            border: none;
+                            background: rgba(255, 255, 255, 0.1);
+                            border: 1px solid rgba(255, 255, 255, 0.2);
                             color: var(--text-primary);
-                            padding: 8px 12px;
-                            border-radius: 8px;
+                            padding: 10px 14px;
+                            border-radius: 12px;
                             cursor: pointer;
                             transition: all 0.3s ease;
                             display: flex;
                             align-items: center;
-                            gap: 5px;
+                            gap: 6px;
                             font-size: 0.9rem;
-                            font-weight: 500;
+                            font-weight: 600;
+                            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+                            box-shadow: 
+                                0 2px 8px rgba(0, 0, 0, 0.1),
+                                inset 0 1px 0 rgba(255, 255, 255, 0.2);
                         }
 
                         .floating-navbar .nav-btn:hover {
-                            background: var(--bg-secondary);
+                            background: rgba(255, 255, 255, 0.2);
                             color: var(--text-primary);
-                            transform: scale(1.05);
+                            transform: scale(1.08);
+                            border-color: rgba(255, 255, 255, 0.3);
+                            box-shadow: 
+                                0 4px 12px rgba(0, 0, 0, 0.15),
+                                inset 0 1px 0 rgba(255, 255, 255, 0.3);
                         }
 
                         .floating-navbar .nav-btn.active {
                             background: var(--text-primary);
                             color: var(--bg-primary);
+                            border-color: var(--text-primary);
+                            box-shadow: 
+                                0 4px 12px rgba(0, 0, 0, 0.2),
+                                inset 0 1px 0 rgba(255, 255, 255, 0.1);
                         }
 
                         .floating-navbar .theme-toggle {
@@ -1419,24 +1682,52 @@ function formatFileSize($bytes) {
 
                         .floating-navbar .theme-toggle .theme-icon {
                             transition: transform 0.3s ease;
+                            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
                         }
 
                         .floating-navbar .theme-toggle:hover .theme-icon {
-                            transform: rotate(180deg);
+                            transform: rotate(180deg) scale(1.1);
+                            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+                        }
+
+                        /* Add a subtle glow effect to the entire navbar */
+                        .floating-navbar::before {
+                            content: '';
+                            position: absolute;
+                            top: -2px;
+                            left: -2px;
+                            right: -2px;
+                            bottom: -2px;
+                            background: linear-gradient(45deg, 
+                                rgba(255, 255, 255, 0.1), 
+                                rgba(255, 255, 255, 0.05), 
+                                rgba(255, 255, 255, 0.1));
+                            border-radius: 27px;
+                            z-index: -1;
+                            opacity: 0.6;
                         }
 
                         /* Responsive navbar */
                         @media (max-width: 768px) {
                             .floating-navbar {
-                                top: 10px;
-                                right: 10px;
-                                padding: 8px 12px;
-                                gap: 8px;
+                                bottom: 15px;
+                                padding: 10px 16px;
+                                gap: 12px;
+                                border-radius: 20px;
+                                box-shadow: 
+                                    0 6px 24px rgba(0, 0, 0, 0.2),
+                                    0 3px 12px rgba(0, 0, 0, 0.15),
+                                    0 0 0 1px rgba(255, 255, 255, 0.15),
+                                    inset 0 1px 0 rgba(255, 255, 255, 0.25);
                             }
 
                             .floating-navbar .nav-btn {
-                                padding: 6px 10px;
+                                padding: 8px 12px;
                                 font-size: 0.8rem;
+                                font-weight: 700;
+                                box-shadow: 
+                                    0 2px 6px rgba(0, 0, 0, 0.15),
+                                    inset 0 1px 0 rgba(255, 255, 255, 0.25);
                             }
 
                             .floating-navbar .nav-btn span {
@@ -1446,14 +1737,181 @@ function formatFileSize($bytes) {
 
                         @media (max-width: 480px) {
                             .floating-navbar {
-                                flex-direction: column;
-                                gap: 5px;
-                                padding: 8px;
+                                bottom: 10px;
+                                flex-direction: row;
+                                gap: 8px;
+                                padding: 8px 12px;
+                                border-radius: 18px;
+                                box-shadow: 
+                                    0 4px 20px rgba(0, 0, 0, 0.25),
+                                    0 2px 8px rgba(0, 0, 0, 0.2),
+                                    0 0 0 1px rgba(255, 255, 255, 0.2),
+                                    inset 0 1px 0 rgba(255, 255, 255, 0.3);
                             }
 
                             .floating-navbar .nav-btn {
+                                padding: 6px 10px;
+                                font-size: 0.75rem;
+                                font-weight: 700;
+                                box-shadow: 
+                                    0 1px 4px rgba(0, 0, 0, 0.2),
+                                    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+                            }
+
+                            .floating-navbar .nav-btn span {
+                                display: none;
+                            }
+                        }
+
+                        /* Responsive Design for Mobile */
+                        @media (max-width: 768px) {
+                            body {
+                                padding: 0.5rem;
+                                font-size: 0.85rem;
+                            }
+
+                            .container {
+                                padding: 1rem;
+                                border-radius: 10px;
+                                margin-bottom: 80px; /* Space for floating navbar */
+                            }
+
+                            h1 {
+                                font-size: 1.5rem;
+                                margin-bottom: 1rem;
+                            }
+
+                            h2 {
+                                font-size: 1.1rem;
+                                margin-bottom: 0.8rem;
+                            }
+
+                            .section {
+                                padding: 1rem;
+                                margin-bottom: 1.5rem;
+                                border-radius: 8px;
+                            }
+
+                            .section h2 {
+                                font-size: 1.1rem;
+                                margin-bottom: 0.8rem;
+                            }
+
+                            .image-gallery .image-item img {
+                                max-width: 100% !important;
+                                height: auto;
+                            }
+
+                            .video-gallery .video-item video {
+                                max-width: 100%;
+                                height: auto;
+                            }
+
+                            .file-gallery .file-item {
+                                display: block;
+                                margin-right: 0;
+                                margin-bottom: 0.5rem;
+                            }
+
+                            .file-gallery .btn {
                                 width: 100%;
-                                justify-content: center;
+                                text-align: center;
+                                font-size: 0.75rem;
+                                padding: 0.5rem 0.8rem;
+                            }
+
+                            .text-content {
+                                font-size: 0.9rem;
+                                line-height: 1.5;
+                            }
+
+                            .text-content ul, .text-content ol {
+                                padding-left: 1rem;
+                            }
+
+                            .no-content {
+                                padding: 2rem 1rem;
+                            }
+
+                            .no-content i {
+                                font-size: 2rem;
+                            }
+                        }
+
+                        @media (max-width: 480px) {
+                            body {
+                                padding: 0.25rem;
+                                font-size: 0.8rem;
+                            }
+
+                            .container {
+                                padding: 0.75rem;
+                                border-radius: 8px;
+                                margin-bottom: 100px; /* More space for floating navbar */
+                            }
+
+                            h1 {
+                                font-size: 1.3rem;
+                                margin-bottom: 0.8rem;
+                            }
+
+                            h2 {
+                                font-size: 1rem;
+                                margin-bottom: 0.6rem;
+                            }
+
+                            .section {
+                                padding: 0.75rem;
+                                margin-bottom: 1rem;
+                                border-radius: 6px;
+                            }
+
+                            .section h2 {
+                                font-size: 1rem;
+                                margin-bottom: 0.6rem;
+                            }
+
+                            .text-content {
+                                font-size: 0.85rem;
+                                line-height: 1.4;
+                            }
+
+                            .text-content ul, .text-content ol {
+                                padding-left: 0.8rem;
+                            }
+
+                            .no-content {
+                                padding: 1.5rem 0.5rem;
+                            }
+
+                            .no-content i {
+                                font-size: 1.5rem;
+                            }
+
+                            .no-content h3 {
+                                font-size: 1.1rem;
+                            }
+
+                            .no-content p {
+                                font-size: 0.9rem;
+                            }
+                        }
+
+                        /* Landscape mobile optimization */
+                        @media (max-width: 768px) and (orientation: landscape) {
+                            .container {
+                                margin-bottom: 60px;
+                            }
+
+                            .floating-navbar {
+                                bottom: 10px;
+                                padding: 8px 14px;
+                                gap: 10px;
+                                box-shadow: 
+                                    0 6px 24px rgba(0, 0, 0, 0.25),
+                                    0 3px 12px rgba(0, 0, 0, 0.2),
+                                    0 0 0 1px rgba(255, 255, 255, 0.2),
+                                    inset 0 1px 0 rgba(255, 255, 255, 0.3);
                             }
                         }
                     </style>
@@ -1461,9 +1919,25 @@ function formatFileSize($bytes) {
                 <body data-theme="light">
                     <!-- Fixed Floating Navbar -->
                     <div class="floating-navbar">
+                        <button class="nav-btn" id="prevPageBtn">
+                            <i class="fas fa-chevron-left"></i>
+                            <span>Prev</span>
+                        </button>
+                        <div class="nav-btn" id="pageIndicator" style="pointer-events: none;">
+                            <i class="fas fa-book-open"></i>
+                            <span><span id="currentPage">1</span>/<span id="totalPages">${totalPages}</span></span>
+                        </div>
+                        <button class="nav-btn" id="nextPageBtn">
+                            <span>Next</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
                         <button class="nav-btn theme-toggle" onclick="togglePreviewTheme()">
                             <i class="fas fa-moon theme-icon"></i>
                             <span>Theme</span>
+                        </button>
+                        <button class="nav-btn" onclick="openDiscussionPopup()">
+                            <i class="fas fa-comments"></i>
+                            <span>Discuss</span>
                         </button>
                         <button class="nav-btn" onclick="window.close()">
                             <i class="fas fa-times"></i>
@@ -1473,7 +1947,7 @@ function formatFileSize($bytes) {
 
                     <div class="container">
                         <h1 class="text-center mb-4"><i class="fas fa-graduation-cap me-2"></i>${courseName}</h1>
-                        ${visibleNotes.length > 0 ? sectionsHtml : '<div class="no-content"><i class="fas fa-book-open"></i><h3>No course materials available</h3><p>Course content will be added soon.</p></div>'}
+                        <div id="courseContent">${visibleNotes.length > 0 ? buildSectionsHtml(1) : '<div class="no-content"><i class="fas fa-book-open"></i><h3>No course materials available</h3><p>Course content will be added soon.</p></div>'}</div>
                     </div>
 </body>
                 </html>
@@ -1487,6 +1961,26 @@ function formatFileSize($bytes) {
             previewWindow.addEventListener('load', function() {
                 const previewBody = previewWindow.document.body;
                 const previewThemeIcon = previewWindow.document.querySelector('.floating-navbar .theme-icon');
+                const prevBtn = previewWindow.document.getElementById('prevPageBtn');
+                const nextBtn = previewWindow.document.getElementById('nextPageBtn');
+                const currEl = previewWindow.document.getElementById('currentPage');
+                const totalEl = previewWindow.document.getElementById('totalPages');
+                let currentPage = 1;
+                if (totalEl) totalEl.textContent = String(totalPages);
+
+                function goTo(page) {
+                    if (page < 1 || page > totalPages) return;
+                    currentPage = page;
+                    const contentRoot = previewWindow.document.getElementById('courseContent');
+                    if (contentRoot) contentRoot.innerHTML = buildSectionsHtml(page);
+                    if (currEl) currEl.textContent = String(page);
+                    if (prevBtn) prevBtn.disabled = page <= 1;
+                    if (nextBtn) nextBtn.disabled = page >= totalPages;
+                }
+                if (prevBtn) prevBtn.onclick = () => goTo(currentPage - 1);
+                if (nextBtn) nextBtn.onclick = () => goTo(currentPage + 1);
+                // Initialize pagination state
+                goTo(1);
                 
                 // Load saved theme from main window
                 const savedTheme = localStorage.getItem('theme') || 'light';
@@ -1514,6 +2008,199 @@ function formatFileSize($bytes) {
             // Focus the preview window
             previewWindow.focus();
         }
+
+        // Discussion Board Functions
+        let currentCourseId = null;
+        let discussionUpdateInterval = null;
+        let lastDiscussionUpdate = null;
+
+        function openDiscussionPopup() {
+            // Get the first enrolled course for discussion
+            const enrolledCourses = document.querySelectorAll('.course-card[data-enrolled="true"]');
+            if (enrolledCourses.length === 0) {
+                alert('You need to be enrolled in a course to access the discussion board.');
+                return;
+            }
+            
+            // Use the first enrolled course
+            const firstCourse = enrolledCourses[0];
+            currentCourseId = firstCourse.dataset.courseId;
+            
+            // Update modal title
+            const courseName = firstCourse.querySelector('.course-title').textContent;
+            document.getElementById('discussionModalLabel').innerHTML = 
+                `<i class="fas fa-comments me-2"></i>Discussion - ${courseName}`;
+            
+            // Show modal and load discussions
+            const modal = new bootstrap.Modal(document.getElementById('discussionModal'));
+            modal.show();
+            loadDiscussions();
+            startDiscussionUpdates();
+        }
+
+        function loadDiscussions() {
+            if (!currentCourseId) return;
+            
+            fetch(`discussion-updates.php?courseId=${currentCourseId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayDiscussions(data.discussions || []);
+                        lastDiscussionUpdate = data.latestTimestamp;
+                    } else {
+                        displayError('Failed to load discussions: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading discussions:', error);
+                    displayError('Error loading discussions. Please try again.');
+                });
+        }
+
+        function displayDiscussions(discussions) {
+            const content = document.getElementById('discussionContent');
+            
+            if (discussions.length === 0) {
+                content.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No discussions yet</h5>
+                        <p class="text-muted">Be the first to start a conversation!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const discussionsHtml = discussions.map(discussion => `
+                <div class="discussion-item">
+                    <div class="discussion-header">
+                        <div class="discussion-author">
+                            <div class="author-avatar ${discussion.userType === 'admin' ? 'admin' : ''}">
+                                ${discussion.username.charAt(0).toUpperCase()}
+                            </div>
+                            <div class="author-info">
+                                <h6>${discussion.username}</h6>
+                                <small>${discussion.userType === 'admin' ? 'Administrator' : 'Student'}</small>
+                            </div>
+                        </div>
+                        <div class="discussion-time">
+                            ${formatDiscussionTime(discussion.messageDate, discussion.messageTime)}
+                        </div>
+                    </div>
+                    <div class="discussion-content">
+                        <strong>${discussion.messageTitle}</strong>
+                        <p class="mt-2 mb-0">${discussion.messageBody}</p>
+                    </div>
+                    <div class="discussion-actions">
+                        <button onclick="likeDiscussion(${discussion.discussionId})">
+                            <i class="fas fa-thumbs-up me-1"></i>Like (${discussion.messageLikes || 0})
+                        </button>
+                        <button onclick="replyToDiscussion(${discussion.discussionId})">
+                            <i class="fas fa-reply me-1"></i>Reply
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            content.innerHTML = discussionsHtml;
+        }
+
+        function displayError(message) {
+            const content = document.getElementById('discussionContent');
+            content.innerHTML = `
+                <div class="text-center py-4">
+                    <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                    <h5 class="text-danger">Error</h5>
+                    <p class="text-muted">${message}</p>
+                    <button class="btn btn-primary" onclick="loadDiscussions()">
+                        <i class="fas fa-retry me-1"></i>Try Again
+                    </button>
+                </div>
+            `;
+        }
+
+        function formatDiscussionTime(date, time) {
+            const dateTime = new Date(date + ' ' + time);
+            const now = new Date();
+            const diffMs = now - dateTime;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            
+            return dateTime.toLocaleDateString();
+        }
+
+        function startDiscussionUpdates() {
+            if (discussionUpdateInterval) {
+                clearInterval(discussionUpdateInterval);
+            }
+            
+            discussionUpdateInterval = setInterval(() => {
+                if (!currentCourseId) return;
+                
+                fetch(`discussion-updates.php?courseId=${currentCourseId}&lastTimestamp=${lastDiscussionUpdate || ''}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.newMessages && data.newMessages.length > 0) {
+                            // Show real-time indicator
+                            const indicator = document.getElementById('realTimeIndicator');
+                            if (indicator) {
+                                indicator.classList.add('active');
+                                setTimeout(() => {
+                                    indicator.classList.remove('active');
+                                }, 3000);
+                            }
+                            
+                            // Reload discussions if modal is open
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('discussionModal'));
+                            if (modal && modal._isShown) {
+                                loadDiscussions();
+                            }
+                        }
+                        lastDiscussionUpdate = data.latestTimestamp;
+                    })
+                    .catch(error => {
+                        console.error('Error checking for updates:', error);
+                    });
+            }, 3000); // Check every 3 seconds
+        }
+
+        function stopDiscussionUpdates() {
+            if (discussionUpdateInterval) {
+                clearInterval(discussionUpdateInterval);
+                discussionUpdateInterval = null;
+            }
+        }
+
+        function refreshDiscussion() {
+            loadDiscussions();
+        }
+
+        function likeDiscussion(discussionId) {
+            // Implement like functionality
+            console.log('Like discussion:', discussionId);
+        }
+
+        function replyToDiscussion(discussionId) {
+            // Implement reply functionality
+            console.log('Reply to discussion:', discussionId);
+        }
+
+        // Clean up when modal is closed
+        document.getElementById('discussionModal').addEventListener('hidden.bs.modal', function() {
+            stopDiscussionUpdates();
+            currentCourseId = null;
+        });
+
+        // Clean up on page unload
+        window.addEventListener('beforeunload', function() {
+            stopDiscussionUpdates();
+        });
     </script>
 </body>
 </html>
