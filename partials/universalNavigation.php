@@ -34,6 +34,12 @@ function isActive($page, $currentPage) {
                 <span>E-Learning</span>
             </a>
         </div>
+        <div class="glass-panel p-2 mb-1 <?php echo isActive('my-discussions', $currentPage); ?>">
+            <a class="nav-link d-flex align-items-center" href="./my-discussions.php">
+                <i class="fas fa-comments me-3 text-primary"></i>
+                <span>Discussion Board</span>
+            </a>
+        </div>
         <div class="glass-panel p-2 mb-1 <?php echo isActive('conversations', $currentPage); ?>">
             <a class="nav-link d-flex align-items-center" href="./conversations.php">
                 <i class="fas fa-comments me-3 text-primary"></i>

@@ -1,9 +1,10 @@
 <?php
-session_start();
+// Use unified app session config so we read the same session cookie everywhere
+include('../config/session.php');
 
-// Error reporting for debugging
+// Error reporting (keep errors out of JSON output in production)
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
 
 // Set content type for JSON response
 header('Content-Type: application/json');

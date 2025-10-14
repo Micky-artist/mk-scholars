@@ -119,6 +119,51 @@ if (!empty($courses)) {
             $coursePricingsMap[$cid][] = $p;
         }
     }
+
+    // Bulk fetch enrollment counts from subscription table (active & not expired)
+    $enrollCountMap = [];
+    $enrollSql = "SELECT Item AS courseId, COUNT(*) AS cnt
+                  FROM subscription
+                  WHERE Item IN ($inClause)
+                    AND SubscriptionStatus = 1
+                    AND (expirationDate IS NULL OR expirationDate > NOW())
+                  GROUP BY Item";
+    if ($enrollRes = mysqli_query($conn, $enrollSql)) {
+        while ($row = mysqli_fetch_assoc($enrollRes)) {
+            $enrollCountMap[(int)$row['courseId']] = (int)$row['cnt'];
+        }
+    }
+
+    // Bulk fetch file counts
+    $fileCountMap = [];
+    $fileCountSql = "SELECT courseId, COUNT(*) AS cnt FROM CourseFiles WHERE courseId IN ($inClause) GROUP BY courseId";
+    if ($fileCountRes = mysqli_query($conn, $fileCountSql)) {
+        while ($row = mysqli_fetch_assoc($fileCountRes)) {
+            $fileCountMap[(int)$row['courseId']] = (int)$row['cnt'];
+        }
+    }
+
+    // Bulk fetch lesson counts
+    $lessonCountMap = [];
+    $lessonCountSql = "SELECT courseId, COUNT(*) AS cnt FROM CourseLessons WHERE courseId IN ($inClause) GROUP BY courseId";
+    if ($lessonCountRes = mysqli_query($conn, $lessonCountSql)) {
+        while ($row = mysqli_fetch_assoc($lessonCountRes)) {
+            $lessonCountMap[(int)$row['courseId']] = (int)$row['cnt'];
+        }
+    }
+
+    // Fetch recent files (top 3 per course) in one pass
+    $recentFilesMap = [];
+    $recentFilesSql = "SELECT courseId, fileName, filePath, fileType, uploadDate, uploadTime FROM CourseFiles WHERE courseId IN ($inClause) ORDER BY courseId, uploadDate DESC, uploadTime DESC";
+    if ($recentRes = mysqli_query($conn, $recentFilesSql)) {
+        while ($f = mysqli_fetch_assoc($recentRes)) {
+            $cid = (int)$f['courseId'];
+            if (!isset($recentFilesMap[$cid])) { $recentFilesMap[$cid] = []; }
+            if (count($recentFilesMap[$cid]) < 3) {
+                $recentFilesMap[$cid][] = $f;
+            }
+        }
+    }
 }
 ?>
 
@@ -638,6 +683,9 @@ if (!empty($courses)) {
                                             }
                                             ?>
                                             <span class="badge <?php echo $statusClass; ?>"><?php echo $statusText; ?></span>
+                                            <span class="badge bg-dark" title="Enrollments" style="margin-left:0.35rem;">
+                                                <i class="fas fa-users me-1"></i><?php echo isset($enrollCountMap[$cid]) ? $enrollCountMap[$cid] : 0; ?>
+                                            </span>
                                         </div>
                                         
                                         <div class="course-actions">
@@ -728,18 +776,39 @@ if (!empty($courses)) {
                                     
                                     <div class="course-stats">
                                         <div class="stat-item">
-                                            <div class="stat-number">0</div>
+                                            <div class="stat-number"><?php echo isset($enrollCountMap[$cid]) ? $enrollCountMap[$cid] : 0; ?></div>
                                             <div class="stat-label">Enrollments</div>
                                         </div>
                                         <div class="stat-item">
-                                            <div class="stat-number">0</div>
+                                            <div class="stat-number"><?php echo isset($lessonCountMap[$cid]) ? $lessonCountMap[$cid] : 0; ?></div>
                                             <div class="stat-label">Lessons</div>
                                         </div>
                                         <div class="stat-item">
-                                            <div class="stat-number">0</div>
+                                            <div class="stat-number"><?php echo isset($fileCountMap[$cid]) ? $fileCountMap[$cid] : 0; ?></div>
                                             <div class="stat-label">Files</div>
                                         </div>
                                     </div>
+
+                                    <?php if (!empty($recentFilesMap[$cid])): ?>
+                                    <div class="px-3 pb-3">
+                                        <div class="mb-2" style="font-weight:600;color:var(--text-secondary);">Recent Files</div>
+                                        <div style="display:flex;flex-direction:column;gap:0.35rem;">
+                                            <?php foreach ($recentFilesMap[$cid] as $rf): ?>
+                                                <div style="display:flex;align-items:center;gap:0.5rem;">
+                                                    <span style="width:28px;height:28px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;background:#f1f5f9;color:#334155;font-size:0.8rem;">
+                                                        <i class="fas <?php echo ($rf['fileType']==='pdf'?'fa-file-pdf':($rf['fileType']==='video'?'fa-file-video':($rf['fileType']==='audio'?'fa-file-audio':($rf['fileType']==='image'?'fa-file-image':'fa-file')))); ?>"></i>
+                                                    </span>
+                                                    <a href="<?php echo htmlspecialchars($rf['filePath']); ?>" target="_blank" style="flex:1;text-decoration:none;color:var(--text-primary);font-size:0.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                                        <?php echo htmlspecialchars($rf['fileName']); ?>
+                                                    </a>
+                                                    <small class="text-muted" style="white-space:nowrap;">
+                                                        <?php echo date('M j', strtotime($rf['uploadDate'])); ?>
+                                                    </small>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         <?php endforeach; ?>

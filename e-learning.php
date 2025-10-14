@@ -548,9 +548,9 @@ function formatFileSize($bytes) {
         }
 
         .real-time-indicator.active {
-            display: block;
+                display: block;
             animation: pulse 2s infinite;
-        }
+            }
 
         @keyframes pulse {
             0% { transform: scale(1); }

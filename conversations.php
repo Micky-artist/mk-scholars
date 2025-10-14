@@ -50,35 +50,7 @@ if (isset($_POST['startConvo']) && $_POST['startConvo'] === 'true') {
     include("./partials/universalNavigation.php"); 
     ?>
 
-    <!-- Mobile Navigation Bar -->
-    <div class="mobile-nav-bar">
-        <div class="container">
-            <div class="mobile-nav-content">
-                <div class="mobile-nav-left">
-                    <a href="./home" class="mobile-nav-link">
-                        <i class="fas fa-home"></i>
-                        <span>Home</span>
-                    </a>
-                    <a href="./applications" class="mobile-nav-link">
-                        <i class="fas fa-search"></i>
-                        <span>Scholarships</span>
-                    </a>
-                    <a href="./writing-services" class="mobile-nav-link">
-                        <i class="fas fa-pen-fancy"></i>
-                        <span>Writing</span>
-                    </a>
-                    <a href="./courses" class="mobile-nav-link">
-                        <i class="fas fa-graduation-cap"></i>
-                        <span>Courses</span>
-                    </a>
-                    <a href="./profile" class="mobile-nav-link">
-                        <i class="fas fa-user"></i>
-                        <span>Profile</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
     <!-- Main Chat Container -->
     <div class="chat-app-container">
@@ -86,6 +58,9 @@ if (isset($_POST['startConvo']) && $_POST['startConvo'] === 'true') {
         <div class="chat-header">
             <div class="chat-header-content">
                 <div class="d-flex align-items-center">
+                    <button class="btn btn-light glass-panel sidebar-toggle d-md-none me-2" type="button" aria-label="Toggle sidebar">
+                        <i class="fas fa-bars"></i>
+                    </button>
                     <div class="chat-avatar">
                         <i class="fas fa-headset"></i>
                     </div>
