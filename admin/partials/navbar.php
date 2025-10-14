@@ -47,13 +47,13 @@
 
         <?php if (hasPermission('PublishApplication')): ?>
         <li class="sidebar-item">
-          <a class="sidebar-link waves-effect waves-dark sidebar-link <?php echo isActive('upload-scholarship', $currentPage) ? 'active' : ''; ?>" href="upload-scholarship" aria-expanded="false"><i class="bi bi-upload"></i><span class="hide-menu">Upload Scholarship</span></a>
+          <a class="sidebar-link waves-effect waves-dark sidebar-link <?php echo isActive('upload-scholarship', $currentPage) ? 'active' : ''; ?>" href="upload-scholarship" aria-expanded="false"><i class="mdi mdi-application"></i><span class="hide-menu">Upload Scholarship</span></a>
         </li>
         <?php endif; ?>
 
         <?php if (hasPermission('ManageYoutubeVideo')): ?>
         <li class="sidebar-item">
-          <a class="sidebar-link waves-effect waves-dark sidebar-link <?php echo isActive('upload-youtube-video', $currentPage) ? 'active' : ''; ?>" href="upload-youtube-video" aria-expanded="false"><i class="mdi mdi-youtube"></i><span class="hide-menu">Upload Video</span></a>
+          <a class="sidebar-link waves-effect waves-dark sidebar-link <?php echo isActive('upload-youtube-video', $currentPage) ? 'active' : ''; ?>" href="upload-youtube-video" aria-expanded="false"><i class="mdi mdi-video"></i><span class="hide-menu">Upload Video</span></a>
         </li>
         <?php endif; ?>
 
@@ -93,7 +93,7 @@
 
         <?php if (hasPermission('ViewUsers')): ?>
         <li class="sidebar-item">
-          <a class="sidebar-link waves-effect waves-dark sidebar-link <?php echo isActive('users', $currentPage) ? 'active' : ''; ?>" href="users" aria-expanded="false"><i class="mdi mdi-account-group"></i><span class="hide-menu">All Users</span></a>
+          <a class="sidebar-link waves-effect waves-dark sidebar-link <?php echo isActive('users', $currentPage) ? 'active' : ''; ?>" href="users" aria-expanded="false"><i class="mdi mdi-account"></i><span class="hide-menu">All Users</span></a>
         </li>
         <?php endif; ?>
 
@@ -105,7 +105,7 @@
 
         <?php if (hasPermission('ManageUserLogs')): ?>
         <li class="sidebar-item">
-          <a class="sidebar-link waves-effect waves-dark sidebar-link <?php echo isActive('user-logs', $currentPage) ? 'active' : ''; ?>" href="user-logs" aria-expanded="false"><i class="mdi mdi-account-clock"></i><span class="hide-menu">User Logs</span></a>
+          <a class="sidebar-link waves-effect waves-dark sidebar-link <?php echo isActive('user-logs', $currentPage) ? 'active' : ''; ?>" href="user-logs" aria-expanded="false"><i class="mdi mdi-account-alert"></i><span class="hide-menu">User Logs</span></a>
         </li>
         <?php endif; ?>
 
