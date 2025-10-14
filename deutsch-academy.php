@@ -20,7 +20,7 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Study Deutsch in MK Deutsch Academy - Learn German Language | MK Scholars</title>
-    <meta name="description" content="Study Deutsch in MK Deutsch Academy. Learn German language from A1 to B2 levels. Physical and online classes available. Registration open for August 2025 intake.">
+    <meta name="description" content="Study Deutsch in MK Deutsch Academy. Learn German language from A1 to B2 levels. Physical and online classes available. Registration open for October 2025 intake.">
     <meta name="keywords" content="German language, learn German, Deutsch Academy, German classes, Rwanda, Kigali, A1, B2, language learning">
     
     <!-- Favicon -->
@@ -529,7 +529,7 @@ try {
                 
                 <div class="intake-banner fade-in">
                     <div class="intake-text">UPCOMING INTAKE</div>
-                    <div class="intake-date">AUGUST 2025</div>
+                    <div class="intake-date">October 2025</div>
                     <div style="font-size: 1.4rem; margin-top: 10px; font-weight: 600;">Registration is Open Right Now</div>
                 </div>
                 
@@ -576,7 +576,7 @@ try {
                     <div class="weekend-info">
                         <div style="font-size: 1.3rem; font-weight: 600; color: var(--deep-blue); margin-bottom: 15px;">Saturday & Sunday</div>
                         <div style="font-size: 1.5rem; font-weight: 700; color: var(--dark-gray); margin-bottom: 20px;">TIME: 08:30 - 15:30</div>
-                        <div class="start-date-badge">START DATE: 18th August 2025</div>
+                        <div class="start-date-badge">START DATE: 18th October 2025</div>
                     </div>
                     <ul class="schedule-list" style="margin-top: 20px;">
                         <li class="schedule-item">Intensive weekend program</li>
@@ -606,8 +606,8 @@ try {
                     </div>
                     <h3 class="benefit-title">PHYSICAL CLASSES</h3>
                     <p class="benefit-description">Location: Kigali City - Kiyovu<br>
-                    Class starts: August 18th, 2025<br>
-                    Registration: Open until August 17th<br>
+                    Class starts: October 18th, 2025<br>
+                    Registration: Open until October 17th<br>
                     Early registration: 5% discount<br>
                     Books: Hard & soft copies provided<br>
                     Levels: A1 to B2 (6 weeks each)</p>

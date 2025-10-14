@@ -30,7 +30,6 @@ $courseStmt->close();
 $tableCheck = "SHOW TABLES LIKE 'DiscussionBoard'";
 $tableResult = $conn->query($tableCheck);
 if ($tableResult->num_rows === 0) {
-    error_log("ERROR: DiscussionBoard table does not exist! Creating it...");
     
     // Create DiscussionBoard table (without foreign key constraints to avoid issues)
     $createTable = "CREATE TABLE DiscussionBoard (
@@ -52,21 +51,9 @@ if ($tableResult->num_rows === 0) {
         INDEX idx_parent_discussion (parentDiscussionId)
     )";
     
-    if ($conn->query($createTable)) {
-        error_log("DiscussionBoard table created successfully");
-    } else {
-        error_log("Error creating DiscussionBoard table: " . mysqli_error($conn));
-    }
+    $conn->query($createTable);
 } else {
-    error_log("DiscussionBoard table exists");
-    
-    // Check table structure
-    $structureCheck = "DESCRIBE DiscussionBoard";
-    $structureResult = $conn->query($structureCheck);
-    if ($structureResult) {
-        $columns = $structureResult->fetch_all(MYSQLI_ASSOC);
-        error_log("DiscussionBoard columns: " . print_r($columns, true));
-    }
+    // Table exists
 }
 
 // Handle form submissions
@@ -74,7 +61,6 @@ $message = '';
 $messageType = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    
     if (isset($_POST['create_discussion'])) {
         $messageTitle = mysqli_real_escape_string($conn, $_POST['messageTitle']);
         $messageBody = mysqli_real_escape_string($conn, $_POST['messageBody']);
@@ -96,11 +82,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $message = 'Error preparing statement: ' . mysqli_error($conn);
                 $messageType = 'danger';
             } else {
-                $insertStmt->bind_param("iisii", $courseId, $adminId, $messageTitle, $messageBody, $isPinned, $parentDiscussionId);
+                $insertStmt->bind_param("iissii", $courseId, $adminId, $messageTitle, $messageBody, $isPinned, $parentDiscussionId);
                 
                 if ($insertStmt->execute()) {
-                    $message = 'Discussion created successfully!';
-                    $messageType = 'success';
+                    // PRG: prevent duplicate submissions on refresh
+                    header("Location: course-discussion.php?id=" . $courseId . "&status=created");
+                    exit;
                 } else {
                     $message = 'Error creating discussion: ' . mysqli_error($conn);
                     $messageType = 'danger';
@@ -117,8 +104,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $deleteStmt->bind_param("i", $discussionId);
         
         if ($deleteStmt->execute()) {
-            $message = 'Discussion deleted successfully!';
-            $messageType = 'success';
+            header("Location: course-discussion.php?id=" . $courseId . "&status=deleted");
+            exit;
         } else {
             $message = 'Error deleting discussion: ' . mysqli_error($conn);
             $messageType = 'danger';
@@ -132,12 +119,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $updateQuery = "UPDATE DiscussionBoard SET isPinned = ? WHERE discussionId = ?";
         $updateStmt = $conn->prepare($updateQuery);
         $updateStmt->bind_param("ii", $isPinned, $discussionId);
-        $updateStmt->execute();
+        if ($updateStmt->execute()) {
+            header("Location: course-discussion.php?id=" . $courseId . "&status=updated");
+            exit;
+        }
         $updateStmt->close();
     }
 }
 
-// Get discussions for this course
+// Pagination setup
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$perPage = isset($_GET['perPage']) ? (int)$_GET['perPage'] : 20;
+if ($perPage < 5) { $perPage = 5; }
+if ($perPage > 50) { $perPage = 50; }
+$offset = ($page - 1) * $perPage;
+
+// Total count
+$countQuery = "SELECT COUNT(*) as total FROM DiscussionBoard d WHERE d.courseId = ?";
+$countStmt = $conn->prepare($countQuery);
+$countStmt->bind_param("i", $courseId);
+$countStmt->execute();
+$total = (int)$countStmt->get_result()->fetch_assoc()['total'];
+$countStmt->close();
+$totalPages = max(1, (int)ceil($total / $perPage));
+if ($page > $totalPages) { $page = $totalPages; $offset = ($page - 1) * $perPage; }
+
+// Get discussions (paged)
 $discussionsQuery = "SELECT d.*, 
                             CASE 
                                 WHEN d.userId IN (SELECT userId FROM users) THEN 'admin'
@@ -151,9 +158,10 @@ $discussionsQuery = "SELECT d.*,
                             END as username
                      FROM DiscussionBoard d 
                      WHERE d.courseId = ? 
-                     ORDER BY d.isPinned DESC, d.messageDate DESC, d.messageTime DESC";
+                     ORDER BY d.isPinned DESC, d.messageDate DESC, d.messageTime DESC
+                     LIMIT ? OFFSET ?";
 $discussionsStmt = $conn->prepare($discussionsQuery);
-$discussionsStmt->bind_param("i", $courseId);
+$discussionsStmt->bind_param("iii", $courseId, $perPage, $offset);
 $discussionsStmt->execute();
 $discussionsResult = $discussionsStmt->get_result();
 $discussions = $discussionsResult->fetch_all(MYSQLI_ASSOC);
@@ -294,43 +302,43 @@ $discussionsStmt->close();
 
         .discussion-card {
             background: var(--glass-bg);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(8px);
             border: 1px solid var(--glass-border);
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            border-left: 4px solid transparent;
+            border-radius: 10px;
+            padding: 0.75rem 0.9rem;
+            margin-bottom: 0.8rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            border-left: 3px solid transparent;
         }
 
         .discussion-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
             border-left-color: #3b82f6;
         }
 
         .discussion-card.pinned {
-            border-left: 4px solid #ffc107;
-            background: linear-gradient(135deg, var(--glass-bg) 0%, rgba(255, 193, 7, 0.1) 100%);
+            border-left: 3px solid #ffc107;
+            background: linear-gradient(135deg, var(--glass-bg) 0%, rgba(255, 193, 7, 0.08) 100%);
         }
 
         .discussion-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
         }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
         }
 
         .user-avatar {
-            width: 45px;
-            height: 45px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             display: flex;
@@ -338,9 +346,9 @@ $discussionsStmt->close();
             justify-content: center;
             color: white;
             font-weight: 700;
-            font-size: 1rem;
-            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.85rem;
+            box-shadow: 0 1px 5px rgba(59, 130, 246, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.18);
         }
 
         .user-avatar.admin {
@@ -365,48 +373,48 @@ $discussionsStmt->close();
         }
 
         .discussion-title {
-            font-size: 1.3rem;
-            font-weight: 700;
+            font-size: 1.05rem;
+            font-weight: 650;
             color: var(--text-primary);
-            margin-bottom: 1rem;
-            line-height: 1.3;
+            margin-bottom: 0.5rem;
+            line-height: 1.25;
         }
 
         .discussion-body {
             color: var(--text-secondary);
-            line-height: 1.7;
-            margin-bottom: 1.5rem;
-            font-size: 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
-            border-radius: 8px;
-            border-left: 3px solid #e5e7eb;
+            line-height: 1.4;
+            margin-bottom: 0.75rem;
+            font-size: 0.92rem;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 0.6rem 0.7rem;
+            border-radius: 6px;
+            border-left: 2px solid #e5e7eb;
         }
 
         .discussion-meta {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-top: 1.5rem;
+            padding-top: 0.5rem;
             border-top: 1px solid var(--glass-border);
-            margin-top: 0.5rem;
+            margin-top: 0.25rem;
         }
 
         .discussion-stats {
             display: flex;
-            gap: 1.5rem;
+            gap: 0.75rem;
             align-items: center;
         }
 
         .stat-item {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.35rem;
             color: var(--text-secondary);
-            font-size: 0.9rem;
-            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+            padding: 0.3rem 0.5rem;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
+            border-radius: 14px;
             transition: all 0.2s ease;
         }
 
@@ -529,6 +537,8 @@ $discussionsStmt->close();
                     </div>
                 <?php endif; ?>
 
+                <!-- Debug sections removed in production -->
+
 
                 <!-- Discussions List -->
                 <div class="discussions-container">
@@ -590,22 +600,7 @@ $discussionsStmt->close();
                                     <?php echo nl2br(htmlspecialchars($discussion['messageBody'])); ?>
                                 </div>
 
-                                <div class="discussion-meta">
-                                    <div class="discussion-stats">
-                                        <div class="stat-item">
-                                            <i class="fas fa-thumbs-up"></i>
-                                            <span><?php echo $discussion['messageLikes']; ?></span>
-                                        </div>
-                                        <div class="stat-item">
-                                            <i class="fas fa-comment"></i>
-                                            <span>0</span>
-                                        </div>
-                                        <div class="stat-item">
-                                            <i class="fas fa-flag"></i>
-                                            <span><?php echo $discussion['messageReport']; ?></span>
-                                        </div>
-                                    </div>
-                                </div>
+                                <div class="discussion-meta"></div>
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>
@@ -624,6 +619,21 @@ $discussionsStmt->close();
             </main>
         </div>
     </div>
+
+    <!-- Pagination Controls -->
+    <?php if ($totalPages > 1): ?>
+    <nav aria-label="Discussions pagination" class="mt-3">
+        <ul class="pagination justify-content-center">
+            <li class="page-item <?php echo $page <= 1 ? 'disabled' : ''; ?>">
+                <a class="page-link" href="?id=<?php echo $courseId; ?>&page=<?php echo max(1, $page-1); ?>&perPage=<?php echo $perPage; ?>">Previous</a>
+            </li>
+            <li class="page-item disabled"><span class="page-link">Page <?php echo $page; ?> of <?php echo $totalPages; ?></span></li>
+            <li class="page-item <?php echo $page >= $totalPages ? 'disabled' : ''; ?>">
+                <a class="page-link" href="?id=<?php echo $courseId; ?>&page=<?php echo min($totalPages, $page+1); ?>&perPage=<?php echo $perPage; ?>">Next</a>
+            </li>
+        </ul>
+    </nav>
+    <?php endif; ?>
 
     <!-- Create Discussion Modal -->
     <div class="modal fade" id="createDiscussionModal" tabindex="-1">
@@ -680,6 +690,38 @@ $discussionsStmt->close();
                     }
                 });
             }
+
+            // Debug: Test modal functionality
+            console.log('Page loaded, testing modal...');
+            const createModal = document.getElementById('createDiscussionModal');
+            if (createModal) {
+                console.log('Modal found:', createModal);
+                
+                // Test form submission
+                const form = createModal.querySelector('form');
+                if (form) {
+                    console.log('Form found:', form);
+                    form.addEventListener('submit', function(e) {
+                        console.log('Form submitted!');
+                        console.log('Form data:', new FormData(form));
+                    });
+                } else {
+                    console.log('Form not found in modal');
+                }
+            } else {
+                console.log('Modal not found');
+            }
+
+            // Test floating action button
+            const fab = document.querySelector('.btn-floating');
+            if (fab) {
+                console.log('FAB found:', fab);
+                fab.addEventListener('click', function() {
+                    console.log('FAB clicked');
+                });
+            } else {
+                console.log('FAB not found');
+            }
         });
 
         // Real-time updates
@@ -691,12 +733,35 @@ $discussionsStmt->close();
             fetch('discussion-updates.php?courseId=<?php echo $courseId; ?>&lastUpdate=' + lastUpdateTime)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.hasUpdates) {
-                        location.reload();
+                    if (data.hasUpdates && Array.isArray(data.newMessages) && data.newMessages.length > 0) {
+                        // Append new messages without visible reload
+                        const container = document.querySelector('.discussions-container');
+                        const fragment = document.createDocumentFragment();
+                        data.newMessages.forEach(discussion => {
+                            const card = document.createElement('div');
+                            card.className = 'discussion-card' + (discussion.isPinned ? ' pinned' : '');
+                            card.innerHTML = `
+                                <div class="discussion-header">
+                                    <div class="user-info">
+                                        <div class="user-avatar ${discussion.userType === 'admin' ? 'admin' : ''}">${discussion.username.charAt(0).toUpperCase()}</div>
+                                        <div class="user-details">
+                                            <h6>${discussion.username}</h6>
+                                            <small>${discussion.userType === 'admin' ? 'Administrator' : 'Student'} • ${discussion.messageDate} ${discussion.messageTime}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="discussion-title">${discussion.messageTitle}</div>
+                                <div class="discussion-body">${discussion.messageBody}</div>
+                                <div class="discussion-meta"></div>`;
+                            fragment.prepend(card);
+                        });
+                        if (container) container.prepend(fragment);
                     }
-                    lastUpdateTime = data.currentTime;
+                    if (data.currentTime) {
+                        lastUpdateTime = data.currentTime;
+                    }
                 })
-                .catch(error => console.error('Error checking for updates:', error));
+                .catch(() => {});
         }
 
         function showRealTimeIndicator() {
@@ -713,10 +778,7 @@ $discussionsStmt->close();
         // Show real-time indicator on page load
         showRealTimeIndicator();
 
-        // Auto-refresh every 30 seconds
-        setInterval(() => {
-            location.reload();
-        }, 30000);
+        // Remove visible auto-refresh; background polling only
     </script>
 </body>
 </html>

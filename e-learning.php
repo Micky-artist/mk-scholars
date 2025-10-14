@@ -1186,11 +1186,12 @@ function formatFileSize($bytes) {
                                         <?php 
                                         $buttonInfo = getButtonInfo($course, $isLoggedIn);
                                         $buttonUrl = '';
+                                        $onclick = null;
                                         
                                         switch($buttonInfo['action']) {
                                             case 'login':
-                                                $next = urlencode('/mkscholars/e-learning');
-                                                $buttonUrl = './login?next=' . $next;
+                                                $next = urlencode('/mkscholars/e-learning.php');
+                                                $buttonUrl = './login.php?next=' . $next;
                                                 break;
                                             case 'open':
                                         $buttonUrl = 'javascript:void(0)';
@@ -1199,13 +1200,13 @@ function formatFileSize($bytes) {
                                         $onclick = "previewCourse(" . $course['courseId'] . ", '" . addslashes($course['courseName']) . "', " . $courseNotesJson . ", " . ($hasAccess ? 'true' : 'false') . ")";
                                                 break;
                                             case 'register':
-                                                $buttonUrl = './subscription?course=' . $course['courseId'];
+                                                $buttonUrl = './subscription.php?course=' . $course['courseId'];
                                                 break;
                                         }
                                         ?>
                                 <a href="<?php echo $buttonUrl; ?>" 
                                    class="btn-primary-custom w-100"
-                                   <?php if (isset($onclick)): ?>onclick="<?php echo $onclick; ?>"<?php endif; ?>>
+                                   <?php if ($buttonInfo['action'] === 'open' && isset($onclick)): ?>onclick="<?php echo $onclick; ?>"<?php endif; ?>>
                                     <i class="<?php echo $buttonInfo['icon']; ?>"></i>
                                     <?php echo $buttonInfo['text']; ?>
                                 </a>
