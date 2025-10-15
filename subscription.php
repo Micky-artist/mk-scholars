@@ -4,14 +4,14 @@ include("./config/session.php");
 include("./dbconnection/connection.php");
 include('./php/validateSession.php');
 
-if(!isset($_SESSION['userId'])){
+if (!isset($_SESSION['userId'])) {
     header("Location: login");
     exit;
 }
 
 $UserId = $_SESSION['userId'];
 $selectUserDetails = mysqli_query($conn, "SELECT * FROM normUsers WHERE NoUserId = $UserId");
-if($selectUserDetails->num_rows > 0){
+if ($selectUserDetails->num_rows > 0) {
     $userData = mysqli_fetch_assoc($selectUserDetails);
 }
 
@@ -25,17 +25,16 @@ $courseData = null;
 
 // Fetch course data from database if courseId is provided
 if ($courseId && is_numeric($courseId)) {
-    $courseQuery = "SELECT c.*, cp.amount, cp.currency, cp.pricingDescription, curr.currencySymbol 
+    $courseQuery = "SELECT c.*, cp.amount, cp.currency, cp.pricingDescription, cp.currency, cp.coursePaymentCodeName, cp.pricingDescription 
                     FROM Courses c 
                     LEFT JOIN CoursePricing cp ON c.courseId = cp.courseId 
-                    LEFT JOIN Currencies curr ON cp.currency = curr.currencyCode 
                     WHERE c.courseId = ? AND c.courseDisplayStatus = 1";
-    
+
     $stmt = $conn->prepare($courseQuery);
     $stmt->bind_param("i", $courseId);
     $stmt->execute();
     $courseResult = $stmt->get_result();
-    
+
     if ($courseResult->num_rows > 0) {
         $courseData = $courseResult->fetch_assoc();
     }
@@ -52,7 +51,7 @@ $defaultCourses = [
         ],
         'features' => [
             'Certified Instructors',
-            '25 Seats Available', 
+            '25 Seats Available',
             'Official Certificate',
             'Flexible Schedule'
         ],
@@ -128,25 +127,25 @@ if ($courseData) {
                      LEFT JOIN Currencies curr ON cp.currency = curr.currencyCode 
                      WHERE cp.courseId = ? 
                      ORDER BY cp.amount ASC";
-    
+
     $stmt = $conn->prepare($pricingQuery);
     $stmt->bind_param("i", $courseId);
     $stmt->execute();
     $pricingResult = $stmt->get_result();
-    
+
     $pricingOptions = [];
     while ($pricing = $pricingResult->fetch_assoc()) {
         $pricingOptions[] = [
             'name' => $pricing['pricingDescription'] ?: 'Course Access',
             'amount' => $pricing['amount'],
             'currency' => $pricing['currencySymbol'] ?: $pricing['currency'] ?: 'RWF',
-        'paymentCode' => $pricing['coursePaymentCodeName'] ?: $pricing['pricingDescription'] ?: 'Course Access',
-        'displayName' => $pricing['pricingDescription'] ?: 'Course Access',
+            'paymentCode' => $pricing['coursePaymentCodeName'] ?: $pricing['pricingDescription'] ?: 'Course Access',
+            'displayName' => $pricing['pricingDescription'] ?: 'Course Access',
             'description' => $pricing['pricingDescription'] ?: 'Full course access with all materials'
         ];
     }
     $stmt->close();
-    
+
     // Use database course data
     $currentCourse = [
         'courseName' => $courseData['courseName'],
@@ -164,13 +163,13 @@ if ($courseData) {
 }
 
 $formData = [
-    'courses' => $_POST['courses'] ?? [$currentCourse['courseName']],
-    'terms'   => isset($_POST['terms']),
+    'courses' => $_GET['courses'] ?? [$currentCourse['courseName']],
+    'terms'   => isset($_GET['terms']),
 ];
 $errors = [];
 
-if (isset($_POST['checkout'])) {
-    $sub = urlencode($_POST['subscription']);
+if (isset($_GET['checkout'])) {
+    $sub = urlencode($_GET['subscription']);
     $courseId = $_GET['course'];
     header("Location: ./payment/checkout.php?course={$courseId}&subscription={$sub}");
     exit;
@@ -178,16 +177,17 @@ if (isset($_POST['checkout'])) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Course Registration - <?php echo htmlspecialchars($currentCourse['courseName']); ?></title>
-  <link rel="shortcut icon" href="./images/logo/logoRound.png" type="image/x-icon">
+    <title>Course Registration - <?php echo htmlspecialchars($currentCourse['courseName']); ?></title>
+    <link rel="shortcut icon" href="./images/logo/logoRound.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-  <style>
+
+    <style>
         :root {
             --bg-primary: #f3f4f6;
             --bg-secondary: #ffffff;
@@ -224,7 +224,8 @@ if (isset($_POST['checkout'])) {
             color: var(--text-primary);
             min-height: 100vh;
             transition: background 0.3s, color 0.3s;
-            padding-top: 80px; /* Fixed navigation height */
+            padding-top: 80px;
+            /* Fixed navigation height */
         }
 
         .glass-panel {
@@ -425,9 +426,19 @@ if (isset($_POST['checkout'])) {
         }
 
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
         }
 
         .feature-list {
@@ -507,23 +518,23 @@ if (isset($_POST['checkout'])) {
             body {
                 padding-top: 70px;
             }
-            
+
             .hero-section {
                 padding: 1rem 0;
             }
-            
+
             .hero-content h1 {
                 font-size: 1.5rem;
             }
-            
+
             .course-card {
                 padding: 0.75rem;
             }
-            
+
             .pricing-option {
                 padding: 0.5rem;
             }
-            
+
             .user-info-card {
                 padding: 0.75rem;
             }
@@ -541,7 +552,9 @@ if (isset($_POST['checkout'])) {
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
@@ -563,35 +576,41 @@ if (isset($_POST['checkout'])) {
         </div>
     </div>
 
-  <div class="container">
-        <form method="POST" class="glass-panel p-4">
-      <div class="row">
-        <!-- Course Selection -->
+    <div class="container">
+        <form method="GET" class="glass-panel p-4">
+            <div class="row">
+                <!-- Course Selection -->
                 <div class="col-lg-6">
                     <h4 class="mb-3">
                         <i class="fas fa-book me-2"></i>
                         Register For <?php echo htmlspecialchars($currentCourse['courseName']); ?>
                     </h4>
 
-          <!-- Main Course Card -->
-          <div class="course-card active"
-               data-course-id="main"
-               data-course-name="<?php echo htmlspecialchars($currentCourse['courseName']); ?>"
-               data-course-amount="0">
-            <div class="d-flex align-items-center justify-content-between">
-              <div class="d-flex align-items-center">
+                    <!-- Main Course Card -->
+                    <div class="course-card active"
+                        data-course-id="main"
+                        data-course-name="<?php echo htmlspecialchars($currentCourse['courseName']); ?>"
+                        data-course-amount="0">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
                                 <div class="neumorphic-icon me-3">
                                     <i class="fas fa-graduation-cap text-primary"></i>
                                 </div>
                                 <div>
                                     <h4 class="mb-1"><?php echo htmlspecialchars($currentCourse['courseName']); ?></h4>
-                                    <p class="text-muted mb-0"><?php echo htmlspecialchars($currentCourse['courseDescription']); ?></p>
                                 </div>
-              </div>
+                            </div>
                             <span class="badge-custom">Active</span>
-            </div>
-            <div class="course-details">
-              <hr>
+                        </div>
+                        <div class="course-details">
+                            <hr>
+                            
+                            <div class="mt-3">
+                                <h6 class="mb-2">What you'll learn:</h6>
+                                <div class="course-description">
+                                    <?php echo nl2br(htmlspecialchars($currentCourse['courseDescription'])); ?>
+                                </div>
+                            </div>
                             <div class="contact-info">
                                 <h6 class="mb-2">
                                     <i class="fas fa-phone me-2"></i>
@@ -599,66 +618,60 @@ if (isset($_POST['checkout'])) {
                                 </h6>
                                 <p class="mb-0"><?php echo htmlspecialchars($currentCourse['contact']); ?></p>
                             </div>
-                            <div class="mt-3">
-                                <h6 class="mb-2">What you'll learn:</h6>
-                                <div class="course-description">
-                                    <?php echo nl2br(htmlspecialchars($currentCourse['courseDescription'])); ?>
-                                </div>
-              </div>
-            </div>
-          </div>
+                        </div>
+                    </div>
 
-          <!-- Pricing Options -->
-          <?php if (count($currentCourse['pricingOptions']) > 1): ?>
+                    <!-- Pricing Options -->
+                    <?php if (count($currentCourse['pricingOptions']) > 1): ?>
                         <h5 class="mt-3 mb-2">
                             <i class="fas fa-tags me-2"></i>
                             Choose Your Package
                         </h5>
-            <?php foreach($currentCourse['pricingOptions'] as $index => $option): ?>
-              <div class="course-card pricing-option"
-                   data-course-id="<?php echo $index + 1; ?>"
-                   data-course-name="<?php echo htmlspecialchars($option['paymentCode']); ?>"
-                                 data-course-display="<?php echo htmlspecialchars($option['displayName']); ?>"
-                   data-course-amount="<?php echo $option['amount']; ?>">
-                <div class="d-flex align-items-center justify-content-between">
+                        <?php foreach ($currentCourse['pricingOptions'] as $index => $option): ?>
+                            <div class="course-card pricing-option"
+                                data-course-id="<?php echo $index + 1; ?>"
+                                data-course-name="<?php echo htmlspecialchars($option['paymentCode']); ?>"
+                                data-course-display="<?php echo htmlspecialchars($option['displayName']); ?>"
+                                data-course-amount="<?php echo $option['amount']; ?>">
+                                <div class="d-flex align-items-center justify-content-between">
                                     <div class="flex-grow-1">
-                                        <h5 class="mb-2"><?php echo htmlspecialchars($option['name']); ?></h5>
+                                        <h5 class="mb-2"><?php echo htmlspecialchars($option['displayName']); ?></h5>
                                         <p class="text-muted mb-2"><?php echo htmlspecialchars($option['description']); ?></p>
                                         <div class="price-tag">
                                             <?php echo number_format($option['amount']); ?> <?php echo htmlspecialchars($option['currency']); ?>
                                         </div>
-                  </div>
+                                    </div>
                                     <button type="button" class="btn-choose choose-course">
                                         <i class="fas fa-check me-1"></i>
                                         Select
                                     </button>
-                </div>
-              </div>
-            <?php endforeach; ?>
-          <?php else: ?>
-            <!-- Single pricing option -->
-            <?php $option = $currentCourse['pricingOptions'][0]; ?>
-            <div class="course-card pricing-option selected"
-                 data-course-id="1"
-                 data-course-name="<?php echo htmlspecialchars($option['paymentCode']); ?>"
-                             data-course-display="<?php echo htmlspecialchars($option['displayName']); ?>"
-                 data-course-amount="<?php echo $option['amount']; ?>">
-              <div class="d-flex align-items-center justify-content-between">
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <!-- Single pricing option -->
+                        <?php $option = $currentCourse['pricingOptions'][0]; ?>
+                        <div class="course-card pricing-option selected"
+                            data-course-id="1"
+                            data-course-name="<?php echo htmlspecialchars($option['paymentCode']); ?>"
+                            data-course-display="<?php echo htmlspecialchars($option['displayName']); ?>"
+                            data-course-amount="<?php echo $option['amount']; ?>">
+                            <div class="d-flex align-items-center justify-content-between">
                                 <div class="flex-grow-1">
-                                    <h5 class="mb-2"><?php echo htmlspecialchars($option['name']); ?></h5>
+                                    <h5 class="mb-2"><?php echo htmlspecialchars($option['displayName']); ?></h5>
                                     <p class="text-muted mb-2"><?php echo htmlspecialchars($option['description']); ?></p>
                                     <div class="price-tag">
                                         <?php echo number_format($option['amount']); ?> <?php echo htmlspecialchars($option['currency']); ?>
                                     </div>
-                </div>
+                                </div>
                                 <button type="button" class="btn-choose selected choose-course">
                                     <i class="fas fa-check me-1"></i>
                                     Selected
                                 </button>
-              </div>
-            </div>
-          <?php endif; ?>
-        </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
 
                 <!-- User Details & Registration -->
                 <div class="col-lg-6">
@@ -700,71 +713,72 @@ if (isset($_POST['checkout'])) {
                     </div>
 
                     <!-- Hidden fields -->
-          <input type="hidden" name="subscription" id="subscription-input"
-                 value="<?php echo htmlspecialchars($currentCourse['courseName']); ?>">
-          <input type="hidden" name="amount" id="amount-input"
-                 value="<?php echo $currentCourse['pricingOptions'][0]['amount']; ?>">
+                    <input type="hidden" name="subscription" id="subscription-input"
+                        value="<?php echo htmlspecialchars($currentCourse['pricingOptions'][0]['paymentCode']); ?>">
+                    <input type="hidden" name="amount" id="amount-input"
+                        value="<?php echo $currentCourse['pricingOptions'][0]['amount']; ?>">
+                    <input type="hidden" id="course-id" value="<?php echo isset($courseId) ? (int)$courseId : 0; ?>">
 
                     <!-- Selected Package -->
-          <div class="selected-courses">
+                    <div class="selected-courses">
                         <h6 class="mb-2">
                             <i class="fas fa-shopping-cart me-2"></i>
                             Selected Package
                         </h6>
                         <div id="selected-courses-list">
-              <?php foreach($formData['courses'] as $c): ?>
+                            <?php foreach ($formData['courses'] as $c): ?>
                                 <div class="d-flex align-items-center mb-2">
                                     <i class="fas fa-check-circle text-success me-2"></i>
                                     <span><?= htmlspecialchars($c) ?></span>
                                 </div>
-              <?php endforeach; ?>
+                            <?php endforeach; ?>
                         </div>
-          </div>
+                    </div>
 
-          <!-- Validation Error Message -->
+                    <!-- Validation Error Message -->
                     <div id="validation-error" class="validation-error d-none">
-            <i class="fas fa-exclamation-triangle me-2"></i>
-            Please select a pricing option to continue.
-          </div>
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Please select a pricing option to continue.
+                    </div>
 
                     <!-- Terms and Conditions -->
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
-            <label class="form-check-label" for="terms">
-                            By enrolling you allow that you have read, understood and agreed to the 
+                        <label class="form-check-label" for="terms">
+                            By enrolling you allow that you have read, understood and agreed to the
                             <a href="./terms-and-conditions" class="text-primary">terms & conditions</a>
-            </label>
-            <?php if(isset($errors['terms'])): ?>
-              <div class="text-danger"><?= $errors['terms'] ?></div>
-            <?php endif; ?>
-          </div>
+                        </label>
+                        <?php if (isset($errors['terms'])): ?>
+                            <div class="text-danger"><?= $errors['terms'] ?></div>
+                        <?php endif; ?>
+                    </div>
 
                     <!-- Action Buttons -->
                     <div class="d-grid gap-2">
-                        <button name="checkout" class="btn-primary-custom w-100">
+                        <button type="submit" name="checkout" class="btn-primary-custom w-100">
                             <i class="fas fa-rocket me-2"></i>
                             Register Now!
-          </button>
+                        </button>
                         <a class="btn-secondary-custom w-100 text-center" href="./e-learning">
                             <i class="fas fa-arrow-left me-2"></i>
                             Back to Courses
                         </a>
                     </div>
-        </div>
-      </div>
-    </form>
-  </div>
+                </div>
+            </div>
+        </form>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    let selectedSet = new Set(["<?php echo htmlspecialchars($currentCourse['courseName']); ?>"]);
-    let hasSelectedOption = false;
-    const nameInput = document.getElementById("subscription-input"),
-          amtInput = document.getElementById("amount-input"),
-          validationError = document.getElementById("validation-error"),
-          registerBtn = document.querySelector('button[name="checkout"]');
+    <script>
+        let selectedSet = new Set(["<?php echo htmlspecialchars($currentCourse['courseName']); ?>"]);
+        let hasSelectedOption = false;
+        const nameInput = document.getElementById("subscription-input"),
+            amtInput = document.getElementById("amount-input"),
+            validationError = document.getElementById("validation-error"),
+            registerBtn = document.querySelector('button[name="checkout"]');
 
-    function updateList(){
+        function updateList() {
             const container = document.getElementById("selected-courses-list");
             container.innerHTML = "";
             selectedSet.forEach(c => {
@@ -774,93 +788,98 @@ if (isset($_POST['checkout'])) {
                         <span>${c}</span>
                     </div>
                 `);
-      });
-    }
+            });
+        }
 
-    function validateSelection() {
+        function validateSelection() {
             hasSelectedOption = selectedSet.size > 1;
-      
-      if (hasSelectedOption) {
-        validationError.classList.add('d-none');
-        registerBtn.disabled = false;
-        registerBtn.classList.remove('btn-secondary');
+
+            if (hasSelectedOption) {
+                validationError.classList.add('d-none');
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('btn-secondary');
                 registerBtn.classList.add('btn-primary-custom');
-        
-        document.querySelectorAll('.course-card').forEach(card => {
-          card.classList.remove('required-highlight');
-        });
-      } else {
-        validationError.classList.remove('d-none');
-        registerBtn.disabled = true;
+                registerBtn.style.display = 'flex';
+
+                document.querySelectorAll('.course-card').forEach(card => {
+                    card.classList.remove('required-highlight');
+                });
+            } else {
+                validationError.classList.add('d-none');
+                registerBtn.disabled = true;
                 registerBtn.classList.remove('btn-primary-custom');
-        registerBtn.classList.add('btn-secondary');
-        
-        document.querySelectorAll('.pricing-option').forEach(card => {
-          card.classList.add('required-highlight');
-        });
-      }
-    }
+                registerBtn.classList.add('btn-secondary');
+                registerBtn.style.display = 'none';
 
-    function hideValidationError() {
-      validationError.classList.add('d-none');
-    }
+                document.querySelectorAll('.pricing-option').forEach(card => {
+                    card.classList.remove('required-highlight');
+                });
+            }
+        }
 
-    // Keep main course expanded
-    document.querySelectorAll('.course-card[data-course-id="main"] .course-details')
+        function hideValidationError() {
+            validationError.classList.add('d-none');
+        }
+
+        // Keep main course expanded
+        document.querySelectorAll('.course-card[data-course-id="main"] .course-details')
             .forEach(d => d.style.maxHeight = "500px");
 
-    updateList();
+        updateList();
         validateSelection();
 
         document.querySelectorAll('.choose-course').forEach(btn => {
             btn.addEventListener('click', e => {
-        const card = e.target.closest('.course-card');
+                const card = e.target.closest('.course-card');
 
-        // Remove active on pricing options
-        document.querySelectorAll('.pricing-option')
+                // Remove active on pricing options
+                document.querySelectorAll('.pricing-option')
                     .forEach(c => c.classList.remove('active', 'selected'));
-        card.classList.add('active', 'selected');
+                card.classList.add('active', 'selected');
 
-        const sub = card.dataset.courseName,
-                      displayName = card.dataset.courseDisplay,
-              amt = card.dataset.courseAmount;
+                const sub = card.dataset.courseName,
+                    displayName = card.dataset.courseDisplay,
+                    amt = card.dataset.courseAmount;
 
                 selectedSet = new Set(["<?php echo htmlspecialchars($currentCourse['courseName']); ?>", displayName]);
-        nameInput.value = sub;
-        amtInput.value = amt;
-        updateList();
+                nameInput.value = sub; // sub is paymentCode (coursePaymentCodeName)
+                amtInput.value = amt;
+                updateList();
 
-        // Toggle button text & colors
+                // Toggle button text & colors
                 document.querySelectorAll('.choose-course').forEach(b => {
                     b.innerHTML = '<i class="fas fa-check me-1"></i>Select';
                     b.classList.remove("selected");
                 });
                 e.target.innerHTML = '<i class="fas fa-check me-1"></i>Selected';
                 e.target.classList.add("selected");
-                
-        validateSelection();
-      });
-    });
 
-    // Form submission validation
-    document.querySelector('form').addEventListener('submit', function(e) {
-      if (!hasSelectedOption) {
-        e.preventDefault();
-        validationError.classList.remove('d-none');
-        validationError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        
-        document.querySelectorAll('.pricing-option').forEach(card => {
-          card.classList.add('required-highlight');
+                validateSelection();
+            });
         });
-        
-        return false;
-      }
-    });
 
-    // Hide validation error when user starts selecting
-    document.querySelectorAll('.choose-course').forEach(btn => {
-      btn.addEventListener('click', hideValidationError);
-    });
-  </script>
+        // Form submission: validate and redirect to checkout URL explicitly
+        document.querySelector('form').addEventListener('submit', function(e) {
+            if (!hasSelectedOption) {
+                e.preventDefault();
+                return false;
+            }
+            // Redirect to maintenance page instead of live checkout
+            var subCode = nameInput.value;
+            var courseIdEl = document.getElementById('course-id');
+            var cid = courseIdEl ? courseIdEl.value : '';
+            if (cid && subCode) {
+                e.preventDefault();
+                window.location.href = './payment/checkout-maintenance.php';
+                return false;
+            }
+        });
+
+        // Hide validation error when user starts selecting
+        document.querySelectorAll('.choose-course').forEach(btn => {
+            btn.addEventListener('click', hideValidationError);
+        });
+    </script>
 </body>
+
 </html>

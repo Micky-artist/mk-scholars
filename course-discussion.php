@@ -355,6 +355,38 @@ $discussionsStmt->close();
             background: var(--bg-secondary);
         }
 
+        /* Dark-friendly modal styling */
+        .modal-content {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+        }
+
+        .modal-header, .modal-footer {
+            border-color: var(--glass-border);
+        }
+
+        .modal-title {
+            color: var(--text-primary);
+        }
+
+        .form-control, .form-select, textarea.form-control {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            border: 1px solid var(--glass-border);
+        }
+
+        .form-control::placeholder, textarea.form-control::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .form-control:focus, .form-select:focus, textarea.form-control:focus {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.15);
+        }
+
         .discussion-card {
             background: var(--glass-bg);
             backdrop-filter: blur(8px);

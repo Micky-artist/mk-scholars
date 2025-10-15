@@ -132,6 +132,24 @@ include("./dbconnection/connection.php");
 		color: #74b9ff;
 	}
 
+	/* Password visibility toggle */
+	.input-group .toggle-password {
+		position: absolute;
+		right: 12px;
+		top: 50%;
+		transform: translateY(-50%);
+		background: transparent;
+		border: none;
+		color: #636e72;
+		cursor: pointer;
+		padding: 4px;
+		line-height: 1;
+	}
+
+	.input-group .toggle-password:focus {
+		outline: none;
+	}
+
 	.submit-btn {
 		background: #74b9ff;
 		color: white;
@@ -216,12 +234,18 @@ include("./dbconnection/connection.php");
 					<label for="login-email">Phone</label>
 				</div>
 				<div class="input-group">
-					<input type="password" name="NoPassword" id="login-email" value="<?php echo $NoPassword?>" placeholder=" ">
-					<label for="login-email">Password</label>
+					<input type="password" name="NoPassword" id="signup-password" value="<?php echo $NoPassword?>" placeholder=" ">
+					<label for="signup-password">Password</label>
+					<button type="button" class="toggle-password" id="toggle-signup-password" aria-label="Show password">
+						<i class="fas fa-eye"></i>
+					</button>
 				</div>
 				<div class="input-group">
-					<input type="password" name="NoCoPassword" id="login-email" value="<?php echo $NoCoPassword?>" placeholder=" ">
-					<label for="login-email">Confirm Password</label>
+					<input type="password" name="NoCoPassword" id="signup-confirm-password" value="<?php echo $NoCoPassword?>" placeholder=" ">
+					<label for="signup-confirm-password">Confirm Password</label>
+					<button type="button" class="toggle-password" id="toggle-signup-confirm-password" aria-label="Show password">
+						<i class="fas fa-eye"></i>
+					</button>
 				</div>
 				<div style="font-size: 12px;">
 				<input type="checkbox" name="aggree" id="remember">
@@ -237,5 +261,31 @@ include("./dbconnection/connection.php");
 	</div>
 
 </body>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var pwd = document.getElementById('signup-password');
+    var pwdBtn = document.getElementById('toggle-signup-password');
+    if (pwd && pwdBtn) {
+        pwdBtn.addEventListener('click', function () {
+            var isText = pwd.type === 'text';
+            pwd.type = isText ? 'password' : 'text';
+            pwdBtn.innerHTML = isText ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+            pwdBtn.setAttribute('aria-label', isText ? 'Show password' : 'Hide password');
+        });
+    }
+
+    var cpwd = document.getElementById('signup-confirm-password');
+    var cpwdBtn = document.getElementById('toggle-signup-confirm-password');
+    if (cpwd && cpwdBtn) {
+        cpwdBtn.addEventListener('click', function () {
+            var isText = cpwd.type === 'text';
+            cpwd.type = isText ? 'password' : 'text';
+            cpwdBtn.innerHTML = isText ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+            cpwdBtn.setAttribute('aria-label', isText ? 'Show password' : 'Hide password');
+        });
+    }
+});
+</script>
 
 </html>

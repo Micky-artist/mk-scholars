@@ -152,7 +152,38 @@ try {
     error_log("Courses page error: " . $error);
 }
 
-// Helper function removed - no images needed
+// Helper: detect offline/online and build admin image URL
+function isLocalHost() {
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    return strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false;
+}
+
+function getBaseDomain($host) {
+    $host = strtolower($host);
+    if (strpos($host, '://') !== false) {
+        $host = parse_url($host, PHP_URL_HOST) ?? $host;
+    }
+    $host = preg_replace('/^www\./', '', $host);
+    $host = preg_replace('/^admin\./', '', $host);
+    return $host;
+}
+
+function getCourseImageUrl($storedPath) {
+    if (!$storedPath) {
+        return '';
+    }
+    // Ensure we use the DB-provided relative path like 'uploads/courses/images/xyz.jpg'
+    $relativePath = ltrim($storedPath, '/');
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    if (isLocalHost()) {
+        // Local: admin app is a folder in this project
+        return './admin/' . $relativePath;
+    }
+    // Online: admin is a subdomain
+    $domain = getBaseDomain($host);
+    $adminHost = 'admin.' . $domain;
+    return 'https://' . $adminHost . '/' . $relativePath;
+}
 
 // Helper function to format price
 function formatPrice($amount, $currencySymbol, $currency) {
@@ -188,7 +219,7 @@ function getStatusClass($status) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Courses | MK Scholars</title>
-    <!-- Favicon removed for testing -->
+    <link rel="shortcut icon" href="./images/logo/logoRound.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -301,7 +332,22 @@ function getStatusClass($status) {
             box-shadow: var(--shadow-xl);
         }
 
-        /* ==== Course Image Section Removed ==== */
+        /* ==== Course Image Section ==== */
+        .course-image {
+            width: 100%;
+            height: 180px;
+            background: #f3f4f6;
+            border-bottom: 1px solid var(--glass-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .course-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
 
         /* Course brand removed with images */
 
@@ -340,6 +386,12 @@ function getStatusClass($status) {
             color: var(--gray-900);
             margin-bottom: 0.5rem;
             line-height: 1.2;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* show first 2 lines only */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-height: 2.4em; /* reserve space for two lines */
         }
 
         .course-subtitle {
@@ -713,7 +765,18 @@ function getStatusClass($status) {
             <?php if (!$hasError && !empty($courses)): ?>
                 <?php foreach ($courses as $course): ?>
                     <div class="course-card">
-                        <!-- Course Image Section Removed for Testing -->
+                        <!-- Course Image -->
+                        <?php 
+                            $imageUrl = '';
+                            if (!empty($course['coursePhoto'])) {
+                                $imageUrl = getCourseImageUrl($course['coursePhoto']);
+                            }
+                        ?>
+                        <?php if ($imageUrl): ?>
+                        <div class="course-image">
+                            <img src="<?php echo htmlspecialchars($imageUrl); ?>" alt="<?php echo htmlspecialchars($course['courseName']); ?>">
+                        </div>
+                        <?php endif; ?>
                         
                         <!-- Course Content -->
                         <div class="course-content">
@@ -761,35 +824,30 @@ function getStatusClass($status) {
                             </div>
                             
                             <div class="course-features">
-                                <?php 
-                                // Parse course features from database
-                                $features = [];
-                                if (!empty($course['courseFeatures'])) {
-                                    $features = json_decode($course['courseFeatures'], true);
+                                <?php
+                                // Read tags from CourseTags table for this course
+                                $tags = [];
+                                $tagSql = "SELECT courseTagIcon, tagDescription, tagColor FROM CourseTags WHERE courseId = ? AND isActive = 1 ORDER BY courseTagId DESC LIMIT 6";
+                                if ($tagStmt = mysqli_prepare($conn, $tagSql)) {
+                                    mysqli_stmt_bind_param($tagStmt, 'i', $course['courseId']);
+                                    mysqli_stmt_execute($tagStmt);
+                                    $tagRes = mysqli_stmt_get_result($tagStmt);
+                                    while ($t = mysqli_fetch_assoc($tagRes)) { $tags[] = $t; }
+                                    mysqli_stmt_close($tagStmt);
                                 }
-                                
-                                // Default features if none in database
-                                if (empty($features) || !is_array($features)) {
-                                    $features = ['Online Learning', 'Expert Support', 'Certificate'];
+
+                                if (!empty($tags)) {
+                                    foreach ($tags as $t) {
+                                        $iconClass = !empty($t['courseTagIcon']) ? $t['courseTagIcon'] : 'fas fa-tag';
+                                        $desc = !empty($t['tagDescription']) ? $t['tagDescription'] : 'Tag';
+                                        $color = !empty($t['tagColor']) ? $t['tagColor'] : '#3b82f6';
+                                        echo '<div class="feature-item">'
+                                            . '<i class="' . htmlspecialchars($iconClass) . ' feature-icon" style="color:' . htmlspecialchars($color) . ';"></i>'
+                                            . '<span>' . htmlspecialchars($desc) . '</span>'
+                                            . '</div>';
+                                    }
                                 }
-                                
-                                $featureIcons = [
-                                    'Online Learning' => 'fas fa-graduation-cap',
-                                    'Expert Support' => 'fas fa-user-tie', 
-                                    'Certificate' => 'fas fa-certificate',
-                                    '24/7 Support' => 'fas fa-headset',
-                                    'Practice Materials' => 'fas fa-book',
-                                    'Personalized Support' => 'fas fa-user-friends'
-                                ];
-                                
-                                foreach ($features as $feature): 
-                                    $icon = $featureIcons[$feature] ?? 'fas fa-check';
                                 ?>
-                                <div class="feature-item">
-                                    <i class="<?php echo $icon; ?> feature-icon"></i>
-                                    <span><?php echo htmlspecialchars($feature); ?></span>
-                                </div>
-                                <?php endforeach; ?>
                             </div>
                             
                             <div class="course-deadline">

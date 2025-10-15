@@ -103,6 +103,24 @@ include("./php/forgetPassword.php");
         color: #74b9ff;
     }
 
+    /* Password visibility toggle */
+    .input-group .toggle-password {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        color: #636e72;
+        cursor: pointer;
+        padding: 4px;
+        line-height: 1;
+    }
+
+    .input-group .toggle-password:focus {
+        outline: none;
+    }
+
     .submit-btn {
         background: #74b9ff;
         color: white;
@@ -215,6 +233,9 @@ include("./php/forgetPassword.php");
                 <div class="input-group">
                     <input type="password" name="newPassword" id="new-password" value="<?php echo isset($newPassword) ? htmlspecialchars($newPassword) : '' ?>" placeholder=" ">
                     <label for="new-password">New Password</label>
+                    <button type="button" class="toggle-password" id="toggle-new-password" aria-label="Show password">
+                        <i class="fas fa-eye"></i>
+                    </button>
                     <?php if (!empty($errors['newPassword'])): ?>
                     <div class="password-rules" style="color:#c41f10; margin-top:6px;">
                         <i class="fa fa-exclamation-circle"></i> <?php echo htmlspecialchars($errors['newPassword']); ?>
@@ -228,6 +249,9 @@ include("./php/forgetPassword.php");
                 <div class="input-group">
                     <input type="password" name="coNewPassword" id="co-new-password" value="<?php echo isset($coNewPassword) ? htmlspecialchars($coNewPassword) : '' ?>" placeholder=" ">
                     <label for="co-new-password">Confirm New Password</label>
+                    <button type="button" class="toggle-password" id="toggle-co-new-password" aria-label="Show password">
+                        <i class="fas fa-eye"></i>
+                    </button>
                     <?php if (!empty($errors['coNewPassword'])): ?>
                     <div class="password-rules" style="color:#c41f10; margin-top:6px;">
                         <i class="fa fa-exclamation-circle"></i> <?php echo htmlspecialchars($errors['coNewPassword']); ?>
@@ -246,6 +270,21 @@ include("./php/forgetPassword.php");
                         setTimeout(function(){ alertBox.style.display = 'none'; }, 400);
                     }, 6000);
                 }
+
+                function attachToggle(inputId, btnId) {
+                    var input = document.getElementById(inputId);
+                    var btn = document.getElementById(btnId);
+                    if (input && btn) {
+                        btn.addEventListener('click', function () {
+                            var isText = input.type === 'text';
+                            input.type = isText ? 'password' : 'text';
+                            btn.innerHTML = isText ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+                            btn.setAttribute('aria-label', isText ? 'Show password' : 'Hide password');
+                        });
+                    }
+                }
+                attachToggle('new-password', 'toggle-new-password');
+                attachToggle('co-new-password', 'toggle-co-new-password');
             });
             </script>
 

@@ -287,6 +287,24 @@ if (!isset($msg)) {
 		color: #74b9ff;
 	}
 
+	/* Password visibility toggle */
+	.input-group .toggle-password {
+		position: absolute;
+		right: 12px;
+		top: 50%;
+		transform: translateY(-50%);
+		background: transparent;
+		border: none;
+		color: #636e72;
+		cursor: pointer;
+		padding: 4px;
+		line-height: 1;
+	}
+
+	.input-group .toggle-password:focus {
+		outline: none;
+	}
+
 	.submit-btn {
 		background: #74b9ff;
 		color: white;
@@ -381,6 +399,9 @@ if (!isset($msg)) {
 				<div class="input-group">
 					<input type="password" name="password" id="login-password" placeholder=" " required>
 					<label for="login-password">Password</label>
+					<button type="button" class="toggle-password" id="toggle-password" aria-label="Show password">
+						<i class="fas fa-eye"></i>
+					</button>
 				</div>
 
 				<button type="submit" name="login" class="submit-btn">Login</button>
@@ -399,6 +420,20 @@ if (!isset($msg)) {
 			// User is already logged in, redirect to e-learning
 			window.location.href = './e-learning';
 		<?php endif; ?>
+	</script>
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			var pwd = document.getElementById('login-password');
+			var btn = document.getElementById('toggle-password');
+			if (pwd && btn) {
+				btn.addEventListener('click', function () {
+					var isText = pwd.type === 'text';
+					pwd.type = isText ? 'password' : 'text';
+					btn.innerHTML = isText ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+					btn.setAttribute('aria-label', isText ? 'Show password' : 'Hide password');
+				});
+			}
+		});
 	</script>
 </body>
 

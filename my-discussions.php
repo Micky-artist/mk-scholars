@@ -44,6 +44,47 @@ $stmt->close();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #4b5563;
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: rgba(0, 0, 0, 0.06);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --text-primary: #e5e7eb;
+            --text-secondary: #9ca3af;
+            --glass-bg: rgba(30, 30, 30, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+        }
+        .theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1100;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         .discussion-cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -59,6 +100,8 @@ $stmt->close();
             flex-direction: column;
             gap: 0.5rem;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
         }
 
         .discussion-card:hover {
@@ -81,6 +124,7 @@ $stmt->close();
         .discussion-title {
             font-weight: 600;
             margin: 0.25rem 0 0.1rem 0;
+            color: var(--text-primary);
         }
 
         .discussion-meta {
@@ -105,6 +149,11 @@ $stmt->close();
     </style>
 </head>
 <body data-theme="light">
+    <!-- Theme Toggle Button -->
+    <button class="btn btn-secondary theme-toggle glass-panel">
+        <i class="fas fa-moon"></i>
+    </button>
+
 <div class="container-fluid">
     <div class="row">
         <?php $_GET['page'] = 'my-discussions'; include('./partials/universalNavigation.php'); ?>
@@ -151,6 +200,26 @@ document.addEventListener('DOMContentLoaded', function () {
         toggleBtn.addEventListener('click', function () {
             sidebar.classList.toggle('active');
         });
+    }
+    // Theme toggle (match dashboard)
+    var themeToggle = document.querySelector('.theme-toggle');
+    var body = document.body;
+    var saved = localStorage.getItem('theme') || 'light';
+    body.setAttribute('data-theme', saved);
+    updateThemeIcon();
+    if (themeToggle) {
+        themeToggle.addEventListener('click', function(){
+            var current = body.getAttribute('data-theme');
+            var next = current === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            updateThemeIcon();
+        });
+    }
+    function updateThemeIcon(){
+        if (!themeToggle) return;
+        var isDark = body.getAttribute('data-theme') === 'dark';
+        themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
     }
 });
 </script>
