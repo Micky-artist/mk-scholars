@@ -942,13 +942,21 @@ if ($shouldCreatePayment) {
             <p class="item-description"><?= htmlspecialchars($courseDescription) ?></p>
             <div class="price-section">
               <span class="price-label">Total Amount</span>
-              <span class="price-amount"><?= number_format($finalAmount, 2) ?> <?= htmlspecialchars($currencySymbol) ?></span>
+              <span class="price-amount"><?= number_format((float)$finalAmount, 0) ?> <?= htmlspecialchars($currencySymbol) ?></span>
             </div>
+            <?php if (isset($currency) && strtoupper($currency) !== 'RWF'): ?>
+              <div style="margin-top:10px;padding:10px;border-radius:8px;background:#fff7ed;border:1px solid #f59e0b;color:#b45309;font-size:0.95rem;">
+                <i class="fas fa-info-circle"></i>
+                Note: This pricing is in <?= htmlspecialchars($currency) ?>, not RWF. Please contact us before proceeding.
+                <a href="../conversations.php" style="margin-left:6px;color:#1e40af;text-decoration:underline;">Open Support Chat</a>
+                or call <a href="tel:+250798611161" style="color:#1e40af;text-decoration:underline;">+250 798 611 161</a>.
+              </div>
+            <?php endif; ?>
             <?php if (!empty($appliedCoupon)): ?>
               <div class="discount-applied">
                 <i class="fas fa-ticket-alt"></i> 
                 Coupon "<?= htmlspecialchars($appliedCoupon['code']) ?>" applied - 
-                <?= number_format($appliedCoupon['discountAmount'], 2) ?> <?= htmlspecialchars($currencySymbol) ?> off
+                <?= number_format((float)$appliedCoupon['discountAmount'], 0) ?> <?= htmlspecialchars($currencySymbol) ?> off
               </div>
             <?php endif; ?>
           </div>

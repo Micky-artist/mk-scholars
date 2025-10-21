@@ -870,8 +870,8 @@ if (isset($_GET['checkout'])) {
             var cid = courseIdEl ? courseIdEl.value : '';
             if (cid && subCode) {
                 e.preventDefault();
-                // Pass the selected amount to the maintenance page for USSD prefill
-                const amt = encodeURIComponent(amtInput.value || '');
+                // Pass the selected amount to the maintenance page for USSD prefill (remove decimals)
+                const amt = encodeURIComponent(amtInput.value ? Math.round(parseFloat(amtInput.value)).toString() : '');
                 const url = './payment/checkout-maintenance.php' + (amt ? ('?amount=' + amt) : '');
                 window.location.href = url;
         return false;
