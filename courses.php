@@ -788,36 +788,7 @@ function getStatusClass($status) {
                                 <p class="course-subtitle"><?php echo htmlspecialchars($course['courseDescription']); ?></p>
                             </div>
                             
-                            <div class="course-pricing">
-                                <?php if (!empty($course['pricingOptions'])): ?>
-                                    <?php if (count($course['pricingOptions']) == 1): ?>
-                                        <!-- Single pricing option -->
-                                        <div class="price-main">
-                                            <?php echo formatPrice($course['pricingOptions'][0]['amount'], $course['pricingOptions'][0]['currencySymbol'], $course['pricingOptions'][0]['currency']); ?>
-                                </div>
-                                        <p class="price-description">
-                                            <?php echo htmlspecialchars($course['pricingOptions'][0]['pricingDescription'] ?? 'Complete Package'); ?>
-                                        </p>
-                                    <?php else: ?>
-                                        <!-- Multiple pricing options -->
-                                        <div class="pricing-options">
-                                            <?php foreach ($course['pricingOptions'] as $index => $pricing): ?>
-                                                <div class="pricing-option <?php echo $index === 0 ? 'featured' : ''; ?>">
-                                                    <div class="price-amount">
-                                                        <?php echo formatPrice($pricing['amount'], $pricing['currencySymbol'], $pricing['currency']); ?>
-                                                    </div>
-                                                    <div class="price-desc">
-                                                        <?php echo htmlspecialchars($pricing['pricingDescription'] ?? 'Package'); ?>
-                                                    </div>
-                                </div>
-                                            <?php endforeach; ?>
-                                    </div>
-                                    <?php endif; ?>
-                                <?php else: ?>
-                                    <!-- No pricing available -->
-                                    <div class="price-main">Contact for Pricing</div>
-                                <?php endif; ?>
-                            </div>
+                            <!-- Pricing section intentionally removed on this page -->
                             
                             <div class="course-description">
                                 <?php echo htmlspecialchars($course['courseShortDescription'] ?? 'Course description not available'); ?>

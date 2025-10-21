@@ -649,9 +649,9 @@ if (isset($_GET['checkout'])) {
               </div>
             <?php endforeach; ?>
           <?php else: ?>
-            <!-- Single pricing option -->
+            <!-- Single pricing option (not preselected) -->
             <?php $option = $currentCourse['pricingOptions'][0]; ?>
-            <div class="course-card pricing-option selected"
+            <div class="course-card pricing-option"
                  data-course-id="1"
                  data-course-name="<?php echo htmlspecialchars($option['paymentCode']); ?>"
                             data-course-display="<?php echo htmlspecialchars($option['displayName']); ?>"
@@ -664,9 +664,9 @@ if (isset($_GET['checkout'])) {
                                         <?php echo number_format($option['amount']); ?> <?php echo htmlspecialchars($option['currency']); ?>
                                     </div>
                 </div>
-                                <button type="button" class="btn-choose selected choose-course">
+                                <button type="button" class="btn-choose choose-course">
                                     <i class="fas fa-check me-1"></i>
-                                    Selected
+                                    Select
                                 </button>
               </div>
             </div>
@@ -713,10 +713,10 @@ if (isset($_GET['checkout'])) {
                     </div>
 
                     <!-- Hidden fields -->
-          <input type="hidden" name="subscription" id="subscription-input"
-                        value="<?php echo htmlspecialchars($currentCourse['pricingOptions'][0]['paymentCode']); ?>">
+                    <input type="hidden" name="subscription" id="subscription-input"
+                        value="">
           <input type="hidden" name="amount" id="amount-input"
-                 value="<?php echo $currentCourse['pricingOptions'][0]['amount']; ?>">
+                 value="">
                     <input type="hidden" id="course-id" value="<?php echo isset($courseId) ? (int)$courseId : 0; ?>">
 
                     <!-- Selected Package -->
@@ -870,7 +870,10 @@ if (isset($_GET['checkout'])) {
             var cid = courseIdEl ? courseIdEl.value : '';
             if (cid && subCode) {
                 e.preventDefault();
-                window.location.href = './payment/checkout-maintenance.php';
+                // Pass the selected amount to the maintenance page for USSD prefill
+                const amt = encodeURIComponent(amtInput.value || '');
+                const url = './payment/checkout-maintenance.php' + (amt ? ('?amount=' + amt) : '');
+                window.location.href = url;
         return false;
       }
     });

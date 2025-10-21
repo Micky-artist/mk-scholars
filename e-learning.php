@@ -1145,10 +1145,6 @@ function formatFileSize($bytes) {
                                     <i class="fas fa-calendar-times meta-icon"></i>
                                     <span>Register by: <?php echo date('M j, Y', strtotime($course['courseRegEndDate'])); ?></span>
                                 </div>
-                                <div class="meta-item">
-                                    <i class="fas fa-users meta-icon"></i>
-                                    <span><?php echo $course['enrollmentCount']; ?> enrolled</span>
-                                </div>
                             </div>
                                     </div>
                                     

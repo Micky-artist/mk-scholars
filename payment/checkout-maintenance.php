@@ -1,6 +1,20 @@
 <?php
 // Optional: keep session for showing user info if needed later
 include('../config/session.php');
+
+// Accept amount from subscription redirect and build USSD/tel link
+$rawAmount = isset($_GET['amount']) ? $_GET['amount'] : '';
+$amountNumeric = preg_replace('/[^0-9]/', '', (string)$rawAmount);
+$hasAmount = $amountNumeric !== '';
+$ussdAmount = $hasAmount ? $amountNumeric : 'amount';
+$ussdCode = "*182*8*1*021112*{$ussdAmount}#";
+// For tel links, encode the trailing '#'
+$telHref = $hasAmount ? "tel:*182*8*1*021112*{$amountNumeric}%23" : '';
+// Pre-fill WhatsApp message
+$waMsg = $hasAmount
+    ? "Hi! I just completed payment using MoMo. Amount: {$amountNumeric}. USSD: {$ussdCode}. I will send the screenshot now."
+    : "Hi! I would like assistance completing my payment via MoMo.";
+$waLink = 'https://wa.me/250798611161?text=' . urlencode($waMsg);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -192,11 +206,17 @@ include('../config/session.php');
             text-align: center;
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
         }
 
         .contact-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            text-decoration: none;
+            color: inherit;
         }
 
         .contact-item.phone {
@@ -213,6 +233,10 @@ include('../config/session.php');
 
         .contact-item.support {
             border-color: var(--primary-color);
+        }
+
+        .contact-item.momo {
+            border-color: #ff6b35;
         }
 
         .contact-icon {
@@ -241,6 +265,76 @@ include('../config/session.php');
 
         .contact-icon.support {
             background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+        }
+
+        .contact-icon.momo {
+            background: linear-gradient(135deg, #ff6b35, #e55a2b);
+        }
+
+        .momo-code {
+            text-align: center;
+        }
+
+        .ussd-code {
+            display: block;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            background: #f8f9fa;
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 2px dashed #ff6b35;
+            margin-bottom: 0.5rem;
+            word-break: break-all;
+        }
+
+        .momo-note {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            display: block;
+        }
+
+        .momo-link {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ff6b35, #e55a2b);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+
+        .momo-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.2);
+            color: white;
+        }
+
+        .ussd-code-mobile {
+            display: block;
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            word-break: break-all;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .momo-note-mobile {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.85rem;
+            display: block;
         }
 
         .contact-title {
@@ -294,8 +388,8 @@ include('../config/session.php');
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
         }
 
         .btn-whatsapp {
@@ -305,8 +399,8 @@ include('../config/session.php');
         }
 
         .btn-whatsapp:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(18, 140, 126, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(18, 140, 126, 0.3);
         }
 
         .btn-outline {
@@ -318,7 +412,7 @@ include('../config/session.php');
         .btn-outline:hover {
             border-color: var(--primary-color);
             color: var(--primary-color);
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
 
         .footer-note {
@@ -388,38 +482,51 @@ include('../config/session.php');
                 </p>
                 
                 <div class="contact-grid">
-                    <div class="contact-item phone">
+                    <a href="<?php echo $hasAmount ? htmlspecialchars($telHref) : '#'; ?>" class="contact-item momo" id="momo-card">
+                        <div class="contact-icon momo">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="contact-title">Mobile Money (MoMo)</div>
+                        <div class="contact-details">
+                            <div id="momo-code" class="momo-code">
+                                <span class="ussd-code"><?php echo htmlspecialchars($ussdCode); ?></span>
+                                <small class="momo-note">Replace 'amount' with your payment amount<?php echo $hasAmount ? ' (filled automatically)' : ''; ?></small>
+                            </div>
+                            
+                            <div id="momo-link" class="momo-link" style="display: none;">
+                                <span class="ussd-code-mobile"><?php echo htmlspecialchars($ussdCode); ?></span>
+                                <small class="momo-note-mobile">Tap to dial this code</small>
+                            </div>
+                            
+                        </div>
+                        <span style="display: flex; justify-content: center; align-items: center; gap: 10px; width: 100%;">
+                            <a class="btn btn-whatsapp" href="<?php echo htmlspecialchars($waLink); ?>" target="_blank" rel="noopener">
+                    <i class="fab fa-whatsapp"></i>
+                    Send Confirmation Message on WhatsApp Chat
+                </a>
+                            </span>
+                    </a>
+                    
+                    <a href="tel:+250798611161" class="contact-item phone">
                         <div class="contact-icon phone">
                             <i class="fas fa-phone"></i>
                         </div>
                         <div class="contact-title">Call Us</div>
-                        <div class="contact-details">
-                            <a href="tel:+250798611161">+250 798 611 161</a>
-                        </div>
-                    </div>
+                        <div class="contact-details">+250 798 611 161</div>
+                    </a>
                     
-                    <div class="contact-item support">
+                    <a href="../conversations.php" class="contact-item support">
                         <div class="contact-icon support">
                             <i class="fas fa-comments"></i>
                         </div>
                         <div class="contact-title">Support Chat</div>
-                        <div class="contact-details">
-                            <a href="../conversations.php">Open Support Chat</a>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-item payment">
-                        <div class="contact-icon payment">
-                            <i class="fas fa-money-bill-wave"></i>
-                        </div>
-                        <div class="contact-title">Pay to this number</div>
-                        <div class="contact-details">+250 798 611 161</div>
-                    </div>
+                        <div class="contact-details">Open Support Chat</div>
+                    </a>
                 </div>
             </div>
 
             <div class="actions">
-                <a class="btn btn-whatsapp" href="https://wa.me/250798611161" target="_blank" rel="noopener">
+                    <a class="btn btn-whatsapp" href="<?php echo htmlspecialchars($waLink); ?>" target="_blank" rel="noopener">
                     <i class="fab fa-whatsapp"></i>
                     Open WhatsApp Chat
                 </a>
@@ -434,6 +541,64 @@ include('../config/session.php');
             </div>
         </div>
     </div>
+
+    <script>
+        // Detect if user is on mobile device
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                   (window.innerWidth <= 768);
+        }
+
+        // Initialize mobile/desktop specific features
+        document.addEventListener('DOMContentLoaded', function() {
+            const momoCode = document.getElementById('momo-code');
+            const momoLink = document.getElementById('momo-link');
+            const momoCard = document.getElementById('momo-card');
+            
+            if (isMobileDevice()) {
+                // Show clickable link for mobile users
+                if (momoCode) momoCode.style.display = 'none';
+                if (momoLink) momoLink.style.display = 'inline-flex';
+                if (momoCard) momoCard.href = 'tel:*182*8*1*021112*amount#';
+            } else {
+                // Show USSD code for desktop users
+                if (momoCode) momoCode.style.display = 'block';
+                if (momoLink) momoLink.style.display = 'none';
+                if (momoCard) momoCard.href = '#';
+                if (momoCard) momoCard.onclick = function(e) {
+                    e.preventDefault();
+                    // Copy USSD code to clipboard
+                    navigator.clipboard.writeText('*182*8*1*021112*amount#').then(function() {
+                        alert('USSD code copied to clipboard! Please dial this on your phone.');
+                    });
+                };
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const momoCode = document.getElementById('momo-code');
+            const momoLink = document.getElementById('momo-link');
+            const momoCard = document.getElementById('momo-card');
+            
+            if (isMobileDevice()) {
+                if (momoCode) momoCode.style.display = 'none';
+                if (momoLink) momoLink.style.display = 'inline-flex';
+                if (momoCard) momoCard.href = 'tel:*182*8*1*021112*amount#';
+            } else {
+                if (momoCode) momoCode.style.display = 'block';
+                if (momoLink) momoLink.style.display = 'none';
+                if (momoCard) momoCard.href = '#';
+                if (momoCard) momoCard.onclick = function(e) {
+                    e.preventDefault();
+                    // Copy USSD code to clipboard
+                    navigator.clipboard.writeText('*182*8*1*021112*amount#').then(function() {
+                        alert('USSD code copied to clipboard! Please dial this on your phone.');
+                    });
+                };
+            }
+        });
+    </script>
 </body>
 </html>
 
