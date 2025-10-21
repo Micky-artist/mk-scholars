@@ -659,7 +659,7 @@ function getStatusClass($status) {
             body { 
                 padding-top: 90px; 
             }
-            
+
             .main-container {
                 padding: 0.5rem;
             }
@@ -727,21 +727,21 @@ function getStatusClass($status) {
             <div class="error-container">
                 <div class="error-icon">
                     <i class="fas fa-exclamation-triangle"></i>
-                </div>
+                                        </div>
                 <h2 class="error-title">Something went wrong</h2>
                 <p class="error-message" id="errorMessage">We're having trouble loading the courses. Please try again.</p>
                 <button class="retry-button" onclick="retryLoadCourses()">
                     <i class="fas fa-refresh me-2"></i>Try Again
                 </button>
-            </div>
-        </div>
+                                    </div>
+                                </div>
 
         <!-- Loading Container -->
         <div id="loadingContainer" style="display: none;">
             <div class="loading-container">
                 <div class="loading-spinner"></div>
-            </div>
-        </div>
+                                        </div>
+                                    </div>
 
         <!-- PHP Error Display -->
         <?php if ($hasError): ?>
@@ -756,8 +756,8 @@ function getStatusClass($status) {
                 <button class="retry-button" onclick="location.reload()">
                     <i class="fas fa-refresh me-2"></i>Refresh Page
                 </button>
-            </div>
-        <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
 
         <!-- Courses Grid -->
         <div class="courses-grid" id="coursesGrid" <?php echo $hasError ? 'style="display: none;"' : ''; ?>>
@@ -794,7 +794,7 @@ function getStatusClass($status) {
                                         <!-- Single pricing option -->
                                         <div class="price-main">
                                             <?php echo formatPrice($course['pricingOptions'][0]['amount'], $course['pricingOptions'][0]['currencySymbol'], $course['pricingOptions'][0]['currency']); ?>
-                                        </div>
+                                </div>
                                         <p class="price-description">
                                             <?php echo htmlspecialchars($course['pricingOptions'][0]['pricingDescription'] ?? 'Complete Package'); ?>
                                         </p>
@@ -961,13 +961,13 @@ function getStatusClass($status) {
                 }
 
                 const originalText = button.innerHTML;
-                
-                // Add loading state
+                    
+                    // Add loading state
                 button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
                 button.disabled = true;
-
+                    
                 // Simulate processing delay
-                setTimeout(() => {
+                    setTimeout(() => {
                     try {
                         if (isLoggedIn) {
                             // Redirect to subscription page
@@ -1008,8 +1008,8 @@ function getStatusClass($status) {
                         const courseId = this.getAttribute('data-course-id');
                         const isLoggedIn = this.onclick.toString().includes('true');
                         enrollCourse(parseInt(courseId), isLoggedIn);
-                    });
                 });
+            });
 
                 // Add smooth scroll behavior
                 document.documentElement.style.scrollBehavior = 'smooth';
