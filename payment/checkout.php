@@ -2,7 +2,8 @@
 include('../dbconnection/connection.php');
 include('./config.php');
 
-session_start();
+// Use shared session configuration to ensure consistency across the app
+include('../config/session.php');
 
 // Prevent caching to avoid form resubmission issues
 header("Cache-Control: no-cache, no-store, must-revalidate");
@@ -75,21 +76,42 @@ if ($scholarshipId) {
   ];
 } else {
   // Course payment context
+  $subscriptionName = trim((string)$subscriptionName);
+
+  // Primary lookup: match by coursePaymentCodeName OR pricingDescription
   $pricingQuery = "SELECT cp.*, c.courseName, c.courseShortDescription, curr.currencySymbol 
                  FROM CoursePricing cp 
                  JOIN Courses c ON cp.courseId = c.courseId 
                  LEFT JOIN Currencies curr ON cp.currency = curr.currencyCode 
-                 WHERE cp.courseId = ? AND cp.coursePaymentCodeName = ? AND c.courseDisplayStatus = 1";
-$stmt = $conn->prepare($pricingQuery);
-$stmt->bind_param('is', $courseId, $subscriptionName);
-$stmt->execute();
-$result = $stmt->get_result();
-if ($result->num_rows === 0) {
-  http_response_code(404);
-  die('Course pricing not found or course not available.');
-}
-$pricingData = $result->fetch_assoc();
-$stmt->close();
+                 WHERE cp.courseId = ? 
+                   AND c.courseDisplayStatus = 1
+                   AND (cp.coursePaymentCodeName = ? OR cp.pricingDescription = ?)";
+  $stmt = $conn->prepare($pricingQuery);
+  $stmt->bind_param('iss', $courseId, $subscriptionName, $subscriptionName);
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  if ($result->num_rows === 0) {
+    // Fallback: pick the first available pricing for this course
+    if ($stmt) { $stmt->close(); }
+    $fallbackSql = "SELECT cp.*, c.courseName, c.courseShortDescription, curr.currencySymbol 
+                    FROM CoursePricing cp 
+                    JOIN Courses c ON cp.courseId = c.courseId 
+                    LEFT JOIN Currencies curr ON cp.currency = curr.currencyCode 
+                    WHERE cp.courseId = ? AND c.courseDisplayStatus = 1
+                    ORDER BY cp.amount ASC
+                    LIMIT 1";
+    $stmt = $conn->prepare($fallbackSql);
+    $stmt->bind_param('i', $courseId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows === 0) {
+      http_response_code(404);
+      die('Course pricing not found or course not available.');
+    }
+  }
+  $pricingData = $result->fetch_assoc();
+  $stmt->close();
 
   $finalAmount = floatval($pricingData['amount']);
 $currency = $pricingData['currency'];
@@ -308,6 +330,11 @@ $customer_email = htmlspecialchars($user['NoEmail'], ENT_QUOTES, 'UTF-8');
 $customer_name  = htmlspecialchars($user['NoUsername'], ENT_QUOTES, 'UTF-8');
 $transaction_id = 'TX-' . time() . '-' . ($scholarshipId ? ('S' . $scholarshipId) : $courseId);
 $userId = isset($_SESSION['userId']) ? (int)$_SESSION['userId'] : 0;
+
+// Build MoMo USSD variables (use final amount, no decimals)
+$ussdAmountInt = max(0, (int)round($finalAmount));
+$ussdCode = "*182*8*1*021112*{$ussdAmountInt}#";
+$telHref = "tel:*182*8*1*021112*{$ussdAmountInt}%23";
 
 // Build redirect URL (use hosted URL online, local URL in dev)
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
@@ -808,6 +835,69 @@ if ($shouldCreatePayment) {
       font-weight: 600;
     }
 
+    /* MoMo styles */
+    .momo-box {
+      background: var(--light-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px;
+    }
+    .momo-code {
+      text-align: center;
+    }
+    .ussd-code {
+      display: inline-block;
+      font-family: 'Courier New', monospace;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      background: #f8f9fa;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 2px dashed #ff6b35;
+      margin-bottom: 6px;
+      word-break: break-all;
+    }
+    .momo-note {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      display: block;
+    }
+    .momo-link {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #ff6b35, #e55a2b);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin-top: 6px;
+      text-align: center;
+    }
+    .momo-link:hover { color: #fff; }
+    .ussd-code-mobile {
+      display: block;
+      font-family: 'Courier New', monospace;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 6px 10px;
+      border-radius: 6px;
+      margin-bottom: 4px;
+      word-break: break-all;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    .momo-note-mobile {
+      color: rgba(255, 255, 255, 0.95);
+      font-size: 0.82rem;
+      display: block;
+    }
+
     @media (max-width: 480px) {
       .checkout-container {
         margin: 10px;
@@ -944,14 +1034,7 @@ if ($shouldCreatePayment) {
               <span class="price-label">Total Amount</span>
               <span class="price-amount"><?= number_format((float)$finalAmount, 0) ?> <?= htmlspecialchars($currencySymbol) ?></span>
             </div>
-            <?php if (isset($currency) && strtoupper($currency) !== 'RWF'): ?>
-              <div style="margin-top:10px;padding:10px;border-radius:8px;background:#fff7ed;border:1px solid #f59e0b;color:#b45309;font-size:0.95rem;">
-                <i class="fas fa-info-circle"></i>
-                Note: This pricing is in <?= htmlspecialchars($currency) ?>, not RWF. Please contact us before proceeding.
-                <a href="../conversations.php" style="margin-left:6px;color:#1e40af;text-decoration:underline;">Open Support Chat</a>
-                or call <a href="tel:+250798611161" style="color:#1e40af;text-decoration:underline;">+250 798 611 161</a>.
-              </div>
-            <?php endif; ?>
+            
             <?php if (!empty($appliedCoupon)): ?>
               <div class="discount-applied">
                 <i class="fas fa-ticket-alt"></i> 
@@ -987,6 +1070,23 @@ if ($shouldCreatePayment) {
               </button>
             </form>
           </div>
+
+        <!-- MoMo USSD Payment Option (mobile-friendly) -->
+        <div class="coupon-section" style="margin-top: 8px;">
+          <h3 class="coupon-label">
+            <i class="fas fa-mobile-alt"></i> Pay with MoMo (USSD)
+          </h3>
+          <div class="momo-box">
+            <div id="momo-code" class="momo-code">
+              <span class="ussd-code"><?= htmlspecialchars($ussdCode) ?></span>
+              <small class="momo-note">Copy and dial this code on your phone</small>
+            </div>
+            <a id="momo-link" class="momo-link" href="<?= htmlspecialchars($telHref) ?>" style="display:none;">
+              <span class="ussd-code-mobile"><?= htmlspecialchars($ussdCode) ?></span>
+              <small class="momo-note-mobile">Tap to dial this code</small>
+            </a>
+          </div>
+        </div>
 
           <!-- Payment Button -->
           <form method="post">
@@ -1051,6 +1151,35 @@ if ($shouldCreatePayment) {
         window.history.replaceState({}, document.title, cleanUrl);
       }
     }, 3000);
+
+    // Mobile vs desktop behavior for MoMo section
+    function isMobileDevice() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+             || (window.innerWidth <= 768);
+    }
+    function setupMomoUI() {
+      var momoCode = document.getElementById('momo-code');
+      var momoLink = document.getElementById('momo-link');
+      if (!momoCode || !momoLink) return;
+      if (isMobileDevice()) {
+        momoCode.style.display = 'none';
+        momoLink.style.display = 'inline-flex';
+      } else {
+        momoCode.style.display = 'block';
+        momoLink.style.display = 'none';
+        // Copy code on click for desktop
+        momoCode.onclick = function() {
+          var code = momoCode.querySelector('.ussd-code');
+          if (!code) return;
+          var text = code.textContent || code.innerText;
+          navigator.clipboard.writeText(text).then(function(){
+            alert('USSD code copied. Dial it on your phone.');
+          });
+        }
+      }
+    }
+    document.addEventListener('DOMContentLoaded', setupMomoUI);
+    window.addEventListener('resize', setupMomoUI);
   </script>
 
 </body>

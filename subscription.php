@@ -864,15 +864,14 @@ if (isset($_GET['checkout'])) {
         e.preventDefault();
                 return false;
             }
-            // Redirect to maintenance page instead of live checkout
+            // Redirect to normal checkout page
             var subCode = nameInput.value;
             var courseIdEl = document.getElementById('course-id');
             var cid = courseIdEl ? courseIdEl.value : '';
             if (cid && subCode) {
                 e.preventDefault();
-                // Pass the selected amount to the maintenance page for USSD prefill (remove decimals)
-                const amt = encodeURIComponent(amtInput.value ? Math.round(parseFloat(amtInput.value)).toString() : '');
-                const url = './payment/checkout-maintenance.php' + (amt ? ('?amount=' + amt) : '');
+                // Redirect to normal checkout with course and subscription parameters
+                const url = './payment/checkout.php?course=' + encodeURIComponent(cid) + '&subscription=' + encodeURIComponent(subCode);
                 window.location.href = url;
         return false;
       }
