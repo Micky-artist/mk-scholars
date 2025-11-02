@@ -368,66 +368,184 @@ if (!$courseData) {
 
     /* Pagination Controls */
     .pagination-controls {
-        background: #f8f9fa;
-        border: 1px solid #e9ecef;
-        border-radius: 8px;
-        padding: 1rem;
-        margin-top: 1rem;
+        background: var(--glass-bg, rgba(255, 255, 255, 0.9));
+        border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.3));
+        border-radius: 12px;
+        padding: 1.25rem 1.5rem;
+        margin-top: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(10px);
     }
 
     .pagination-controls .pagination-info {
         font-size: 0.9rem;
-        color: #6c757d;
+        color: var(--text-secondary, #6c757d);
+        font-weight: 500;
+        white-space: nowrap;
     }
 
     .pagination-controls .pagination-buttons {
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
     }
 
     .pagination-controls .page-numbers {
         display: flex;
-        gap: 0.25rem;
-    }
-
-    .pagination-controls .btn {
-        min-width: 40px;
-        height: 32px;
-        display: flex;
+        gap: 0.35rem;
+        flex-wrap: wrap;
         align-items: center;
+        max-width: 100%;
         justify-content: center;
     }
 
+    .pagination-controls .page-numbers .btn {
+        min-width: 38px;
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        padding: 0.375rem 0.75rem;
+    }
+
+    .pagination-controls .page-numbers .btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+    }
+
+    .pagination-controls .page-numbers .btn.btn-primary {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        border-color: #007bff;
+        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.4);
+    }
+
+    .pagination-controls .page-numbers .ellipsis {
+        padding: 0.375rem 0.5rem;
+        color: var(--text-secondary, #6c757d);
+        font-weight: 600;
+        user-select: none;
+        pointer-events: none;
+    }
+
+    .pagination-controls .btn-nav {
+        min-width: 100px;
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        padding: 0.5rem 1rem;
+        gap: 0.5rem;
+    }
+
+    .pagination-controls .btn-nav:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+    }
+
+    .pagination-controls .btn-nav:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
     .sections-pagination {
-        border-top: 1px solid #e9ecef;
-        padding-top: 1rem;
-        margin-top: 1rem;
+        border-top: 1px solid var(--glass-border, #e9ecef);
+        padding-top: 1.25rem;
+        margin-top: 1.5rem;
+        background: var(--glass-bg, rgba(255, 255, 255, 0.9));
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
     .sections-pagination .pagination-info {
-        font-size: 0.8rem;
-        color: #6c757d;
+        font-size: 0.85rem;
+        color: var(--text-secondary, #6c757d);
+        font-weight: 500;
+        white-space: nowrap;
     }
 
     .sections-pagination .pagination-buttons {
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
     }
 
     .sections-pagination .page-numbers {
         display: flex;
-        gap: 0.25rem;
+        gap: 0.3rem;
+        flex-wrap: wrap;
+        align-items: center;
+        max-width: 100%;
+        justify-content: center;
     }
 
-    .sections-pagination .btn {
-        min-width: 35px;
-        height: 28px;
-        display: flex;
+    .sections-pagination .page-numbers .btn {
+        min-width: 32px;
+        height: 32px;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
         font-size: 0.8rem;
+        font-weight: 600;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        padding: 0.25rem 0.5rem;
+    }
+
+    .sections-pagination .page-numbers .btn:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+    }
+
+    .sections-pagination .page-numbers .btn.btn-primary {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        border-color: #007bff;
+        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.4);
+    }
+
+    .sections-pagination .page-numbers .ellipsis {
+        padding: 0.25rem 0.4rem;
+        color: var(--text-secondary, #6c757d);
+        font-weight: 600;
+        user-select: none;
+        pointer-events: none;
+        font-size: 0.8rem;
+    }
+
+    .sections-pagination .btn-nav {
+        min-width: 85px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        padding: 0.375rem 0.75rem;
+        gap: 0.4rem;
+    }
+
+    .sections-pagination .btn-nav:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+    }
+
+    .sections-pagination .btn-nav:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 
     /* Break Section Styling */
@@ -464,22 +582,62 @@ if (!$courseData) {
 
     /* Responsive pagination */
     @media (max-width: 768px) {
+        .pagination-controls {
+            padding: 1rem;
+        }
+
         .pagination-controls .d-flex {
             flex-direction: column;
             gap: 1rem;
+            align-items: center;
         }
         
+        .pagination-controls .pagination-info {
+            text-align: center;
+        }
+
         .pagination-controls .pagination-buttons {
             justify-content: center;
+            width: 100%;
+        }
+
+        .pagination-controls .page-numbers {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .pagination-controls .btn-nav {
+            flex: 1;
+            min-width: auto;
         }
         
+        .sections-pagination {
+            padding: 0.875rem;
+        }
+
         .sections-pagination .d-flex {
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .sections-pagination .pagination-info {
+            text-align: center;
         }
         
         .sections-pagination .pagination-buttons {
             justify-content: center;
+            width: 100%;
+        }
+
+        .sections-pagination .page-numbers {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .sections-pagination .btn-nav {
+            flex: 1;
+            min-width: auto;
         }
     }
 </style>
@@ -895,6 +1053,58 @@ if (!$courseData) {
         let currentSectionsPage = 1;
         let sectionsPerPageList = 5; // Number of sections per page in the list
 
+        // Smart pagination function - generates page numbers with ellipsis
+        function generatePaginationNumbers(currentPage, totalPages, maxVisible = 7) {
+            const pages = [];
+            
+            if (totalPages <= maxVisible) {
+                // Show all pages if total is less than max visible
+                for (let i = 1; i <= totalPages; i++) {
+                    pages.push(i);
+                }
+            } else {
+                // Always show first page
+                pages.push(1);
+                
+                let startPage = Math.max(2, currentPage - 1);
+                let endPage = Math.min(totalPages - 1, currentPage + 1);
+                
+                // Adjust if we're near the beginning
+                if (currentPage <= 3) {
+                    endPage = Math.min(4, totalPages - 1);
+                }
+                
+                // Adjust if we're near the end
+                if (currentPage >= totalPages - 2) {
+                    startPage = Math.max(2, totalPages - 3);
+                }
+                
+                // Add ellipsis after first page if needed
+                if (startPage > 2) {
+                    pages.push('ellipsis-start');
+                }
+                
+                // Add middle pages
+                for (let i = startPage; i <= endPage; i++) {
+                    if (i !== 1 && i !== totalPages) {
+                        pages.push(i);
+                    }
+                }
+                
+                // Add ellipsis before last page if needed
+                if (endPage < totalPages - 1) {
+                    pages.push('ellipsis-end');
+                }
+                
+                // Always show last page
+                if (totalPages > 1) {
+                    pages.push(totalPages);
+                }
+            }
+            
+            return pages;
+        }
+
         // Change page function
         function changePage(page) {
             if (page < 1) return;
@@ -1198,34 +1408,38 @@ if (!$courseData) {
                     backdrop-filter: blur(10px);
                     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
                 `;
+                const pageNumbers = generatePaginationNumbers(page, totalPages, 7);
+                const pageNumbersHtml = pageNumbers.map(pageNum => {
+                    if (pageNum === 'ellipsis-start' || pageNum === 'ellipsis-end') {
+                        return `<span class="ellipsis">...</span>`;
+                    }
+                    const isActive = pageNum === page;
+                    return `<button class="btn btn-sm ${isActive ? 'btn-primary' : 'btn-outline-primary'}" 
+                                   onclick="changePage(${pageNum})">${pageNum}</button>`;
+                }).join('');
+
                 paginationDiv.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
                         <div class="pagination-info">
                             <span style="color: var(--text-secondary, #4b5563);">
                                 Page ${page} of ${totalPages} (${sectionsToShow.length} sections on this page)
                             </span>
                         </div>
                         <div class="pagination-buttons">
-                            <button class="btn btn-outline-primary btn-sm me-2" 
+                            <button class="btn btn-outline-primary btn-nav" 
                                     onclick="changePage(${page - 1})" 
-                                    ${page === 1 ? 'disabled' : ''}
-                                    style="border-radius: 8px; transition: all 0.2s ease;">
-                                <i class="fas fa-chevron-left me-1"></i>Previous
+                                    ${page === 1 ? 'disabled' : ''}>
+                                <i class="fas fa-chevron-left"></i>
+                                <span>Previous</span>
                             </button>
                             <span class="page-numbers">
-                                ${Array.from({length: totalPages}, (_, i) => {
-                                    const pageNum = i + 1;
-                                    const isActive = pageNum === page;
-                                    return `<button class="btn btn-sm me-1 ${isActive ? 'btn-primary' : 'btn-outline-primary'}" 
-                                                   onclick="changePage(${pageNum})"
-                                                   style="border-radius: 8px; transition: all 0.2s ease;">${pageNum}</button>`;
-                                }).join('')}
+                                ${pageNumbersHtml}
                             </span>
-                            <button class="btn btn-outline-primary btn-sm ms-2" 
+                            <button class="btn btn-outline-primary btn-nav" 
                                     onclick="changePage(${page + 1})" 
-                                    ${page === totalPages ? 'disabled' : ''}
-                                    style="border-radius: 8px; transition: all 0.2s ease;">
-                                Next<i class="fas fa-chevron-right ms-1"></i>
+                                    ${page === totalPages ? 'disabled' : ''}>
+                                <span>Next</span>
+                                <i class="fas fa-chevron-right"></i>
                             </button>
                         </div>
                     </div>
@@ -1521,31 +1735,38 @@ if (!$courseData) {
             if (totalPages > 1) {
                 const paginationDiv = document.createElement('div');
                 paginationDiv.className = 'sections-pagination mt-3';
+                const pageNumbers = generatePaginationNumbers(currentSectionsPage, totalPages, 7);
+                const pageNumbersHtml = pageNumbers.map(pageNum => {
+                    if (pageNum === 'ellipsis-start' || pageNum === 'ellipsis-end') {
+                        return `<span class="ellipsis">...</span>`;
+                    }
+                    const isActive = pageNum === currentSectionsPage;
+                    return `<button class="btn btn-sm ${isActive ? 'btn-primary' : 'btn-outline-primary'}" 
+                                   onclick="changeSectionsPage(${pageNum})">${pageNum}</button>`;
+                }).join('');
+
                 paginationDiv.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap">
                         <div class="pagination-info">
                             <span class="text-muted small">
                                 Page ${currentSectionsPage} of ${totalPages} (${sectionsToShow.length} sections on this page)
                             </span>
                         </div>
                         <div class="pagination-buttons">
-                            <button class="btn btn-outline-primary btn-sm me-2" 
+                            <button class="btn btn-outline-primary btn-nav" 
                                     onclick="changeSectionsPage(${currentSectionsPage - 1})" 
                                     ${currentSectionsPage === 1 ? 'disabled' : ''}>
-                                <i class="fas fa-chevron-left me-1"></i>Previous
+                                <i class="fas fa-chevron-left"></i>
+                                <span>Previous</span>
                             </button>
                             <span class="page-numbers">
-                                ${Array.from({length: totalPages}, (_, i) => {
-                                    const pageNum = i + 1;
-                                    const isActive = pageNum === currentSectionsPage;
-                                    return `<button class="btn btn-sm me-1 ${isActive ? 'btn-primary' : 'btn-outline-primary'}" 
-                                                   onclick="changeSectionsPage(${pageNum})">${pageNum}</button>`;
-                                }).join('')}
+                                ${pageNumbersHtml}
                             </span>
-                            <button class="btn btn-outline-primary btn-sm ms-2" 
+                            <button class="btn btn-outline-primary btn-nav" 
                                     onclick="changeSectionsPage(${currentSectionsPage + 1})" 
                                     ${currentSectionsPage === totalPages ? 'disabled' : ''}>
-                                Next<i class="fas fa-chevron-right ms-1"></i>
+                                <span>Next</span>
+                                <i class="fas fa-chevron-right"></i>
                             </button>
                         </div>
                     </div>

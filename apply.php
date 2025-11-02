@@ -198,6 +198,29 @@ function generatePaginationLink($page_num)
             --border-color: #374151;
         }
 
+        /* Dark mode form controls */
+        [data-theme="dark"] .form-control,
+        [data-theme="dark"] textarea.form-control,
+        [data-theme="dark"] input.form-control {
+            background-color: #1f2937;
+            border-color: #374151;
+            color: #f9fafb;
+        }
+
+        [data-theme="dark"] .form-control:focus,
+        [data-theme="dark"] textarea.form-control:focus,
+        [data-theme="dark"] input.form-control:focus {
+            background-color: #1f2937;
+            border-color: var(--primary-color);
+            color: #f9fafb;
+            box-shadow: 0 0 0 0.2rem rgba(14, 119, 194, 0.25);
+        }
+
+        [data-theme="dark"] .form-control::placeholder {
+            color: #9ca3af;
+            opacity: 1;
+        }
+
         body {
             background: var(--bg-primary);
             color: var(--text-primary);
@@ -535,6 +558,250 @@ function generatePaginationLink($page_num)
             color: #721c24;
         }
 
+        /* Application Notice Modal Styling */
+        .notice-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .notice-modal-overlay.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .application-notice-modal {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            max-width: 480px;
+            width: 90%;
+            max-height: 85vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        .application-notice-modal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            pointer-events: none;
+        }
+
+        .notice-modal-header {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .notice-modal-title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .notice-modal-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .notice-modal-icon i {
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .notice-modal-title {
+            color: white;
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .notice-modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .notice-modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .notice-modal-content {
+            padding: 1.5rem;
+            background: white;
+            max-height: calc(85vh - 80px);
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .notice-modal-item {
+            display: flex;
+            gap: 1rem;
+            padding: 0.875rem;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+            border-radius: 12px;
+            border-left: 3px solid #667eea;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        }
+
+        .notice-modal-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .notice-modal-item:hover {
+            transform: translateX(3px);
+            box-shadow: 0 3px 12px rgba(102, 126, 234, 0.15);
+            border-left-color: #764ba2;
+        }
+
+        .notice-modal-item-icon {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.25);
+        }
+
+        .notice-modal-item-icon i {
+            color: white;
+            font-size: 1rem;
+        }
+
+        .notice-modal-item-text {
+            flex: 1;
+        }
+
+        .notice-modal-item-text strong {
+            display: block;
+            color: #2d3748;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .notice-modal-item-text p {
+            margin: 0;
+            color: #4a5568;
+            line-height: 1.5;
+            font-size: 0.85rem;
+        }
+
+        /* Scrollbar styling for modal content */
+        .notice-modal-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .notice-modal-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .notice-modal-content::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .notice-modal-content::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+
+        @media (max-width: 768px) {
+            .application-notice-modal {
+                width: 95%;
+                max-height: 90vh;
+            }
+
+            .notice-modal-header {
+                padding: 0.875rem 1.25rem;
+            }
+
+            .notice-modal-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            .notice-modal-title {
+                font-size: 1rem;
+            }
+
+            .notice-modal-content {
+                padding: 1.25rem;
+            }
+
+            .notice-modal-item {
+                flex-direction: column;
+                gap: 0.75rem;
+                padding: 0.75rem;
+            }
+
+            .notice-modal-item-icon {
+                width: 32px;
+                height: 32px;
+                margin: 0 auto;
+            }
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .scholarships-grid {
@@ -600,7 +867,7 @@ function generatePaginationLink($page_num)
                             </div>
                             <div class="col-md-3 text-end">
                                 <div class="fee-badge">
-                                    $<?= $scholarshipData['amount'] ?>
+                                    RWF <?= number_format($scholarshipData['amount'], 0) ?>
                                 </div>
                             </div>
                         </div>
@@ -687,7 +954,7 @@ function generatePaginationLink($page_num)
                                                 <span><?php echo $s['scholarshipUpdateDate'] ?></span>
                                             </div>
                                             <div class="scholarship-fee">
-                                                $<?php echo $s['amount'] ?>
+                                                RWF <?php echo number_format($s['amount'], 0) ?>
                                             </div>
                                         </div>
                                     </div>
@@ -834,15 +1101,68 @@ function generatePaginationLink($page_num)
             window.location.href = 'apply';
         }
 
-        // Form Validation
-        document.getElementById('termsCheck')?.addEventListener('change', function() {
-            document.getElementById('submitBtn').disabled = !this.checked;
-        });
+        // Application Assistance Notice Modal - Wait for DOM to load
+        document.addEventListener('DOMContentLoaded', function() {
+            const noticeModal = document.getElementById('applicationNoticeModal');
+            const termsCheck = document.getElementById('termsCheck');
+            const submitBtn = document.getElementById('submitBtn');
 
-        document.getElementById('comments')?.addEventListener('input', function() {
-            const words = this.value.trim().split(/\s+/);
-            if (words.length > 200) {
-                this.value = words.slice(0, 200).join(' ');
+            if (!noticeModal || !termsCheck || !submitBtn) {
+                console.error('Modal elements not found');
+                return;
+            }
+
+            function openNoticeModal() {
+                if (noticeModal) {
+                    noticeModal.classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+
+            function closeNoticeModal() {
+                if (noticeModal) {
+                    noticeModal.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+            }
+
+            // Show modal when terms checkbox is checked
+            termsCheck.addEventListener('change', function() {
+                if (this.checked) {
+                    submitBtn.disabled = false;
+                    openNoticeModal();
+                } else {
+                    submitBtn.disabled = true;
+                }
+            });
+
+            // Close modal when clicking overlay
+            noticeModal.addEventListener('click', function(e) {
+                if (e.target === noticeModal) {
+                    closeNoticeModal();
+                }
+            });
+
+            // Close modal when clicking close button
+            const closeButton = document.querySelector('.notice-modal-close');
+            if (closeButton) {
+                closeButton.addEventListener('click', function() {
+                    closeNoticeModal();
+                });
+            }
+
+            // Form Validation - Initialize submit button state
+            submitBtn.disabled = !termsCheck.checked;
+
+            // Comments word limit
+            const commentsField = document.getElementById('comments');
+            if (commentsField) {
+                commentsField.addEventListener('input', function() {
+                    const words = this.value.trim().split(/\s+/);
+                    if (words.length > 200) {
+                        this.value = words.slice(0, 200).join(' ');
+                    }
+                });
             }
         });
 
@@ -881,6 +1201,61 @@ function generatePaginationLink($page_num)
             });
         });
     </script>
+
+    <!-- Application Assistance Notice Modal -->
+    <div class="notice-modal-overlay" id="applicationNoticeModal">
+        <div class="application-notice-modal" onclick="event.stopPropagation()">
+            <div class="notice-modal-header">
+                <div class="notice-modal-title-wrapper">
+                    <div class="notice-modal-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h5 class="notice-modal-title">Application Assistance Notice</h5>
+                </div>
+                <button type="button" class="notice-modal-close" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="notice-modal-content">
+                <div class="notice-modal-item">
+                    <div class="notice-modal-item-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="notice-modal-item-text">
+                        <strong>Requesting Support</strong>
+                        <p>You are now requesting support with this application process.</p>
+                    </div>
+                </div>
+                <div class="notice-modal-item">
+                    <div class="notice-modal-item-icon">
+                        <i class="fas fa-users-cog"></i>
+                    </div>
+                    <div class="notice-modal-item-text">
+                        <strong>Expert Guidance</strong>
+                        <p>Our team will provide full guidance throughout your application.</p>
+                    </div>
+                </div>
+                <div class="notice-modal-item">
+                    <div class="notice-modal-item-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div class="notice-modal-item-text">
+                        <strong>Flexible Payment</strong>
+                        <p>Please note that a service fee applies, payable in two installments.</p>
+                    </div>
+                </div>
+                <div class="notice-modal-item">
+                    <div class="notice-modal-item-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="notice-modal-item-text">
+                        <strong>Track Progress</strong>
+                        <p>You will also be able to track your application progress as we assist you.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 

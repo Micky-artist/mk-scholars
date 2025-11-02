@@ -705,6 +705,70 @@ if ($shouldCreatePayment) {
       background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
     }
 
+    /* Flutterwave Button Styles */
+    .flutterwave-btn {
+      background: linear-gradient(135deg, #00A1FF 0%, #0066CC 100%);
+      color: white;
+      border: none;
+      padding: 18px 28px;
+      border-radius: var(--radius-md);
+      font-size: 1.15rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      box-shadow: 0 4px 15px rgba(0, 161, 255, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .flutterwave-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .flutterwave-btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .flutterwave-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 161, 255, 0.4);
+      background: linear-gradient(135deg, #0088E6 0%, #0052A3 100%);
+    }
+
+    .flutterwave-logo {
+      height: 24px;
+      width: auto;
+      object-fit: contain;
+      filter: brightness(0) invert(1);
+      position: relative;
+      z-index: 1;
+    }
+
+    .flutterwave-btn span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .flutterwave-btn i {
+      position: relative;
+      z-index: 1;
+    }
+
     .loading-section {
       text-align: center;
       padding: 40px 24px;
@@ -835,12 +899,33 @@ if ($shouldCreatePayment) {
       font-weight: 600;
     }
 
-    /* MoMo styles */
+    /* MTN MoMo styles */
     .momo-box {
-      background: var(--light-bg);
-      border: 1px solid var(--border-color);
+      background: linear-gradient(135deg, #ffcc00 0%, #ffd700 100%);
+      border: 2px solid #ffa500;
       border-radius: var(--radius-md);
-      padding: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(255, 204, 0, 0.3);
+    }
+    .momo-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    .mtn-logo {
+      height: 32px;
+      width: auto;
+      object-fit: contain;
+    }
+    .mtn-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #000000;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
     }
     .momo-code {
       text-align: center;
@@ -848,54 +933,65 @@ if ($shouldCreatePayment) {
     .ussd-code {
       display: inline-block;
       font-family: 'Courier New', monospace;
-      font-size: 1rem;
+      font-size: 1.1rem;
       font-weight: 700;
-      color: var(--text-primary);
-      background: #f8f9fa;
-      padding: 8px 12px;
+      color: #000000;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 12px 16px;
       border-radius: 8px;
-      border: 2px dashed #ff6b35;
-      margin-bottom: 6px;
+      border: 2px dashed #000000;
+      margin-bottom: 8px;
       word-break: break-all;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
     .momo-note {
-      color: var(--text-secondary);
-      font-size: 0.85rem;
+      color: #000000;
+      font-size: 0.9rem;
       display: block;
+      font-weight: 500;
+      opacity: 0.85;
     }
     .momo-link {
       display: inline-flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #ff6b35, #e55a2b);
-      color: white;
-      padding: 10px 16px;
+      background: linear-gradient(135deg, #ffcc00 0%, #ffd700 100%);
+      color: #000000;
+      padding: 14px 20px;
       border-radius: 8px;
       text-decoration: none;
-      font-weight: 600;
+      font-weight: 700;
       transition: all 0.3s ease;
-      margin-top: 6px;
+      margin-top: 8px;
       text-align: center;
+      border: 2px solid #000000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      width: 100%;
     }
-    .momo-link:hover { color: #fff; }
+    .momo-link:hover { 
+      color: #000000;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
     .ussd-code-mobile {
       display: block;
       font-family: 'Courier New', monospace;
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       font-weight: 700;
-      color: #fff;
-      background: rgba(255, 255, 255, 0.2);
-      padding: 6px 10px;
+      color: #000000;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 10px 14px;
       border-radius: 6px;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
       word-break: break-all;
-      border: 2px solid rgba(255, 255, 255, 0.3);
+      border: 2px solid #000000;
     }
     .momo-note-mobile {
-      color: rgba(255, 255, 255, 0.95);
-      font-size: 0.82rem;
+      color: #000000;
+      font-size: 0.9rem;
       display: block;
+      font-weight: 600;
     }
 
     @media (max-width: 480px) {
@@ -924,6 +1020,40 @@ if ($shouldCreatePayment) {
         left: 16px;
         width: 36px;
         height: 36px;
+      }
+
+      .flutterwave-btn {
+        padding: 16px 24px;
+        font-size: 1.05rem;
+      }
+
+      .flutterwave-logo {
+        height: 20px;
+      }
+
+      .momo-box {
+        padding: 16px;
+      }
+
+      .mtn-logo {
+        height: 28px;
+      }
+
+      .mtn-title {
+        font-size: 1.05rem;
+      }
+
+      .ussd-code {
+        font-size: 1rem;
+        padding: 10px 14px;
+      }
+
+      .momo-link {
+        padding: 12px 18px;
+      }
+
+      .ussd-code-mobile {
+        font-size: 1rem;
       }
     }
   </style>
@@ -1047,7 +1177,7 @@ if ($shouldCreatePayment) {
           <!-- Coupon Section -->
           <div class="coupon-section">
             <h3 class="coupon-label">
-              <i class="fas fa-ticket-alt"></i> Have a Coupon?
+              <i class="fas fa-ticket-alt"></i> Have a Coupon? (Optional)
             </h3>
             
             <?php if (!empty($couponMsg)): ?>
@@ -1071,12 +1201,16 @@ if ($shouldCreatePayment) {
             </form>
           </div>
 
-        <!-- MoMo USSD Payment Option (mobile-friendly) -->
+        <!-- MTN MoMo USSD Payment Option (mobile-friendly) -->
         <div class="coupon-section" style="margin-top: 8px;">
           <h3 class="coupon-label">
-            <i class="fas fa-mobile-alt"></i> Pay with MoMo (USSD)
+            <i class="fas fa-mobile-alt"></i> Pay with MTN MoMo
           </h3>
           <div class="momo-box">
+            <div class="momo-header">
+              <img src="https://www.mtn.com/wp-content/uploads/2019/08/mtn-logo.png" alt="MTN Logo" class="mtn-logo" onerror="this.style.display='none';">
+              <span class="mtn-title">MTN Mobile Money</span>
+            </div>
             <div id="momo-code" class="momo-code">
               <span class="ussd-code"><?= htmlspecialchars($ussdCode) ?></span>
               <small class="momo-note">Copy and dial this code on your phone</small>
@@ -1091,8 +1225,10 @@ if ($shouldCreatePayment) {
           <!-- Payment Button -->
           <form method="post">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>" />
-            <button class="payment-btn" type="submit" name="continue_to_pay" value="1">
-              <i class="fas fa-lock"></i> Continue to Secure Payment
+            <button class="payment-btn flutterwave-btn" type="submit" name="continue_to_pay" value="1">
+              <img src="https://flutterwave.com/images/flutterwave-logo.svg" alt="Flutterwave" class="flutterwave-logo" onerror="this.style.display='none';">
+              <span>Pay with Flutterwave</span>
+              <i class="fas fa-lock"></i>
             </button>
           </form>
 

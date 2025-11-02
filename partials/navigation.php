@@ -70,9 +70,11 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 				<li class="nav-item">
 					<a href="./driving-school" class="nav-link">Driving School</a>
 				</li>
-				<li class="nav-item dropdown">
-					<a href="#" class="nav-link dropdown-toggle">More</a>
-					<ul class="dropdown-menu">
+			<li class="nav-item dropdown">
+				<button type="button" class="nav-link dropdown-toggle" id="nav-more-toggle" aria-haspopup="true" aria-expanded="false" aria-controls="nav-more-menu">
+						More
+					</button>
+				<ul class="dropdown-menu" id="nav-more-menu" role="menu">
 						<li><a href="./about-us#contact" class="dropdown-link">Contact Us</a></li>
 						<li><a href="./about-us" class="dropdown-link">About Us</a></li>
 						<li><a href="./faq" class="dropdown-link">FAQ</a></li>
@@ -353,6 +355,10 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 	padding: 10px 0;
 	transition: color 0.3s ease;
 	position: relative;
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-family: inherit;
 }
 
 .nav-link:hover {
@@ -371,6 +377,15 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 }
 
 .nav-link:hover::after {
+	width: 100%;
+}
+
+.nav-link:focus {
+	outline: none;
+	color: #0E77C2;
+}
+
+.nav-link:focus::after {
 	width: 100%;
 }
 
@@ -403,10 +418,32 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 	transform: translateY(0);
 }
 
-.dropdown-menu.active {
+.dropdown.open .dropdown-menu {
 	opacity: 1;
 	visibility: visible;
 	transform: translateY(0);
+}
+
+.dropdown:focus-within .dropdown-menu {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0);
+}
+
+.dropdown:focus-within .dropdown-toggle {
+	color: #0E77C2;
+}
+
+.dropdown:focus-within .dropdown-toggle::after {
+	width: 100%;
+}
+
+.dropdown.open .dropdown-toggle {
+	color: #0E77C2;
+}
+
+.dropdown.open .dropdown-toggle::after {
+	width: 100%;
 }
 
 .dropdown-link {
@@ -420,15 +457,6 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 .dropdown-link:hover {
 	background: linear-gradient(135deg, rgba(14, 119, 194, 0.1) 0%, rgba(8, 51, 82, 0.05) 100%);
 	color: #0E77C2;
-}
-
-/* Dropdown toggle active state */
-.dropdown-toggle.active {
-	color: #0E77C2;
-}
-
-.dropdown-toggle.active::after {
-	width: 100%;
 }
 
 /* Right Side Styles */
@@ -674,32 +702,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	const mobileNavOverlay = document.getElementById('mobile-nav-overlay');
 	const mobileClose = document.getElementById('mobile-close');
 
-	// Support multiple dropdown toggles/menus if present
-	const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-	const dropdownMenus = document.querySelectorAll('.dropdown-menu');
-	
-	dropdownToggles.forEach(function(tgl) {
-		const menu = tgl.parentElement.querySelector('.dropdown-menu');
-		if (!menu) return;
-		
-		tgl.addEventListener('click', function(e) {
-			e.preventDefault();
-			e.stopPropagation();
-			menu.classList.toggle('active');
-		});
-	});
-
-	// Close when clicking outside
-	document.addEventListener('click', function(e) {
-		dropdownMenus.forEach(function(menu) { menu.classList.remove('active'); });
-	});
-
-	// Close on escape and resize
-	document.addEventListener('keydown', function(e) {
-		if (e.key === 'Escape') dropdownMenus.forEach(function(menu){ menu.classList.remove('active'); });
-	});
-	window.addEventListener('resize', function(){ dropdownMenus.forEach(function(menu){ menu.classList.remove('active'); }); });
-
 	// Open mobile menu
 	if (hamburgerMenu) {
 		hamburgerMenu.addEventListener('click', function() {
@@ -722,6 +724,42 @@ document.addEventListener('DOMContentLoaded', function() {
 			if (e.target === mobileNavOverlay) {
 				mobileNavOverlay.classList.remove('active');
 				document.body.style.overflow = '';
+			}
+		});
+	}
+
+	// Desktop "More" dropdown toggle support
+	const dropdown = document.querySelector('.nav-item.dropdown');
+	const dropdownToggle = document.getElementById('nav-more-toggle');
+	const dropdownMenu = document.getElementById('nav-more-menu');
+
+	const closeDropdown = () => {
+		if (!dropdown || !dropdownToggle) {
+			return;
+		}
+		dropdown.classList.remove('open');
+		dropdownToggle.setAttribute('aria-expanded', 'false');
+	};
+
+	if (dropdown && dropdownToggle && dropdownMenu) {
+		dropdownToggle.addEventListener('click', function(e) {
+			e.preventDefault();
+			const isOpen = dropdown.classList.toggle('open');
+			dropdownToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+		});
+
+		document.addEventListener('click', function(e) {
+			if (!dropdown.contains(e.target)) {
+				closeDropdown();
+			}
+		});
+
+		document.addEventListener('keydown', function(e) {
+			if (e.key === 'Escape' || e.key === 'Esc') {
+				if (dropdown.classList.contains('open')) {
+					closeDropdown();
+					dropdownToggle.focus();
+				}
 			}
 		});
 	}

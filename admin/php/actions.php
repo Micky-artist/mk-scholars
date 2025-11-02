@@ -69,6 +69,12 @@ if (isset($_GET['i']) && !empty($_GET['i']) && is_numeric($_GET['i']) &&
     // Handle different actions using prepared statements
     switch ($action) {
         case "publishScholarship":
+            // Check if admin has PublishApplication permission
+            if (!hasPermission('PublishApplication')) {
+                echo '<script>alert("You do not have permission to publish applications."); window.location.href="../applications";</script>';
+                exit;
+            }
+            
             // Get the scholarship title first
             $scholarshipTitle = getScholarshipTitle($conn, $id);
             
@@ -77,13 +83,19 @@ if (isset($_GET['i']) && !empty($_GET['i']) && is_numeric($_GET['i']) &&
             if ($stmt->execute()) {
                 logScholarshipAction($conn, "Published Scholarship", $id, $scholarshipTitle, $adminId);
                 $stmt->close();
-                header("Location: ../scholarships");
+                header("Location: ../applications");
                 exit;
             }
             $stmt->close();
             break;
             
         case "unPublishScholarship":
+            // Check if admin has PublishApplication permission
+            if (!hasPermission('PublishApplication')) {
+                echo '<script>alert("You do not have permission to unpublish applications."); window.location.href="../applications";</script>';
+                exit;
+            }
+            
             // Get the scholarship title first
             $scholarshipTitle = getScholarshipTitle($conn, $id);
             
@@ -92,7 +104,7 @@ if (isset($_GET['i']) && !empty($_GET['i']) && is_numeric($_GET['i']) &&
             if ($stmt->execute()) {
                 logScholarshipAction($conn, "Unpublished Scholarship", $id, $scholarshipTitle, $adminId);
                 $stmt->close();
-                header("Location: ../scholarships");
+                header("Location: ../applications");
                 exit;
             }
             $stmt->close();
@@ -129,6 +141,12 @@ if (isset($_GET['i']) && !empty($_GET['i']) && is_numeric($_GET['i']) &&
             break;
             
         case "deleteScholarship":
+            // Check if admin has DeleteApplication permission
+            if (!hasPermission('DeleteApplication')) {
+                echo '<script>alert("You do not have permission to delete applications."); window.location.href="../applications";</script>';
+                exit;
+            }
+            
             // First retrieve the scholarship information safely
             $stmt = $conn->prepare("SELECT scholarshipId, scholarshipTitle, scholarshipImage FROM scholarships WHERE scholarshipId = ?");
             $stmt->bind_param("i", $id);
@@ -160,7 +178,7 @@ if (isset($_GET['i']) && !empty($_GET['i']) && is_numeric($_GET['i']) &&
                 if ($stmt->execute()) {
                     logScholarshipAction($conn, "Deleted Scholarship", $id, $scholarshipTitle, $adminId);
                     $stmt->close();
-                    echo '<script>alert("Scholarship \"' . htmlspecialchars($scholarshipTitle) . '\" has been successfully deleted"); window.location.href="../scholarships";</script>';
+                    echo '<script>alert("Scholarship \"' . htmlspecialchars($scholarshipTitle) . '\" has been successfully deleted"); window.location.href="../applications";</script>';
                     exit;
                 }
                 $stmt->close();

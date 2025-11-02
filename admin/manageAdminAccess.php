@@ -6,86 +6,15 @@ if (!hasPermission('ManageRights')) {
 }
 
 
-if(isset($_GET['Deactivate'])){
-  $Deactivate = $_GET['Deactivate'];
-  $updateUserStatus = mysqli_query($conn,"UPDATE users SET status = 0 WHERE userId = $Deactivate");
-  if($updateUserStatus){
-    echo '<script>
-          window.location.href="manage-access";
-          </script>';
-  }
-}
-if(isset($_GET['Activate'])){
-  $Activate = $_GET['Activate'];
-  $updateUserStatus = mysqli_query($conn,"UPDATE users SET status = 1 WHERE userId = $Activate");
-  if($updateUserStatus){
-    echo '<script>
-          window.location.href="manage-access";
-          </script>';
-  }
-}
+// Note: Activate/Deactivate actions are now handled in manage-access.php BEFORE HTML output
+// This prevents "headers already sent" errors
 
 
 // Check super admin status (implement proper authentication)
 $_SESSION['is_super_admin'] = true;
 
-
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_SESSION['is_super_admin']) {
-  $adminId = $_POST['adminId'];
-  $rights = [];
-  foreach ($_POST as $key => $value) {
-    if ($key !== 'adminId') {
-      $rights[$key] = isset($_POST[$key]) ? 1 : 0;
-    }
-  }
-
-  // Check if the admin already has rights
-  $checkSql = "SELECT * FROM AdminRights WHERE AdminId = $adminId";
-  $checkResult = $conn->query($checkSql);
-
-  if ($checkResult->num_rows > 0) {
-
-    $updateSql = "UPDATE AdminRights SET " .
-      implode(', ', array_map(function ($k) use ($rights) {
-        return "$k = {$rights[$k]}";
-      }, array_keys($rights))) .
-      " WHERE AdminId = $adminId"; // Added space before WHERE
-
-    if ($conn->query($updateSql)) {
-      $_SESSION['flash'] = 'Rights updated successfully!';
-      echo '<script>
-          window.location.href="manage-access";
-          </script>';
-    } else {
-      $_SESSION['flash'] = "Error: " . $conn->error;
-      echo '<script>
-          window.location.href="manage-access";
-          </script>';
-    }
-  } else {
-    // Insert new rights
-    $columns = implode(', ', array_keys($rights));
-    $values = implode(', ', array_values($rights));
-    $insertSql = "INSERT INTO AdminRights (AdminId, $columns) VALUES ($adminId, $values)";
-    if ($conn->query($insertSql)) {
-      $_SESSION['flash'] = 'Rights created successfully!';
-
-      echo '<script>
-          window.location.href="manage-access";
-          </script>';
-          // unset($_SESSION['flash']);
-    } else {
-      echo '<script>
-          window.location.href="manage-access";
-          </script>';
-      // $_SESSION['flash'] = "Error: " . $conn->error;
-    }
-  }
-
-  header("Location: " . $_SERVER['REQUEST_URI']);
-  exit;
-}
+// Note: Form submission is now handled in manage-access.php BEFORE HTML output
+// This prevents "headers already sent" errors
 // Fetch all admins and their rights
 $admins = [];
 $sql = "SELECT u.userId, u.username, u.email, u.status, ar.* 
@@ -287,9 +216,25 @@ if ($result->num_rows > 0) {
         document.getElementById('modalAdminId').value = adminId;
 
         // Fetch and load modal content
-        const response = await fetch(`./php/get_admin_rights.php?adminId=${adminId}`);
-        const data = await response.text();
-        modalBody.innerHTML = data;
+        try {
+          const response = await fetch(`./php/get_admin_rights.php?adminId=${adminId}`);
+          if (!response.ok) {
+            throw new Error('Failed to load admin rights');
+          }
+          const data = await response.text();
+          modalBody.innerHTML = data;
+          
+          // Re-initialize toggle switches after content is loaded
+          const toggles = modalBody.querySelectorAll('input[type="checkbox"]');
+          toggles.forEach(toggle => {
+            toggle.addEventListener('change', function() {
+              this.setAttribute('value', this.checked ? '1' : '');
+            });
+          });
+        } catch (error) {
+          console.error('Error loading admin rights:', error);
+          modalBody.innerHTML = '<div class="alert alert-danger">Error loading admin rights. Please try again.</div>';
+        }
       });
 
       // Handle click on permission pills
@@ -309,16 +254,27 @@ if ($result->num_rows > 0) {
           });
 
           if (result.isConfirmed) {
-            // Send AJAX request to remove the right
-            const response = await fetch(`./php/remove_right.php?adminId=${adminId}&right=${right}`);
-            const data = await response.json();
+            try {
+              // Send AJAX request to remove the right
+              const response = await fetch(`./php/remove_right.php?adminId=${adminId}&right=${right}`);
+              const data = await response.json();
 
-            if (data.success) {
-              Swal.fire('Success!', `The "${right}" right has been removed.`, 'success');
-              // Remove the pill from the UI
-              e.target.remove();
-            } else {
-              Swal.fire('Error!', 'Failed to remove the right.', 'error');
+              if (data.success) {
+                Swal.fire({
+                  title: 'Success!',
+                  text: `The "${right}" right has been removed.`,
+                  icon: 'success',
+                  confirmButtonText: 'OK'
+                }).then(() => {
+                  // Reload the page to refresh the UI
+                  location.reload();
+                });
+              } else {
+                Swal.fire('Error!', data.message || 'Failed to remove the right.', 'error');
+              }
+            } catch (error) {
+              console.error('Error removing right:', error);
+              Swal.fire('Error!', 'An error occurred while removing the right.', 'error');
             }
           }
         }

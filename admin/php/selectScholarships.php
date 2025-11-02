@@ -134,18 +134,23 @@ if (!$selectScholarships) {
                                     </div>
 
                                     <div class="btn-group gap-2">
-                                        <a href="edit-scholarship?edit=true&i=<?= $getScholarships['scholarshipId'] ?>&n=<?= urlencode($getScholarships['scholarshipTitle']) ?>" 
-                                           class="btn btn-outline-primary btn-sm" 
-                                           target="_blank">
-                                           <i class="fas fa-edit"></i> Edit
-                                        </a>
-
+                                        <?php if (hasPermission('ViewApplications')): ?>
                                         <a href="https://www.mkscholars.com/scholarship-details-preview?scholarship-id=<?= $getScholarships['scholarshipId']?>&scholarship-title=<?= urlencode($getScholarships['scholarshipTitle'])?>" 
                                            class="btn btn-primary btn-sm" 
                                            target="_blank">
                                            <i class="fas fa-eye"></i> View
                                         </a>
+                                        <?php endif; ?>
+                                        
+                                        <?php if (hasPermission('EditApplication')): ?>
+                                        <a href="edit-scholarship?edit=true&i=<?= $getScholarships['scholarshipId'] ?>&n=<?= urlencode($getScholarships['scholarshipTitle']) ?>" 
+                                           class="btn btn-outline-primary btn-sm" 
+                                           target="_blank">
+                                           <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <?php endif; ?>
 
+                                        <?php if (hasPermission('PublishApplication')): ?>
                                         <?php if ($getScholarships['scholarshipStatus'] == 0) { ?>
                                             <a href="#" 
                                                class="btn btn-outline-success btn-sm publish-btn" 
@@ -161,13 +166,16 @@ if (!$selectScholarships) {
                                                <i class="fas fa-times"></i> Unpublish
                                             </a>
                                         <?php } ?>
+                                        <?php endif; ?>
 
+                                        <?php if (hasPermission('DeleteApplication')): ?>
                                         <a href="#" 
                                            class="btn btn-outline-danger btn-sm delete-btn" 
                                            data-id="<?= $getScholarships['scholarshipId'] ?>" 
                                            data-title="<?= $getScholarships['scholarshipTitle'] ?>">
                                            <i class="fas fa-trash"></i> Delete
                                         </a>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>

@@ -1,5 +1,37 @@
 <?php
 include("./dbconnection/connection.php");
+session_start();
+
+// Load admin session and permissions if admin is logged in
+$isAdmin = false;
+$adminPermissions = [];
+
+if (isset($_SESSION['adminId']) && isset($_SESSION['AdminName'])) {
+    include("./admin/dbconnections/connection.php");
+    include("./admin/php/validateAdminSession.php");
+    $isAdmin = true;
+    
+    // Get admin permissions
+    if (isset($access) && is_array($access)) {
+        foreach ($access as $right) {
+            $adminPermissions[] = $right;
+        }
+    }
+}
+
+// Helper function to check admin permission
+function hasAdminPermission($permissionName) {
+    global $isAdmin, $adminPermissions;
+    if (!$isAdmin || empty($adminPermissions)) {
+        return false;
+    }
+    foreach ($adminPermissions as $right) {
+        if (isset($right[$permissionName]) && $right[$permissionName] == 1) {
+            return true;
+        }
+    }
+    return false;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -241,7 +273,10 @@ include("./dbconnection/connection.php");
 													<span><?php echo $s['scholarshipUpdateDate'] ?></span>
 												</div>
 												<div class="card-actions">
-									<a href="apply?scholarshipId=<?php echo $s['scholarshipId']; ?>" class="apply-button">
+									<a href="apply?scholarshipId=<?php echo $s['scholarshipId']; ?>" 
+													   class="apply-button ask-help-btn" 
+													   data-scholarship-id="<?php echo $s['scholarshipId']; ?>"
+													   data-details-url="scholarship-details?scholarship-id=<?php echo $s['scholarshipId'] ?>&scholarship-title=<?php echo preg_replace('/\s+/', '-', $s['scholarshipTitle']) ?>">
 														<span>Ask Help</span>
 														<div class="button-hover-effect"></div>
 													</a>
@@ -1037,10 +1072,436 @@ include("./dbconnection/connection.php");
 									margin-top: 20px;
 								}
 							}
+
+							/* Eligibility Notice Modal Styles */
+							.eligibility-modal-overlay {
+								display: none;
+								position: fixed;
+								top: 0;
+								left: 0;
+								right: 0;
+								bottom: 0;
+								background: rgba(0, 0, 0, 0.6);
+								backdrop-filter: blur(5px);
+								z-index: 9999;
+								align-items: center;
+								justify-content: center;
+								animation: fadeIn 0.3s ease;
+								padding: 1rem;
+								overflow-y: auto;
+							}
+
+							.eligibility-modal-overlay.show {
+								display: flex;
+							}
+
+							@keyframes fadeIn {
+								from { opacity: 0; }
+								to { opacity: 1; }
+							}
+
+							@keyframes slideUp {
+								from {
+									opacity: 0;
+									transform: translateY(30px) scale(0.95);
+								}
+								to {
+									opacity: 1;
+									transform: translateY(0) scale(1);
+								}
+							}
+
+							.eligibility-modal {
+								background: white;
+								border-radius: 20px;
+								max-width: 550px;
+								width: 100%;
+								max-height: 90vh;
+								overflow-y: auto;
+								box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+								position: relative;
+								animation: slideUp 0.3s ease;
+								margin: auto;
+								display: flex;
+								flex-direction: column;
+							}
+
+							.eligibility-modal-header {
+								background: linear-gradient(135deg, #0E77C2 0%, #083352 100%);
+								padding: 2rem 1.5rem;
+								display: flex;
+								align-items: center;
+								gap: 1rem;
+								color: white;
+								flex-shrink: 0;
+							}
+
+							.eligibility-modal-icon {
+								width: 60px;
+								height: 60px;
+								background: rgba(255, 255, 255, 0.2);
+								border-radius: 12px;
+								display: flex;
+								align-items: center;
+								justify-content: center;
+								backdrop-filter: blur(10px);
+								flex-shrink: 0;
+							}
+
+							.eligibility-modal-icon i {
+								font-size: 1.75rem;
+								color: white;
+							}
+
+							.eligibility-modal-title {
+								flex: 1;
+								margin: 0;
+								font-weight: 700;
+								font-size: 2.25rem;
+								line-height: 1.3;
+							}
+
+							.eligibility-modal-close {
+								background: rgba(255, 255, 255, 0.2);
+								border: none;
+								width: 40px;
+								height: 40px;
+								border-radius: 8px;
+								color: white;
+								cursor: pointer;
+								display: flex;
+								align-items: center;
+								justify-content: center;
+								transition: all 0.2s ease;
+								backdrop-filter: blur(10px);
+								flex-shrink: 0;
+							}
+
+							.eligibility-modal-close:hover {
+								background: rgba(255, 255, 255, 0.3);
+								transform: rotate(90deg);
+							}
+
+							.eligibility-modal-close i {
+								font-size: 1.1rem;
+							}
+
+							.eligibility-modal-content {
+								padding: 2.5rem 2rem;
+								text-align: center;
+								flex: 1;
+								display: flex;
+								flex-direction: column;
+								justify-content: center;
+							}
+
+							.eligibility-question {
+								font-size: 2.25rem;
+								font-weight: 700;
+								color: #2d3748;
+								margin-bottom: 1.25rem;
+								line-height: 1.4;
+							}
+
+							.eligibility-message {
+								font-size: 1.6rem;
+								color: #4a5568;
+								line-height: 1.7;
+								margin: 0;
+							}
+
+							.eligibility-modal-footer {
+								padding: 2rem 1.5rem;
+								background: #f8f9fa;
+								display: flex;
+								flex-direction: column;
+								gap: 0.875rem;
+								border-top: 1px solid #e0e0e0;
+								flex-shrink: 0;
+							}
+
+							.eligibility-btn {
+								padding: 1.5rem 2.5rem;
+								border-radius: 12px;
+								font-weight: 600;
+								font-size: 1.6rem;
+								text-decoration: none;
+								display: flex;
+								align-items: center;
+								justify-content: center;
+								transition: all 0.3s ease;
+								border: none;
+								cursor: pointer;
+								width: 100%;
+							}
+
+							.eligibility-btn i {
+								margin-right: 0.5rem;
+								font-size: 1.7rem;
+							}
+
+							.eligibility-btn-primary {
+								background: linear-gradient(135deg, #0E77C2 0%, #083352 100%);
+								color: white;
+								box-shadow: 0 4px 15px rgba(14, 119, 194, 0.3);
+							}
+
+							.eligibility-btn-primary:hover {
+								transform: translateY(-2px);
+								box-shadow: 0 6px 20px rgba(14, 119, 194, 0.4);
+							}
+
+							.eligibility-btn-secondary {
+								background: white;
+								color: #0E77C2;
+								border: 2px solid #0E77C2;
+							}
+
+							.eligibility-btn-secondary:hover {
+								background: #0E77C2;
+								color: white;
+								transform: translateY(-2px);
+							}
+
+							.eligibility-btn-close {
+								background: #e0e0e0;
+								color: #4a5568;
+							}
+
+							.eligibility-btn-close:hover {
+								background: #cbd5e0;
+								transform: translateY(-2px);
+							}
+
+							/* Tablet styles */
+							@media (max-width: 992px) {
+								.eligibility-modal {
+									max-width: 500px;
+								}
+
+								.eligibility-modal-header {
+									padding: 1.75rem 1.5rem;
+								}
+
+								.eligibility-modal-content {
+									padding: 2rem 1.75rem;
+								}
+
+								.eligibility-question {
+									font-size: 1.9rem;
+								}
+
+								.eligibility-message {
+									font-size: 1.45rem;
+								}
+
+								.eligibility-modal-title {
+									font-size: 1.9rem;
+								}
+
+								.eligibility-btn {
+									font-size: 1.4rem;
+									padding: 1.25rem 2rem;
+								}
+
+								.eligibility-btn i {
+									font-size: 1.5rem;
+								}
+							}
+
+							/* Mobile styles */
+							@media (max-width: 768px) {
+								.eligibility-modal-overlay {
+									padding: 0.75rem;
+								}
+
+								.eligibility-modal {
+									width: 100%;
+									max-width: 100%;
+									max-height: 95vh;
+									border-radius: 16px;
+									margin: 0;
+								}
+
+								.eligibility-modal-header {
+									padding: 1.5rem 1.25rem;
+								}
+
+								.eligibility-modal-icon {
+									width: 50px;
+									height: 50px;
+								}
+
+								.eligibility-modal-icon i {
+									font-size: 1.5rem;
+								}
+
+								.eligibility-modal-title {
+									font-size: 1.3rem;
+								}
+
+								.eligibility-modal-close {
+									width: 36px;
+									height: 36px;
+								}
+
+								.eligibility-modal-content {
+									padding: 1.75rem 1.5rem;
+								}
+
+								.eligibility-question {
+									font-size: 1.75rem;
+									margin-bottom: 1rem;
+								}
+
+								.eligibility-message {
+									font-size: 1.35rem;
+									line-height: 1.6;
+								}
+
+								.eligibility-modal-title {
+									font-size: 1.8rem;
+								}
+
+								.eligibility-modal-footer {
+									padding: 1.5rem 1.25rem;
+									gap: 0.75rem;
+								}
+
+								.eligibility-btn {
+									padding: 1.15rem 1.75rem;
+									font-size: 1.3rem;
+								}
+
+								.eligibility-btn i {
+									font-size: 1.4rem;
+								}
+							}
+
+							/* Small mobile styles */
+							@media (max-width: 480px) {
+								.eligibility-modal-overlay {
+									padding: 0.5rem;
+								}
+
+								.eligibility-modal {
+									border-radius: 12px;
+								}
+
+								.eligibility-modal-header {
+									padding: 1.25rem 1rem;
+								}
+
+								.eligibility-modal-icon {
+									width: 45px;
+									height: 45px;
+								}
+
+								.eligibility-modal-icon i {
+									font-size: 1.3rem;
+								}
+
+								.eligibility-modal-title {
+									font-size: 1.15rem;
+								}
+
+								.eligibility-modal-close {
+									width: 32px;
+									height: 32px;
+								}
+
+								.eligibility-modal-content {
+									padding: 1.5rem 1.25rem;
+								}
+
+								.eligibility-question {
+									font-size: 1.5rem;
+									margin-bottom: 0.875rem;
+								}
+
+								.eligibility-message {
+									font-size: 1.25rem;
+								}
+
+								.eligibility-modal-title {
+									font-size: 1.55rem;
+								}
+
+								.eligibility-modal-footer {
+									padding: 1.25rem 1rem;
+								}
+
+								.eligibility-btn {
+									padding: 1rem 1.5rem;
+									font-size: 1.2rem;
+								}
+
+								.eligibility-btn i {
+									font-size: 1.3rem;
+								}
+							}
+
+							/* Very small screens */
+							@media (max-width: 360px) {
+								.eligibility-modal-title {
+									font-size: 1.4rem;
+								}
+
+								.eligibility-question {
+									font-size: 1.4rem;
+								}
+
+								.eligibility-message {
+									font-size: 1.2rem;
+								}
+
+								.eligibility-btn {
+									padding: 0.9rem 1.25rem;
+									font-size: 1.15rem;
+								}
+
+								.eligibility-btn i {
+									font-size: 1.25rem;
+								}
+							}
 						</style>
 
 						<!-- End of row div -->
 
+
+						<!-- Eligibility Notice Modal -->
+						<div class="eligibility-modal-overlay" id="eligibilityModal">
+							<div class="eligibility-modal" onclick="event.stopPropagation()">
+								<div class="eligibility-modal-header">
+									<div class="eligibility-modal-icon">
+										<i class="fas fa-info-circle"></i>
+									</div>
+									<h4 class="eligibility-modal-title">Check Your Eligibility</h4>
+									<button type="button" class="eligibility-modal-close" aria-label="Close">
+										<i class="fas fa-times"></i>
+									</button>
+								</div>
+								<div class="eligibility-modal-content">
+									<p class="eligibility-question">
+										Have you checked your eligibility for this application?
+									</p>
+									<p class="eligibility-message">
+										Please make sure you meet all the requirements before proceeding with the application assistance request.
+									</p>
+								</div>
+								<div class="eligibility-modal-footer">
+									<button type="button" class="eligibility-btn eligibility-btn-primary" id="proceedBtn">
+										<i class="fas fa-check-circle me-2"></i>Proceed
+									</button>
+									<a href="#" class="eligibility-btn eligibility-btn-secondary" id="readApplicationBtn">
+										<i class="fas fa-file-alt me-2"></i>Read Application
+									</a>
+									<button type="button" class="eligibility-btn eligibility-btn-close" id="closeModalBtn">
+										<i class="fas fa-times me-2"></i>Close
+									</button>
+								</div>
+							</div>
+						</div>
 
 						<!-- Modern Pagination -->
 						<?php if ($total_pages > 1): ?>
@@ -1210,6 +1671,7 @@ include("./dbconnection/connection.php");
 		</button>
 
 
+
 		<!-- Js File_________________________________ -->
 
 		<!-- j Query -->
@@ -1250,6 +1712,76 @@ include("./dbconnection/connection.php");
 			
 			return true;
 		}
+
+		// Eligibility Notice Modal Handler
+		document.addEventListener('DOMContentLoaded', function() {
+			const eligibilityModal = document.getElementById('eligibilityModal');
+			const proceedBtn = document.getElementById('proceedBtn');
+			const readApplicationBtn = document.getElementById('readApplicationBtn');
+			const closeModalBtn = document.getElementById('closeModalBtn');
+			const closeBtn = document.querySelector('.eligibility-modal-close');
+			let currentApplyUrl = '';
+			let currentDetailsUrl = '';
+
+			function openEligibilityModal(applyUrl, detailsUrl) {
+				currentApplyUrl = applyUrl;
+				currentDetailsUrl = detailsUrl;
+				if (eligibilityModal) {
+					eligibilityModal.classList.add('show');
+					document.body.style.overflow = 'hidden';
+					readApplicationBtn.href = detailsUrl;
+				}
+			}
+
+			function closeEligibilityModal() {
+				if (eligibilityModal) {
+					eligibilityModal.classList.remove('show');
+					document.body.style.overflow = '';
+					currentApplyUrl = '';
+					currentDetailsUrl = '';
+				}
+			}
+
+			// Handle Ask Help button clicks
+			document.querySelectorAll('.ask-help-btn').forEach(btn => {
+				btn.addEventListener('click', function(e) {
+					e.preventDefault();
+					const scholarshipId = this.getAttribute('data-scholarship-id');
+					const detailsUrl = this.getAttribute('data-details-url');
+					const applyUrl = `apply?scholarshipId=${scholarshipId}`;
+					openEligibilityModal(applyUrl, detailsUrl);
+				});
+			});
+
+			// Proceed button - go to application page
+			if (proceedBtn) {
+				proceedBtn.addEventListener('click', function() {
+					if (currentApplyUrl) {
+						window.location.href = currentApplyUrl;
+					}
+				});
+			}
+
+			// Read Application button - handled by href in link
+			// Close button
+			if (closeModalBtn) {
+				closeModalBtn.addEventListener('click', closeEligibilityModal);
+			}
+
+			// Close icon button
+			if (closeBtn) {
+				closeBtn.addEventListener('click', closeEligibilityModal);
+			}
+
+			// Close modal when clicking overlay
+			if (eligibilityModal) {
+				eligibilityModal.addEventListener('click', function(e) {
+					if (e.target === eligibilityModal) {
+						closeEligibilityModal();
+					}
+				});
+			}
+		});
 
 		// Add smooth scrolling to pagination links
 		document.addEventListener('DOMContentLoaded', function() {

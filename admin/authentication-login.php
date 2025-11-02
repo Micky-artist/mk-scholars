@@ -75,7 +75,7 @@ include("./php/login.php");
 
     .input-group input {
       width: 100%;
-      padding: 12px 12px 12px 40px;
+      padding: 12px 64px 12px 40px; /* extra right space to avoid Safari autofill/clear icons overlap */
       border: none;
       border-radius: 10px;
       background: #fff;
@@ -126,6 +126,32 @@ include("./php/login.php");
     .footer-text a:hover {
       text-decoration: underline;
     }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.03);
+      border: none;
+      color: #777;
+      cursor: pointer;
+      padding: 0;
+      border-radius: 8px;
+      z-index: 20; /* keep above input and browser UI overlays */
+    }
+
+    .toggle-password i { font-size: 1rem; }
+
+    .toggle-password:hover {
+      color: #333;
+      background: rgba(0,0,0,0.08);
+    }
   </style>
 </head>
 
@@ -145,7 +171,10 @@ include("./php/login.php");
         </div>
         <div class="input-group">
           <i class="fas fa-lock"></i>
-          <input type="password" class="form-control" placeholder="Password" name="password" required>
+          <input type="password" id="admin-password" class="form-control" placeholder="Password" name="password" required>
+          <button type="button" class="toggle-password" aria-label="Show password" aria-pressed="false" data-target="#admin-password">
+            <i class="fas fa-eye"></i>
+          </button>
         </div>
         <button class="btn-login" name="submit">Login</button>
       </form>
@@ -161,6 +190,25 @@ include("./php/login.php");
   <script src="./assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     $(".preloader").fadeOut();
+    document.addEventListener('DOMContentLoaded', function() {
+      var toggles = document.querySelectorAll('.toggle-password');
+      toggles.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var targetSelector = btn.getAttribute('data-target');
+          var input = document.querySelector(targetSelector);
+          if (!input) return;
+          var isPassword = input.getAttribute('type') === 'password';
+          input.setAttribute('type', isPassword ? 'text' : 'password');
+          btn.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
+          btn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+          var icon = btn.querySelector('i');
+          if (icon) {
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+          }
+        });
+      });
+    });
   </script>
 </body>
 

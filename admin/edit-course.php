@@ -30,6 +30,48 @@ if (!$course) {
     exit;
 }
 
+// Handle image removal
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_image'])) {
+    $courseId = isset($_POST['courseId']) ? (int)$_POST['courseId'] : 0;
+    if ($courseId > 0) {
+        // Get current course photo path
+        $courseQuery = "SELECT coursePhoto FROM Courses WHERE courseId = $courseId";
+        $courseResult = mysqli_query($conn, $courseQuery);
+        if ($courseResult && $course = mysqli_fetch_assoc($courseResult)) {
+            $photoPath = $course['coursePhoto'];
+            
+            // Delete file if exists
+            if ($photoPath && file_exists('./' . $photoPath)) {
+                @unlink('./' . $photoPath);
+            }
+            
+            // Update database to remove photo path
+            $updateQuery = "UPDATE Courses SET coursePhoto = '' WHERE courseId = $courseId";
+            if (mysqli_query($conn, $updateQuery)) {
+                // Refresh course data
+                $courseQuery = "SELECT * FROM Courses WHERE courseId = $courseId";
+                $courseResult = mysqli_query($conn, $courseQuery);
+                $course = mysqli_fetch_assoc($courseResult);
+                
+                // Refresh pricing data
+                $pricings = [];
+                $pricingRes = mysqli_query($conn, "SELECT * FROM CoursePricing WHERE courseId = $courseId ORDER BY coursePricingId ASC");
+                if ($pricingRes) {
+                    while ($row = mysqli_fetch_assoc($pricingRes)) {
+                        $pricings[] = $row;
+                    }
+                }
+                
+                $message = 'Image removed successfully!';
+                $messageType = 'success';
+            } else {
+                $message = 'Error removing image from database: ' . mysqli_error($conn);
+                $messageType = 'error';
+            }
+        }
+    }
+}
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update_course'])) {
@@ -545,10 +587,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         function removeCurrentImage() {
-            if (confirm('Are you sure you want to remove the current image?')) {
-                // This would need server-side handling to remove the file
-                currentImage.style.display = 'none';
-                imageUploadArea.style.display = 'block';
+            if (confirm('Are you sure you want to remove the current image? This action cannot be undone.')) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = window.location.href;
+                
+                const courseIdInput = document.createElement('input');
+                courseIdInput.type = 'hidden';
+                courseIdInput.name = 'courseId';
+                courseIdInput.value = <?php echo $courseId; ?>;
+                form.appendChild(courseIdInput);
+                
+                const removeImageInput = document.createElement('input');
+                removeImageInput.type = 'hidden';
+                removeImageInput.name = 'remove_image';
+                removeImageInput.value = '1';
+                form.appendChild(removeImageInput);
+                
+                document.body.appendChild(form);
+                form.submit();
             }
         }
 

@@ -713,10 +713,12 @@ if (!empty($courses)) {
                                                     <li><a class="dropdown-item" href="course-discussion.php?id=<?php echo $course['courseId']; ?>">
                                                         <i class="fas fa-comments me-2"></i>Discussion Board
                                                     </a></li>
+                                                    <?php if (hasPermission('DeleteApplication')): ?>
                                                     <li><hr class="dropdown-divider"></li>
                                                     <li><a class="dropdown-item text-danger" href="#" onclick="deleteCourse(<?php echo $course['courseId']; ?>)">
                                                         <i class="fas fa-trash me-2"></i>Delete Course
                                                     </a></li>
+                                                    <?php endif; ?>
                                                 </ul>
                                             </div>
                                         </div>
@@ -972,25 +974,30 @@ if (!empty($courses)) {
         function deleteCourse(courseId) {
             if (confirm('Are you sure you want to delete this course? This action cannot be undone. This will also delete the discussion board and all messages.')) {
                 // Delete course and related data
-                fetch('php/delete-course.php', {
+                fetch('./php/delete-course.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
                     body: 'courseId=' + courseId
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.success) {
                         alert('Course deleted successfully!');
                         location.reload();
                     } else {
-                        alert('Error deleting course: ' + data.message);
+                        alert('Error deleting course: ' + (data.message || 'Unknown error'));
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Error deleting course');
+                    alert('Error deleting course: ' + error.message);
                 });
             }
         }

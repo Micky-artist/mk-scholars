@@ -10,6 +10,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// Check if admin has DeleteApplication permission
+if (!hasPermission('DeleteApplication')) {
+    echo json_encode(['success' => false, 'message' => 'You do not have permission to delete courses.']);
+    exit;
+}
+
 $courseId = isset($_POST['courseId']) ? (int)$_POST['courseId'] : 0;
 
 if (!$courseId) {
@@ -28,6 +34,27 @@ try {
     $deleteDiscussionsStmt->execute();
     $deleteDiscussionsStmt->close();
     
+    // Delete course files
+    $deleteFilesQuery = "DELETE FROM CourseFiles WHERE courseId = ?";
+    $deleteFilesStmt = $conn->prepare($deleteFilesQuery);
+    $deleteFilesStmt->bind_param("i", $courseId);
+    $deleteFilesStmt->execute();
+    $deleteFilesStmt->close();
+    
+    // Delete course lessons
+    $deleteLessonsQuery = "DELETE FROM CourseLessons WHERE courseId = ?";
+    $deleteLessonsStmt = $conn->prepare($deleteLessonsQuery);
+    $deleteLessonsStmt->bind_param("i", $courseId);
+    $deleteLessonsStmt->execute();
+    $deleteLessonsStmt->close();
+    
+    // Delete course tags
+    $deleteTagsQuery = "DELETE FROM CourseTags WHERE courseId = ?";
+    $deleteTagsStmt = $conn->prepare($deleteTagsQuery);
+    $deleteTagsStmt->bind_param("i", $courseId);
+    $deleteTagsStmt->execute();
+    $deleteTagsStmt->close();
+    
     // Delete course enrollments
     $deleteEnrollmentsQuery = "DELETE FROM CourseEnrollments WHERE courseId = ?";
     $deleteEnrollmentsStmt = $conn->prepare($deleteEnrollmentsQuery);
@@ -41,6 +68,13 @@ try {
     $deletePricingStmt->bind_param("i", $courseId);
     $deletePricingStmt->execute();
     $deletePricingStmt->close();
+    
+    // Delete subscription records related to this course
+    $deleteSubscriptionsQuery = "DELETE FROM subscription WHERE Item = ?";
+    $deleteSubscriptionsStmt = $conn->prepare($deleteSubscriptionsQuery);
+    $deleteSubscriptionsStmt->bind_param("i", $courseId);
+    $deleteSubscriptionsStmt->execute();
+    $deleteSubscriptionsStmt->close();
     
     // Delete the course
     $deleteCourseQuery = "DELETE FROM Courses WHERE courseId = ?";
