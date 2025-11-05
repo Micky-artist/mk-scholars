@@ -595,7 +595,7 @@ if (!$courseData) {
         .pagination-controls .pagination-info {
             text-align: center;
         }
-
+        
         .pagination-controls .pagination-buttons {
             justify-content: center;
             width: 100%;
@@ -614,7 +614,7 @@ if (!$courseData) {
         .sections-pagination {
             padding: 0.875rem;
         }
-
+        
         .sections-pagination .d-flex {
             flex-direction: column;
             gap: 0.75rem;

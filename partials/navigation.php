@@ -68,9 +68,9 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 					<a href="./writing-services" class="nav-link">Writting Services</a>
 				</li>
 				<li class="nav-item">
-					<a href="./driving-school" class="nav-link">Driving School</a>
+					<a href="https://driving.mkscholars.com/en" target="_blank" class="nav-link">Driving School</a>
 				</li>
-			<li class="nav-item dropdown">
+				<li class="nav-item dropdown">
 				<button type="button" class="nav-link dropdown-toggle" id="nav-more-toggle" aria-haspopup="true" aria-expanded="false" aria-controls="nav-more-menu">
 						More
 					</button>
@@ -140,7 +140,7 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 					<a href="./writing-services" class="mobile-nav-link">Writting Services</a>
 				</li>
 				<li class="mobile-nav-item">
-					<a href="./driving-school" class="mobile-nav-link">Driving School</a>
+					<a href="https://driving.mkscholars.com/en" target="_blank"  class="mobile-nav-link">Driving School</a>
 				</li>
 				<li class="mobile-nav-item">
 					<a href="./about-us" class="mobile-nav-link">About Us</a>

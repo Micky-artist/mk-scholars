@@ -217,12 +217,12 @@ if ($result->num_rows > 0) {
 
         // Fetch and load modal content
         try {
-          const response = await fetch(`./php/get_admin_rights.php?adminId=${adminId}`);
+        const response = await fetch(`./php/get_admin_rights.php?adminId=${adminId}`);
           if (!response.ok) {
             throw new Error('Failed to load admin rights');
           }
-          const data = await response.text();
-          modalBody.innerHTML = data;
+        const data = await response.text();
+        modalBody.innerHTML = data;
           
           // Re-initialize toggle switches after content is loaded
           const toggles = modalBody.querySelectorAll('input[type="checkbox"]');
@@ -255,11 +255,11 @@ if ($result->num_rows > 0) {
 
           if (result.isConfirmed) {
             try {
-              // Send AJAX request to remove the right
-              const response = await fetch(`./php/remove_right.php?adminId=${adminId}&right=${right}`);
-              const data = await response.json();
+            // Send AJAX request to remove the right
+            const response = await fetch(`./php/remove_right.php?adminId=${adminId}&right=${right}`);
+            const data = await response.json();
 
-              if (data.success) {
+            if (data.success) {
                 Swal.fire({
                   title: 'Success!',
                   text: `The "${right}" right has been removed.`,
@@ -269,7 +269,7 @@ if ($result->num_rows > 0) {
                   // Reload the page to refresh the UI
                   location.reload();
                 });
-              } else {
+            } else {
                 Swal.fire('Error!', data.message || 'Failed to remove the right.', 'error');
               }
             } catch (error) {

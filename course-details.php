@@ -97,14 +97,53 @@ function getStatusClass($status) {
 
 // Check if user is logged in
 $isLoggedIn = isset($_SESSION['userId']);
+
+// Build course image URL for Open Graph
+$courseImageUrl = '';
+if (!empty($course['coursePhoto'])) {
+    $courseImageUrl = getImageUrl($course['coursePhoto']);
+    // Ensure absolute URL for Open Graph
+    if (!empty($courseImageUrl) && strpos($courseImageUrl, 'http') !== 0) {
+        $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? 'mkscholars.com';
+        // Handle relative paths (local development)
+        if (strpos($courseImageUrl, './admin/') === 0) {
+            // For local: admin.mkscholars.com or localhost
+            $courseImageUrl = 'https://admin.mkscholars.com/' . str_replace('./admin/', '', $courseImageUrl);
+        } else {
+            $courseImageUrl = $protocol . '://' . $host . '/' . ltrim($courseImageUrl, './');
+        }
+    }
+}
+
+// Build absolute course URL for Open Graph
+$protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+$host = $_SERVER['HTTP_HOST'] ?? 'mkscholars.com';
+$courseUrl = $protocol . '://' . $host . $_SERVER['REQUEST_URI'];
+
+// Fallback image if no course image
+if (empty($courseImageUrl)) {
+    $courseImageUrl = 'https://mkscholars.com/images/logo/logoRound.png';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title><?php echo htmlspecialchars($course['courseName']); ?> - Course Details</title>
+    <title><?php echo htmlspecialchars($course['courseName']); ?> - Course Details | MK Scholars</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="<?php echo htmlspecialchars($course['courseShortDescription'] ?? $course['courseDescription'] ?? 'Course details'); ?>">
+    
+    <!-- Open Graph metadata for social sharing -->
+    <meta property="og:title" content="<?php echo htmlspecialchars($course['courseName']); ?> - MK Scholars" />
+    <meta property="og:description" content="<?php echo htmlspecialchars($course['courseShortDescription'] ?? $course['courseDescription'] ?? 'Course details'); ?>" />
+    <meta property="og:image" content="<?php echo htmlspecialchars($courseImageUrl); ?>" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="<?php echo htmlspecialchars($courseUrl); ?>" />
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="shortcut icon" href="https://mkscholars.com/images/logo/logoRound.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

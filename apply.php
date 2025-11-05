@@ -1158,9 +1158,9 @@ function generatePaginationLink($page_num)
             const commentsField = document.getElementById('comments');
             if (commentsField) {
                 commentsField.addEventListener('input', function() {
-                    const words = this.value.trim().split(/\s+/);
-                    if (words.length > 200) {
-                        this.value = words.slice(0, 200).join(' ');
+            const words = this.value.trim().split(/\s+/);
+            if (words.length > 200) {
+                this.value = words.slice(0, 200).join(' ');
                     }
                 });
             }
