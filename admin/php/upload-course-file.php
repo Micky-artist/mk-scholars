@@ -16,6 +16,13 @@ error_reporting(E_ALL);
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
+// Increase upload limits for this endpoint (subject to server policy)
+@ini_set('upload_max_filesize', '50M');
+@ini_set('post_max_size', '55M');
+@ini_set('memory_limit', '256M');
+@ini_set('max_execution_time', '300');
+@ini_set('max_input_time', '300');
+
 // Log upload attempts
 error_log("Upload attempt - Course ID: $courseId, File Type: $fileType, File Name: " . ($_FILES['file']['name'] ?? 'N/A'));
 
@@ -102,11 +109,11 @@ if (!in_array($fileExtension, $allowedTypes)) {
     exit;
 }
 
-// Validate file size (10MB max)
-$maxSize = 10 * 1024 * 1024; // 10MB
+// Validate file size (50MB max)
+$maxSize = 50 * 1024 * 1024; // 50MB
 if ($fileSize > $maxSize) {
     ob_clean();
-    echo json_encode(['success' => false, 'message' => 'File size too large. Maximum size is 10MB']);
+    echo json_encode(['success' => false, 'message' => 'File size too large. Maximum size is 50MB']);
     exit;
 }
 

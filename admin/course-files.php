@@ -285,6 +285,7 @@ $filesResult = mysqli_query($conn, $filesQuery);
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
         const filesList = document.getElementById('filesList');
+        const MAX_SIZE_BYTES = 50 * 1024 * 1024; // 50MB client-side cap
 
         // File type filtering
         document.querySelectorAll('input[name="fileType"]').forEach(radio => {
@@ -328,6 +329,24 @@ $filesResult = mysqli_query($conn, $filesQuery);
 
         function uploadFiles(files) {
             Array.from(files).forEach(file => {
+                // Client-side size validation to avoid unnecessary uploads
+                if (file.size > MAX_SIZE_BYTES) {
+                    const fileCard = document.createElement('div');
+                    fileCard.className = 'file-card';
+                    fileCard.innerHTML = `
+                        <div class="d-flex align-items-center">
+                            <div class="file-icon file">
+                                <i class="fas fa-exclamation-circle text-warning"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">${file.name}</h6>
+                                <small class="text-warning">File too large. Maximum allowed size is 50MB.</small>
+                            </div>
+                        </div>
+                    `;
+                    filesList.insertBefore(fileCard, filesList.firstChild);
+                    return;
+                }
                 uploadFile(file);
             });
         }

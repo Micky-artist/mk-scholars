@@ -142,6 +142,36 @@ if ($conn) {
     }
 }
 
+// Helpers to construct course image URLs
+function isLocalHost() {
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    return strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false;
+}
+
+function getBaseDomain($host) {
+    $host = strtolower($host ?? '');
+    if (strpos($host, '://') !== false) {
+        $host = parse_url($host, PHP_URL_HOST) ?? $host;
+    }
+    $host = preg_replace('/^www\./', '', $host);
+    $host = preg_replace('/^admin\./', '', $host);
+    return $host;
+}
+
+function getCourseImageUrl($storedPath) {
+    if (!$storedPath) return '';
+    $relativePath = ltrim($storedPath, '/');
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    if (isLocalHost()) {
+        // Local: admin lives inside project
+        return './admin/' . $relativePath;
+    }
+    // Online: admin is a subdomain
+    $domain = getBaseDomain($host);
+    $adminHost = 'admin.' . $domain;
+    return 'https://' . $adminHost . '/' . $relativePath;
+}
+
 // Helper function to get button info based on enrollment and payment status
 function getButtonInfo($course, $isLoggedIn) {
     if (!$isLoggedIn) {
@@ -699,6 +729,21 @@ function formatFileSize($bytes) {
             min-height: 260px;
         }
 
+.course-cover {
+    width: 100%;
+    height: 160px;
+    background: #f3f4f6;
+    border-bottom: 1px solid var(--glass-border);
+    position: relative;
+    overflow: hidden;
+}
+.course-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
         .course-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
@@ -710,6 +755,8 @@ function formatFileSize($bytes) {
             flex: 1;
             display: flex;
             flex-direction: column;
+            /* Extra top padding so badges don't overlap title */
+            padding-top: 2.25rem;
         }
 
         .course-badge {
@@ -1117,6 +1164,17 @@ function formatFileSize($bytes) {
                     <?php if (!empty($courses)): ?>
                         <?php foreach ($courses as $course): ?>
                             <div class="course-card" data-course-id="<?php echo $course['courseId']; ?>" data-enrolled="<?php echo ($course['isEnrolled'] || $course['isPaid']) ? 'true' : 'false'; ?>">
+                        <?php 
+                            $imageUrl = '';
+                            if (!empty($course['coursePhoto'])) {
+                                $imageUrl = getCourseImageUrl($course['coursePhoto']);
+                            }
+                        ?>
+                        <?php if ($imageUrl): ?>
+                        <div class="course-cover">
+                            <img src="<?php echo htmlspecialchars($imageUrl); ?>" alt="<?php echo htmlspecialchars($course['courseName']); ?>">
+                        </div>
+                        <?php endif; ?>
                         <div class="course-header">
                             <div class="course-badge <?php echo $course['courseDisplayStatus'] == 1 ? 'open' : 'closed'; ?>">
                                 <?php echo $course['courseDisplayStatus'] == 1 ? 'Open' : 'Closed'; ?>
@@ -1141,10 +1199,12 @@ function formatFileSize($bytes) {
                                     <i class="fas fa-flag-checkered meta-icon"></i>
                                     <span>Ends: <?php echo date('M j, Y', strtotime($course['courseEndDate'])); ?></span>
                                 </div>
+                                <?php if (!empty($course['courseRegEndDate'])): ?>
                                 <div class="meta-item">
                                     <i class="fas fa-calendar-times meta-icon"></i>
                                     <span>Register by: <?php echo date('M j, Y', strtotime($course['courseRegEndDate'])); ?></span>
                                 </div>
+                                <?php endif; ?>
                             </div>
                                     </div>
                                     
