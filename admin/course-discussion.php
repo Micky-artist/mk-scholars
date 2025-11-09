@@ -125,6 +125,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $updateStmt->close();
     }
+    
+    if (isset($_POST['update_discussion'])) {
+        $discussionId = (int)$_POST['discussionId'];
+        $messageTitle = mysqli_real_escape_string($conn, $_POST['messageTitle']);
+        $messageBody = mysqli_real_escape_string($conn, $_POST['messageBody']);
+        $isPinned = isset($_POST['isPinned']) ? 1 : 0;
+        
+        $updateQuery = "UPDATE DiscussionBoard SET messageTitle = ?, messageBody = ?, isPinned = ? WHERE discussionId = ?";
+        $updateStmt = $conn->prepare($updateQuery);
+        $updateStmt->bind_param("ssii", $messageTitle, $messageBody, $isPinned, $discussionId);
+        
+        if ($updateStmt->execute()) {
+            header("Location: course-discussion.php?id=" . $courseId . "&status=updated");
+            exit;
+        } else {
+            $message = 'Error updating discussion: ' . mysqli_error($conn);
+            $messageType = 'danger';
+        }
+        $updateStmt->close();
+    }
 }
 
 // Pagination setup
@@ -166,6 +186,20 @@ $discussionsStmt->execute();
 $discussionsResult = $discussionsStmt->get_result();
 $discussions = $discussionsResult->fetch_all(MYSQLI_ASSOC);
 $discussionsStmt->close();
+
+// Helper: safely escape then linkify URLs and convert newlines to <br>
+if (!function_exists('linkifyAndEscape')) {
+    function linkifyAndEscape($text) {
+        $escaped = htmlspecialchars($text ?? '');
+        // Linkify URLs (http/https)
+        $escaped = preg_replace(
+            '~(https?://[^\s<]+)~i',
+            '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>',
+            $escaped
+        );
+        return nl2br($escaped);
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -570,6 +604,12 @@ $discussionsStmt->close();
                                             </button>
                                             <ul class="dropdown-menu">
                                                 <li>
+                                                    <button type="button" class="dropdown-item" onclick='openEditModal(<?php echo json_encode($discussion, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>)'>
+                                                        <i class="fas fa-edit me-2"></i>Edit
+                                                    </button>
+                                                </li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
                                                     <form method="POST" class="d-inline">
                                                         <input type="hidden" name="discussionId" value="<?php echo $discussion['discussionId']; ?>">
                                                         <input type="hidden" name="isPinned" value="<?php echo $discussion['isPinned'] ? '0' : '1'; ?>">
@@ -597,7 +637,7 @@ $discussionsStmt->close();
                                 </div>
 
                                 <div class="discussion-body">
-                                    <?php echo nl2br(htmlspecialchars($discussion['messageBody'])); ?>
+                                    <?php echo linkifyAndEscape($discussion['messageBody']); ?>
                                 </div>
 
                                 <div class="discussion-meta"></div>
@@ -653,6 +693,17 @@ $discussionsStmt->close();
                             <label for="messageBody" class="form-label">Message</label>
                             <textarea class="form-control" id="messageBody" name="messageBody" rows="6" required></textarea>
                         </div>
+                        <!-- Insert Link Helper -->
+                        <div class="mb-2">
+                            <label class="form-label">Insert Link</label>
+                            <div class="input-group">
+                                <input type="url" class="form-control" id="discussionLinkUrl" placeholder="https://example.com">
+                                <button class="btn btn-outline-primary" type="button" id="insertLinkBtn">
+                                    <i class="fas fa-link me-1"></i>Insert Link
+                                </button>
+                            </div>
+                            <small class="text-muted">Adds the URL at the cursor position. Links will be clickable after posting.</small>
+                        </div>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="isPinned" name="isPinned">
                             <label class="form-check-label" for="isPinned">
@@ -663,6 +714,52 @@ $discussionsStmt->close();
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" name="create_discussion" class="btn btn-primary">Create Discussion</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Discussion Modal -->
+    <div class="modal fade" id="editDiscussionModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Discussion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="POST">
+                    <input type="hidden" name="discussionId" id="editDiscussionId">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="editMessageTitle" class="form-label">Discussion Title</label>
+                            <input type="text" class="form-control" id="editMessageTitle" name="messageTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMessageBody" class="form-label">Message</label>
+                            <textarea class="form-control" id="editMessageBody" name="messageBody" rows="6" required></textarea>
+                        </div>
+                        <!-- Insert Link Helper -->
+                        <div class="mb-2">
+                            <label class="form-label">Insert Link</label>
+                            <div class="input-group">
+                                <input type="url" class="form-control" id="editDiscussionLinkUrl" placeholder="https://example.com">
+                                <button class="btn btn-outline-primary" type="button" id="editInsertLinkBtn">
+                                    <i class="fas fa-link me-1"></i>Insert Link
+                                </button>
+                            </div>
+                            <small class="text-muted">Adds the URL at the cursor position. Links will be clickable after updating.</small>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="editIsPinned" name="isPinned">
+                            <label class="form-check-label" for="editIsPinned">
+                                Pin this discussion to the top
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" name="update_discussion" class="btn btn-primary">Update Discussion</button>
                     </div>
                 </form>
             </div>
@@ -722,7 +819,71 @@ $discussionsStmt->close();
             } else {
                 console.log('FAB not found');
             }
+
+            // Insert Link into textarea at cursor (Create Modal)
+            const insertBtn = document.getElementById('insertLinkBtn');
+            const linkInput = document.getElementById('discussionLinkUrl');
+            const textarea = document.getElementById('messageBody');
+            if (insertBtn && linkInput && textarea) {
+                insertBtn.addEventListener('click', function() {
+                    const url = (linkInput.value || '').trim();
+                    if (!url) return;
+                    try { new URL(url); } catch(e) { alert('Please enter a valid URL (e.g., https://example.com)'); return; }
+                    // Normalize any CRLF in current text to LF to avoid artifacts
+                    textarea.value = textarea.value.replace(/\r\n/g, '\n');
+                    // Insert with spaces (no newlines) to avoid showing \r\n artifacts
+                    const leftSpace = textarea.value && !textarea.value.endsWith(' ') ? ' ' : '';
+                    insertTextAtCursor(textarea, leftSpace + url + ' ');
+                    // Remove any literal backslash sequences like \r\n if present
+                    textarea.value = textarea.value.replace(/\\r\\n/g, ' ');
+                    linkInput.value = '';
+                    textarea.focus();
+                });
+            }
+
+            // Insert Link into textarea at cursor (Edit Modal)
+            const editInsertBtn = document.getElementById('editInsertLinkBtn');
+            const editLinkInput = document.getElementById('editDiscussionLinkUrl');
+            const editTextarea = document.getElementById('editMessageBody');
+            if (editInsertBtn && editLinkInput && editTextarea) {
+                editInsertBtn.addEventListener('click', function() {
+                    const url = (editLinkInput.value || '').trim();
+                    if (!url) return;
+                    try { new URL(url); } catch(e) { alert('Please enter a valid URL (e.g., https://example.com)'); return; }
+                    // Normalize any CRLF in current text to LF to avoid artifacts
+                    editTextarea.value = editTextarea.value.replace(/\r\n/g, '\n');
+                    // Insert with spaces (no newlines) to avoid showing \r\n artifacts
+                    const leftSpace = editTextarea.value && !editTextarea.value.endsWith(' ') ? ' ' : '';
+                    insertTextAtCursor(editTextarea, leftSpace + url + ' ');
+                    // Remove any literal backslash sequences like \r\n if present
+                    editTextarea.value = editTextarea.value.replace(/\\r\\n/g, ' ');
+                    editLinkInput.value = '';
+                    editTextarea.focus();
+                });
+            }
         });
+
+        function insertTextAtCursor(textarea, text) {
+            const start = textarea.selectionStart ?? textarea.value.length;
+            const end = textarea.selectionEnd ?? textarea.value.length;
+            const before = textarea.value.substring(0, start);
+            const after = textarea.value.substring(end);
+            textarea.value = before + text + after;
+            const pos = start + text.length;
+            textarea.selectionStart = textarea.selectionEnd = pos;
+        }
+
+        // Open edit modal with discussion data
+        function openEditModal(discussion) {
+            document.getElementById('editDiscussionId').value = discussion.discussionId;
+            document.getElementById('editMessageTitle').value = discussion.messageTitle || '';
+            document.getElementById('editMessageBody').value = discussion.messageBody || '';
+            document.getElementById('editIsPinned').checked = discussion.isPinned == 1;
+            
+            // Open the modal
+            const editModal = new bootstrap.Modal(document.getElementById('editDiscussionModal'));
+            editModal.show();
+        }
 
         // Real-time updates
         let lastUpdateTime = new Date().toISOString();

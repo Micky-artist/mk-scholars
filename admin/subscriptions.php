@@ -48,7 +48,7 @@ if ($conn) {
         }
     }
     
-    // Get paginated subscription data
+    // Get paginated subscription data with course names
     $query = "
         SELECT 
             s.SubId,
@@ -58,10 +58,12 @@ if ($conn) {
             s.subscriptionDate,
             s.expirationDate,
             u.NoUsername AS subscriberName,
-            a.username AS adminName
+            a.username AS adminName,
+            c.courseName
         FROM subscription s
         LEFT JOIN normUsers u ON s.UserId = u.NoUserId
         LEFT JOIN users a ON s.adminId = a.userId
+        LEFT JOIN Courses c ON s.Item = c.courseId
         ORDER BY s.subscriptionDate DESC
         LIMIT $limit OFFSET $offset
     ";
@@ -557,8 +559,8 @@ if ($conn) {
                             <table class="subscriptions-table">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Item</th>
+                                        <th>#</th>
+                                        <th>Course</th>
                                         <th>Status</th>
                                         <th>Code</th>
                                         <th>Start Date</th>
@@ -569,13 +571,15 @@ if ($conn) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($subscriptions as $subscription): ?>
+                                    <?php 
+                                    $rowNumber = $offset + 1; // Start numbering from the current page offset
+                                    foreach ($subscriptions as $subscription): ?>
                                         <tr>
                                             <td>
-                                                <span class="fw-bold text-primary">#<?php echo (int)$subscription['SubId']; ?></span>
+                                                <span class="fw-bold text-primary"><?php echo $rowNumber++; ?></span>
                                             </td>
                                             <td>
-                                                <span class="fw-medium"><?php echo htmlspecialchars($subscription['Item']); ?></span>
+                                                <span class="fw-medium"><?php echo htmlspecialchars($subscription['courseName'] ?? $subscription['Item']); ?></span>
                                             </td>
                                             <td>
                                                 <span class="status-badge <?php echo (int)$subscription['SubscriptionStatus'] === 1 ? 'active' : 'inactive'; ?>">

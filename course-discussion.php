@@ -178,6 +178,20 @@ $discussionsStmt->execute();
 $discussionsResult = $discussionsStmt->get_result();
 $discussions = $discussionsResult->fetch_all(MYSQLI_ASSOC);
 $discussionsStmt->close();
+
+// Helper: safely escape then linkify URLs and convert newlines to <br>
+if (!function_exists('linkifyAndEscape')) {
+    function linkifyAndEscape($text) {
+        $escaped = htmlspecialchars($text ?? '');
+        // Linkify URLs (http/https)
+        $escaped = preg_replace(
+            '~(https?://[^\s<]+)~i',
+            '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>',
+            $escaped
+        );
+        return nl2br($escaped);
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -635,7 +649,7 @@ $discussionsStmt->close();
                                 </div>
 
                                 <div class="discussion-body">
-                                    <?php echo nl2br(htmlspecialchars($discussion['messageBody'])); ?>
+                                    <?php echo linkifyAndEscape($discussion['messageBody']); ?>
                                 </div>
 
                                 <div class="discussion-meta"></div>
@@ -752,20 +766,27 @@ $discussionsStmt->close();
                         const container = document.querySelector('.discussions-container');
                         const fragment = document.createDocumentFragment();
                         data.newMessages.forEach(discussion => {
+                            // Safely escape then linkify and add <br> for newlines
+                            const escapeHtml = (s) => (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                            const linkify = (s) => s.replace(/(https?:\/\/[^\s<]+)/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+                            const bodyHtml = linkify(escapeHtml(discussion.messageBody)).replace(/\n/g,'<br>');
+                            const titleHtml = escapeHtml(discussion.messageTitle);
+                            const userNameHtml = escapeHtml(discussion.username);
+                            const roleLabel = discussion.userType === 'admin' ? 'Administrator' : 'Student';
                             const card = document.createElement('div');
                             card.className = 'discussion-card' + (discussion.isPinned ? ' pinned' : '');
                             card.innerHTML = `
                                 <div class="discussion-header">
                                     <div class="user-info">
-                                        <div class="user-avatar ${discussion.userType === 'admin' ? 'admin' : ''}">${discussion.username.charAt(0).toUpperCase()}</div>
+                                        <div class="user-avatar ${discussion.userType === 'admin' ? 'admin' : ''}">${userNameHtml.charAt(0).toUpperCase()}</div>
                                         <div class="user-details">
-                                            <h6>${discussion.username}</h6>
-                                            <small>${discussion.userType === 'admin' ? 'Administrator' : 'Student'} • ${discussion.messageDate} ${discussion.messageTime}</small>
+                                            <h6>${userNameHtml}</h6>
+                                            <small>${roleLabel} • ${discussion.messageDate} ${discussion.messageTime}</small>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="discussion-title">${discussion.messageTitle}</div>
-                                <div class="discussion-body">${discussion.messageBody}</div>
+                                <div class="discussion-title">${titleHtml}</div>
+                                <div class="discussion-body">${bodyHtml}</div>
                                 <div class="discussion-meta"></div>`;
                             fragment.appendChild(card);
                         });

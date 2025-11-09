@@ -62,13 +62,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['grant_subscription'])
         
         // Validate subscription type against available courses
         $validCourseIds = array_column($courses, 'courseId');
-        $allowedTypes = array_merge(['notes','instructor','moroccoadmissions'], $validCourseIds);
         
-        error_log("Allowed types: " . print_r($allowedTypes, true));
+        error_log("Valid course IDs: " . print_r($validCourseIds, true));
         error_log("Selected type: " . $subscriptionType);
 
-        if (!in_array($subscriptionType, $allowedTypes)) {
-            throw new Exception('Invalid subscription type selected: ' . $subscriptionType . '. Allowed: ' . implode(', ', $allowedTypes));
+        if (!in_array($subscriptionType, $validCourseIds)) {
+            throw new Exception('Invalid course selected: ' . $subscriptionType . '. Please select a valid course.');
         }
 
         // Check if user exists
@@ -299,6 +298,21 @@ $success = $_SESSION['success'] ?? null; unset($_SESSION['success']);
       border-color: var(--primary-color);
     }
     
+    .course-item {
+      display: block;
+    }
+    
+    .course-item.hidden {
+      display: none;
+    }
+    
+    #courseList {
+      border: 1px solid #dee2e6;
+      border-radius: .5rem;
+      padding: 0.5rem;
+      background: #fff;
+    }
+    
     .btn-grant {
       background-color: var(--success-color);
       color: white;
@@ -455,45 +469,35 @@ $success = $_SESSION['success'] ?? null; unset($_SESSION['success']);
               </div>
 
               <div class="mb-3">
-                <label class="form-label">Subscription Type</label>
-                <div class="row g-2" id="subscriptionOptions">
-                  <!-- Default subscription types -->
-                  <div class="col-6">
-                    <div class="subscription-option" onclick="selectSubscription('notes')" id="option-notes">
-                      <h6>Notes Access</h6>
-                      <small class="text-muted">Study materials</small>
-                    </div>
-                  </div>
-                  
-                  <div class="col-6">
-                    <div class="subscription-option" onclick="selectSubscription('instructor')" id="option-instructor">
-                      <h6>Instructor</h6>
-                      <small class="text-muted">Teaching access</small>
-                    </div>
-                  </div>
-                  
-                  <div class="col-6">
-                    <div class="subscription-option" onclick="selectSubscription('moroccoadmissions')" id="option-moroccoadmissions">
-                      <h6>Morocco Admissions</h6>
-                      <small class="text-muted">Admission materials</small>
-                    </div>
-                  </div>
-                  
-                  <!-- Dynamic courses from database -->
+                <label class="form-label">Select Course</label>
+                <div class="search-box mb-3">
+                  <i class="fas fa-search"></i>
+                  <input
+                    type="text"
+                    id="courseSearchInput"
+                    class="form-control"
+                    placeholder="Type to search courses..."
+                    autocomplete="off"
+                  >
+                </div>
+                <div id="courseList" class="row g-2" style="max-height: 400px; overflow-y: auto;">
                   <?php if (!empty($courses)): ?>
-                    <div class="col-12">
-                      <hr class="my-3">
-                      <h6 class="text-muted mb-2">Available Courses</h6>
-                    </div>
                     <?php foreach ($courses as $course): ?>
-                      <div class="col-6">
+                      <div class="col-12 course-item" data-course-id="<?= $course['courseId'] ?>" data-course-name="<?= htmlspecialchars(strtolower($course['courseName'])) ?>">
                         <div class="subscription-option" onclick="selectSubscription('<?= $course['courseId'] ?>')" id="option-<?= $course['courseId'] ?>">
                           <h6><?= htmlspecialchars($course['courseName']) ?></h6>
-                          <small class="text-muted">Course access</small>
+                          <small class="text-muted"><?= htmlspecialchars($course['courseShortDescription'] ?? 'Course access') ?></small>
                         </div>
                       </div>
                     <?php endforeach; ?>
+                  <?php else: ?>
+                    <div class="col-12">
+                      <div class="alert alert-info">No courses available.</div>
+                    </div>
                   <?php endif; ?>
+                </div>
+                <div id="noCourseResults" class="alert alert-warning mt-2" style="display: none;">
+                  <i class="fas fa-info-circle me-2"></i>No courses found matching your search.
                 </div>
               </div>
 
@@ -547,7 +551,10 @@ $success = $_SESSION['success'] ?? null; unset($_SESSION['success']);
       subscriptionTypeInput: document.getElementById('subscriptionTypeInput'),
       selectedUserDisplay: document.getElementById('selectedUserDisplay'),
       grantButton: document.getElementById('grantButton'),
-      duration: document.getElementById('duration')
+      duration: document.getElementById('duration'),
+      courseSearchInput: document.getElementById('courseSearchInput'),
+      courseList: document.getElementById('courseList'),
+      noCourseResults: document.getElementById('noCourseResults')
     };
 
     // Debounced search function
@@ -596,11 +603,34 @@ $success = $_SESSION['success'] ?? null; unset($_SESSION['success']);
         elements.subscriptionTypeInput.value = type;
         console.log('Subscription selected - Type:', type, 'Input value:', elements.subscriptionTypeInput.value);
         
-        // Set default duration based on type
-        const defaultDuration = (type === '15days' ? 15 : 30);
-        elements.duration.value = defaultDuration;
+        // Set default duration
+        elements.duration.value = 30;
         checkFormCompletion();
       });
+    }
+    
+    // Course search functionality
+    function filterCourses() {
+      const searchTerm = elements.courseSearchInput.value.trim().toLowerCase();
+      const courseItems = document.querySelectorAll('.course-item');
+      let visibleCount = 0;
+      
+      courseItems.forEach(item => {
+        const courseName = item.getAttribute('data-course-name') || '';
+        if (courseName.includes(searchTerm)) {
+          item.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          item.classList.add('hidden');
+        }
+      });
+      
+      // Show/hide "no results" message
+      if (visibleCount === 0 && searchTerm.length > 0) {
+        elements.noCourseResults.style.display = 'block';
+      } else {
+        elements.noCourseResults.style.display = 'none';
+      }
     }
 
     // Optimized form completion check
@@ -663,6 +693,16 @@ $success = $_SESSION['success'] ?? null; unset($_SESSION['success']);
         });
       }
 
+      // Course search input event listener
+      if (elements.courseSearchInput) {
+        elements.courseSearchInput.addEventListener('input', debounce(filterCourses, 200));
+        elements.courseSearchInput.addEventListener('keyup', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+          }
+        });
+      }
+      
       // Initial form state
       checkFormCompletion();
       

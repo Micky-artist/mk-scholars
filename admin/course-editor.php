@@ -640,6 +640,44 @@ if (!$courseData) {
             min-width: auto;
         }
     }
+
+    /* Context Menu for Pagination */
+    .pagination-context-menu {
+        position: absolute;
+        z-index: 9999;
+        background: #ffffff;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        min-width: 220px;
+        display: none;
+        overflow: hidden;
+    }
+    .pagination-context-menu .menu-item {
+        padding: 10px 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+        color: #374151;
+        transition: background 0.15s ease;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    .pagination-context-menu .menu-item:last-child {
+        border-bottom: none;
+    }
+    .pagination-context-menu .menu-item:hover {
+        background: #f3f4f6;
+    }
+    .pagination-context-menu .menu-item.danger {
+        color: #b91c1c;
+    }
+    .pagination-context-menu .menu-item.disabled {
+        color: #9ca3af;
+        cursor: not-allowed;
+        background: #ffffff !important;
+    }
 </style>
 
 <body>
@@ -813,29 +851,7 @@ if (!$courseData) {
                                     <small class="text-muted"><?php echo $courseData['theme']['bodyFontSize']; ?></small>
                                 </div>
                             </div>
-                            
-                            <!-- Pagination Settings -->
-                            <h5 class="mb-3 mt-4">Pagination Settings</h5>
-                            <div class="pagination-controls">
-                                <div class="mb-3">
-                                    <div class="alert alert-info">
-                                        <i class="fas fa-info-circle me-2"></i>
-                                        <strong>Break Course Sections</strong><br>
-                                        <small>Add "Break Course Section" to control pagination. Content after each break will appear on the next page.</small>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Sections per page (List)</label>
-                                    <select class="form-control" id="sectionsPerPageListSelect">
-                                        <option value="3">3 sections</option>
-                                        <option value="5" selected>5 sections</option>
-                                        <option value="10">10 sections</option>
-                                        <option value="15">15 sections</option>
-                                        <option value="20">20 sections</option>
-                                    </select>
-                                    <small class="text-muted">Number of sections shown per page in sections list (for management only)</small>
-                                </div>
-                            </div>
+                            <!-- Pagination Settings removed -->
                         </div>
                     </div>
 
@@ -974,6 +990,7 @@ if (!$courseData) {
                                 <button type="button" onclick="formatText('justifyRight')" title="Align Right"><i class="fas fa-align-right"></i></button>
                                 <button type="button" onclick="formatText('insertUnorderedList')" title="Bullet List"><i class="fas fa-list-ul"></i></button>
                                 <button type="button" onclick="formatText('insertOrderedList')" title="Numbered List"><i class="fas fa-list-ol"></i></button>
+                                <button type="button" onclick="promptAndInsertLink()" title="Insert Link"><i class="fas fa-link"></i></button>
                             </div>
                             <div class="content-editor" id="sectionContent" contenteditable="true" placeholder="Enter section content..."></div>
                         </div>
@@ -988,6 +1005,36 @@ if (!$courseData) {
                                 </button>
                             </div>
                             <small class="text-muted">Enter a URL and click "Add Link" to insert it into the content</small>
+                            
+                            <!-- Add Media by URL -->
+                            <div class="mt-3">
+                                <label class="form-label">Add Media by URL</label>
+                                <div class="input-group mb-2">
+                                    <input type="url" class="form-control" id="imageUrlInput" placeholder="Image URL (https://...)">
+                                    <button class="btn btn-outline-primary" type="button" onclick="insertImageUrl()">
+                                        <i class="fas fa-image me-1"></i>Insert Image
+                                    </button>
+                                </div>
+                                <div class="input-group mb-2">
+                                    <input type="url" class="form-control" id="videoUrlInput" placeholder="Video URL (direct .mp4, .webm)">
+                                    <button class="btn btn-outline-primary" type="button" onclick="insertVideoUrl()">
+                                        <i class="fas fa-video me-1"></i>Insert Video
+                                    </button>
+                                </div>
+                                <div class="input-group mb-2">
+                                    <input type="url" class="form-control" id="audioUrlInput" placeholder="Audio URL (direct .mp3, .wav, .ogg)">
+                                    <button class="btn btn-outline-primary" type="button" onclick="insertAudioUrl()">
+                                        <i class="fas fa-headphones me-1"></i>Insert Audio
+                                    </button>
+                                </div>
+                                <div class="input-group mb-2">
+                                    <input type="url" class="form-control" id="fileUrlInput" placeholder="File URL (PDF, DOC, etc.)">
+                                    <button class="btn btn-outline-primary" type="button" onclick="insertFileUrl()">
+                                        <i class="fas fa-file me-1"></i>Insert File Link
+                                    </button>
+                                </div>
+                                <small class="text-muted">Direct file URLs are required for preview (e.g., .mp4, .webm, images). Links are inserted into the editor preview.</small>
+                            </div>
                         </div>
                         <div class="file-upload-area" id="fileUploadArea" style="display: none;">
                             <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
@@ -1415,6 +1462,7 @@ if (!$courseData) {
                     }
                     const isActive = pageNum === page;
                     return `<button class="btn btn-sm ${isActive ? 'btn-primary' : 'btn-outline-primary'}" 
+                                   data-page-number="${pageNum}"
                                    onclick="changePage(${pageNum})">${pageNum}</button>`;
                 }).join('');
 
@@ -1445,7 +1493,140 @@ if (!$courseData) {
                     </div>
                 `;
                 preview.appendChild(paginationDiv);
+
+                // Setup right-click context menu for pagination page numbers
+                setupPaginationContextMenu(preview);
             }
+        }
+
+        // Helper: get indices of break sections in full courseData.sections
+        function getBreakIndices() {
+            const breaks = [];
+            courseData.sections.forEach((section, index) => {
+                if (section.type === 'break') breaks.push(index);
+            });
+            return breaks;
+        }
+
+        // Helper: for a given page (>1), return the break index in courseData.sections
+        function getBreakIndexForPage(pageNumber) {
+            if (pageNumber <= 1) return -1;
+            const breaks = getBreakIndices();
+            // Page 2 is after first break → index 0, page 3 → index 1, etc.
+            const breakIdxInList = pageNumber - 2;
+            return breaks[breakIdxInList] !== undefined ? breaks[breakIdxInList] : -1;
+        }
+
+        // Helper: count sections on a given page (non-break) based on current courseData.sections
+        function countSectionsOnPage(pageNumber) {
+            if (pageNumber < 1) return 0;
+            const sections = courseData.sections;
+            const breakIndices = sections.map((s, i) => s.type === 'break' ? i : -1).filter(i => i !== -1);
+            let startIdx = 0;
+            let endIdx = sections.length;
+            if (pageNumber === 1) {
+                endIdx = breakIndices.length > 0 ? breakIndices[0] : sections.length;
+            } else {
+                const prevBreak = breakIndices[pageNumber - 2];
+                const nextBreak = breakIndices[pageNumber - 1];
+                startIdx = prevBreak + 1;
+                endIdx = nextBreak !== undefined ? nextBreak : sections.length;
+            }
+            let count = 0;
+            for (let i = startIdx; i < endIdx; i++) {
+                if (sections[i].type !== 'break') count++;
+            }
+            return count;
+        }
+
+        // Delete the page break that starts the given page (page > 1)
+        function deletePageBreakForPage(pageNumber) {
+            if (pageNumber <= 1) return;
+            const breakIndex = getBreakIndexForPage(pageNumber);
+            if (breakIndex < 0) return;
+
+            const sectionsToMove = countSectionsOnPage(pageNumber);
+            const message = sectionsToMove > 0
+                ? `Delete page ${pageNumber} break? ${sectionsToMove} section(s) on that page will be merged into the previous page.`
+                : `Delete page ${pageNumber} break? This page is empty.`;
+            if (!confirm(message)) return;
+
+            // Remove the break section; content naturally merges into previous page
+            courseData.sections.splice(breakIndex, 1);
+            renderCoursePreview();
+            renderSectionsList();
+            showNotification(`Page ${pageNumber} break deleted successfully.`, 'success');
+        }
+
+        // Create and wire a context menu for pagination page numbers
+        function setupPaginationContextMenu(previewRoot) {
+            let menu = document.getElementById('paginationContextMenu');
+            if (!menu) {
+                menu = document.createElement('div');
+                menu.id = 'paginationContextMenu';
+                menu.className = 'pagination-context-menu';
+                menu.innerHTML = `
+                    <div class="menu-item danger" id="menuDeletePageBreak">
+                        <i class="fas fa-trash-alt"></i>
+                        <span>Delete this page break</span>
+                    </div>
+                `;
+                document.body.appendChild(menu);
+            }
+
+            // Hide menu helper
+            const hideMenu = () => { menu.style.display = 'none'; };
+
+            // Track current target page
+            let targetPageNumber = null;
+
+            // Right-click on a page number
+            previewRoot.addEventListener('contextmenu', function(e) {
+                const btn = e.target.closest('[data-page-number]');
+                if (!btn) {
+                    hideMenu();
+                    return; // Not on page number button
+                }
+                e.preventDefault();
+                const pageNumber = parseInt(btn.getAttribute('data-page-number'), 10) || 0;
+                targetPageNumber = pageNumber;
+
+                // Disable delete if page 1 (no break to delete)
+                const deleteItem = document.getElementById('menuDeletePageBreak');
+                if (pageNumber <= 1 || getBreakIndexForPage(pageNumber) < 0) {
+                    deleteItem.classList.add('disabled');
+                } else {
+                    deleteItem.classList.remove('disabled');
+                }
+
+                // Position and show menu
+                const x = e.pageX;
+                const y = e.pageY;
+                menu.style.left = x + 'px';
+                menu.style.top = y + 'px';
+                menu.style.display = 'block';
+            });
+
+            // Click action for delete
+            menu.addEventListener('click', function(e) {
+                const item = e.target.closest('#menuDeletePageBreak');
+                if (!item) return;
+                if (item.classList.contains('disabled')) return;
+                if (typeof targetPageNumber === 'number' && targetPageNumber > 1) {
+                    deletePageBreakForPage(targetPageNumber);
+                }
+                hideMenu();
+            });
+
+            // Hide on outside click or ESC
+            document.addEventListener('click', function(e) {
+                if (!menu.contains(e.target)) hideMenu();
+            });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') hideMenu();
+            });
+            window.addEventListener('scroll', hideMenu, { passive: true });
+            window.addEventListener('resize', hideMenu);
         }
 
         // Show add section modal
@@ -1669,6 +1850,31 @@ if (!$courseData) {
                 }
             }
             
+            // If this page has 0 sections, show a delete page button
+            if (sectionsToShow.filter(s => s.type !== 'break').length === 0 && currentSectionsPage > 1) {
+                const emptyAlert = document.createElement('div');
+                emptyAlert.className = 'alert alert-warning d-flex justify-content-between align-items-center';
+                emptyAlert.innerHTML = `
+                    <div>
+                        <i class="fas fa-info-circle me-2"></i>
+                        This page has 0 sections.
+                    </div>
+                    <button class="btn btn-sm btn-danger" id="deleteEmptyPageBtn">
+                        <i class="fas fa-trash me-1"></i>Delete This Page
+                    </button>
+                `;
+                list.appendChild(emptyAlert);
+                // Wire delete button
+                setTimeout(() => {
+                    const btn = document.getElementById('deleteEmptyPageBtn');
+                    if (btn) {
+                        btn.addEventListener('click', function() {
+                            deleteSectionsPage(currentSectionsPage);
+                        });
+                    }
+                }, 0);
+            }
+            
             sectionsToShow.forEach((section, pageIndex) => {
                 const originalIndex = courseData.sections.findIndex(s => s === section);
                 const sectionDiv = document.createElement('div');
@@ -1774,6 +1980,34 @@ if (!$courseData) {
                 list.appendChild(paginationDiv);
             }
         }
+        
+        // Helpers to delete a sections page by removing its break
+        function getBreakIndicesForSections() {
+            const indices = [];
+            courseData.sections.forEach((s, i) => { if (s.type === 'break') indices.push(i); });
+            return indices;
+        }
+        function getBreakIndexForSectionsPage(pageNumber) {
+            if (pageNumber <= 1) return -1;
+            const breaks = getBreakIndicesForSections();
+            const idx = pageNumber - 2;
+            return breaks[idx] !== undefined ? breaks[idx] : -1;
+        }
+        function deleteSectionsPage(pageNumber) {
+            if (pageNumber <= 1) return;
+            const breakIndex = getBreakIndexForSectionsPage(pageNumber);
+            if (breakIndex < 0) {
+                showNotification('No page break found for this page.', 'warning');
+                return;
+            }
+            const confirmMsg = 'Delete this empty page? Content will be merged into the previous page if any.';
+            if (!confirm(confirmMsg)) return;
+            courseData.sections.splice(breakIndex, 1);
+            currentSectionsPage = Math.max(1, pageNumber - 1);
+            renderCoursePreview();
+            renderSectionsList();
+            showNotification('Page deleted successfully.', 'success');
+        }
 
         // Edit section
         function editSection(index) {
@@ -1807,17 +2041,31 @@ if (!$courseData) {
                     section.files.forEach((file, index) => {
                         const fileItem = document.createElement('div');
                         fileItem.className = 'file-item';
+                        const fileUrl = `<?php echo getImageUrl(''); ?>${file.filePath}`;
+                        const isImage = (file.fileType === 'image') || (/\.(jpe?g|png|gif|webp)$/i).test(file.fileName || '');
+                        const previewHtml = isImage 
+                            ? `<img src="${fileUrl}" alt="${file.fileName}" style="max-width: 120px; max-height: 90px; margin-right: 10px; border-radius: 6px;">`
+                            : `<i class="fas fa-file text-primary me-2"></i>`;
                         fileItem.innerHTML = `
                             <div class="d-flex align-items-center">
-                                <i class="fas fa-check-circle text-success me-2"></i>
+                                ${previewHtml}
                                 <div>
                                     <div class="fw-bold">${file.fileName}</div>
                                     <small class="text-muted">${(file.fileSize / 1024 / 1024).toFixed(2)} MB - Existing</small>
                                 </div>
                             </div>
-                            <button class="btn btn-sm btn-outline-danger" onclick="removeExistingFile(${index})">
-                                <i class="fas fa-times"></i>
-                            </button>
+                            <div class="d-flex align-items-center" style="gap: 6px;">
+                                <a class="btn btn-sm btn-outline-primary" href="${fileUrl}" target="_blank" title="View File">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                ${file.fileId ? `
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteUploadedFile(${file.fileId}, '${file.fileName}')" title="Delete File">
+                                    <i class="fas fa-trash"></i>
+                                </button>` : `
+                                <button class="btn btn-sm btn-outline-danger" onclick="removeExistingFile(${index})" title="Remove">
+                                    <i class="fas fa-times"></i>
+                                </button>`}
+                            </div>
                         `;
                         filesContainer.appendChild(fileItem);
                     });
@@ -2051,6 +2299,105 @@ if (!$courseData) {
             }
         }
 
+        // Prompt for a link and insert at cursor (toolbar button)
+        function promptAndInsertLink() {
+            const url = prompt('Enter the URL (e.g., https://example.com):', 'https://');
+            if (!url) return;
+            try {
+                new URL(url);
+            } catch (e) {
+                alert('Please enter a valid URL (e.g., https://example.com)');
+                return;
+            }
+            const contentEditor = document.getElementById('sectionContent');
+            const linkText = prompt('Enter link text (optional):', url);
+            const linkHtml = `<a href="${url}" target="_blank" rel="noopener noreferrer">${linkText || url}</a>`;
+            contentEditor.focus();
+            const selection = window.getSelection();
+            if (selection && selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                if (contentEditor.contains(range.commonAncestorContainer)) {
+                    range.deleteContents();
+                    const linkNode = document.createElement('div');
+                    linkNode.innerHTML = linkHtml;
+                    range.insertNode(linkNode.firstChild);
+                    range.collapse(false);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                } else {
+                    const separator = contentEditor.innerHTML ? '<br><br>' : '';
+                    contentEditor.innerHTML += separator + linkHtml;
+                }
+            } else {
+                const separator = contentEditor.innerHTML ? '<br><br>' : '';
+                contentEditor.innerHTML += separator + linkHtml;
+            }
+            showNotification('Link inserted.', 'success');
+        }
+
+        // Insert media by URL helpers
+        function insertImageUrl() {
+            const input = document.getElementById('imageUrlInput');
+            const url = (input && input.value.trim()) || '';
+            if (!url) { alert('Enter an image URL'); return; }
+            try { new URL(url); } catch(e) { alert('Enter a valid URL'); return; }
+            const html = `<div style="margin: 6px 0;"><img src="${url}" alt="" style="width: 100%; max-width: 480px; height: auto; border-radius: 8px;"></div>`;
+            insertHtmlIntoEditor(html);
+            input.value = '';
+        }
+        function insertVideoUrl() {
+            const input = document.getElementById('videoUrlInput');
+            const url = (input && input.value.trim()) || '';
+            if (!url) { alert('Enter a direct video URL (.mp4, .webm)'); return; }
+            try { new URL(url); } catch(e) { alert('Enter a valid URL'); return; }
+            const type = url.endsWith('.webm') ? 'video/webm' : 'video/mp4';
+            const html = `<div style="margin: 6px 0;"><video controls style="width: 100%; max-width: 480px; border-radius: 8px;"><source src="${url}" type="${type}">Your browser does not support the video tag.</video></div>`;
+            insertHtmlIntoEditor(html);
+            input.value = '';
+        }
+        function insertAudioUrl() {
+            const input = document.getElementById('audioUrlInput');
+            const url = (input && input.value.trim()) || '';
+            if (!url) { alert('Enter a direct audio URL (.mp3, .wav, .ogg)'); return; }
+            try { new URL(url); } catch(e) { alert('Enter a valid URL'); return; }
+            let audioType = 'audio/mpeg';
+            if (url.endsWith('.wav')) audioType = 'audio/wav';
+            else if (url.endsWith('.ogg')) audioType = 'audio/ogg';
+            const html = `<div style="margin: 6px 0; max-width: 480px;"><audio controls style="width: 100%;"><source src="${url}" type="${audioType}">Your browser does not support the audio element.</audio></div>`;
+            insertHtmlIntoEditor(html);
+            input.value = '';
+        }
+        function insertFileUrl() {
+            const input = document.getElementById('fileUrlInput');
+            const url = (input && input.value.trim()) || '';
+            if (!url) { alert('Enter a file URL'); return; }
+            try { new URL(url); } catch(e) { alert('Enter a valid URL'); return; }
+            const html = `<div style="margin: 6px 0;"><a href="${url}" target="_blank" rel="noopener noreferrer"><i class="fas fa-file me-1"></i>Open file</a></div>`;
+            insertHtmlIntoEditor(html);
+            input.value = '';
+        }
+        function insertHtmlIntoEditor(html) {
+            const contentEditor = document.getElementById('sectionContent');
+            if (!contentEditor) return;
+            contentEditor.focus();
+            const selection = window.getSelection();
+            if (selection && selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                if (contentEditor.contains(range.commonAncestorContainer)) {
+                    const wrapper = document.createElement('div');
+                    wrapper.innerHTML = html;
+                    const node = wrapper.firstChild;
+                    range.insertNode(node);
+                    range.setStartAfter(node);
+                    range.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                    return;
+                }
+            }
+            contentEditor.innerHTML += html;
+        }
+
         // Remove existing file
         function removeExistingFile(index) {
             if (window.uploadedFiles && window.uploadedFiles.length > index) {
@@ -2064,17 +2411,31 @@ if (!$courseData) {
                         window.uploadedFiles.forEach((file, idx) => {
                             const fileItem = document.createElement('div');
                             fileItem.className = 'file-item';
+                            const fileUrl = `<?php echo getImageUrl(''); ?>${file.filePath}`;
+                            const isImage = (file.fileType === 'image') || (/\.(jpe?g|png|gif|webp)$/i).test(file.fileName || '');
+                            const previewHtml = isImage 
+                                ? `<img src="${fileUrl}" alt="${file.fileName}" style="max-width: 120px; max-height: 90px; margin-right: 10px; border-radius: 6px;">`
+                                : `<i class="fas fa-file text-primary me-2"></i>`;
+                            const descVal = file.description || '';
                             fileItem.innerHTML = `
                                 <div class="d-flex align-items-center">
-                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    ${previewHtml}
                                     <div>
                                         <div class="fw-bold">${file.fileName}</div>
                                         <small class="text-muted">${(file.fileSize / 1024 / 1024).toFixed(2)} MB - Existing</small>
+                                        <div class="mt-1">
+                                            <input type="text" class="form-control form-control-sm" placeholder="File description (optional)" value="${descVal.replace(/"/g,'&quot;')}" oninput="updateUploadedFileDescription(${idx}, this.value)">
+                                        </div>
                                     </div>
                                 </div>
-                                <button class="btn btn-sm btn-outline-danger" onclick="removeExistingFile(${idx})">
-                                    <i class="fas fa-times"></i>
-                                </button>
+                                <div class="d-flex align-items-center" style="gap: 6px;">
+                                    <a class="btn btn-sm btn-outline-primary" href="${fileUrl}" target="_blank" title="View File">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="removeExistingFile(${idx})" title="Remove">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
                             `;
                             filesContainer.appendChild(fileItem);
                         });
@@ -2516,12 +2877,7 @@ if (!$courseData) {
             renderCoursePreview();
         });
 
-        // Pagination controls
-        document.getElementById('sectionsPerPageListSelect').addEventListener('change', function() {
-            sectionsPerPageList = parseInt(this.value);
-            currentSectionsPage = 1; // Reset to first page
-            renderSectionsList();
-        });
+        // Pagination Settings removed: no listener for sectionsPerPageListSelect
 
         // File upload functionality
         function setupFileUpload() {
@@ -2529,7 +2885,12 @@ if (!$courseData) {
             const fileInput = document.getElementById('fileInput');
             
             if (fileUploadArea && fileInput) {
-                console.log('Setting up file upload functionality');
+                if (fileUploadArea.dataset.bound === '1') {
+                    console.log('File upload already initialized; skipping re-binding.');
+                    return;
+                }
+                fileUploadArea.dataset.bound = '1';
+                console.log('Setting up file upload functionality (bound listeners).');
                 
                 // Click to upload
                 fileUploadArea.addEventListener('click', function(e) {
@@ -2617,6 +2978,13 @@ if (!$courseData) {
             return 'file';
         }
         
+        // Update description for uploaded file in memory
+        function updateUploadedFileDescription(index, value) {
+            if (!window.uploadedFiles) return;
+            if (index < 0 || index >= window.uploadedFiles.length) return;
+            window.uploadedFiles[index].description = value;
+        }
+        
         function uploadFile(file, index, container) {
             const formData = new FormData();
             formData.append('file', file);
@@ -2642,6 +3010,27 @@ if (!$courseData) {
                 </button>
             `;
             container.appendChild(fileItem);
+            
+            // Local preview for images before upload completes
+            if (fileType === 'image') {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const previewImg = document.createElement('img');
+                    previewImg.src = e.target.result;
+                    previewImg.alt = file.name;
+                    previewImg.style.maxWidth = '120px';
+                    previewImg.style.maxHeight = '90px';
+                    previewImg.style.marginRight = '10px';
+                    previewImg.style.borderRadius = '6px';
+                    const left = fileItem.querySelector('.d-flex.align-items-center');
+                    if (left) {
+                        const icon = left.querySelector('i');
+                        if (icon) icon.remove();
+                        left.insertBefore(previewImg, left.firstChild);
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
             
             // Upload file
             fetch('php/upload-course-file.php', {
@@ -2673,28 +3062,42 @@ if (!$courseData) {
                 console.log('Upload response data:', data);
                 
                 if (data.success) {
-                    fileItem.innerHTML = `
-                        <div class="d-flex align-items-center">
-                            <i class="fas fa-check-circle text-success me-2"></i>
-                            <div>
-                                <div class="fw-bold">${file.name}</div>
-                                <small class="text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB - Uploaded</small>
-                            </div>
-                        </div>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteUploadedFile(${data.fileId}, '${file.name}')" title="Delete File">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    `;
-                    
-                    // Store file info
+                    const fileUrl = `<?php echo getImageUrl(''); ?>${data.filePath}`;
+                    const isImage = (data.fileType === 'image');
+                    // Store file info FIRST to get index for bindings
                     if (!window.uploadedFiles) window.uploadedFiles = [];
                     window.uploadedFiles.push({
                         fileId: data.fileId,
                         fileName: data.fileName,
                         filePath: data.filePath,
                         fileSize: data.fileSize,
-                        fileType: data.fileType
+                        fileType: data.fileType,
+                        description: ''
                     });
+                    const idx = window.uploadedFiles.length - 1;
+                    const previewHtml = isImage 
+                        ? `<img src="${fileUrl}" alt="${file.name}" style="max-width: 120px; max-height: 90px; margin-right: 10px; border-radius: 6px;">`
+                        : `<i class="fas fa-check-circle text-success me-2"></i>`;
+                    fileItem.innerHTML = `
+                        <div class="d-flex align-items-center">
+                            ${previewHtml}
+                            <div>
+                                <div class="fw-bold">${file.name}</div>
+                                <small class="text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB - Uploaded</small>
+                                <div class="mt-1">
+                                    <input type="text" class="form-control form-control-sm" placeholder="File description (optional)" value="" oninput="updateUploadedFileDescription(${idx}, this.value)">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center" style="gap: 6px;">
+                            <a class="btn btn-sm btn-outline-primary" href="${fileUrl}" target="_blank" title="View File">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteUploadedFile(${data.fileId}, '${file.name}')" title="Delete File">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
                     
                     console.log('File uploaded successfully:', data);
                 } else {

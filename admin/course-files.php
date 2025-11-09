@@ -234,6 +234,13 @@ $filesResult = mysqli_query($conn, $filesQuery);
                                                 <?php endif; ?>
                                             </div>
                                             <div class="file-actions">
+                                                <?php
+                                                    $fullUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http")
+                                                        . "://" . $_SERVER['HTTP_HOST'] . '/' . ltrim($file['filePath'], '/');
+                                                ?>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary btn-copy-url" data-url="<?php echo htmlspecialchars($fullUrl); ?>" title="Copy URL">
+                                                    <i class="fas fa-link"></i>
+                                                </button>
                                                 <a href="../<?php echo $file['filePath']; ?>" target="_blank" class="btn btn-sm btn-outline-primary">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
@@ -413,6 +420,48 @@ $filesResult = mysqli_query($conn, $filesQuery);
                 bsAlert.close();
             });
         }, 5000);
+
+        // Copy file URL handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const copyButtons = document.querySelectorAll('.btn-copy-url');
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const url = this.getAttribute('data-url') || '';
+                    if (!url) return;
+                    const originalHtml = this.innerHTML;
+                    try {
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            await navigator.clipboard.writeText(url);
+                        } else {
+                            const temp = document.createElement('input');
+                            temp.value = url;
+                            document.body.appendChild(temp);
+                            temp.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(temp);
+                        }
+                        this.innerHTML = '<i class="fas fa-check"></i>';
+                        this.classList.remove('btn-outline-secondary');
+                        this.classList.add('btn-success');
+                        setTimeout(() => {
+                            this.innerHTML = originalHtml;
+                            this.classList.remove('btn-success');
+                            this.classList.add('btn-outline-secondary');
+                        }, 1500);
+                    } catch (e) {
+                        console.error('Copy failed:', e);
+                        this.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                        this.classList.remove('btn-outline-secondary');
+                        this.classList.add('btn-warning');
+                        setTimeout(() => {
+                            this.innerHTML = originalHtml;
+                            this.classList.remove('btn-warning');
+                            this.classList.add('btn-outline-secondary');
+                        }, 1500);
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>
