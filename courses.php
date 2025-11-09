@@ -504,7 +504,7 @@ function getStatusClass($status) {
         /* ==== Course Deadline ==== */
         .course-deadline {
             display: flex;
-            align-items: center;
+            flex-direction: column;
             gap: 0.5rem;
             font-size: 0.875rem;
             color: var(--gray-500);
@@ -512,6 +512,17 @@ function getStatusClass($status) {
             padding: 0.75rem;
             background: var(--gray-50);
             border-radius: 8px;
+        }
+
+        .deadline-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .deadline-item i {
+            color: var(--primary);
+            font-size: 0.9rem;
         }
 
         /* ==== Course Actions ==== */
@@ -552,39 +563,6 @@ function getStatusClass($status) {
             transform: none;
         }
 
-        /* ==== WhatsApp Share Button ==== */
-        .whatsapp-share-button {
-            background: linear-gradient(135deg, #25D366, #128C7E);
-            color: var(--white);
-            border: none;
-            padding: 0.875rem 1.5rem;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            width: 100%;
-            margin-top: 0.75rem;
-            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
-        }
-
-        .whatsapp-share-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
-            background: linear-gradient(135deg, #20BA5A, #0FA76E);
-        }
-
-        .whatsapp-share-button:active {
-            transform: translateY(0);
-        }
-
-        .whatsapp-share-button i {
-            font-size: 1.2rem;
-        }
 
         /* ==== Error Handling Styles ==== */
         .error-container {
@@ -719,10 +697,6 @@ function getStatusClass($status) {
                 font-size: 0.9rem;
             }
 
-            .whatsapp-share-button {
-                padding: 0.75rem 1.25rem;
-                font-size: 0.85rem;
-            }
         }
     </style>
 </head>
@@ -861,40 +835,36 @@ function getStatusClass($status) {
                             </div>
                             
                             <div class="course-deadline">
-                                <i class="fas fa-hourglass-half"></i>
-                                <span>Registration Ends: <?php echo date('F j, Y', strtotime($course['courseRegEndDate'])); ?></span>
+                                <?php if (!empty($course['courseRegEndDate'])): ?>
+                                <div class="deadline-item">
+                                    <i class="fas fa-hourglass-half"></i>
+                                    <span>Registration Ends: <?php echo date('F j, Y', strtotime($course['courseRegEndDate'])); ?></span>
+                                </div>
+                                <?php endif; ?>
+                                <?php if (!empty($course['courseStartDate'])): ?>
+                                <div class="deadline-item">
+                                    <i class="fas fa-calendar-check"></i>
+                                    <span>Course Starts: <?php echo date('F j, Y', strtotime($course['courseStartDate'])); ?></span>
+                                </div>
+                                <?php endif; ?>
+                                <?php if (!empty($course['courseEndDate'])): ?>
+                                <div class="deadline-item">
+                                    <i class="fas fa-calendar-times"></i>
+                                    <span>Course Ends: <?php echo date('F j, Y', strtotime($course['courseEndDate'])); ?></span>
+                                </div>
+                                <?php endif; ?>
                             </div>
                             
                             <div class="course-actions">
                                 <?php
                                     $isLoggedIn = isset($_SESSION) && isset($_SESSION['userId']);
                                     $next = urlencode('/mkscholars/courses');
-                                    
-                                    // Build course URL for sharing
-                                    $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'];
-                                    $scriptPath = str_replace('/courses.php', '', $_SERVER['PHP_SELF']);
-                                    $courseUrl = $baseUrl . $scriptPath . "/course-details?id=" . $course['courseId'];
-                                    
-                                    // Prepare data attributes for sharing (using JSON encoding for safe JavaScript)
-                                    $shareData = [
-                                        'title' => $course['courseName'],
-                                        'image' => $imageUrl ?: '',
-                                        'url' => $courseUrl,
-                                        'description' => $course['courseShortDescription'] ?? $course['courseDescription'] ?? ''
-                                    ];
-                                    $shareDataJson = json_encode($shareData, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
                                 ?>
                                 <button onclick="enrollCourse(<?php echo $course['courseId']; ?>, <?php echo $isLoggedIn ? 'true' : 'false'; ?>)" 
                                         class="enroll-button" 
                                         data-course-id="<?php echo $course['courseId']; ?>">
                                     <i class="fas fa-arrow-right"></i>
                                     Register Now (Iyandikishe)
-                                </button>
-                                <button onclick="shareOnWhatsAppFromData(<?php echo htmlspecialchars($shareDataJson, ENT_QUOTES, 'UTF-8'); ?>)" 
-                                        class="whatsapp-share-button" 
-                                        title="Share on WhatsApp">
-                                    <i class="fab fa-whatsapp"></i>
-                                    Share on WhatsApp
                                 </button>
                             </div>
                         </div>
@@ -978,36 +948,6 @@ function getStatusClass($status) {
             }, 1000);
         }
 
-        // WhatsApp Share Function (matching scholarship-details.php logic)
-        function shareOnWhatsAppFromData(data) {
-            try {
-                const courseUrl = data.url || '';
-                const title = data.title || 'Course';
-                
-                // Build the share message - matching scholarship-details.php format
-                const message = 'Check out this course: ' + courseUrl;
-                
-                // Create WhatsApp share URL - using api.whatsapp.com like scholarship-details.php
-                const whatsappUrl = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(message);
-                
-                // Open in new window/tab (matching scholarship-details.php behavior)
-                window.open(whatsappUrl, '_blank');
-                
-            } catch (error) {
-                console.error('WhatsApp share error:', error);
-                showError('Unable to share on WhatsApp. Please try again.');
-            }
-        }
-        
-        // Legacy function for backward compatibility
-        function shareOnWhatsApp(title, imageUrl, courseUrl, description) {
-            shareOnWhatsAppFromData({
-                title: title,
-                image: imageUrl,
-                url: courseUrl,
-                description: description
-            });
-        }
 
         // Enhanced course enrollment function
         function enrollCourse(courseId, isLoggedIn) {
@@ -1027,21 +967,13 @@ function getStatusClass($status) {
                 button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
                 button.disabled = true;
                     
-                // Simulate processing delay
-                    setTimeout(() => {
+                // Simulate processing delay then always go to subscription
+                setTimeout(() => {
                     try {
-                        if (isLoggedIn) {
-                            // Redirect to subscription page
-                            window.location.href = `./subscription?course=${courseId}`;
-                        } else {
-                            // Redirect to login page
-                            const next = encodeURIComponent('/mkscholars/courses');
-                            window.location.href = `./login?next=${next}`;
-                        }
+                        window.location.href = `./subscription?course=${courseId}`;
                     } catch (error) {
                         console.error('Navigation error:', error);
                         showError('Unable to navigate to the enrollment page. Please try again.');
-                        
                         // Restore button state
                         button.innerHTML = originalText;
                         button.disabled = false;

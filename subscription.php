@@ -2,22 +2,26 @@
 // Include session configuration for persistent sessions
 include("./config/session.php");
 include("./dbconnection/connection.php");
-include('./php/validateSession.php');
 
-if (!isset($_SESSION['userId'])) {
-    header("Location: login");
-    exit;
+// Check if user is logged in (optional - page is accessible to all)
+// Note: We do NOT include validateSession.php as it redirects non-logged-in users
+$isLoggedIn = isset($_SESSION['userId']) && !empty($_SESSION['userId']);
+
+// Fetch user data only if logged in
+$name = 'Unknown User';
+$email = 'Unknown Email';
+$phone = '';
+
+if ($isLoggedIn) {
+    $UserId = $_SESSION['userId'];
+    $selectUserDetails = mysqli_query($conn, "SELECT * FROM normUsers WHERE NoUserId = $UserId");
+    if ($selectUserDetails && $selectUserDetails->num_rows > 0) {
+        $userData = mysqli_fetch_assoc($selectUserDetails);
+        $name  = $userData['NoUsername'] ?? 'Unknown User';
+        $email = $userData['NoEmail']   ?? 'Unknown Email';
+        $phone = $userData['NoPhone']   ?? '';
+    }
 }
-
-$UserId = $_SESSION['userId'];
-$selectUserDetails = mysqli_query($conn, "SELECT * FROM normUsers WHERE NoUserId = $UserId");
-if ($selectUserDetails->num_rows > 0) {
-    $userData = mysqli_fetch_assoc($selectUserDetails);
-}
-
-$name  = $userData['NoUsername'] ?? 'Unknown User';
-$email = $userData['NoEmail']   ?? 'Unknown Email';
-$phone = $userData['NoPhone']   ?? '';
 
 // Get course parameter
 $courseId = $_GET['course'] ?? '';
@@ -174,6 +178,58 @@ if (isset($_GET['checkout'])) {
     header("Location: ./payment/checkout.php?course={$courseId}&subscription={$sub}");
     exit;
 }
+
+// Build course URL for WhatsApp sharing
+$baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'];
+$scriptPath = str_replace('/subscription.php', '', $_SERVER['PHP_SELF']);
+$courseUrl = $baseUrl . $scriptPath . "/course-details?id=" . ($courseId && is_numeric($courseId) ? $courseId : '');
+if (!$courseId || !is_numeric($courseId)) {
+    // For default courses, use subscription page URL
+    $courseUrl = $baseUrl . $_SERVER['REQUEST_URI'];
+}
+
+// Prepare share data for WhatsApp
+$shareData = [
+    'title' => $currentCourse['courseName'],
+    'url' => $courseUrl,
+    'description' => $currentCourse['courseDescription'] ?? ''
+];
+$shareDataJson = json_encode($shareData, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+
+// Open Graph metadata preparation
+$pageUrl = $baseUrl . $_SERVER['REQUEST_URI'];
+$ogTitle = ($currentCourse['courseName'] ?? 'Course') . ' - MK Scholars';
+$ogDescription = $currentCourse['courseDescription'] ?? '';
+$ogImageUrl = '';
+
+// Build course image URL if available from database
+if (!empty($courseData) && !empty($courseData['coursePhoto'])) {
+    $storedPath = ltrim($courseData['coursePhoto'], '/');
+    if (function_exists('isOnline') && isOnline()) {
+        // Use admin subdomain in production
+        $host = $_SERVER['HTTP_HOST'] ?? 'mkscholars.com';
+        $domain = strtolower($host);
+        $domain = preg_replace('/^www\./', '', $domain);
+        $domain = preg_replace('/^admin\./', '', $domain);
+        $adminHost = 'admin.' . $domain;
+        $ogImageUrl = 'https://' . $adminHost . '/' . $storedPath;
+    } else {
+        // Local path fallback
+        $ogImageUrl = './admin/' . $storedPath;
+    }
+}
+
+// Ensure absolute URL for image
+if (!empty($ogImageUrl) && strpos($ogImageUrl, 'http') !== 0) {
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'mkscholars.com';
+    $ogImageUrl = $protocol . '://' . $host . '/' . ltrim($ogImageUrl, './');
+}
+
+// Fallback image
+if (empty($ogImageUrl)) {
+    $ogImageUrl = 'https://mkscholars.com/images/logo/logoRound.png';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -182,6 +238,20 @@ if (isset($_GET['checkout'])) {
   <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Course Registration - <?php echo htmlspecialchars($currentCourse['courseName']); ?></title>
+  <meta name="description" content="<?php echo htmlspecialchars($ogDescription); ?>">
+  <!-- Open Graph metadata for social sharing -->
+  <meta property="og:title" content="<?php echo htmlspecialchars($ogTitle); ?>">
+  <meta property="og:description" content="<?php echo htmlspecialchars($ogDescription); ?>">
+  <meta property="og:image" content="<?php echo htmlspecialchars($ogImageUrl); ?>">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="<?php echo htmlspecialchars($pageUrl); ?>">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<?php echo htmlspecialchars($ogTitle); ?>">
+  <meta name="twitter:description" content="<?php echo htmlspecialchars($ogDescription); ?>">
+  <meta name="twitter:image" content="<?php echo htmlspecialchars($ogImageUrl); ?>">
   <link rel="shortcut icon" href="./images/logo/logoRound.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -513,6 +583,42 @@ if (isset($_GET['checkout'])) {
             background: #059669;
         }
 
+        /* WhatsApp Share Button */
+        .whatsapp-share-button {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            border: none;
+            padding: 0.875rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            margin-top: 0.75rem;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+            text-decoration: none;
+        }
+
+        .whatsapp-share-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+            background: linear-gradient(135deg, #20BA5A, #0FA76E);
+            color: white;
+        }
+
+        .whatsapp-share-button:active {
+            transform: translateY(0);
+        }
+
+        .whatsapp-share-button i {
+            font-size: 1.2rem;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             body {
@@ -675,6 +781,7 @@ if (isset($_GET['checkout'])) {
 
                 <!-- User Details & Registration -->
                 <div class="col-lg-6">
+                    <?php if ($isLoggedIn): ?>
                     <h4 class="mb-3">
                         <i class="fas fa-user me-2"></i>
                         Your Details
@@ -711,6 +818,13 @@ if (isset($_GET['checkout'])) {
                             </div>
                         </div>
                     </div>
+                    <?php else: ?>
+                    <div class="alert alert-info mb-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Not logged in?</strong> You can still view course details. 
+                        <a href="./login?next=<?php echo urlencode($_SERVER['REQUEST_URI']); ?>" class="alert-link">Login</a> to see your details and register.
+                    </div>
+                    <?php endif; ?>
 
                     <!-- Hidden fields -->
                     <input type="hidden" name="subscription" id="subscription-input"
@@ -755,14 +869,27 @@ if (isset($_GET['checkout'])) {
 
                     <!-- Action Buttons -->
                     <div class="d-grid gap-2">
+                        <?php if ($isLoggedIn): ?>
                         <button type="submit" name="checkout" class="btn-primary-custom w-100">
                             <i class="fas fa-rocket me-2"></i>
                             Register Now!
-          </button>
+                        </button>
+                        <?php else: ?>
+                        <a href="./login?next=<?php echo urlencode($_SERVER['REQUEST_URI']); ?>" class="btn-primary-custom w-100 text-center">
+                            <i class="fas fa-sign-in-alt me-2"></i>
+                            Login to Register
+                        </a>
+                        <?php endif; ?>
                         <a class="btn-secondary-custom w-100 text-center" href="./e-learning">
                             <i class="fas fa-arrow-left me-2"></i>
                             Back to Courses
                         </a>
+                        <button onclick="shareOnWhatsAppFromData(<?php echo htmlspecialchars($shareDataJson, ENT_QUOTES, 'UTF-8'); ?>)" 
+                                class="whatsapp-share-button" 
+                                title="Share on WhatsApp">
+                            <i class="fab fa-whatsapp"></i>
+                            Share on WhatsApp
+                        </button>
                     </div>
         </div>
       </div>
@@ -881,6 +1008,27 @@ if (isset($_GET['checkout'])) {
     document.querySelectorAll('.choose-course').forEach(btn => {
       btn.addEventListener('click', hideValidationError);
     });
+
+    // WhatsApp Share Function (matching courses.php logic)
+    function shareOnWhatsAppFromData(data) {
+        try {
+            const courseUrl = data.url || '';
+            const title = data.title || 'Course';
+            
+            // Build the share message - matching courses.php format
+            const message = 'Check out this course: ' + courseUrl;
+            
+            // Create WhatsApp share URL - using api.whatsapp.com like courses.php
+            const whatsappUrl = 'https://api.whatsapp.com/send?text=' + encodeURIComponent(message);
+            
+            // Open in new window/tab (matching courses.php behavior)
+            window.open(whatsappUrl, '_blank');
+            
+        } catch (error) {
+            console.error('WhatsApp share error:', error);
+            alert('Unable to share on WhatsApp. Please try again.');
+        }
+    }
   </script>
 </body>
 
