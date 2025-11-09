@@ -26,6 +26,9 @@ if ($courseResult->num_rows === 0) {
 $course = $courseResult->fetch_assoc();
 $courseStmt->close();
 
+// Get current admin ID for permission checks
+$currentAdminId = isset($_SESSION['adminId']) ? (int)$_SESSION['adminId'] : 0;
+
 // Debug: Check if DiscussionBoard table exists and has correct structure
 $tableCheck = "SHOW TABLES LIKE 'DiscussionBoard'";
 $tableResult = $conn->query($tableCheck);
@@ -128,22 +131,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if (isset($_POST['update_discussion'])) {
         $discussionId = (int)$_POST['discussionId'];
-        $messageTitle = mysqli_real_escape_string($conn, $_POST['messageTitle']);
-        $messageBody = mysqli_real_escape_string($conn, $_POST['messageBody']);
-        $isPinned = isset($_POST['isPinned']) ? 1 : 0;
         
-        $updateQuery = "UPDATE DiscussionBoard SET messageTitle = ?, messageBody = ?, isPinned = ? WHERE discussionId = ?";
-        $updateStmt = $conn->prepare($updateQuery);
-        $updateStmt->bind_param("ssii", $messageTitle, $messageBody, $isPinned, $discussionId);
+        // Check if the discussion belongs to the current admin
+        $checkQuery = "SELECT userId FROM DiscussionBoard WHERE discussionId = ?";
+        $checkStmt = $conn->prepare($checkQuery);
+        $checkStmt->bind_param("i", $discussionId);
+        $checkStmt->execute();
+        $checkResult = $checkStmt->get_result();
+        $discussionData = $checkResult->fetch_assoc();
+        $checkStmt->close();
         
-        if ($updateStmt->execute()) {
-            header("Location: course-discussion.php?id=" . $courseId . "&status=updated");
-            exit;
-        } else {
-            $message = 'Error updating discussion: ' . mysqli_error($conn);
+        if (!$discussionData || (int)$discussionData['userId'] !== $currentAdminId) {
+            $message = 'Error: You can only edit your own discussions.';
             $messageType = 'danger';
+        } else {
+            $messageTitle = mysqli_real_escape_string($conn, $_POST['messageTitle']);
+            $messageBody = mysqli_real_escape_string($conn, $_POST['messageBody']);
+            $isPinned = isset($_POST['isPinned']) ? 1 : 0;
+            
+            $updateQuery = "UPDATE DiscussionBoard SET messageTitle = ?, messageBody = ?, isPinned = ? WHERE discussionId = ? AND userId = ?";
+            $updateStmt = $conn->prepare($updateQuery);
+            $updateStmt->bind_param("ssiii", $messageTitle, $messageBody, $isPinned, $discussionId, $currentAdminId);
+            
+            if ($updateStmt->execute()) {
+                header("Location: course-discussion.php?id=" . $courseId . "&status=updated");
+                exit;
+            } else {
+                $message = 'Error updating discussion: ' . mysqli_error($conn);
+                $messageType = 'danger';
+            }
+            $updateStmt->close();
         }
-        $updateStmt->close();
     }
 }
 
@@ -190,14 +208,17 @@ $discussionsStmt->close();
 // Helper: safely escape then linkify URLs and convert newlines to <br>
 if (!function_exists('linkifyAndEscape')) {
     function linkifyAndEscape($text) {
+        // Escape and remove any newline sequences (actual CR/LF and literal "\r\n")
         $escaped = htmlspecialchars($text ?? '');
+        $escaped = str_replace(array("\\r\\n", "\r\n", "\r", "\n"), ' ', $escaped);
         // Linkify URLs (http/https)
         $escaped = preg_replace(
             '~(https?://[^\s<]+)~i',
             '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>',
             $escaped
         );
-        return nl2br($escaped);
+        // Do not re-introduce newlines
+        return $escaped;
     }
 }
 ?>
@@ -527,6 +548,16 @@ if (!function_exists('linkifyAndEscape')) {
             font-size: 0.9rem;
             margin-top: 0.5rem;
         }
+
+        kbd {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: 4px;
+            padding: 0.2rem 0.4rem;
+            font-size: 0.85em;
+            font-family: monospace;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 
@@ -603,12 +634,14 @@ if (!function_exists('linkifyAndEscape')) {
                                                 <i class="fas fa-ellipsis-v"></i>
                                             </button>
                                             <ul class="dropdown-menu">
+                                                <?php if ((int)$discussion['userId'] === $currentAdminId): ?>
                                                 <li>
                                                     <button type="button" class="dropdown-item" onclick='openEditModal(<?php echo json_encode($discussion, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>)'>
                                                         <i class="fas fa-edit me-2"></i>Edit
                                                     </button>
                                                 </li>
                                                 <li><hr class="dropdown-divider"></li>
+                                                <?php endif; ?>
                                                 <li>
                                                     <form method="POST" class="d-inline">
                                                         <input type="hidden" name="discussionId" value="<?php echo $discussion['discussionId']; ?>">
@@ -859,6 +892,58 @@ if (!function_exists('linkifyAndEscape')) {
                     editTextarea.value = editTextarea.value.replace(/\\r\\n/g, ' ');
                     editLinkInput.value = '';
                     editTextarea.focus();
+                });
+            }
+
+            // Realtime sanitize to remove any CR/LF or literal "\r\n"
+            function sanitizeTextarea(el) {
+                el.value = el.value.replace(/\\r\\n/g, ' ').replace(/\r\n|\r|\n/g, ' ');
+            }
+            const messageBody = document.getElementById('messageBody');
+            const editMessageBody = document.getElementById('editMessageBody');
+            if (messageBody) {
+                messageBody.addEventListener('input', function() { sanitizeTextarea(this); });
+                messageBody.addEventListener('paste', (e) => {
+                    setTimeout(() => sanitizeTextarea(messageBody), 0);
+                });
+                // Prevent Enter -> no newlines
+                messageBody.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') { e.preventDefault(); insertTextAtCursor(this, ' '); }
+                });
+            }
+            if (editMessageBody) {
+                editMessageBody.addEventListener('input', function() { sanitizeTextarea(this); });
+                editMessageBody.addEventListener('paste', (e) => {
+                    setTimeout(() => sanitizeTextarea(editMessageBody), 0);
+                });
+                // Prevent Enter -> no newlines
+                editMessageBody.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') { e.preventDefault(); insertTextAtCursor(this, ' '); }
+                });
+            }
+
+            // Prevent Enter key from creating newlines in message textareas
+            // (Handled above in realtime sanitize)
+
+            // Strip any newlines from textareas before form submission
+            const createForm = document.querySelector('#createDiscussionModal form');
+            const editForm = document.querySelector('#editDiscussionModal form');
+            
+            if (createForm) {
+                createForm.addEventListener('submit', function(e) {
+                    const textarea = this.querySelector('#messageBody');
+                    if (textarea) {
+                        textarea.value = textarea.value.replace(/\\r\\n/g, ' ').replace(/\r\n|\r|\n/g, ' ');
+                    }
+                });
+            }
+            
+            if (editForm) {
+                editForm.addEventListener('submit', function(e) {
+                    const textarea = this.querySelector('#editMessageBody');
+                    if (textarea) {
+                        textarea.value = textarea.value.replace(/\\r\\n/g, ' ').replace(/\r\n|\r|\n/g, ' ');
+                    }
                 });
             }
         });

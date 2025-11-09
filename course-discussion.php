@@ -182,14 +182,16 @@ $discussionsStmt->close();
 // Helper: safely escape then linkify URLs and convert newlines to <br>
 if (!function_exists('linkifyAndEscape')) {
     function linkifyAndEscape($text) {
+        // Escape and remove any newline sequences (actual CR/LF and literal "\r\n")
         $escaped = htmlspecialchars($text ?? '');
+        $escaped = str_replace(array("\\r\\n", "\r\n", "\r", "\n"), ' ', $escaped);
         // Linkify URLs (http/https)
         $escaped = preg_replace(
             '~(https?://[^\s<]+)~i',
             '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>',
             $escaped
         );
-        return nl2br($escaped);
+        return $escaped;
     }
 }
 ?>
@@ -565,6 +567,16 @@ if (!function_exists('linkifyAndEscape')) {
                 bottom: 80px;
             }
         }
+
+        kbd {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: 4px;
+            padding: 0.2rem 0.4rem;
+            font-size: 0.85em;
+            font-family: monospace;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 
@@ -753,6 +765,41 @@ if (!function_exists('linkifyAndEscape')) {
                     }
                 });
             }
+
+            // Prevent Enter key from creating newlines in message textarea
+            const messageBody = document.getElementById('messageBody');
+            if (messageBody) {
+                // Realtime sanitize input/paste to remove any CR/LF and literal "\r\n"
+                function sanitize(el) {
+                    el.value = el.value.replace(/\\r\\n/g, ' ').replace(/\r\n|\r|\n/g, ' ');
+                }
+                messageBody.addEventListener('input', function() { sanitize(this); });
+                messageBody.addEventListener('paste', function() { setTimeout(() => sanitize(messageBody), 0); });
+                messageBody.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        // Replace Enter with a space
+                        const start = this.selectionStart ?? this.value.length;
+                        const end = this.selectionEnd ?? this.value.length;
+                        const before = this.value.substring(0, start);
+                        const after = this.value.substring(end);
+                        this.value = before + ' ' + after;
+                        const pos = start + 1;
+                        this.selectionStart = this.selectionEnd = pos;
+                    }
+                });
+            }
+
+            // Strip any newlines from textarea before form submission
+            const createForm = document.querySelector('#createDiscussionModal form');
+            if (createForm) {
+                createForm.addEventListener('submit', function(e) {
+                    const textarea = this.querySelector('#messageBody');
+                    if (textarea) {
+                        textarea.value = textarea.value.replace(/\\r\\n/g, ' ').replace(/\r\n|\r|\n/g, ' ');
+                    }
+                });
+            }
         });
 
         // Real-time updates
@@ -766,10 +813,11 @@ if (!function_exists('linkifyAndEscape')) {
                         const container = document.querySelector('.discussions-container');
                         const fragment = document.createDocumentFragment();
                         data.newMessages.forEach(discussion => {
-                            // Safely escape then linkify and add <br> for newlines
+                            // Safely escape then linkify and remove newline artifacts
                             const escapeHtml = (s) => (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
                             const linkify = (s) => s.replace(/(https?:\/\/[^\s<]+)/gi, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
-                            const bodyHtml = linkify(escapeHtml(discussion.messageBody)).replace(/\n/g,'<br>');
+                            const sanitizedBody = escapeHtml(discussion.messageBody).replace(/\\r\\n/g,' ').replace(/\r\n|\r|\n/g,' ');
+                            const bodyHtml = linkify(sanitizedBody);
                             const titleHtml = escapeHtml(discussion.messageTitle);
                             const userNameHtml = escapeHtml(discussion.username);
                             const roleLabel = discussion.userType === 'admin' ? 'Administrator' : 'Student';
