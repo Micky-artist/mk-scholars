@@ -731,11 +731,11 @@ if (!empty($courses)) {
                                         <div class="course-meta">
                                             <div class="meta-item">
                                                 <div class="meta-label">Start Date</div>
-                                                <div class="meta-value"><?php echo date('M j, Y', strtotime($course['courseStartDate'])); ?></div>
+                                                <div class="meta-value"><?php echo !empty($course['courseStartDate']) ? date('M j, Y', strtotime($course['courseStartDate'])) : ''; ?></div>
                                             </div>
                                             <div class="meta-item">
                                                 <div class="meta-label">End Date</div>
-                                                <div class="meta-value"><?php echo date('M j, Y', strtotime($course['courseEndDate'])); ?></div>
+                                                <div class="meta-value"><?php echo !empty($course['courseEndDate']) ? date('M j, Y', strtotime($course['courseEndDate'])) : ''; ?></div>
                                             </div>
                                             <div class="meta-item">
                                                 <div class="meta-label">Seats</div>
@@ -1068,7 +1068,7 @@ if (!empty($courses)) {
 
         // Helper functions
         function formatDate(dateString) {
-            if (!dateString) return 'N/A';
+            if (!dateString) return '';
             const date = new Date(dateString);
             return date.toLocaleDateString('en-US', { 
                 year: 'numeric', 

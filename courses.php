@@ -841,13 +841,13 @@ function getStatusClass($status) {
                                     <span>Registration Ends: <?php echo date('F j, Y', strtotime($course['courseRegEndDate'])); ?></span>
                                 </div>
                                 <?php endif; ?>
-                                <?php if (!empty($course['courseStartDate'])): ?>
+                                <?php if (!empty($course['courseStartDate']) && $course['courseStartDate'] !== '0000-00-00'): ?>
                                 <div class="deadline-item">
                                     <i class="fas fa-calendar-check"></i>
                                     <span>Course Starts: <?php echo date('F j, Y', strtotime($course['courseStartDate'])); ?></span>
                                 </div>
                                 <?php endif; ?>
-                                <?php if (!empty($course['courseEndDate'])): ?>
+                                <?php if (!empty($course['courseEndDate']) && $course['courseEndDate'] !== '0000-00-00'): ?>
                                 <div class="deadline-item">
                                     <i class="fas fa-calendar-times"></i>
                                     <span>Course Ends: <?php echo date('F j, Y', strtotime($course['courseEndDate'])); ?></span>

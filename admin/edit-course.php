@@ -78,9 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $courseName = mysqli_real_escape_string($conn, $_POST['courseName']);
         $courseShortDescription = mysqli_real_escape_string($conn, $_POST['courseShortDescription']);
         $courseLongDescription = mysqli_real_escape_string($conn, $_POST['courseLongDescription']);
-        $courseStartDate = $_POST['courseStartDate'];
+                $courseStartDate = !empty($_POST['courseStartDate']) ? $_POST['courseStartDate'] : null;
         $courseRegEndDate = !empty($_POST['courseRegEndDate']) ? $_POST['courseRegEndDate'] : null;
-        $courseEndDate = $_POST['courseEndDate'];
+                $courseEndDate = !empty($_POST['courseEndDate']) ? $_POST['courseEndDate'] : null;
         $courseSeats = (int)$_POST['courseSeats'];
         $courseDisplayStatus = (int)$_POST['courseDisplayStatus'];
         
@@ -148,9 +148,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         courseName = '$courseName',
                         courseShortDescription = '$courseShortDescription',
                         courseLongDescription = '$courseLongDescription',
-                        courseStartDate = '$courseStartDate',
+                        courseStartDate = " . ($courseStartDate ? "'$courseStartDate'" : "NULL") . ",
                         courseRegEndDate = " . ($courseRegEndDate ? "'$courseRegEndDate'" : "NULL") . ",
-                        courseEndDate = '$courseEndDate',
+                        courseEndDate = " . ($courseEndDate ? "'$courseEndDate'" : "NULL") . ",
                         courseSeats = $courseSeats,
                         coursePhoto = '$coursePhoto',
                         courseDisplayStatus = $courseDisplayStatus
@@ -419,14 +419,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </div>
                                     <div class="col-md-4">
                                         <div class="mb-3">
-                                            <label for="courseStartDate" class="form-label">Course Start Date <span class="required-star">*</span></label>
-                                            <input type="date" class="form-control" id="courseStartDate" name="courseStartDate" value="<?php echo $course['courseStartDate']; ?>" required>
+                                            <label for="courseStartDate" class="form-label">Course Start Date (optional)</label>
+                                            <input type="date" class="form-control" id="courseStartDate" name="courseStartDate" value="<?php echo $course['courseStartDate']; ?>">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="mb-3">
-                                            <label for="courseEndDate" class="form-label">Course End Date <span class="required-star">*</span></label>
-                                            <input type="date" class="form-control" id="courseEndDate" name="courseEndDate" value="<?php echo $course['courseEndDate']; ?>" required>
+                                            <label for="courseEndDate" class="form-label">Course End Date (optional)</label>
+                                            <input type="date" class="form-control" id="courseEndDate" name="courseEndDate" value="<?php echo $course['courseEndDate']; ?>">
                                         </div>
                                     </div>
                                 </div>

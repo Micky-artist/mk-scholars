@@ -16,9 +16,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $courseName = mysqli_real_escape_string($conn, $_POST['courseName']);
         $courseShortDescription = mysqli_real_escape_string($conn, $_POST['courseShortDescription']);
         $courseLongDescription = mysqli_real_escape_string($conn, $_POST['courseLongDescription']);
-        $courseStartDate = $_POST['courseStartDate'];
+                $courseStartDate = !empty($_POST['courseStartDate']) ? $_POST['courseStartDate'] : null;
         $courseRegEndDate = !empty($_POST['courseRegEndDate']) ? $_POST['courseRegEndDate'] : null;
-        $courseEndDate = $_POST['courseEndDate'];
+                $courseEndDate = !empty($_POST['courseEndDate']) ? $_POST['courseEndDate'] : null;
         $courseSeats = (int)$_POST['courseSeats'];
         $courseDisplayStatus = (int)$_POST['courseDisplayStatus'];
         $coursePaymentCodeName = mysqli_real_escape_string($conn, $_POST['coursePaymentCodeName']);
@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Insert course (coursePaymentCodeName belongs to CoursePricing, not Courses)
-        $insertQuery = "INSERT INTO Courses (courseName, courseShortDescription, courseLongDescription, courseStartDate, courseRegEndDate, courseEndDate, courseSeats, coursePhoto, courseDisplayStatus, courseCreatedBy) VALUES ('$courseName', '$courseShortDescription', '$courseLongDescription', '$courseStartDate', " . ($courseRegEndDate ? "'$courseRegEndDate'" : "NULL") . ", '$courseEndDate', $courseSeats, '$coursePhoto', $courseDisplayStatus, " . $_SESSION['adminId'] . ")";
+        $insertQuery = "INSERT INTO Courses (courseName, courseShortDescription, courseLongDescription, courseStartDate, courseRegEndDate, courseEndDate, courseSeats, coursePhoto, courseDisplayStatus, courseCreatedBy) VALUES ('$courseName', '$courseShortDescription', '$courseLongDescription', " . ($courseStartDate ? "'$courseStartDate'" : "NULL") . ", " . ($courseRegEndDate ? "'$courseRegEndDate'" : "NULL") . ", " . ($courseEndDate ? "'$courseEndDate'" : "NULL") . ", $courseSeats, '$coursePhoto', $courseDisplayStatus, " . $_SESSION['adminId'] . ")";
         
         if (mysqli_query($conn, $insertQuery)) {
             $courseId = mysqli_insert_id($conn);
@@ -452,14 +452,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </div>
                                     <div class="col-md-4">
                                         <div class="mb-3">
-                                            <label for="courseStartDate" class="form-label">Course Start Date <span class="required-star">*</span></label>
-                                            <input type="date" class="form-control" id="courseStartDate" name="courseStartDate" required>
+                                            <label for="courseStartDate" class="form-label">Course Start Date (optional)</label>
+                                            <input type="date" class="form-control" id="courseStartDate" name="courseStartDate">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="mb-3">
-                                            <label for="courseEndDate" class="form-label">Course End Date <span class="required-star">*</span></label>
-                                            <input type="date" class="form-control" id="courseEndDate" name="courseEndDate" required>
+                                            <label for="courseEndDate" class="form-label">Course End Date (optional)</label>
+                                            <input type="date" class="form-control" id="courseEndDate" name="courseEndDate">
                                         </div>
                                     </div>
                                 </div>
@@ -699,18 +699,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const courseForm = document.getElementById('courseForm');
             if (courseForm) {
                 courseForm.addEventListener('submit', function(e) {
-                    const startDate = new Date(document.getElementById('courseStartDate').value);
-                    const regEndDate = new Date(document.getElementById('courseRegEndDate').value);
-                    const endDate = new Date(document.getElementById('courseEndDate').value);
+                    const startVal = document.getElementById('courseStartDate').value;
+                    const regEndVal = document.getElementById('courseRegEndDate').value;
+                    const endVal = document.getElementById('courseEndDate').value;
+                    const startDate = startVal ? new Date(startVal) : null;
+                    const regEndDate = regEndVal ? new Date(regEndVal) : null;
+                    const endDate = endVal ? new Date(endVal) : null;
                     const isFreeCheckbox = document.getElementById('isFree');
 
-                    if (document.getElementById('courseRegEndDate').value && regEndDate >= startDate) {
+                    if (regEndDate && startDate && regEndDate >= startDate) {
                         alert('Registration end date must be before course start date');
                         e.preventDefault();
                         return;
                     }
 
-                    if (endDate <= startDate) {
+                    if (endDate && startDate && endDate <= startDate) {
                         alert('Course end date must be after course start date');
                         e.preventDefault();
                         return;

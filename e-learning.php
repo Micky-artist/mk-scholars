@@ -1191,14 +1191,18 @@ function formatFileSize($bytes) {
                             <p class="course-subtitle"><?php echo htmlspecialchars($course['courseShortDescription']); ?></p>
                             
                             <div class="course-meta">
+                                <?php if (!empty($course['courseStartDate'])): ?>
                                 <div class="meta-item">
                                     <i class="fas fa-play meta-icon"></i>
                                     <span>Starts: <?php echo date('M j, Y', strtotime($course['courseStartDate'])); ?></span>
                                 </div>
+                                <?php endif; ?>
+                                <?php if (!empty($course['courseEndDate'])): ?>
                                 <div class="meta-item">
                                     <i class="fas fa-flag-checkered meta-icon"></i>
                                     <span>Ends: <?php echo date('M j, Y', strtotime($course['courseEndDate'])); ?></span>
                                 </div>
+                                <?php endif; ?>
                                 <?php if (!empty($course['courseRegEndDate'])): ?>
                                 <div class="meta-item">
                                     <i class="fas fa-calendar-times meta-icon"></i>

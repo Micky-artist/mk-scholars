@@ -182,7 +182,7 @@ if (isset($_GET['checkout'])) {
 // Build course URL for WhatsApp sharing
 $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'];
 $scriptPath = str_replace('/subscription.php', '', $_SERVER['PHP_SELF']);
-$courseUrl = $baseUrl . $scriptPath . "/course-details?id=" . ($courseId && is_numeric($courseId) ? $courseId : '');
+$courseUrl = $baseUrl . $scriptPath . "/subscription?course=" . ($courseId && is_numeric($courseId) ? $courseId : '');
 if (!$courseId || !is_numeric($courseId)) {
     // For default courses, use subscription page URL
     $courseUrl = $baseUrl . $_SERVER['REQUEST_URI'];
