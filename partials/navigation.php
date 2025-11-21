@@ -59,8 +59,9 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 					<a href="./applications" class="nav-link">All Applications</a>
 				</li>
 				<li class="nav-item">
-					<a href="./deutsch-academy" class="nav-link">Deutsch Academy</a>
+					<a href="https://driving.mkscholars.com/en" target="_blank" class="nav-link">Driving School</a>
 				</li>
+				
 				<li class="nav-item">
 					<a href="./courses" class="nav-link">Courses</a>
 				</li>
@@ -68,7 +69,7 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 					<a href="./writing-services" class="nav-link">Writting Services</a>
 				</li>
 				<li class="nav-item">
-					<a href="https://driving.mkscholars.com/en" target="_blank" class="nav-link">Driving School</a>
+					<a href="./deutsch-academy" class="nav-link">Deutsch Academy</a>
 				</li>
 				<li class="nav-item dropdown">
 				<button type="button" class="nav-link dropdown-toggle" id="nav-more-toggle" aria-haspopup="true" aria-expanded="false" aria-controls="nav-more-menu">
@@ -130,8 +131,9 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 				<li class="mobile-nav-item">
 					<a href="./applications" class="mobile-nav-link">All Applications</a>
 				</li>
+				
 				<li class="mobile-nav-item">
-					<a href="./deutsch-academy" class="mobile-nav-link">Deutsch Academy</a>
+					<a href="https://driving.mkscholars.com/en" target="_blank"  class="mobile-nav-link">Driving School</a>
 				</li>
 				<li class="mobile-nav-item">
 					<a href="./courses" class="mobile-nav-link">Courses</a>
@@ -140,7 +142,7 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 					<a href="./writing-services" class="mobile-nav-link">Writting Services</a>
 				</li>
 				<li class="mobile-nav-item">
-					<a href="https://driving.mkscholars.com/en" target="_blank"  class="mobile-nav-link">Driving School</a>
+					<a href="./deutsch-academy" class="mobile-nav-link">Deutsch Academy</a>
 				</li>
 				<li class="mobile-nav-item">
 					<a href="./about-us" class="mobile-nav-link">About Us</a>

@@ -1275,9 +1275,13 @@ if (isset($_POST['startConvo']) && $_POST['startConvo'] === 'true') {
 
         // Close files panel when clicking outside
         document.addEventListener('click', (e) => {
-            if (!filesPanel.contains(e.target) && 
-                !filesToggle.contains(e.target) && 
-                !filesToggleBottom.contains(e.target)) {
+            if (!filesPanel) return;
+
+            const clickedInsidePanel = filesPanel.contains(e.target);
+            const clickedHeaderToggle = filesToggle && filesToggle.contains(e.target);
+            const clickedBottomToggle = filesToggleBottom && filesToggleBottom.contains(e.target);
+
+            if (!clickedInsidePanel && !clickedHeaderToggle && !clickedBottomToggle) {
                 closeFilesPanel();
             }
         });
@@ -1996,16 +2000,15 @@ if (isset($_POST['startConvo']) && $_POST['startConvo'] === 'true') {
             const isMobile = window.innerWidth <= 768;
             
             if (isMobile) {
-                // Show mobile-friendly file picker
+                // Use the default accept types from HTML; ensure we don't force camera-only on iOS
                 const fileInput = document.getElementById('panel-file-input');
                 if (fileInput) {
-                    fileInput.setAttribute('capture', 'environment');
-                    fileInput.setAttribute('accept', 'image/*,video/*,.pdf,.doc,.docx');
+                    fileInput.removeAttribute('capture');
                 }
             }
         }
 
-        // Initialize mobile file handling
+        // Initialize mobile file handling (keeps behaviour consistent but avoids iOS camera-only bug)
         handleMobileFileUpload();
     </script>
 </body>

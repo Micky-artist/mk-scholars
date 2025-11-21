@@ -359,10 +359,6 @@ function formatPrice($amount, $currencySymbol, $currency) {
                                                     }
                                                     ?>
                                                 </span>
-                                                <span class="course-students-small">
-                                                    <i class="fas fa-users"></i>
-                                                    <?php echo $course['enrollmentCount']; ?>
-                                                </span>
                                             </div>
                                             <div class="course-date-small">
                                                 <i class="fas fa-calendar me-1"></i>

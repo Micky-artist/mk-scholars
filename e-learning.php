@@ -1520,6 +1520,8 @@ function formatFileSize($bytes) {
                 <!DOCTYPE html>
                 <html>
                 <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
                     <title>${courseName} - Course Preview</title>
                     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
                     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -1547,7 +1549,7 @@ function formatFileSize($bytes) {
                             background: var(--bg-primary);
                             color: var(--text-primary);
                             padding: 1rem;
-                            font-size: 1rem;
+                            font-size: 1.05rem;
                             min-height: 100vh;
                             transition: background 0.3s, color 0.3s;
                         }
@@ -1635,12 +1637,12 @@ function formatFileSize($bytes) {
                         .text-content {
                             line-height: 1.7;
                             color: var(--text-primary);
-                            font-size: 1rem;
+                            font-size: 1.05rem;
                         }
                         .text-content p {
                             color: var(--text-secondary);
                             margin-bottom: 1rem;
-                            font-size: 1rem;
+                            font-size: 1.05rem;
                         }
                         .text-content h1, .text-content h2, .text-content h3, .text-content h4, .text-content h5, .text-content h6 {
                             color: var(--text-primary);
@@ -1654,11 +1656,11 @@ function formatFileSize($bytes) {
                             color: var(--text-secondary);
                             margin-bottom: 1rem;
                             padding-left: 1.5rem;
-                            font-size: 1rem;
+                            font-size: 1.05rem;
                         }
                         .text-content li {
                             margin-bottom: 0.5rem;
-                            font-size: 1rem;
+                            font-size: 1.05rem;
                         }
                         .no-content {
                             text-align: center;
@@ -1674,25 +1676,30 @@ function formatFileSize($bytes) {
                         /* Fixed Floating Navbar */
                         .floating-navbar {
                             position: fixed;
-                            bottom: 20px;
+                            bottom: 18px;
                             left: 50%;
                             transform: translateX(-50%);
-                            z-index: 1050;
+                            z-index: 9999;
                             background: var(--glass-bg);
                             backdrop-filter: blur(15px);
+                            -webkit-backdrop-filter: blur(15px);
                             border: 2px solid var(--glass-border);
-                            border-radius: 25px;
-                            padding: 14px 22px;
+                            border-radius: 22px;
+                            padding: 10px 18px;
                             box-shadow: 
-                                0 8px 32px rgba(0, 0, 0, 0.15),
-                                0 4px 16px rgba(0, 0, 0, 0.1),
+                                0 6px 24px rgba(0, 0, 0, 0.15),
+                                0 3px 12px rgba(0, 0, 0, 0.1),
                                 0 0 0 1px rgba(255, 255, 255, 0.1),
                                 inset 0 1px 0 rgba(255, 255, 255, 0.2);
                             display: flex;
                             align-items: center;
-                            gap: 14px;
+                            gap: 10px;
                             transition: all 0.3s ease;
-                            min-height: 58px;
+                            min-height: 52px;
+                            pointer-events: auto;
+                            overflow-x: auto;
+                            overflow-y: hidden;
+                            -webkit-overflow-scrolling: touch;
                         }
 
                         .floating-navbar:hover {
@@ -1708,21 +1715,26 @@ function formatFileSize($bytes) {
                             background: rgba(255, 255, 255, 0.1);
                             border: 1px solid rgba(255, 255, 255, 0.2);
                             color: var(--text-primary);
-                            padding: 10px 16px;
-                            border-radius: 12px;
+                            padding: 8px 12px;
+                            border-radius: 10px;
                             cursor: pointer;
                             transition: all 0.3s ease;
                             display: flex;
                             align-items: center;
-                            gap: 8px;
-                            font-size: 0.95rem;
+                            gap: 6px;
+                            font-size: 0.9rem;
                             font-weight: 600;
                             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
                             box-shadow: 
-                                0 2px 8px rgba(0, 0, 0, 0.1),
+                                0 2px 6px rgba(0, 0, 0, 0.1),
                                 inset 0 1px 0 rgba(255, 255, 255, 0.2);
-                            min-height: 40px;
+                            min-height: 36px;
                             text-decoration: none;
+                            pointer-events: auto;
+                            touch-action: manipulation;
+                            -webkit-tap-highlight-color: transparent;
+                            -webkit-user-select: none;
+                            user-select: none;
                         }
 
                         .floating-navbar .nav-btn:hover {
@@ -1782,20 +1794,21 @@ function formatFileSize($bytes) {
                         /* Responsive navbar */
                         @media (max-width: 768px) {
                             .floating-navbar {
-                                bottom: 15px;
-                                padding: 20px 28px;
-                                gap: 18px;
-                                border-radius: 30px;
-                                min-height: 75px;
+                                bottom: 12px;
+                                padding: 8px 14px;
+                                gap: 8px;
+                                border-radius: 20px;
+                                min-height: 50px;
                                 border-width: 3px;
+                                max-width: 100%;
                             }
 
                             .floating-navbar .nav-btn {
-                                padding: 18px 24px;
-                                font-size: 1.2rem;
+                                padding: 8px 12px;
+                                font-size: 0.95rem;
                                 font-weight: 700;
-                                min-height: 55px;
-                                border-radius: 20px;
+                                min-height: 40px;
+                                border-radius: 12px;
                                 box-shadow: 
                                     0 3px 8px rgba(0, 0, 0, 0.15),
                                     inset 0 1px 0 rgba(255, 255, 255, 0.25);
@@ -1812,12 +1825,12 @@ function formatFileSize($bytes) {
 
                         @media (max-width: 480px) {
                             .floating-navbar {
-                                bottom: 10px;
+                                bottom: 8px;
                                 flex-direction: row;
-                                gap: 14px;
-                                padding: 18px 24px;
-                                border-radius: 28px;
-                                min-height: 70px;
+                                gap: 8px;
+                                padding: 8px 12px;
+                                border-radius: 18px;
+                                min-height: 48px;
                                 border-width: 3px;
                                 box-shadow: 
                                     0 6px 24px rgba(0, 0, 0, 0.3),
@@ -1827,11 +1840,11 @@ function formatFileSize($bytes) {
                             }
 
                             .floating-navbar .nav-btn {
-                                padding: 16px 20px;
-                                font-size: 1.25rem;
+                                padding: 8px 10px;
+                                font-size: 1rem;
                                 font-weight: 700;
-                                min-height: 50px;
-                                border-radius: 18px;
+                                min-height: 40px;
+                                border-radius: 12px;
                                 box-shadow: 
                                     0 2px 6px rgba(0, 0, 0, 0.2),
                                     inset 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -1841,8 +1854,21 @@ function formatFileSize($bytes) {
                                 font-size: 1.45rem;
                             }
 
+                            /* Keep icons only label; span hidden to save space */
                             .floating-navbar .nav-btn span {
                                 display: none;
+                            }
+
+                            /* Optional: thinner scrollbar for horizontal scroll */
+                            .floating-navbar::-webkit-scrollbar {
+                                height: 4px;
+                            }
+                            .floating-navbar::-webkit-scrollbar-track {
+                                background: transparent;
+                            }
+                            .floating-navbar::-webkit-scrollbar-thumb {
+                                background: rgba(148, 163, 184, 0.6);
+                                border-radius: 2px;
                             }
                         }
 
@@ -1850,7 +1876,7 @@ function formatFileSize($bytes) {
                         @media (max-width: 768px) {
                             body {
                                 padding: 0.5rem;
-                                font-size: 1.25rem;
+                                font-size: 1.15rem;
                             }
 
                             .container {
@@ -1904,20 +1930,20 @@ function formatFileSize($bytes) {
                             }
 
                             .text-content {
-                                font-size: 1.25rem;
-                                line-height: 1.7;
+                                font-size: 1.2rem;
+                                line-height: 1.65;
                             }
 
                             .text-content p {
-                                font-size: 1.25rem;
+                                font-size: 1.2rem;
                             }
 
                             .text-content ul, .text-content ol {
-                                font-size: 1.25rem;
+                                font-size: 1.2rem;
                             }
 
                             .text-content li {
-                                font-size: 1.25rem;
+                                font-size: 1.2rem;
                             }
 
                             .text-content ul, .text-content ol {
@@ -1936,7 +1962,7 @@ function formatFileSize($bytes) {
                         @media (max-width: 480px) {
                             body {
                                 padding: 0.5rem;
-                                font-size: 1.3rem;
+                                font-size: 1.25rem;
                             }
 
                             .container {
@@ -1968,7 +1994,7 @@ function formatFileSize($bytes) {
 
                             .text-content {
                                 font-size: 1.3rem;
-                                line-height: 1.7;
+                                line-height: 1.75;
                             }
 
                             .text-content p {
@@ -2007,7 +2033,7 @@ function formatFileSize($bytes) {
                         /* Landscape mobile optimization */
                         @media (max-width: 768px) and (orientation: landscape) {
                             body {
-                                font-size: 1.2rem;
+                                font-size: 1.15rem;
                             }
 
                             .container {
@@ -2071,6 +2097,12 @@ function formatFileSize($bytes) {
                             <i class="fas fa-moon theme-icon"></i>
                             <span>Theme</span>
                         </button>
+                        <button class="nav-btn" id="fontSmallerBtn" title="Smaller text">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <button class="nav-btn" id="fontLargerBtn" title="Larger text">
+                            <i class="fas fa-plus"></i>
+                        </button>
                         <a href="my-discussions.php" target="_blank" class="nav-btn" style="text-decoration: none; display: flex; align-items: center; gap: 8px;">
                             <i class="fas fa-comments"></i>
                             <span>Discuss</span>
@@ -2090,31 +2122,94 @@ function formatFileSize($bytes) {
             `;
             
             // Write the content to the preview window
+            previewWindow.document.open();
             previewWindow.document.write(previewHtml);
             previewWindow.document.close();
             
-            // Add theme toggle functionality to preview window
-            previewWindow.addEventListener('load', function() {
-                const previewBody = previewWindow.document.body;
-                const previewThemeIcon = previewWindow.document.querySelector('.floating-navbar .theme-icon');
-                const prevBtn = previewWindow.document.getElementById('prevPageBtn');
-                const nextBtn = previewWindow.document.getElementById('nextPageBtn');
-                const currEl = previewWindow.document.getElementById('currentPage');
-                const totalEl = previewWindow.document.getElementById('totalPages');
+            // Safely initialize controls in the preview window (works better on iOS/Safari)
+            (function initPreviewWindow() {
+                if (!previewWindow || previewWindow.closed) {
+                    return;
+                }
+
+                const doc = previewWindow.document;
+                if (!doc || (doc.readyState !== 'interactive' && doc.readyState !== 'complete')) {
+                    setTimeout(initPreviewWindow, 50);
+                    return;
+                }
+
+                const previewBody = doc.body;
+                const previewThemeIcon = doc.querySelector('.floating-navbar .theme-icon');
+                const prevBtn = doc.getElementById('prevPageBtn');
+                const nextBtn = doc.getElementById('nextPageBtn');
+                const fontSmallerBtn = doc.getElementById('fontSmallerBtn');
+                const fontLargerBtn = doc.getElementById('fontLargerBtn');
+                const currEl = doc.getElementById('currentPage');
+                const totalEl = doc.getElementById('totalPages');
                 let currentPage = 1;
                 if (totalEl) totalEl.textContent = String(totalPages);
+
+                // Font size control
+                let currentFontSizeRem = null;
+
+                function initFontSize() {
+                    if (currentFontSizeRem !== null) return;
+                    const sample = doc.querySelector('.text-content');
+                    if (sample) {
+                        const px = parseFloat(previewWindow.getComputedStyle(sample).fontSize) || 18;
+                        currentFontSizeRem = px / 16;
+                    } else {
+                        currentFontSizeRem = 1.1;
+                    }
+                }
+
+                function applyFontSize() {
+                    initFontSize();
+                    const targets = doc.querySelectorAll('.text-content, .text-content p, .text-content ul, .text-content ol, .text-content li');
+                    targets.forEach(el => {
+                        el.style.fontSize = currentFontSizeRem + 'rem';
+                    });
+                }
 
                 function goTo(page) {
                     if (page < 1 || page > totalPages) return;
                     currentPage = page;
-                    const contentRoot = previewWindow.document.getElementById('courseContent');
+                    const contentRoot = doc.getElementById('courseContent');
                     if (contentRoot) contentRoot.innerHTML = buildSectionsHtml(page);
+                    // Re-apply font size to newly rendered content
+                    applyFontSize();
                     if (currEl) currEl.textContent = String(page);
                     if (prevBtn) prevBtn.disabled = page <= 1;
                     if (nextBtn) nextBtn.disabled = page >= totalPages;
                 }
-                if (prevBtn) prevBtn.onclick = () => goTo(currentPage - 1);
-                if (nextBtn) nextBtn.onclick = () => goTo(currentPage + 1);
+
+                if (prevBtn) {
+                    prevBtn.onclick = function () {
+                        goTo(currentPage - 1);
+                    };
+                }
+                if (nextBtn) {
+                    nextBtn.onclick = function () {
+                        goTo(currentPage + 1);
+                    };
+                }
+
+                // Font size buttons
+                if (fontSmallerBtn) {
+                    fontSmallerBtn.onclick = function () {
+                        initFontSize();
+                        currentFontSizeRem = Math.max(0.7, currentFontSizeRem - 0.1);
+                        applyFontSize();
+                    };
+                }
+                if (fontLargerBtn) {
+                    fontLargerBtn.onclick = function () {
+                        initFontSize();
+                        currentFontSizeRem = Math.min(1.8, currentFontSizeRem + 0.1);
+                        applyFontSize();
+                    };
+                }
+
                 // Initialize pagination state
                 goTo(1);
                 
@@ -2123,7 +2218,7 @@ function formatFileSize($bytes) {
                 previewBody.setAttribute('data-theme', savedTheme);
                 updatePreviewThemeIcon();
                 
-                // Add theme toggle function to preview window
+                // Add theme toggle function to preview window (called from inline onclick)
                 previewWindow.togglePreviewTheme = function() {
                     const currentTheme = previewBody.getAttribute('data-theme');
                     const newTheme = currentTheme === 'light' ? 'dark' : 'light';
@@ -2139,7 +2234,7 @@ function formatFileSize($bytes) {
                         previewThemeIcon.className = currentTheme === 'light' ? 'fas fa-moon theme-icon' : 'fas fa-sun theme-icon';
                     }
                 }
-            });
+            })();
             
             // Focus the preview window
             previewWindow.focus();
