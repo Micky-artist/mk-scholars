@@ -713,6 +713,9 @@ if (!empty($courses)) {
                                                     <li><a class="dropdown-item" href="course-discussion.php?id=<?php echo $course['courseId']; ?>">
                                                         <i class="fas fa-comments me-2"></i>Discussion Board
                                                     </a></li>
+                                                    <li><a class="dropdown-item" href="submissions.php?course=<?php echo $course['courseId']; ?>">
+                                                        <i class="fas fa-file-upload me-2"></i>Submissions
+                                                    </a></li>
                                                     <?php if (hasPermission('DeleteApplication')): ?>
                                                     <li><hr class="dropdown-divider"></li>
                                                     <li><a class="dropdown-item text-danger" href="#" onclick="deleteCourse(<?php echo $course['courseId']; ?>)">

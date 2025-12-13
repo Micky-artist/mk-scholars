@@ -968,7 +968,7 @@ if (!$courseData) {
                         </div>
                         <div class="section-type-card" data-type="break">
                             <div class="section-type-icon"><i class="fas fa-page-break"></i></div>
-                            <h6>Break Course Section</h6>
+                            <h6>New Page</h6>
                             <small>Page break for pagination</small>
                         </div>
                     </div>
@@ -1688,19 +1688,62 @@ if (!$courseData) {
             cards.forEach((card, index) => {
                 console.log(`Card ${index}:`, card, 'Type:', card.dataset.type);
                 // Remove existing listeners first
-                card.removeEventListener('click', handleSectionTypeClick);
+                const oldHandler = card._sectionTypeHandler;
+                if (oldHandler) {
+                    card.removeEventListener('click', oldHandler);
+                }
+                // Create new handler that passes event
+                const newHandler = function(e) {
+                    handleSectionTypeClick.call(this, e);
+                };
+                card._sectionTypeHandler = newHandler;
                 // Add new listener
-                card.addEventListener('click', handleSectionTypeClick);
+                card.addEventListener('click', newHandler);
             });
         }
 
-        function handleSectionTypeClick() {
+        function handleSectionTypeClick(e) {
+            // Prevent duplicate execution from event delegation
+            if (e && e.stopPropagation) {
+                e.stopPropagation();
+            }
+            
             console.log('Section type clicked:', this.dataset.type);
             document.querySelectorAll('.section-type-card').forEach(c => c.classList.remove('selected'));
             this.classList.add('selected');
             selectedSectionType = this.dataset.type;
             
             console.log('Selected section type:', selectedSectionType);
+            
+            // For break sections, immediately add without showing form
+            if (selectedSectionType === 'break') {
+                const section = {
+                    type: 'break',
+                    title: 'New Page',
+                    content: '<div class="page-break-section"><i class="fas fa-page-break"></i> Page Break</div>',
+                    order: courseData.sections.length,
+                    files: [],
+                    publishDate: null,
+                    unpublishDate: null,
+                    visibilityMode: 'immediate'
+                };
+                
+                courseData.sections.push(section);
+                renderCoursePreview();
+                renderSectionsList();
+                
+                // Close modal
+                const modalElement = document.getElementById('addSectionModal');
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                if (modal) {
+                    modal.hide();
+                }
+                
+                // Show success message
+                showNotification('New page section added successfully!', 'success');
+                return;
+            }
+            
             document.getElementById('section-form').style.display = 'block';
             document.getElementById('textToolbar').style.display = selectedSectionType === 'text' ? 'block' : 'none';
             document.getElementById('linkInputContainer').style.display = selectedSectionType === 'text' ? 'block' : 'none';
@@ -1776,9 +1819,10 @@ if (!$courseData) {
                 }
             }
             
-            const visibilityMode = document.getElementById('sectionVisibilityMode').value;
-            const publishDate = document.getElementById('sectionPublishDate').value || null;
-            const unpublishDate = document.getElementById('sectionUnpublishDate').value || null;
+            // Section visibility must always be immediate
+            const visibilityMode = 'immediate';
+            const publishDate = null;
+            const unpublishDate = null;
             
             const section = {
                 type: selectedSectionType,
@@ -3324,11 +3368,15 @@ if (!$courseData) {
         });
 
         // Add event delegation for section type cards (fallback)
+        // Only use if direct listener is not already attached
         document.addEventListener('click', function(e) {
             if (e.target.closest('.section-type-card')) {
                 const card = e.target.closest('.section-type-card');
-                console.log('Section type card clicked via delegation:', card.dataset.type);
-                handleSectionTypeClick.call(card);
+                // Check if direct listener is attached (has _sectionTypeHandler)
+                if (!card._sectionTypeHandler) {
+                    console.log('Section type card clicked via delegation:', card.dataset.type);
+                    handleSectionTypeClick.call(card, e);
+                }
             }
         });
 

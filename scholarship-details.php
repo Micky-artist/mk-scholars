@@ -809,7 +809,7 @@ include("./php/selectScholarshipDetails.php")
 			}
 		</style>
 
-		<script>
+			<script>
 			document.addEventListener('DOMContentLoaded', function() {
 				const helpPopup = document.getElementById('helpPopupModal');
 				const closeBtn = document.getElementById('helpPopupClose');
@@ -818,6 +818,7 @@ include("./php/selectScholarshipDetails.php")
 				const scholarshipId = <?php echo isset($scholarshipData['scholarshipId']) ? $scholarshipData['scholarshipId'] : 0; ?>;
 				const storageKey = 'helpPopupLastShown_' + scholarshipId;
 				let lastShownTime = localStorage.getItem(storageKey) || 0;
+				const thirtySeconds = 30000; // 30 seconds in milliseconds
 				const oneMinute = 60000; // 1 minute in milliseconds
 
 				function showHelpPopup() {
@@ -837,10 +838,19 @@ include("./php/selectScholarshipDetails.php")
 					}
 				}
 
-				// Show popup immediately when user enters the page
-				showHelpPopup();
+				// Show popup 30 seconds after user opens the scholarship page
+				setTimeout(function() {
+					const now = Date.now();
+					const storedTime = parseInt(localStorage.getItem(storageKey)) || 0;
+					const timeSinceLastShow = now - storedTime;
+					
+					// Only show if it's been at least 1 minute since last show (to avoid spam)
+					if (timeSinceLastShow >= oneMinute) {
+						showHelpPopup();
+					}
+				}, thirtySeconds);
 
-				// Set interval to show popup every 1 minute after page load
+				// Set interval to show popup every 1 minute after the initial 30 second delay
 				popupTimer = setInterval(function() {
 					const now = Date.now();
 					const storedTime = parseInt(localStorage.getItem(storageKey)) || 0;

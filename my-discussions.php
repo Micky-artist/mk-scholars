@@ -87,44 +87,50 @@ $stmt->close();
         }
         .discussion-cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
         }
 
         .discussion-card {
             text-decoration: none;
             color: inherit;
-            border-radius: 14px;
-            padding: 1rem;
+            border-radius: 16px;
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            gap: 1rem;
+            transition: all 0.3s ease;
             background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
+            border: 2px solid var(--glass-border);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
         .discussion-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+            border-color: rgba(59, 130, 246, 0.3);
             text-decoration: none;
         }
 
         .discussion-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 12px;
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: rgba(59, 130, 246, 0.12);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(29, 78, 216, 0.15));
             color: #3b82f6;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
         }
 
         .discussion-title {
-            font-weight: 600;
-            margin: 0.25rem 0 0.1rem 0;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin: 0;
             color: var(--text-primary);
+            line-height: 1.3;
         }
 
         .discussion-meta {
@@ -135,16 +141,56 @@ $stmt->close();
             font-size: 0.85rem;
         }
 
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
         .open-btn {
-            margin-top: 0.25rem;
-            align-self: flex-start;
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            width: 100%;
             border: none;
             color: white;
-            padding: 0.4rem 0.75rem;
-            border-radius: 8px;
-            font-size: 0.85rem;
+            padding: 0.875rem 1.25rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
             font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .open-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+            color: white;
+            text-decoration: none;
+        }
+
+        .open-btn.discussion-btn {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+
+        .open-btn.discussion-btn:hover {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+        }
+
+        .open-btn.submission-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .open-btn.submission-btn:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .open-btn i {
+            font-size: 1.1rem;
         }
     </style>
 </head>
@@ -169,21 +215,33 @@ $stmt->close();
                 <?php if (!empty($courses)): ?>
                     <div class="discussion-cards-grid">
                         <?php foreach ($courses as $course): ?>
-                            <a class="discussion-card glass-panel" href="course-discussion.php?id=<?php echo $course['courseId']; ?>">
-                                <div class="discussion-icon"><i class="fas fa-comments"></i></div>
-                                <div class="discussion-title"><?php echo htmlspecialchars($course['courseName']); ?></div>
-                                <div class="discussion-meta">
-                                    <span>Open discussion</span>
-                                    <i class="fas fa-arrow-right"></i>
+                            <div class="discussion-card">
+                                <div class="d-flex align-items-start mb-2">
+                                    <div class="discussion-icon">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <div class="discussion-title"><?php echo htmlspecialchars($course['courseName']); ?></div>
+                                    </div>
                                 </div>
-                            </a>
+                                <div class="action-buttons">
+                                    <a href="course-discussion.php?id=<?php echo $course['courseId']; ?>" class="open-btn discussion-btn">
+                                        <i class="fas fa-comments"></i>
+                                        <span>Discussion Board</span>
+                                    </a>
+                                    <a href="submission.php?course=<?php echo $course['courseId']; ?>" class="open-btn submission-btn">
+                                        <i class="fas fa-file-upload"></i>
+                                        <span>Assignment Submission</span>
+                                    </a>
+                                </div>
+                            </div>
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
                     <div class="text-center py-5">
                         <i class="fas fa-comments fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">No accessible discussions</h5>
-                        <p class="text-muted">Enroll in a course or subscribe to access its discussion board.</p>
+                        <h5 class="text-muted">No accessible courses</h5>
+                        <p class="text-muted">Enroll in a course or subscribe to access its discussion board and assignments.</p>
                         <a href="e-learning.php" class="btn btn-primary">Browse Courses</a>
                     </div>
                 <?php endif; ?>

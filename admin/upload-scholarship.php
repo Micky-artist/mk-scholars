@@ -167,8 +167,44 @@ if (!hasPermission('PublishApplication')) {
     </div>
     </div>
 
-    <script type="text/javascript" src="./tinymce/tinymce.min.js"></script>
-    <script type="text/javascript" src="./tinymce/tinyscript.js"></script>
+    <!-- jQuery and Bootstrap JS (required for some plugins) -->
+    <script src="./assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="./assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- TinyMCE Editor -->
+    <script type="text/javascript" src="../tinymce/tinymce.min.js"></script>
+    <script type="text/javascript">
+        // Wait for DOM to be ready
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof tinymce !== 'undefined') {
+                tinymce.init({
+                    selector: '#textdescription',
+                    height: 500,
+                    menubar: true,
+                    plugins: [
+                        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                        'insertdatetime', 'media', 'table', 'help', 'wordcount'
+                    ],
+                    toolbar: 'undo redo | blocks | ' +
+                        'bold italic underline strikethrough | forecolor backcolor | ' +
+                        'alignleft aligncenter alignright alignjustify | ' +
+                        'bullist numlist | outdent indent | ' +
+                        'removeformat | link image | table | code | fullscreen | help',
+                    content_style: 'body { font-family: Arial, sans-serif; font-size: 14px; }',
+                    branding: false,
+                    promotion: false,
+                    setup: function(editor) {
+                        editor.on('change', function() {
+                            editor.save();
+                        });
+                    }
+                });
+            } else {
+                console.error('TinyMCE library not loaded. Check the script path.');
+            }
+        });
+    </script>
 </body>
 
 </html>

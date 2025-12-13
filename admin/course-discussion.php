@@ -59,11 +59,68 @@ if ($tableResult->num_rows === 0) {
     // Table exists
 }
 
+// Check if DiscussionReplies table exists
+$repliesTableCheck = "SHOW TABLES LIKE 'DiscussionReplies'";
+$repliesTableResult = $conn->query($repliesTableCheck);
+if ($repliesTableResult->num_rows === 0) {
+    $createRepliesTable = "CREATE TABLE DiscussionReplies (
+        replyId INT AUTO_INCREMENT PRIMARY KEY,
+        discussionId INT NOT NULL,
+        userId INT NOT NULL,
+        replyContent LONGTEXT NOT NULL,
+        replyDate DATE NOT NULL,
+        replyTime TIME NOT NULL,
+        createdDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_discussion_replies (discussionId),
+        INDEX idx_user_replies (userId),
+        INDEX idx_reply_date (replyDate, replyTime)
+    )";
+    
+    $conn->query($createRepliesTable);
+}
+
 // Handle form submissions
 $message = '';
 $messageType = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['create_reply'])) {
+        $discussionId = isset($_POST['discussionId']) ? (int)$_POST['discussionId'] : 0;
+        $replyContent = mysqli_real_escape_string($conn, $_POST['replyContent']);
+        
+        $adminId = isset($_SESSION['adminId']) ? $_SESSION['adminId'] : 0;
+        
+        if ($adminId == 0) {
+            $message = 'Error: Admin ID not found in session. Please login again.';
+            $messageType = 'danger';
+        } elseif ($discussionId <= 0) {
+            $message = 'Error: Invalid discussion ID.';
+            $messageType = 'danger';
+        } elseif (empty(trim($replyContent))) {
+            $message = 'Error: Reply content cannot be empty.';
+            $messageType = 'danger';
+        } else {
+            $insertReplyQuery = "INSERT INTO DiscussionReplies (discussionId, userId, replyContent, replyDate, replyTime) VALUES (?, ?, ?, CURDATE(), CURTIME())";
+            $insertReplyStmt = $conn->prepare($insertReplyQuery);
+            
+            if (!$insertReplyStmt) {
+                $message = 'Error preparing statement: ' . mysqli_error($conn);
+                $messageType = 'danger';
+            } else {
+                $insertReplyStmt->bind_param("iis", $discussionId, $adminId, $replyContent);
+                
+                if ($insertReplyStmt->execute()) {
+                    header("Location: course-discussion.php?id=" . $courseId . "&status=reply_created");
+                    exit;
+                } else {
+                    $message = 'Error creating reply: ' . mysqli_error($conn);
+                    $messageType = 'danger';
+                }
+                $insertReplyStmt->close();
+            }
+        }
+    }
+    
     if (isset($_POST['create_discussion'])) {
         $messageTitle = mysqli_real_escape_string($conn, $_POST['messageTitle']);
         $messageBody = mysqli_real_escape_string($conn, $_POST['messageBody']);
@@ -204,6 +261,41 @@ $discussionsStmt->execute();
 $discussionsResult = $discussionsStmt->get_result();
 $discussions = $discussionsResult->fetch_all(MYSQLI_ASSOC);
 $discussionsStmt->close();
+
+// Fetch replies for each discussion
+$repliesByDiscussion = [];
+if (!empty($discussions)) {
+    $discussionIds = array_column($discussions, 'discussionId');
+    $placeholders = implode(',', array_fill(0, count($discussionIds), '?'));
+    
+    $repliesQuery = "SELECT r.*,
+                            CASE 
+                                WHEN r.userId IN (SELECT userId FROM users) THEN 'admin'
+                                WHEN r.userId IN (SELECT NoUserId FROM normUsers) THEN 'student'
+                                ELSE 'unknown'
+                            END as userType,
+                            CASE 
+                                WHEN r.userId IN (SELECT userId FROM users) THEN (SELECT username FROM users WHERE userId = r.userId)
+                                WHEN r.userId IN (SELECT NoUserId FROM normUsers) THEN (SELECT NoUsername FROM normUsers WHERE NoUserId = r.userId)
+                                ELSE 'Unknown User'
+                            END as username
+                     FROM DiscussionReplies r 
+                     WHERE r.discussionId IN ($placeholders)
+                     ORDER BY r.replyDate ASC, r.replyTime ASC";
+    
+    $repliesStmt = $conn->prepare($repliesQuery);
+    if ($repliesStmt) {
+        $types = str_repeat('i', count($discussionIds));
+        $repliesStmt->bind_param($types, ...$discussionIds);
+        $repliesStmt->execute();
+        $repliesResult = $repliesStmt->get_result();
+        
+        while ($reply = $repliesResult->fetch_assoc()) {
+            $repliesByDiscussion[$reply['discussionId']][] = $reply;
+        }
+        $repliesStmt->close();
+    }
+}
 
 // Helper: safely escape then linkify URLs and convert newlines to <br>
 if (!function_exists('linkifyAndEscape')) {
@@ -558,6 +650,88 @@ if (!function_exists('linkifyAndEscape')) {
             font-family: monospace;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
+
+        /* Replies Section Styling */
+        .replies-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .reply-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 3px solid #3b82f6;
+            border-radius: 6px;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .reply-header {
+            margin-bottom: 0.5rem;
+        }
+
+        .user-avatar-small {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .user-avatar-small.admin {
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+        }
+
+        .reply-author {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .reply-time {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .reply-content {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-left: 36px;
+        }
+
+        .reply-form-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .reply-form-container {
+            margin-top: 0.5rem;
+        }
+
+        .reply-form .input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .reply-textarea {
+            flex: 1;
+            resize: none;
+            font-size: 0.9rem;
+        }
+
+        .reply-btn {
+            font-size: 0.85rem;
+        }
+
+        .reply-count {
+            font-size: 0.85rem;
+        }
     </style>
 </head>
 
@@ -673,7 +847,60 @@ if (!function_exists('linkifyAndEscape')) {
                                     <?php echo linkifyAndEscape($discussion['messageBody']); ?>
                                 </div>
 
-                                <div class="discussion-meta"></div>
+                                <div class="discussion-meta">
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <?php if (isset($repliesByDiscussion[$discussion['discussionId']]) && count($repliesByDiscussion[$discussion['discussionId']]) > 0): ?>
+                                            <button class="btn btn-sm btn-outline-secondary show-replies-btn" data-discussion-id="<?php echo $discussion['discussionId']; ?>">
+                                                <i class="fas fa-comments me-1"></i>Show Replies (<?php echo count($repliesByDiscussion[$discussion['discussionId']]); ?>)
+                                            </button>
+                                        <?php endif; ?>
+                                        <button class="btn btn-sm btn-outline-primary reply-btn" data-discussion-id="<?php echo $discussion['discussionId']; ?>">
+                                            <i class="fas fa-reply me-1"></i>Reply
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Replies Section -->
+                                <div class="replies-section" id="replies-<?php echo $discussion['discussionId']; ?>" style="display: none;">
+                                    <?php if (isset($repliesByDiscussion[$discussion['discussionId']])): ?>
+                                        <?php foreach ($repliesByDiscussion[$discussion['discussionId']] as $reply): ?>
+                                            <div class="reply-item">
+                                                <div class="reply-header">
+                                                    <div class="user-info">
+                                                        <div class="user-avatar-small <?php echo $reply['userType'] === 'admin' ? 'admin' : ''; ?>">
+                                                            <?php echo strtoupper(substr($reply['username'], 0, 1)); ?>
+                                                        </div>
+                                                        <div class="user-details">
+                                                            <strong class="reply-author"><?php echo htmlspecialchars($reply['username']); ?></strong>
+                                                            <small class="reply-time">
+                                                                <?php echo $reply['userType'] === 'admin' ? 'Administrator' : 'Student'; ?>
+                                                                • <?php echo date('M j, Y g:i A', strtotime($reply['replyDate'] . ' ' . $reply['replyTime'])); ?>
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="reply-content">
+                                                    <?php echo linkifyAndEscape($reply['replyContent']); ?>
+                                                </div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </div>
+
+                                <!-- Reply Form Section -->
+                                <div class="reply-form-section" id="reply-form-<?php echo $discussion['discussionId']; ?>" style="display: none;">
+                                    <div class="reply-form-container">
+                                        <form method="POST" class="reply-form">
+                                            <input type="hidden" name="discussionId" value="<?php echo $discussion['discussionId']; ?>">
+                                            <div class="input-group">
+                                                <textarea class="form-control reply-textarea" name="replyContent" rows="2" placeholder="Write a reply..." required></textarea>
+                                                <button type="submit" name="create_reply" class="btn btn-primary">
+                                                    <i class="fas fa-paper-plane"></i>
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>
@@ -1025,6 +1252,99 @@ if (!function_exists('linkifyAndEscape')) {
         showRealTimeIndicator();
 
         // Remove visible auto-refresh; background polling only
+
+        // Reply button functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show Replies button - only shows/hides replies
+            const showRepliesButtons = document.querySelectorAll('.show-replies-btn');
+            showRepliesButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const discussionId = this.getAttribute('data-discussion-id');
+                    const repliesSection = document.getElementById('replies-' + discussionId);
+                    
+                    if (repliesSection) {
+                        const isVisible = repliesSection.style.display !== 'none';
+                        repliesSection.style.display = isVisible ? 'none' : 'block';
+                        
+                        // Update button text
+                        const replyCount = this.textContent.match(/\d+/);
+                        if (isVisible) {
+                            this.innerHTML = `<i class="fas fa-comments me-1"></i>Show Replies (${replyCount})`;
+                        } else {
+                            this.innerHTML = `<i class="fas fa-eye-slash me-1"></i>Hide Replies (${replyCount})`;
+                        }
+                    }
+                });
+            });
+
+            // Reply button - shows reply form and also shows replies if hidden
+            const replyButtons = document.querySelectorAll('.reply-btn');
+            replyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const discussionId = this.getAttribute('data-discussion-id');
+                    const replyFormSection = document.getElementById('reply-form-' + discussionId);
+                    const repliesSection = document.getElementById('replies-' + discussionId);
+                    
+                    // Show reply form
+                    if (replyFormSection) {
+                        const isFormVisible = replyFormSection.style.display !== 'none';
+                        replyFormSection.style.display = isFormVisible ? 'none' : 'block';
+                        
+                        // Also show replies if they exist and are hidden
+                        if (repliesSection && repliesSection.style.display === 'none') {
+                            repliesSection.style.display = 'block';
+                            // Update show replies button if it exists
+                            const showRepliesBtn = document.querySelector(`.show-replies-btn[data-discussion-id="${discussionId}"]`);
+                            if (showRepliesBtn) {
+                                const replyCount = showRepliesBtn.textContent.match(/\d+/);
+                                showRepliesBtn.innerHTML = `<i class="fas fa-eye-slash me-1"></i>Hide Replies (${replyCount})`;
+                            }
+                        }
+                        
+                        // Focus on textarea if showing form
+                        if (!isFormVisible) {
+                            const textarea = replyFormSection.querySelector('.reply-textarea');
+                            if (textarea) {
+                                setTimeout(() => textarea.focus(), 100);
+                            }
+                        }
+                    }
+                });
+            });
+
+            // Sanitize reply textarea
+            const replyTextareas = document.querySelectorAll('.reply-textarea');
+            replyTextareas.forEach(textarea => {
+                function sanitize(el) {
+                    el.value = el.value.replace(/\\r\\n/g, ' ').replace(/\r\n|\r|\n/g, ' ');
+                }
+                textarea.addEventListener('input', function() { sanitize(this); });
+                textarea.addEventListener('paste', function() { setTimeout(() => sanitize(textarea), 0); });
+                textarea.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        const start = this.selectionStart ?? this.value.length;
+                        const end = this.selectionEnd ?? this.value.length;
+                        const before = this.value.substring(0, start);
+                        const after = this.value.substring(end);
+                        this.value = before + ' ' + after;
+                        const pos = start + 1;
+                        this.selectionStart = this.selectionEnd = pos;
+                    }
+                });
+            });
+
+            // Sanitize reply forms before submission
+            const replyForms = document.querySelectorAll('.reply-form');
+            replyForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    const textarea = this.querySelector('.reply-textarea');
+                    if (textarea) {
+                        textarea.value = textarea.value.replace(/\\r\\n/g, ' ').replace(/\r\n|\r|\n/g, ' ');
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>

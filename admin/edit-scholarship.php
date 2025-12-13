@@ -125,10 +125,10 @@ if ((isset($_GET['edit']) && !empty(isset($_GET['edit'])) && (isset($_GET['i']) 
                                             <label for="cono1" class="card-title">Scholarship Status</label>
                                             <div class="col-sm-9">
                                                 <select type="text" name="ScholarshipStatus" class="form-control" id="lname" required>
-                                                    <option selected disabled>Select Status</option>
-                                                    <option value="10">Hidden</option>
-                                                    <option value="1">Free</option>
-                                                    <option value="2">Payable</option>
+                                                    <option <?php echo (!isset($getScholarships['scholarshipStatus']) || $getScholarships['scholarshipStatus'] === '') ? 'selected' : ''; ?> disabled>Select Status</option>
+                                                    <option value="10" <?php echo (isset($getScholarships['scholarshipStatus']) && $getScholarships['scholarshipStatus'] == 0) ? 'selected' : ''; ?>>Hidden</option>
+                                                    <option value="1" <?php echo (isset($getScholarships['scholarshipStatus']) && $getScholarships['scholarshipStatus'] == 1) ? 'selected' : ''; ?>>Free</option>
+                                                    <option value="2" <?php echo (isset($getScholarships['scholarshipStatus']) && $getScholarships['scholarshipStatus'] == 2) ? 'selected' : ''; ?>>Payable</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -144,8 +144,11 @@ if ((isset($_GET['edit']) && !empty(isset($_GET['edit'])) && (isset($_GET['i']) 
                                         <label for="cono1" class="card-title">Scholarship Country</label>
                                         <div class="col-sm-9">
                                             <select type="text" name="ScholarshipCountry" class="form-control" id="lname" required>
-                                                <option selected disabled>Select Country</option>
-                                                <?php include("./php/selectCountries.php"); ?><?php  ?>
+                                                <option <?php echo (!isset($getScholarships['country']) || $getScholarships['country'] === '') ? 'selected' : ''; ?> disabled>Select Country</option>
+                                                <?php 
+                                                $selectedCountryId = isset($getScholarships['country']) ? $getScholarships['country'] : '';
+                                                include("./php/selectCountries.php"); 
+                                                ?>
                                             </select>
                                         </div>
                                     </div>

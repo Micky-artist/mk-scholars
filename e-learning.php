@@ -1795,19 +1795,19 @@ function formatFileSize($bytes) {
                         @media (max-width: 768px) {
                             .floating-navbar {
                                 bottom: 12px;
-                                padding: 8px 14px;
-                                gap: 8px;
+                                padding: 10px 16px;
+                                gap: 10px;
                                 border-radius: 20px;
-                                min-height: 50px;
+                                min-height: 56px;
                                 border-width: 3px;
                                 max-width: 100%;
                             }
 
                             .floating-navbar .nav-btn {
-                                padding: 8px 12px;
-                                font-size: 0.95rem;
+                                padding: 8px 14px;
+                                font-size: 0.85rem;
                                 font-weight: 700;
-                                min-height: 40px;
+                                min-height: 44px;
                                 border-radius: 12px;
                                 box-shadow: 
                                     0 3px 8px rgba(0, 0, 0, 0.15),
@@ -1815,11 +1815,12 @@ function formatFileSize($bytes) {
                             }
 
                             .floating-navbar .nav-btn i {
-                                font-size: 1.5rem;
+                                font-size: 1.2rem;
                             }
 
                             .floating-navbar .nav-btn span {
-                                display: none;
+                                display: inline;
+                                font-size: 0.8rem;
                             }
                         }
 
@@ -1828,9 +1829,9 @@ function formatFileSize($bytes) {
                                 bottom: 8px;
                                 flex-direction: row;
                                 gap: 8px;
-                                padding: 8px 12px;
+                                padding: 10px 14px;
                                 border-radius: 18px;
-                                min-height: 48px;
+                                min-height: 54px;
                                 border-width: 3px;
                                 box-shadow: 
                                     0 6px 24px rgba(0, 0, 0, 0.3),
@@ -1840,10 +1841,10 @@ function formatFileSize($bytes) {
                             }
 
                             .floating-navbar .nav-btn {
-                                padding: 8px 10px;
-                                font-size: 1rem;
+                                padding: 8px 12px;
+                                font-size: 0.75rem;
                                 font-weight: 700;
-                                min-height: 40px;
+                                min-height: 42px;
                                 border-radius: 12px;
                                 box-shadow: 
                                     0 2px 6px rgba(0, 0, 0, 0.2),
@@ -1851,12 +1852,13 @@ function formatFileSize($bytes) {
                             }
 
                             .floating-navbar .nav-btn i {
-                                font-size: 1.45rem;
+                                font-size: 1.1rem;
                             }
 
-                            /* Keep icons only label; span hidden to save space */
+                            /* Show text labels on mobile to match desktop */
                             .floating-navbar .nav-btn span {
-                                display: none;
+                                display: inline;
+                                font-size: 0.7rem;
                             }
 
                             /* Optional: thinner scrollbar for horizontal scroll */
@@ -1882,7 +1884,7 @@ function formatFileSize($bytes) {
                             .container {
                                 padding: 1.5rem;
                                 border-radius: 10px;
-                                margin-bottom: 120px; /* More space for larger floating navbar */
+                                margin-bottom: 140px; /* More space for larger floating navbar with text labels */
                             }
 
                             h1 {
@@ -1968,7 +1970,7 @@ function formatFileSize($bytes) {
                             .container {
                                 padding: 1.25rem;
                                 border-radius: 8px;
-                                margin-bottom: 150px; /* Extra space for larger floating navbar */
+                                margin-bottom: 160px; /* Extra space for larger floating navbar with text labels */
                             }
 
                             h1 {
@@ -2043,9 +2045,9 @@ function formatFileSize($bytes) {
 
                             .floating-navbar {
                                 bottom: 10px;
-                                padding: 16px 22px;
-                                gap: 16px;
-                                min-height: 65px;
+                                padding: 12px 18px;
+                                gap: 12px;
+                                min-height: 60px;
                                 border-width: 3px;
                                 box-shadow: 
                                     0 6px 24px rgba(0, 0, 0, 0.25),
@@ -2055,13 +2057,18 @@ function formatFileSize($bytes) {
                             }
 
                             .floating-navbar .nav-btn {
-                                padding: 14px 18px;
-                                font-size: 1.15rem;
-                                min-height: 48px;
+                                padding: 10px 16px;
+                                font-size: 0.9rem;
+                                min-height: 46px;
                             }
 
                             .floating-navbar .nav-btn i {
-                                font-size: 1.35rem;
+                                font-size: 1.2rem;
+                            }
+
+                            .floating-navbar .nav-btn span {
+                                display: inline;
+                                font-size: 0.85rem;
                             }
 
                             h2, .section h2 {

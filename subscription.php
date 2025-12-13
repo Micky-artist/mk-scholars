@@ -743,9 +743,15 @@ if (empty($ogImageUrl)) {
                                     <div class="flex-grow-1">
                                         <h5 class="mb-2"><?php echo htmlspecialchars($option['displayName']); ?></h5>
                                         <p class="text-muted mb-2"><?php echo htmlspecialchars($option['description']); ?></p>
+                                        <?php if ($isLoggedIn): ?>
                                         <div class="price-tag">
                                             <?php echo number_format($option['amount']); ?> <?php echo htmlspecialchars($option['currency']); ?>
                                         </div>
+                                        <?php else: ?>
+                                        <div class="price-tag text-muted">
+                                            <i class="fas fa-lock me-1"></i>Login to see pricing
+                                        </div>
+                                        <?php endif; ?>
                   </div>
                                     <button type="button" class="btn-choose choose-course">
                                         <i class="fas fa-check me-1"></i>
@@ -766,9 +772,15 @@ if (empty($ogImageUrl)) {
                                 <div class="flex-grow-1">
                                     <h5 class="mb-2"><?php echo htmlspecialchars($option['displayName']); ?></h5>
                                     <p class="text-muted mb-2"><?php echo htmlspecialchars($option['description']); ?></p>
+                                    <?php if ($isLoggedIn): ?>
                                     <div class="price-tag">
                                         <?php echo number_format($option['amount']); ?> <?php echo htmlspecialchars($option['currency']); ?>
                                     </div>
+                                    <?php else: ?>
+                                    <div class="price-tag text-muted">
+                                        <i class="fas fa-lock me-1"></i>Login to see pricing
+                                    </div>
+                                    <?php endif; ?>
                 </div>
                                 <button type="button" class="btn-choose choose-course">
                                     <i class="fas fa-check me-1"></i>

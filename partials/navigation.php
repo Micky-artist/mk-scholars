@@ -59,7 +59,7 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 					<a href="./applications" class="nav-link">All Applications</a>
 				</li>
 				<li class="nav-item">
-					<a href="https://driving.mkscholars.com/en" target="_blank" class="nav-link">Driving School</a>
+					<a href="https://driving.mkscholars.com/rw" target="_blank" class="nav-link">Driving School</a>
 				</li>
 				
 				<li class="nav-item">
@@ -133,7 +133,7 @@ include("./deutsch-popup.php"); // MK Deutsch Academy popup
 				</li>
 				
 				<li class="mobile-nav-item">
-					<a href="https://driving.mkscholars.com/en" target="_blank"  class="mobile-nav-link">Driving School</a>
+					<a href="https://driving.mkscholars.com/rw" target="_blank"  class="mobile-nav-link">Driving School</a>
 				</li>
 				<li class="mobile-nav-item">
 					<a href="./courses" class="mobile-nav-link">Courses</a>
