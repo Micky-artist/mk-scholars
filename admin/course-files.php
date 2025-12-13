@@ -7,6 +7,11 @@ $courseId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $message = '';
 $messageType = '';
 
+// Validate course access before proceeding
+if ($courseId > 0) {
+    validateCourseAccess($courseId);
+}
+
 // Get course data
 $courseQuery = "SELECT * FROM Courses WHERE courseId = $courseId";
 $courseResult = mysqli_query($conn, $courseQuery);

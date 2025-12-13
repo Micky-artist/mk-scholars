@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MK Deutsch Academy News</title>
+  <title>MK Driving School News</title>
   <style>
-    /* Responsive Deutsch Academy Popup */
+    /* Modern MK Driving School Popup - Redesigned */
     .popup-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -20,7 +21,7 @@
       visibility: hidden;
       transition: opacity 0.3s ease, visibility 0.3s ease;
       z-index: 9999;
-      padding: 20px;
+      padding: 15px;
       box-sizing: border-box;
     }
 
@@ -30,51 +31,49 @@
     }
 
     .popup-container {
-      background: linear-gradient(135deg, #0E77C2 0%, #083352 100%);
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
       width: 100%;
-      max-width: 500px;
-      padding: 30px;
-      text-align: center;
+      max-width: 380px;
+      padding: 24px;
+      text-align: left;
       position: relative;
-      transform: scale(0.8);
+      transform: scale(0.9) translateY(20px);
       opacity: 0;
-      transition: transform 0.3s ease, opacity 0.3s ease;
-      color: white;
-      border: 3px solid #FFD700;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+      color: #1a1a1a;
     }
 
     .popup-overlay.active .popup-container {
-      transform: scale(1);
+      transform: scale(1) translateY(0);
       opacity: 1;
     }
 
-    /* Close Button - Large and Easy to Tap */
+    /* Close Button - Minimal Design */
     .close-button {
       position: absolute;
-      top: 15px;
-      right: 15px;
-      background: #DC143C;
+      top: 12px;
+      right: 12px;
+      background: transparent;
       border: none;
-      font-size: 24px;
-      color: white;
+      font-size: 22px;
+      color: #6b7280;
       cursor: pointer;
-      width: 45px;
-      height: 45px;
+      width: 32px;
+      height: 32px;
       display: flex;
       justify-content: center;
       align-items: center;
-      border-radius: 50%;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(220, 20, 60, 0.4);
+      border-radius: 8px;
+      transition: all 0.2s ease;
       z-index: 10;
+      line-height: 1;
     }
 
     .close-button:hover {
-      background: #B22222;
-      transform: scale(1.1);
-      box-shadow: 0 6px 20px rgba(220, 20, 60, 0.6);
+      background: #f3f4f6;
+      color: #1a1a1a;
     }
 
     .close-button:active {
@@ -83,125 +82,133 @@
 
     /* Header */
     .popup-header {
-      margin-bottom: 25px;
-      margin-top: 20px;
-    }
-
-    .popup-header .emoji {
-      font-size: 60px;
-      margin-bottom: 15px;
-      animation: float 3s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+      margin-bottom: 16px;
+      margin-top: 0;
+      padding-right: 30px;
     }
 
     .popup-header h2 {
-      font-size: 28px;
-      color: #FFD700;
-      margin: 0;
+      font-size: 22px;
+      color: #1a1a1a;
+      margin: 0 0 6px 0;
       font-weight: 700;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      letter-spacing: -0.5px;
     }
 
     .popup-header h3 {
-      font-size: 22px;
-      color: white;
-      margin: 10px 0;
-      font-weight: 600;
+      font-size: 14px;
+      color: #6b7280;
+      margin: 0;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     /* Body */
     .popup-body {
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
 
     .popup-body p {
-      font-size: 18px;
-      color: white;
+      font-size: 14px;
+      color: #4b5563;
       line-height: 1.6;
-      margin-bottom: 20px;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+      margin-bottom: 16px;
+    }
+
+    .popup-body strong {
+      color: #1a1a1a;
+      font-weight: 600;
     }
 
     .highlight-box {
-      background: rgba(255, 215, 0, 0.2);
-      border: 2px solid #FFD700;
-      border-radius: 15px;
-      padding: 20px;
-      margin: 20px 0;
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-left: 3px solid #6366f1;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
     }
 
     .highlight-box h4 {
-      color: #FFD700;
-      font-size: 20px;
-      margin-bottom: 15px;
+      color: #1a1a1a;
+      font-size: 15px;
+      margin-bottom: 12px;
       font-weight: 600;
     }
 
     .highlight-box ul {
       text-align: left;
-      color: white;
-      font-size: 16px;
-      line-height: 1.8;
+      color: #4b5563;
+      font-size: 13px;
+      line-height: 1.7;
+      margin: 0;
+      padding-left: 20px;
+      list-style: none;
     }
 
     .highlight-box li {
       margin-bottom: 8px;
+      position: relative;
+      padding-left: 20px;
+    }
+
+    .highlight-box li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: #6366f1;
+      font-weight: bold;
+      font-size: 18px;
     }
 
     /* Buttons */
     .popup-buttons {
       display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-top: 25px;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
       flex-wrap: wrap;
     }
 
     .popup-button {
-      padding: 15px 30px;
+      padding: 10px 20px;
       border: none;
-      border-radius: 30px;
-      font-size: 16px;
+      border-radius: 8px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
-      min-width: 120px;
+      transition: all 0.2s ease;
       text-decoration: none;
       display: inline-block;
       text-align: center;
     }
 
     .popup-button.primary {
-      background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-      color: #000;
-      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+      background: #6366f1;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
     }
 
     .popup-button.primary:hover {
-      background: linear-gradient(135deg, #FFA500 0%, #FF8C00 100%);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
+      background: #4f46e5;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
     }
 
     .popup-button.secondary {
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      backdrop-filter: blur(10px);
+      background: #f3f4f6;
+      color: #4b5563;
+      border: 1px solid #e5e7eb;
     }
 
     .popup-button.secondary:hover {
-      background: rgba(255, 255, 255, 0.3);
-      transform: translateY(-3px);
-      border-color: rgba(255, 255, 255, 0.5);
+      background: #e5e7eb;
+      color: #1a1a1a;
     }
 
     .popup-button:active {
-      transform: translateY(-1px);
+      transform: translateY(0);
     }
 
     /* Mobile Optimizations */
@@ -213,296 +220,90 @@
       }
 
       .popup-container {
-        padding: 20px 15px;
+        padding: 20px;
         max-width: 100%;
-        border-radius: 15px;
+        border-radius: 12px;
         margin: 0;
         max-height: calc(100vh - 40px);
         overflow-y: auto;
       }
 
       .close-button {
-        width: 50px;
-        height: 50px;
-        font-size: 26px;
-        top: 8px;
-        right: 8px;
+        width: 32px;
+        height: 32px;
+        font-size: 20px;
+        top: 10px;
+        right: 10px;
       }
 
       .popup-header h2 {
-        font-size: 22px;
-        line-height: 1.2;
+        font-size: 20px;
       }
 
       .popup-header h3 {
-        font-size: 18px;
-        margin: 8px 0;
+        font-size: 13px;
       }
 
       .popup-body p {
-        font-size: 15px;
-        margin-bottom: 15px;
+        font-size: 13px;
+        margin-bottom: 14px;
       }
 
       .highlight-box {
-        padding: 12px;
-        margin: 15px 0;
+        padding: 14px;
+        margin: 14px 0;
       }
 
       .highlight-box h4 {
-        font-size: 16px;
+        font-size: 14px;
         margin-bottom: 10px;
       }
 
       .highlight-box ul {
-        font-size: 14px;
-        line-height: 1.6;
+        font-size: 12px;
       }
 
       .popup-buttons {
         flex-direction: column;
-        gap: 10px;
-        margin-top: 20px;
+        gap: 8px;
+        margin-top: 18px;
       }
 
       .popup-button {
-        padding: 16px 20px;
-        font-size: 15px;
+        padding: 12px 18px;
+        font-size: 14px;
         width: 100%;
       }
     }
 
-    /* iPhone SE and similar small devices */
-    @media (max-width: 414px) {
-      .popup-overlay {
-        padding: 5px;
-        padding-top: 15px;
-      }
-
+    @media (max-width: 480px) {
       .popup-container {
-        padding: 15px 12px;
-        max-height: calc(100vh - 30px);
-        border-radius: 12px;
-      }
-
-      .close-button {
-        width: 48px;
-        height: 48px;
-        font-size: 24px;
-        top: 6px;
-        right: 6px;
-      }
-
-      .popup-header .emoji {
-        font-size: 40px;
-        margin-bottom: 10px;
-      }
-
-      .popup-header h2 {
-        font-size: 20px;
-        line-height: 1.1;
-      }
-
-      .popup-header h3 {
-        font-size: 16px;
-        margin: 6px 0;
-      }
-
-      .popup-body p {
-        font-size: 14px;
-        margin-bottom: 12px;
-        line-height: 1.4;
-      }
-
-      .highlight-box {
-        padding: 10px;
-        margin: 12px 0;
-      }
-
-      .highlight-box h4 {
-        font-size: 15px;
-        margin-bottom: 8px;
-      }
-
-      .highlight-box ul {
-        font-size: 13px;
-        line-height: 1.5;
-      }
-
-      .highlight-box li {
-        margin-bottom: 6px;
-      }
-
-      .popup-button {
-        padding: 14px 18px;
-        font-size: 14px;
-        border-radius: 25px;
-      }
-    }
-
-    /* Extra small devices (iPhone SE, etc.) */
-    @media (max-width: 375px) {
-      .popup-overlay {
-        padding: 3px;
-        padding-top: 10px;
-      }
-
-      .popup-container {
-        padding: 12px 10px;
-        max-height: calc(100vh - 20px);
-        border-radius: 10px;
-      }
-
-      .close-button {
-        width: 45px;
-        height: 45px;
-        font-size: 22px;
-        top: 5px;
-        right: 5px;
-      }
-
-      .popup-header {
-        margin-bottom: 15px;
-        margin-top: 15px;
-      }
-
-      .popup-header .emoji {
-        font-size: 35px;
-        margin-bottom: 8px;
+        padding: 18px;
+        max-width: 100%;
       }
 
       .popup-header h2 {
         font-size: 18px;
-        line-height: 1.1;
       }
 
       .popup-header h3 {
-        font-size: 15px;
-        margin: 5px 0;
-      }
-
-      .popup-body {
-        margin-bottom: 15px;
-      }
-
-      .popup-body p {
-        font-size: 13px;
-        margin-bottom: 10px;
-        line-height: 1.3;
-      }
-
-      .highlight-box {
-        padding: 8px;
-        margin: 10px 0;
-      }
-
-      .highlight-box h4 {
-        font-size: 14px;
-        margin-bottom: 6px;
-      }
-
-      .highlight-box ul {
         font-size: 12px;
-        line-height: 1.4;
-        padding-left: 15px;
-      }
-
-      .highlight-box li {
-        margin-bottom: 4px;
-      }
-
-      .popup-buttons {
-        gap: 8px;
-        margin-top: 15px;
-      }
-
-      .popup-button {
-        padding: 12px 16px;
-        font-size: 13px;
-        border-radius: 20px;
-      }
-    }
-
-    /* Ultra small devices (320px width) */
-    @media (max-width: 320px) {
-      .popup-overlay {
-        padding: 2px;
-        padding-top: 8px;
-      }
-
-      .popup-container {
-        padding: 10px 8px;
-        max-height: calc(100vh - 16px);
-        border-radius: 8px;
-      }
-
-      .close-button {
-        width: 42px;
-        height: 42px;
-        font-size: 20px;
-        top: 4px;
-        right: 4px;
-      }
-
-      .popup-header {
-        margin-bottom: 12px;
-        margin-top: 12px;
-      }
-
-      .popup-header .emoji {
-        font-size: 30px;
-        margin-bottom: 6px;
-      }
-
-      .popup-header h2 {
-        font-size: 16px;
-        line-height: 1.1;
-      }
-
-      .popup-header h3 {
-        font-size: 13px;
-        margin: 4px 0;
-      }
-
-      .popup-body {
-        margin-bottom: 12px;
       }
 
       .popup-body p {
         font-size: 12px;
-        margin-bottom: 8px;
-        line-height: 1.2;
       }
 
       .highlight-box {
-        padding: 6px;
-        margin: 8px 0;
+        padding: 12px;
       }
 
       .highlight-box h4 {
-        font-size: 12px;
-        margin-bottom: 4px;
+        font-size: 13px;
       }
 
       .highlight-box ul {
         font-size: 11px;
-        line-height: 1.3;
-        padding-left: 12px;
-      }
-
-      .highlight-box li {
-        margin-bottom: 3px;
-      }
-
-      .popup-buttons {
-        gap: 6px;
-        margin-top: 12px;
-      }
-
-      .popup-button {
-        padding: 10px 14px;
-        font-size: 12px;
-        border-radius: 18px;
       }
     }
 
@@ -529,44 +330,43 @@
 
       <!-- Header -->
       <div class="popup-header">
-        <div class="emoji">🇩🇪</div>
-        <h2>MK Deutsch Academy</h2>
-        <h3>📢 Exciting News!</h3>
+        <h3>New Program</h3>
+        <h2>MK Driving School</h2>
       </div>
 
       <!-- Body -->
       <div class="popup-body">
         <p>
-          We're thrilled to announce the launch of our new <strong>German Language Academy</strong>!
+          We're thrilled to announce the launch of our new <strong>MK Driving School</strong>!
         </p>
         
         <div class="highlight-box">
-          <h4>🎓 What We Offer:</h4>
+          <h4>What We Offer</h4>
           <ul>
-            <li>✅ German classes from A1 to B2 levels</li>
-            <li>✅ Physical and Online learning options</li>
-            <li>✅ Professional certified instructors</li>
-            <li>✅ Flexible schedules (Weekdays & Weekends)</li>
-            <li>✅ Affordable pricing: 200K Rwf (Physical) / 100K Rwf (Online)</li>
+            <li>Professional driving training</li>
+            <li>Theory exam preparation (Provisoire)</li>
+            <li>Real past exam questions and answers</li>
+            <li>Study smarter and faster</li>
+            <li>Pass the first time</li>
           </ul>
         </div>
 
         <p>
-          <strong>Registration is now open for October 2025 intake!</strong><br>
+          <strong>Learn. Practice. Pass.</strong>
         </p>
       </div>
 
       <!-- Buttons -->
       <div class="popup-buttons">
         <button class="popup-button secondary" onclick="dismissPopup()">Maybe Later</button>
-        <a href="deutsch-academy" class="popup-button primary" onclick="continueAction()">Register Now!</a>
+        <a href="subscription?course=3" class="popup-button primary" onclick="continueAction()">Register Now!</a>
       </div>
     </div>
   </div>
 
   <script>
-    // Deutsch Academy Popup Cookie Management
-    const COOKIE_KEY = 'mk_deutsch_popup_2025';
+    // MK Driving School Popup Cookie Management
+    const COOKIE_KEY = 'mk_driving_popup_2025';
     const MAX_DISMISSALS = 2; // Show only twice
     const COOKIE_EXPIRY_HOURS = 24; // Show twice in 24 hours
     const popupOverlay = document.querySelector('.popup-overlay');
@@ -698,4 +498,5 @@
 
 </body>
 </html>
+
 

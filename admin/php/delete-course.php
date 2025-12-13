@@ -23,6 +23,12 @@ if (!$courseId) {
     exit;
 }
 
+// Validate course access (super admins can delete any course, but regular admins need access)
+if (!hasCourseAccess($courseId)) {
+    echo json_encode(['success' => false, 'message' => 'You do not have access to this course.']);
+    exit;
+}
+
 // Start transaction
 mysqli_autocommit($conn, false);
 

@@ -9,6 +9,9 @@ if ($courseId <= 0) {
     exit;
 }
 
+// Validate course access before proceeding
+validateCourseAccess($courseId);
+
 // Fetch course
 $course = null;
 $courseRes = mysqli_query($conn, "SELECT courseId, courseName, courseStartDate, courseEndDate FROM Courses WHERE courseId = $courseId LIMIT 1");

@@ -13,6 +13,12 @@ if (!$courseId) {
     exit;
 }
 
+// Validate course access
+if (!hasCourseAccess($courseId)) {
+    echo json_encode(['success' => false, 'message' => 'You do not have access to this course.', 'hasUpdates' => false]);
+    exit;
+}
+
 // Check if there are any new discussions since last update
 $checkQuery = "SELECT COUNT(*) as count FROM DiscussionBoard 
                WHERE courseId = ? AND createdDate > ?";

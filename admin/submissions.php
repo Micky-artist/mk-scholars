@@ -11,6 +11,9 @@ if ($courseId <= 0) {
     exit;
 }
 
+// Validate course access before proceeding
+validateCourseAccess($courseId);
+
 // Get course details
 $courseQuery = "SELECT * FROM Courses WHERE courseId = ?";
 $courseStmt = $conn->prepare($courseQuery);

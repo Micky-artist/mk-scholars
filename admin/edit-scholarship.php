@@ -172,7 +172,7 @@ if ((isset($_GET['edit']) && !empty(isset($_GET['edit'])) && (isset($_GET['i']) 
                             <textarea type="text" id="post" name="scholarshipYoutubeLink" class="form-control" rows="2" required><?php echo $getScholarships['scholarshipYoutubeLink'] ?></textarea>
                             <br>
                             <label class="card-title">Scholarship description</label>
-                            <textarea type="text" id="post" name="ScholarshipDescription" class="form-control" rows="10" required><?php echo $getScholarships['scholarshipDetails'] ?></textarea>
+                            <textarea type="text" id="textdescription" name="ScholarshipDescription" class="form-control" rows="30" cols="20" required><?php echo htmlspecialchars($getScholarships['scholarshipDetails'] ?? ''); ?></textarea>
 
                             </div>
                            
@@ -303,6 +303,41 @@ if ((isset($_GET['edit']) && !empty(isset($_GET['edit'])) && (isset($_GET['i']) 
         });
         var quill = new Quill("#editor", {
             theme: "snow",
+        });
+    </script>
+    
+    <!-- TinyMCE Editor -->
+    <script type="text/javascript" src="../tinymce/tinymce.min.js"></script>
+    <script type="text/javascript">
+        // Wait for DOM to be ready
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof tinymce !== 'undefined') {
+                tinymce.init({
+                    selector: '#textdescription',
+                    height: 500,
+                    menubar: true,
+                    plugins: [
+                        'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                        'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                        'insertdatetime', 'media', 'table', 'help', 'wordcount'
+                    ],
+                    toolbar: 'undo redo | blocks | ' +
+                        'bold italic underline strikethrough | forecolor backcolor | ' +
+                        'alignleft aligncenter alignright alignjustify | ' +
+                        'bullist numlist | outdent indent | ' +
+                        'removeformat | link image | table | code | fullscreen | help',
+                    content_style: 'body { font-family: Arial, sans-serif; font-size: 14px; }',
+                    branding: false,
+                    promotion: false,
+                    setup: function(editor) {
+                        editor.on('change', function() {
+                            editor.save();
+                        });
+                    }
+                });
+            } else {
+                console.error('TinyMCE library not loaded. Check the script path.');
+            }
         });
     </script>
 </body>

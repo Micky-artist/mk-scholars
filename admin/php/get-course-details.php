@@ -16,6 +16,12 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $courseId = (int)$_GET['id'];
 
+// Validate course access
+if (!hasCourseAccess($courseId)) {
+    echo json_encode(['success' => false, 'message' => 'You do not have access to this course.']);
+    exit;
+}
+
 // Fetch course details with pricing information and currency symbol
 $query = "SELECT c.*, cp.amount, cp.currency, cp.pricingDescription, curr.currencySymbol 
           FROM Courses c 

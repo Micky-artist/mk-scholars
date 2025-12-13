@@ -728,6 +728,7 @@ if (empty($ogImageUrl)) {
           </div>
 
           <!-- Pricing Options -->
+          <?php if ((int)$courseId !== 3): // Hide pricing for course ID 3 (MK Driving) ?>
           <?php if (count($currentCourse['pricingOptions']) > 1): ?>
                         <h5 class="mt-3 mb-2">
                             <i class="fas fa-tags me-2"></i>
@@ -788,6 +789,7 @@ if (empty($ogImageUrl)) {
                                 </button>
               </div>
             </div>
+          <?php endif; ?>
           <?php endif; ?>
         </div>
 
@@ -881,7 +883,13 @@ if (empty($ogImageUrl)) {
 
                     <!-- Action Buttons -->
                     <div class="d-grid gap-2">
-                        <?php if ($isLoggedIn): ?>
+                        <?php if ((int)$courseId === 3): // MK Driving - no checkout button ?>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Contact us for registration:</strong><br>
+                            <?php echo htmlspecialchars($currentCourse['contact']); ?>
+                        </div>
+                        <?php elseif ($isLoggedIn): ?>
                         <button type="submit" name="checkout" class="btn-primary-custom w-100">
                             <i class="fas fa-rocket me-2"></i>
                             Register Now!
@@ -931,6 +939,18 @@ if (empty($ogImageUrl)) {
     }
 
     function validateSelection() {
+            // For course ID 3 (MK Driving), no pricing selection needed
+            const courseId = document.getElementById('course-id') ? parseInt(document.getElementById('course-id').value) : 0;
+            if (courseId === 3) {
+                hasSelectedOption = true; // Always valid for course 3
+                validationError.classList.add('d-none');
+                if (registerBtn) {
+                    registerBtn.disabled = false;
+                    registerBtn.style.display = 'none'; // Hide register button for course 3
+                }
+                return;
+            }
+            
             hasSelectedOption = selectedSet.size > 1;
       
       if (hasSelectedOption) {
@@ -999,21 +1019,29 @@ if (empty($ogImageUrl)) {
 
         // Form submission: validate and redirect to checkout URL explicitly
     document.querySelector('form').addEventListener('submit', function(e) {
-      if (!hasSelectedOption) {
-        e.preventDefault();
+            var courseIdEl = document.getElementById('course-id');
+            var cid = courseIdEl ? parseInt(courseIdEl.value) : 0;
+            
+            // For course 3 (MK Driving), prevent form submission
+            if (cid === 3) {
+                e.preventDefault();
                 return false;
             }
+            
+            if (!hasSelectedOption) {
+                e.preventDefault();
+                return false;
+            }
+            
             // Redirect to normal checkout page
             var subCode = nameInput.value;
-            var courseIdEl = document.getElementById('course-id');
-            var cid = courseIdEl ? courseIdEl.value : '';
             if (cid && subCode) {
                 e.preventDefault();
                 // Redirect to normal checkout with course and subscription parameters
                 const url = './payment/checkout.php?course=' + encodeURIComponent(cid) + '&subscription=' + encodeURIComponent(subCode);
                 window.location.href = url;
-        return false;
-      }
+                return false;
+            }
     });
 
     // Hide validation error when user starts selecting

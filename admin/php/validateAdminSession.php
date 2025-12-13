@@ -87,4 +87,63 @@ function hasPermission($permissionName) {
 // } else {
 //     echo "No".$_SESSION['adminId'];
 // }
+
+// Function to check if admin has access to a specific course
+function hasCourseAccess($courseId) {
+    global $conn, $access;
+    
+    // Super admins (with ManageRights) have access to all courses
+    if (hasPermission('ManageRights')) {
+        return true;
+    }
+    
+    // Check if course access table exists
+    $tableCheck = $conn->query("SHOW TABLES LIKE 'AdminCourseAccess'");
+    if (!$tableCheck || $tableCheck->num_rows == 0) {
+        // If table doesn't exist, allow access (backward compatibility)
+        return true;
+    }
+    
+    // Check if admin has been granted access to this course
+    $adminId = isset($_SESSION['adminId']) ? (int)$_SESSION['adminId'] : 0;
+    if ($adminId <= 0 || $courseId <= 0) {
+        return false;
+    }
+    
+    $checkSql = "SELECT accessId FROM AdminCourseAccess WHERE adminId = ? AND courseId = ?";
+    $stmt = $conn->prepare($checkSql);
+    if (!$stmt) {
+        error_log("Error preparing course access check: " . $conn->error);
+        return false;
+    }
+    
+    $stmt->bind_param("ii", $adminId, $courseId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $hasAccess = $result->num_rows > 0;
+    $stmt->close();
+    
+    return $hasAccess;
+}
+
+// Function to validate course access and redirect if unauthorized
+function validateCourseAccess($courseId, $redirectUrl = 'course-management.php') {
+    if (!hasCourseAccess($courseId)) {
+        // Check if this is an AJAX request
+        $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 
+                  strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+        
+        if ($isAjax) {
+            // Return JSON for AJAX requests
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'You do not have access to this course.']);
+            exit;
+        } else {
+            // Redirect for regular requests
+            $_SESSION['flash'] = 'You do not have access to this course.';
+            header("Location: " . $redirectUrl);
+            exit;
+        }
+    }
+}
 ?>

@@ -3,6 +3,10 @@ session_start();
 include("./dbconnections/connection.php");
 include("./php/validateAdminSession.php");
 
+// Check if admin is super admin (has ManageRights permission)
+$isSuperAdmin = hasPermission('ManageRights');
+$currentAdminId = $_SESSION['adminId'] ?? 0;
+
 // Handle form submissions
 $message = '';
 $messageType = '';
@@ -52,6 +56,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (mysqli_query($conn, $insertQuery)) {
             $courseId = mysqli_insert_id($conn);
             
+            // Grant access to the course creator (if not super admin)
+            if (!$isSuperAdmin && $courseCreatedBy > 0) {
+                // Check if access already exists
+                $checkAccessSql = "SELECT accessId FROM AdminCourseAccess WHERE adminId = ? AND courseId = ?";
+                $checkAccessStmt = $conn->prepare($checkAccessSql);
+                $checkAccessStmt->bind_param("ii", $courseCreatedBy, $courseId);
+                $checkAccessStmt->execute();
+                $checkAccessResult = $checkAccessStmt->get_result();
+                $checkAccessStmt->close();
+                
+                if ($checkAccessResult->num_rows == 0) {
+                    // Grant access to course creator
+                    $grantAccessSql = "INSERT INTO AdminCourseAccess (adminId, courseId, grantedBy) VALUES (?, ?, ?)";
+                    $grantAccessStmt = $conn->prepare($grantAccessSql);
+                    $grantAccessStmt->bind_param("iii", $courseCreatedBy, $courseId, $courseCreatedBy);
+                    $grantAccessStmt->execute();
+                    $grantAccessStmt->close();
+                }
+            }
+            
             // Create discussion board for the course
             $discussionQuery = "INSERT INTO DiscussionBoard (courseId, userId, messageTitle, messageBody, messageDate, messageTime, isPinned, parentDiscussionId, isApproved) VALUES (?, ?, ?, ?, CURDATE(), CURTIME(), 1, NULL, 1)";
             $discussionStmt = $conn->prepare($discussionQuery);
@@ -75,26 +99,36 @@ $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $limit = 12; // Courses per page
 $offset = ($page - 1) * $limit;
 
+// Build JOIN clause for course access filtering
+$accessJoinClause = "";
+if (!$isSuperAdmin && $currentAdminId > 0) {
+    // Non-super admin: only show courses they have been granted access to
+    $accessJoinClause = " INNER JOIN AdminCourseAccess aca ON c.courseId = aca.courseId AND aca.adminId = " . (int)$currentAdminId;
+} else {
+    // Super admin: show all courses
+    $accessJoinClause = "";
+}
+
 // Get total count for pagination
-$countQuery = "SELECT COUNT(*) as total FROM Courses c";
+$countQuery = "SELECT COUNT(*) as total FROM Courses c" . $accessJoinClause;
 $countResult = mysqli_query($conn, $countQuery);
 $totalCourses = mysqli_fetch_assoc($countResult)['total'];
 $totalPages = ceil($totalCourses / $limit);
 
 // Get courses with pagination and optimized query
-      $coursesQuery = "SELECT c.courseId, c.courseName, c.courseShortDescription, c.courseStartDate, 
-                              c.courseEndDate, c.courseSeats, c.courseDisplayStatus, c.courseCreatedDate,
-                              c.coursePhoto, c.courseRegEndDate,
-                              ap.minAmount AS amount, ap.currency, curr.currencySymbol, ap.pricingCount
-                       FROM Courses c
-                       LEFT JOIN (
-                           SELECT courseId, MIN(amount) AS minAmount, MAX(currency) AS currency, COUNT(*) AS pricingCount
-                           FROM CoursePricing
-                           GROUP BY courseId
-                       ) ap ON ap.courseId = c.courseId
-                       LEFT JOIN Currencies curr ON ap.currency = curr.currencyCode
-                       ORDER BY c.courseCreatedDate DESC
-                       LIMIT $limit OFFSET $offset";
+$coursesQuery = "SELECT c.courseId, c.courseName, c.courseShortDescription, c.courseStartDate, 
+                        c.courseEndDate, c.courseSeats, c.courseDisplayStatus, c.courseCreatedDate,
+                        c.coursePhoto, c.courseRegEndDate,
+                        ap.minAmount AS amount, ap.currency, curr.currencySymbol, ap.pricingCount
+                 FROM Courses c" . $accessJoinClause . "
+                 LEFT JOIN (
+                     SELECT courseId, MIN(amount) AS minAmount, MAX(currency) AS currency, COUNT(*) AS pricingCount
+                     FROM CoursePricing
+                     GROUP BY courseId
+                 ) ap ON ap.courseId = c.courseId
+                 LEFT JOIN Currencies curr ON ap.currency = curr.currencyCode
+                 ORDER BY c.courseCreatedDate DESC
+                 LIMIT $limit OFFSET $offset";
 $coursesResult = mysqli_query($conn, $coursesQuery);
 
 // Collect courses into array to enable bulk pricing fetch

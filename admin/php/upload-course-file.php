@@ -41,6 +41,13 @@ if (!$courseId) {
     exit;
 }
 
+// Validate course access
+if (!hasCourseAccess($courseId)) {
+    ob_clean();
+    echo json_encode(['success' => false, 'message' => 'You do not have access to this course.']);
+    exit;
+}
+
 if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
     $errorMessages = [
         UPLOAD_ERR_INI_SIZE => 'File too large (server limit)',

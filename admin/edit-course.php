@@ -7,6 +7,11 @@ $courseId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $message = '';
 $messageType = '';
 
+// Validate course access before proceeding
+if ($courseId > 0) {
+    validateCourseAccess($courseId);
+}
+
 // Get currencies from database
 $currenciesQuery = "SELECT * FROM Currencies WHERE isActive = 1 ORDER BY displayOrder, currencyName";
 $currenciesResult = mysqli_query($conn, $currenciesQuery);
@@ -74,6 +79,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_image'])) {
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Re-validate course access on POST requests (defense in depth)
+    if ($courseId > 0) {
+        validateCourseAccess($courseId);
+    }
+    
     if (isset($_POST['update_course'])) {
         $courseName = mysqli_real_escape_string($conn, $_POST['courseName']);
         $courseShortDescription = mysqli_real_escape_string($conn, $_POST['courseShortDescription']);

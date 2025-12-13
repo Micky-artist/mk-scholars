@@ -4,8 +4,37 @@ include("./dbconnections/connection.php");
 include("./php/validateAdminSession.php");
 
 $courseId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+// Also check for courseId in refresh parameter (for AJAX refresh requests)
+if (!$courseId && isset($_GET['courseId'])) {
+    $courseId = (int)$_GET['courseId'];
+}
+
 $message = '';
 $messageType = '';
+
+// Validate course access before proceeding
+if ($courseId > 0) {
+    validateCourseAccess($courseId);
+}
+
+// Handle AJAX refresh request
+if (isset($_GET['refresh']) && $_GET['refresh'] == '1') {
+    header('Content-Type: application/json');
+    $courseQuery = "SELECT courseContent FROM Courses WHERE courseId = $courseId";
+    $courseResult = mysqli_query($conn, $courseQuery);
+    $course = mysqli_fetch_assoc($courseResult);
+    
+    if ($course) {
+        $courseData = json_decode($course['courseContent'], true);
+        if (!$courseData) {
+            $courseData = ['sections' => [], 'theme' => [], 'settings' => [], 'links' => []];
+        }
+        echo json_encode(['success' => true, 'courseData' => $courseData]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Course not found']);
+    }
+    exit;
+}
 
 // Get course data with optimized query
 $courseQuery = "SELECT courseId, courseName, courseContent, courseDisplayStatus, 
@@ -21,6 +50,11 @@ if (!$course) {
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Re-validate course access on POST requests (defense in depth)
+    if ($courseId > 0) {
+        validateCourseAccess($courseId);
+    }
+    
     if (isset($_POST['save_course_content'])) {
         $courseContent = $_POST['course_content'];
         
