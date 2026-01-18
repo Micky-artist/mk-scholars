@@ -818,7 +818,10 @@ if (!$dbWorking) {
 											</a>
 										</h3>
 										<div class="card-description">
-											<p><?php echo htmlspecialchars($s['scholarshipDetails'], ENT_QUOTES) ?></p>
+											<?php 
+											$details = !empty($s['scholarshipDetails']) ? 'No description available.' : htmlspecialchars($s['scholarshipDetails'], ENT_QUOTES);
+											echo '<p>' . $details . '</p>';
+											?>
 										</div>
 										<div class="card-footer">
 											<div class="date-info">
