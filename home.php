@@ -819,7 +819,7 @@ if (!$dbWorking) {
 										</h3>
 										<div class="card-description">
 											<?php 
-											$details = !empty($s['scholarshipDetails']) ? 'No description available.' : htmlspecialchars($s['scholarshipDetails'], ENT_QUOTES);
+											$details = empty($s['scholarshipDetails']) ? 'No description available.' : htmlspecialchars($s['scholarshipDetails'], ENT_QUOTES);
 											echo '<p>' . $details . '</p>';
 											?>
 										</div>
