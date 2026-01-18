@@ -13,6 +13,14 @@ Thumbs.db
 !.env.example
 .env.testing
 
+# Database dumps and backups
+dumps/
+*.sql
+*.sql.gz
+*.sql.zip
+backup/
+backups/
+
 # Laravel
 /vendor/
 node_modules/
