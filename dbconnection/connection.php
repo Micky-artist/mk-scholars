@@ -1,201 +1,100 @@
 <?php
+/**
+ * MK Scholars Database Connection
+ * 
+ * IMPORTANT: This file uses environment variables for configuration.
+ * 
+ * SETUP INSTRUCTIONS:
+ * 1. Copy .env.example to .env (create .env file if it doesn't exist)
+ * 2. Configure your environment variables in .env
+ * 3. NEVER commit .env to version control (it's in .gitignore)
+ * 
+ * ENVIRONMENTS:
+ * - Local: APP_ENV=local with your local database settings
+ * - Production: APP_ENV=production with live database settings
+ * 
+ * REQUIRED ENV VARIABLES:
+ * - DB_HOST: Database server hostname
+ * - DB_PORT: Database server port (default: 3306)
+ * - DB_NAME: Database name
+ * - DB_USER: Database username
+ * - DB_PASSWORD: Database password
+ * - APP_ENV: Environment (local/production)
+ * 
+ * TROUBLESHOOTING:
+ * - If connection fails, check .env file exists and has correct values
+ * - Use ?debug=db parameter to see connection details
+ * - Check error logs for detailed connection messages
+ * 
+ * @author MK Scholars Development Team
+ * @version 2.0 - Environment-based configuration
+ */
+
 date_default_timezone_set('Africa/Kigali');
 
-// Enhanced function to detect if we're online (production) or offline (local development)
-function isOnline() {
-    // Get server information
-    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $serverName = $_SERVER['SERVER_NAME'] ?? 'localhost';
-    $serverAddr = $_SERVER['SERVER_ADDR'] ?? '';
-    $port = $_SERVER['SERVER_PORT'] ?? '80';
-    $documentRoot = $_SERVER['DOCUMENT_ROOT'] ?? '';
-    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-    
-    // List of local development indicators
-    $localIndicators = [
-        'localhost',
-        '127.0.0.1',
-        '::1',
-        '0.0.0.0',
-        'xampp',
-        'wamp',
-        'mamp',
-        'laragon',
-        'local',
-        'dev',
-        'development',
-        'test',
-        'staging.local',
-        '.local',
-        '.dev',
-        '.test'
-    ];
-    
-    // Check host and server name for local indicators
-    foreach ($localIndicators as $indicator) {
-        if (stripos($host, $indicator) !== false || 
-            stripos($serverName, $indicator) !== false ||
-            stripos($serverAddr, $indicator) !== false) {
-            return false; // We're offline (local development)
-        }
-    }
-    
-    // Check for common local development ports
-    $localPorts = ['3306', '8080', '8000', '3000', '5000', '9000', '8888', '8889'];
-    if (in_array($port, $localPorts)) {
-        return false; // Likely local development
-    }
-    
-    // Check document root for local development paths
-    $localPaths = ['xampp', 'wamp', 'mamp', 'laragon', 'htdocs', 'www', 'public_html'];
-    foreach ($localPaths as $path) {
-        if (stripos($documentRoot, $path) !== false) {
-            return false; // Likely local development
-        }
-    }
-    
-    // Check for environment variables (if set)
-    if (getenv('APP_ENV') && in_array(strtolower(getenv('APP_ENV')), ['local', 'development', 'dev', 'test'])) {
+// Load environment variables
+function loadEnv($file) {
+    if (!file_exists($file)) {
         return false;
     }
     
-    // Check for .env file or config files that might indicate local development
-    if (file_exists(__DIR__ . '/.env') || 
-        file_exists(__DIR__ . '/../.env') ||
-        file_exists(__DIR__ . '/../config/local.php')) {
-        // Read .env file to check for local environment
-        $envFile = file_exists(__DIR__ . '/.env') ? __DIR__ . '/.env' : __DIR__ . '/../.env';
-        if (file_exists($envFile)) {
-            $envContent = file_get_contents($envFile);
-            if (stripos($envContent, 'APP_ENV=local') !== false || 
-                stripos($envContent, 'APP_ENV=development') !== false) {
-                return false;
+    $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos($line, '#') === 0) {
+            continue;
+        }
+        
+        if (strpos($line, '=') !== false) {
+            list($key, $value) = explode('=', $line, 2);
+            $key = trim($key);
+            $value = trim($value);
+            
+            // Remove quotes if present
+            if ((substr($value, 0, 1) === '"' && substr($value, -1) === '"') ||
+                (substr($value, 0, 1) === "'" && substr($value, -1) === "'")) {
+                $value = substr($value, 1, -1);
             }
+            
+            putenv("$key=$value");
+            $_ENV[$key] = $value;
         }
     }
-    
-    // Check if we're behind a common local development proxy
-    $forwardedHost = $_SERVER['HTTP_X_FORWARDED_HOST'] ?? '';
-    if (!empty($forwardedHost)) {
-        foreach ($localIndicators as $indicator) {
-            if (stripos($forwardedHost, $indicator) !== false) {
-                return false;
-            }
-        }
-    }
-    
-    // Check for common production indicators
-    $productionIndicators = [
-        '.com',
-        '.org',
-        '.net',
-        '.io',
-        'www.',
-        'https://'
-    ];
-    
-    $isProduction = false;
-    foreach ($productionIndicators as $indicator) {
-        if (stripos($host, $indicator) !== false) {
-            $isProduction = true;
-            break;
-        }
-    }
-    
-    // If we have production indicators, we're likely online
-    if ($isProduction) {
-        return true;
-    }
-    
-    // Final check: if we can't determine, default to online (production)
-    // This is safer for production environments
     return true;
 }
 
-// Database configuration based on environment
-$isOnline = isOnline();
-$connectionType = $isOnline ? 'PRODUCTION' : 'LOCAL';
+// Load .env file
+loadEnv(__DIR__ . '/../.env');
 
-// Database configurations
-$configs = [
-    'production' => [
-        'host' => 'localhost',
-        'username' => 'u722035022_mkscholars',
-        'password' => 'Mkscholars123@',
-        'database' => 'u722035022_mkscholars',
-        'port' => 3306,
-        'charset' => 'utf8mb4'
-    ],
-    'local' => [
-        'host' => 'localhost',
-        'username' => 'root',
-        'password' => '',
-        'database' => 'mkscholars',
-        'port' => 3306,
-        'charset' => 'utf8mb4'
-    ]
-];
-
-// Select configuration based on environment
-$config = $isOnline ? $configs['production'] : $configs['local'];
-
-// Create connection with enhanced error handling and fallback
+// Database configuration from environment
 $conn = null;
-$connectionAttempts = 0;
-$maxAttempts = 3;
+$connectionType = 'UNKNOWN';
 
-while ($connectionAttempts < $maxAttempts && !$conn) {
-    $connectionAttempts++;
+try {
+    $host = getenv('DB_HOST') ?: 'localhost';
+    $port = getenv('DB_PORT') ?: '3306';
+    $socket = getenv('DB_SOCKET') ?: '';
+    $database = getenv('DB_NAME') ?: 'mkscholars';
+    $username = getenv('DB_USER') ?: 'root';
+    $password = getenv('DB_PASSWORD') ?: '';
+    $charset = 'utf8mb4';
     
-    try {
-        // Attempt connection
-        $conn = mysqli_connect(
-            $config['host'], 
-            $config['username'], 
-            $config['password'], 
-            $config['database'],
-            $config['port']
-        );
-        
-        if ($conn) {
-            // Set charset for proper UTF-8 support
-            mysqli_set_charset($conn, $config['charset']);
-            
-            // Log successful connection
-            error_log("Database connected successfully ({$connectionType}) to {$config['database']} on {$config['host']}:{$config['port']}");
-            break;
-        } else {
-            $error = mysqli_connect_error();
-            error_log("Database connection attempt {$connectionAttempts} failed ({$connectionType}): {$error}");
-            
-            // If production fails, try local as fallback
-            if ($isOnline && $connectionAttempts == 1) {
-                error_log("Production connection failed, trying local fallback...");
-                $config = $configs['local'];
-                $connectionType = 'LOCAL_FALLBACK';
-            }
-        }
-    } catch (Exception $e) {
-        error_log("Database connection exception (attempt {$connectionAttempts}, {$connectionType}): " . $e->getMessage());
-        
-        // If production fails, try local as fallback
-        if ($isOnline && $connectionAttempts == 1) {
-            error_log("Production connection exception, trying local fallback...");
-            $config = $configs['local'];
-            $connectionType = 'LOCAL_FALLBACK';
-        }
+    $appEnv = getenv('APP_ENV') ?: 'local';
+    $connectionType = strtoupper($appEnv);
+    
+    // Create connection (with socket if provided)
+    if (!empty($socket)) {
+        $conn = mysqli_connect($host, $username, $password, $database, $port, $socket);
+    } else {
+        $conn = mysqli_connect($host, $username, $password, $database, $port);
     }
     
-    // Wait before retry (only if not the last attempt)
-    if ($connectionAttempts < $maxAttempts) {
-        usleep(500000); // 0.5 second delay
+    if ($conn) {
+        mysqli_set_charset($conn, $charset);
+        error_log("Database connected successfully ({$connectionType}) to {$database} on {$host}:{$port}");
     }
-}
-
-// Final connection status
-if (!$conn) {
-    error_log("All database connection attempts failed. Final status: {$connectionType}");
-    $conn = null; // Set to null instead of crashing
+} catch (Exception $e) {
+    error_log("Database connection exception ({$connectionType}): " . $e->getMessage());
+    $conn = null;
 }
 
 // Initialize variables

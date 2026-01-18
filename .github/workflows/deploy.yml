@@ -1,0 +1,65 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - '.env'
+      - '.env.example'
+      - 'README.md'
+      - '.gitignore'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Deploy Application Files (excluding .env)
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.HOSTINGER_HOST }}
+        port: ${{ secrets.HOSTINGER_PORT }}
+        username: ${{ secrets.HOSTINGER_USER }}
+        password: ${{ secrets.HOSTINGER_PASSWORD }}
+        source: "."
+        target: "/home/${{ secrets.HOSTINGER_USER }}/domains/mkscholars.com/public_html/"
+        strip_components: 0
+        overwrite: true
+        exclude: |
+          .env
+          .env.example
+          .git*
+          README.md
+          node_modules/
+          .DS_Store
+          *.log
+          
+    - name: Verify .env file exists on server
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.HOSTINGER_HOST }}
+        port: ${{ secrets.HOSTINGER_PORT }}
+        username: ${{ secrets.HOSTINGER_USER }}
+        password: ${{ secrets.HOSTINGER_PASSWORD }}
+        script: |
+          if [ ! -f "/home/${{ secrets.HOSTINGER_USER }}/domains/mkscholars.com/public_html/.env" ]; then
+            echo "⚠️ WARNING: .env file missing on production server!"
+            echo "Please create .env file with production settings."
+            exit 1
+          else
+            echo "✅ .env file exists on production server"
+          fi
+          
+    - name: Test Database Connection
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.HOSTINGER_HOST }}
+        port: ${{ secrets.HOSTINGER_PORT }}
+        username: ${{ secrets.HOSTINGER_USER }}
+        password: ${{ secrets.HOSTINGER_PASSWORD }}
+        script: |
+          cd "/home/${{ secrets.HOSTINGER_USER }}/domains/mkscholars.com/public_html"
+          php -r "include_once 'dbconnection/connection.php'; echo 'Database: ' . (\$conn ? 'CONNECTED' : 'FAILED') . PHP_EOL; echo 'Environment: ' . getenv('APP_ENV') . PHP_EOL;"

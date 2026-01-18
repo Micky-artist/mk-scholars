@@ -333,8 +333,8 @@ $userId = isset($_SESSION['userId']) ? (int)$_SESSION['userId'] : 0;
 
 // Build MoMo USSD variables (use final amount, no decimals)
 $ussdAmountInt = max(0, (int)round($finalAmount));
-$ussdCode = "*182*8*1*021112*{$ussdAmountInt}#";
-$telHref = "tel:*182*8*1*021112*{$ussdAmountInt}%23";
+$ussdCode = "*182*1*1*0798611161*{$ussdAmountInt}#";
+$telHref = "tel:*182*1*1*0798611161*{$ussdAmountInt}%23";
 
 // Build redirect URL (use hosted URL online, local URL in dev)
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
@@ -1204,7 +1204,7 @@ if ($shouldCreatePayment) {
         <!-- MTN MoMo USSD Payment Option (mobile-friendly) -->
         <div class="coupon-section" style="margin-top: 8px;">
           <h3 class="coupon-label">
-            <i class="fas fa-mobile-alt"></i> Pay with MTN MoMo
+            <i class="fas fa-mobile-alt"></i> Pay with MTN MoMo to PAUL
           </h3>
           <div class="momo-box">
             <div class="momo-header">
@@ -1223,6 +1223,8 @@ if ($shouldCreatePayment) {
         </div>
 
           <!-- Payment Button -->
+          <!-- Flutterwave payment disabled per Paul's request -->
+          <!--
           <form method="post">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>" />
             <button class="payment-btn flutterwave-btn" type="submit" name="continue_to_pay" value="1">
@@ -1231,6 +1233,7 @@ if ($shouldCreatePayment) {
               <i class="fas fa-lock"></i>
             </button>
           </form>
+          -->
 
           <!-- Security Badge -->
           <div class="security-badge">
