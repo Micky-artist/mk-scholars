@@ -819,8 +819,14 @@ if (!$dbWorking) {
 										</h3>
 										<div class="card-description">
 											<?php 
-											$details = empty($s['scholarshipDetails']) ? 'No description available.' : htmlspecialchars($s['scholarshipDetails'], ENT_QUOTES);
-											echo '<p>' . $details . '</p>';
+											if (empty($s['scholarshipDetails'])) {
+											    echo '<p>No description available.</p>';
+											} else {
+											    // Strip all HTML tags and limit length for card view
+											    $plainText = strip_tags($s['scholarshipDetails']);
+											    $truncated = (strlen($plainText) > 150) ? substr($plainText, 0, 150) . '...' : $plainText;
+											    echo '<p>' . htmlspecialchars($truncated, ENT_QUOTES) . '</p>';
+											}
 											?>
 										</div>
 										<div class="card-footer">
