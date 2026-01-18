@@ -822,10 +822,11 @@ if (!$dbWorking) {
 											if (empty($s['scholarshipDetails'])) {
 											    echo '<p>No description available.</p>';
 											} else {
-											    // Strip all HTML tags and limit length for card view
+											    // Strip all HTML tags, decode entities, and limit length for card view
 											    $plainText = strip_tags($s['scholarshipDetails']);
-											    $truncated = (strlen($plainText) > 150) ? substr($plainText, 0, 150) . '...' : $plainText;
-											    echo '<p>' . htmlspecialchars($truncated, ENT_QUOTES) . '</p>';
+											    $decodedText = html_entity_decode($plainText, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+											    $truncated = (mb_strlen($decodedText) > 150) ? mb_substr($decodedText, 0, 150) . '...' : $decodedText;
+											    echo '<p>' . htmlspecialchars($truncated, ENT_QUOTES, 'UTF-8') . '</p>';
 											}
 											?>
 										</div>
